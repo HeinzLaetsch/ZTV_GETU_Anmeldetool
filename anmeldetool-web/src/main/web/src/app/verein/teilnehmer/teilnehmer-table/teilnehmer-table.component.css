@@ -1,0 +1,114 @@
+.example-container {
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+}
+
+.example-header {
+  min-height: 64px;
+  padding: 8px 24px 0;
+}
+.mat-paginator {
+  display: flex;
+  justify-content: center;
+  min-height: 70px;
+}
+
+.mat-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+.mat-table {
+  overflow: auto;
+  max-height: 70vh;
+}
+.mat-row {
+  min-height: 30px;
+}
+mat-header-cell {
+  min-height: 120px;
+  max-height: 120px;
+  align-items: flex-end;
+}
+.w_20 {
+  min-width: 20%;
+}
+
+.w_5 {
+  min-width: 5%;
+  max-width: 5%;
+}
+
+.w_8 {
+  min-width: 8%;
+}
+button {
+  line-height: unset;
+  min-width: 12px;
+  padding: 0px;
+}
+
+.centeredHeader {
+  display: flex;
+  justify-content: left;
+  padding-left: 0px;
+  padding-bottom: 5px;
+  min-width: 40px;
+}
+
+.centered {
+  display: flex;
+  justify-content: left;
+  padding-left: 0px;
+  min-width: 40px;
+}
+.aktion {
+  max-width: 70px;
+}
+.rotate {
+  /* Something you can count on */
+  height: 160px;
+  white-space: pre-wrap;
+}
+.below {
+  display: flex;
+  position: absolute;
+  bottom: -7px;
+}
+div.rotate {
+  transform:
+    /* Magic Numbers */
+    translate(25px, 51px)
+    /* 45 is really 360 - 45 */
+    rotate(315deg);
+  /* width: 30px; */
+}
+div.rotate > span {
+  /* border-bottom: 1px solid #ccc;*/
+  padding: 5px 10px;
+}
+
+.material-icons.color_gray {
+  color: rgba(0,0,0,0.54);
+}
+.material-icons.color_green {
+  color: #00ff00;
+}
+.material-icons.color_white {
+  color: #ffffff;
+}
+
+.kategorie {
+  min-width: 120px;
+}
+.ng-valid[required], .ng-valid.required  {
+  border: 1px solid #42A948; /* green */
+  color: #42A948;
+}
+
+.ng-invalid:not(form)  {
+  border: 1px solid #a94442; /* red */
+  color: white;
+  background-image: linear-gradient(to right, #a94442 0%, white 100%)
+}

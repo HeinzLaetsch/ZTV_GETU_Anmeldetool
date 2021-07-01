@@ -1,0 +1,71 @@
+<div class="container-fluid" *ngIf="isTeilnehmerLoaded | async; else loading">
+  <h3 class="label">Teilnehmer {{ verein.name }}</h3>
+
+  <mat-tab-group mat-align-tabs="start" #tabs>
+    <mat-tab label="Turnerinnen">
+      <app-teilnehmer-table [tiTu]="ti"></app-teilnehmer-table>
+      <div>
+        <button
+          mat-fab
+          [disabled]="disAllowAdd"
+          color="primary"
+          #tooltip="matTooltip"
+          matTooltip="Neue Turnerin anlegen"
+          matTooltipPosition="below"
+          matTooltipHideDelay="500"
+          (click)="addTurnerin($event)"
+        >
+          Neu
+        </button>
+        <button
+          [disabled]="disAllowSave"
+          class="mat-fab2"
+          mat-fab
+          color="primary"
+          #tooltip="matTooltip"
+          matTooltip="Änderungen speichern"
+          matTooltipPosition="below"
+          matTooltipHideDelay="500"
+          (click)="saveTurnerinnen($event)"
+        >
+          Speichern
+        </button>
+        <button
+          [disabled]="disAllowCancel"
+          class="mat-fab3"
+          mat-fab
+          color="primary"
+          #tooltip="matTooltip"
+          matTooltip="Änderungen verwerfen"
+          matTooltipPosition="below"
+          matTooltipHideDelay="500"
+          (click)="cancel()"
+        >
+          Verwerfen
+        </button>
+      </div>
+    </mat-tab>
+    <mat-tab label="Turner">
+      <div>
+        <button
+          mat-fab
+          [disabled]="disAllowAdd"
+          color="primary"
+          #tooltip="matTooltip"
+          matTooltip="Neuen Turner anlegen"
+          matTooltipPosition="below"
+          matTooltipHideDelay="500"
+          (click)="addTurner($event)"
+        >
+          Neu
+        </button>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+
+<ng-template #loading>
+  <div class="center">
+    <mat-spinner style="margin: 0 auto"></mat-spinner>
+  </div>
+</ng-template>

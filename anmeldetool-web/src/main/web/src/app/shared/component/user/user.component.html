@@ -1,0 +1,103 @@
+<!--div class="container" [formGroup]="form"-->
+<div [formGroup]="form">
+  <!--form [formGroup]="form" (submit)="save()"-->
+  <p *ngIf="showBenutzername">
+    <mat-form-field [appearance]="appearance">
+      <mat-label>Benutzername</mat-label>
+      <input
+        matInput
+        placeholder="Benutzername"
+        formControlName="benutzernameControl"
+      />
+      <mat-error *ngIf="form.controls.benutzernameControl.hasError('required')">
+        Pflichtfeld
+      </mat-error>
+      <mat-hint>Gib eine eMail als Benutzername ein</mat-hint>
+    </mat-form-field>
+  </p>
+  <p>
+    <mat-form-field [appearance]="appearance">
+      <mat-label>Nachname</mat-label>
+      <input
+        matInput
+        placeholder="Nachname"
+        formControlName="nachnameControl"
+      />
+      <mat-error *ngIf="form.controls.nachnameControl.hasError('required')">
+        Pflichtfeld
+      </mat-error>
+      <mat-hint>Gib den Nachnamen ein</mat-hint>
+    </mat-form-field>
+  </p>
+  <p>
+    <mat-form-field [appearance]="appearance">
+      <mat-label>Vorname</mat-label>
+      <input matInput placeholder="Vorname" formControlName="vornameControl" />
+      <mat-error *ngIf="form.controls.vornameControl.hasError('required')">
+        Pflichtfeld
+      </mat-error>
+      <mat-hint>Gib den Vornamen ein</mat-hint>
+    </mat-form-field>
+  </p>
+  <p *ngIf="showPassword">
+    <mat-form-field [appearance]="appearance">
+      <mat-label>Passwort</mat-label>
+      <input
+        type="password"
+        matInput
+        placeholder="Passwort"
+        formControlName="passwortControl"
+      />
+      <mat-error *ngIf="form.controls.passwortControl.hasError('required')">
+        Pflichtfeld
+      </mat-error>
+      <mat-hint>Gib das gleiche Passwort nochmals ein</mat-hint>
+    </mat-form-field>
+  </p>
+  <p *ngIf="showPassword">
+    <mat-form-field [appearance]="appearance">
+      <mat-label>Passwort bestätigen</mat-label>
+      <input
+        type="password"
+        matInput
+        placeholder="Passwort"
+        formControlName="passwort2Control"
+      />
+      <mat-error *ngIf="form.controls.passwort2Control.hasError('required')">
+        Pflichtfeld
+      </mat-error>
+      <mat-hint>Gib das Passwort nochmals ein</mat-hint>
+    </mat-form-field>
+  </p>
+  <p>
+    <mat-form-field [appearance]="appearance">
+      <mat-label>Mobiltelefon</mat-label>
+      <input
+        matInput
+        placeholder="Mobil Nummer"
+        formControlName="mobilNummerControl"
+      />
+      <mat-error *ngIf="form.controls.mobilNummerControl.hasError('required')">
+        Pflichtfeld
+      </mat-error>
+      <mat-hint>Gib die Mobilnummer ein</mat-hint>
+    </mat-form-field>
+  </p>
+  <p>
+    <mat-form-field [appearance]="appearance">
+      <mat-label>Kontakt eMail Adresse</mat-label>
+      <input
+        matInput
+        placeholder="eMail Adresse"
+        formControlName="eMailAdresseControl"
+      />
+      <mat-error *ngIf="form.controls.eMailAdresseControl.hasError('required')">
+        Pflichtfeld
+      </mat-error>
+      <mat-hint>Gib die eMail Adresse ein</mat-hint>
+    </mat-form-field>
+  </p>
+  <!--button mat-button (click)="cancel()">Abbrechen</button>
+  <button mat-button type="submit" [disabled]="!form.valid">Speichern</button>
+  </form-->
+</div>

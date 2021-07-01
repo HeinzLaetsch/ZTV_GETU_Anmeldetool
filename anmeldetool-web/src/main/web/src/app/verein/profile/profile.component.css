@@ -1,0 +1,37 @@
+mat-form-field {
+  min-width: 400px;
+  max-width: 400px;
+  width: 400px
+}
+.label {
+  color: rgba(0, 0, 0, 0.54);
+  margin: 0 0 0px;
+}
+em {
+    float: right;
+    color: #E05C65;
+    padding-left: 10px;
+}
+.error input {
+    background-color: #E3C3C5;
+}
+.error ::-webkit-input-placeholder {
+    color: #999;
+}
+.error ::-moz-placeholder {
+    color: #999;
+}
+.error :-moz-placeholder{
+    color: #999;
+}
+.error :-ms-input-placeholder {
+    color: #999;
+    position: relative;
+    bottom: 45px;
+  }
+.mat-fab {
+  right: 20px;
+  bottom: 10px;
+  left: auto;
+  position: absolute;
+}

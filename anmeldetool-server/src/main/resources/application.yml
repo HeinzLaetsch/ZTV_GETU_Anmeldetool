@@ -1,0 +1,40 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+spring:
+  profiles:
+    active: "local"
+
+# this info may be accessed via actuator
+info:
+  app:
+    name: Anmeldetool
+    version: "@version@"
+    buildtime: "@timestamp@"
+
+logging:
+  level:
+    org.springframework.cloud: INFO
+    org.springframework.security: DEBUG
+    org.flywaydb: INFO
+    org.springframework.web.cors: DEBUG
+
+management:
+  endpoints:
+    web:
+      cors:
+        path-mappings: /**
+        allowed-origins: ${CORS_ALLOWED_ORIGINS}
+        allowed-methods: GET, POST, PUT
+        allowed-headers: "*"
+  server:
+    servlet:
+      context-path: /admin
+  endpoint:
+    beans:
+      enabled: true
+    health:
+      enabled: true
+    info:
+      enabled: true

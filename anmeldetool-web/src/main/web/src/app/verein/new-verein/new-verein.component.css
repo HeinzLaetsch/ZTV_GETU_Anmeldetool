@@ -1,0 +1,9 @@
+.mat-form-field {
+  width: 100%;
+}
+.label {
+  color: rgba(0,0,0,.54);
+}
+button {
+  margin-right: 10px;
+}

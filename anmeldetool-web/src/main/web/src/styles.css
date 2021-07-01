@@ -1,0 +1,44 @@
+/* You can add global styles to this file, and also import other style files */
+.well
+  {
+    background-color: #488dd6;
+    color: #FFFF;
+    cursor: pointer;
+  }
+
+  .hoverwell:hover {
+    background-color: #FFFF;
+    color: #488dd6;
+    cursor: pointer;
+  }
+  
+  .container {
+    padding-top: 5px;
+  }
+  
+  .pointable {
+    cursor: pointer;
+  }
+  
+  button {
+    color: #555;
+  }
+  
+  [hidden] {
+    display: none !important;
+  }
+  
+  .toast-success {
+    background-color: #51a351;
+  }
+  .toast-error {
+    background-color: #bd362f;
+  }
+  .toast-info {
+    background-color: #2f96b4;
+  }
+  .toast-warning {
+    background-color: #f89406;
+  }
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

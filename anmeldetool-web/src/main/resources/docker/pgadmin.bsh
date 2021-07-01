@@ -1,0 +1,6 @@
+docker pull dpage/pgadmin4
+docker run -p 81:80 \
+    --net keycloak-network \
+    -e 'PGADMIN_DEFAULT_EMAIL=ztv@ztv.ch' \
+    -e 'PGADMIN_DEFAULT_PASSWORD=password' \
+    -d dpage/pgadmin4

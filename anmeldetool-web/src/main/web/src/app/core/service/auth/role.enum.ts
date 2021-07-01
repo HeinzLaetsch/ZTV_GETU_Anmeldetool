@@ -1,0 +1,5 @@
+export enum RoleEnum {
+  VEREINSANMELDER,
+  RIEGENLEITER,
+  WERTUNGSRICHTER
+}

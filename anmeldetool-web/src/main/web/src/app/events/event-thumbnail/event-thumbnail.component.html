@@ -1,0 +1,7 @@
+<div [routerLink]="['/events/', event.id]" class="well hoverwell thumbnail">
+    <h4>{{event.name}}</h4>
+    <div [class.green]="event.start_datum === '14.05.2020'">Date: {{event.start_datum}}</div>
+    <div [ngClass]="getStartTimeClass()">Date: {{event.start_datum}}</div>
+    <div *ngIf="event.start_datum!=event.end_datum">Date: {{event.end_datum}}</div>
+    <button class="btn-btn-primary" (click)="handleClickMe()">Click Me</button>
+</div>

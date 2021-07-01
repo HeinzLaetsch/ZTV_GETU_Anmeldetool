@@ -1,0 +1,45 @@
+mat-form-field {
+  min-width: 400px;
+  max-width: 400px;
+  width: 400px;
+}
+.label {
+  color: rgba(0, 0, 0, 0.54);
+  margin: 0 0 0px;
+}
+em {
+  float: right;
+  color: #e05c65;
+  padding-left: 10px;
+}
+.error input {
+  background-color: #e3c3c5;
+}
+.error ::-webkit-input-placeholder {
+  color: #999;
+}
+.error ::-moz-placeholder {
+  color: #999;
+}
+.error :-moz-placeholder {
+  color: #999;
+}
+.error :-ms-input-placeholder {
+  color: #999;
+  position: relative;
+  bottom: 45px;
+}
+.mat-fab {
+  right: 10px;
+  bottom: 10px;
+  left: auto;
+  position: absolute;
+}
+.mat-fab2 {
+  right: 80px;
+  font-size: 12px;
+}
+.mat-fab3 {
+  right: 150px;
+  font-size: 12px;
+}

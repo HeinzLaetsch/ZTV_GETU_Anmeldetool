@@ -1,0 +1,24 @@
+<div class="container-fluid">
+  <h1 class="label">Vereinsadministration {{ verein.name }}</h1>
+  <mat-tab-group mat-align-tabs="start" #tabs>
+    <mat-tab
+      *ngFor="let user2 of vereinsUsers"
+      label="{{ user2.benutzername }}"
+    >
+      <app-user-form [currentUser]="user2"></app-user-form>
+    </mat-tab>
+  </mat-tab-group>
+  <div>
+    <button
+      mat-fab
+      color="primary"
+      #tooltip="matTooltip"
+      matTooltip="Neuen Benutzer anlegen"
+      matTooltipPosition="below"
+      matTooltipHideDelay="500"
+      (click)="addUser($event)"
+    >
+      Neu
+    </button>
+  </div>
+</div>

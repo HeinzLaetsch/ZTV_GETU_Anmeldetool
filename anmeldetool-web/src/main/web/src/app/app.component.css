@@ -1,0 +1,90 @@
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -moz-transform: translateX(-50%) translateY(-50%);
+  -webkit-transform: translateX(-50%) translateY(-50%);
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.overlay {
+  /* Height & width depends on how you want to reveal the overlay (see JS below) */
+  height: 100%;
+  width: 100%;
+  position: fixed; /* Stay in place */
+  z-index: 2; /* Sit on top */
+  left: 0;
+  top: 0;
+  background-color: rgba(139, 139, 139, 0.5); /* Black w/opacity */
+  overflow-x: hidden; /* Disable horizontal scroll */
+  transition: 0.5s; /* 0.5 second transition effect to slide in or slide down the overlay (height or width, depending on reveal) */
+}
+.overlay-content-login {
+  width:300px;
+  height:400px;
+  position: fixed;
+  top: 50vh;
+  left: 50vw;
+  margin-top: -200px;
+  margin-left: -150px;
+
+  background-color: rgba(250, 250, 250);
+  z-index: 1; /* Sit on top */
+}
+.overlay-content-newverein {
+  width:500px;
+  height:860px;
+  position: fixed;
+  top: 50vh;
+  left: 50vw;
+  margin-top: -430px;
+  margin-left: -250px;
+
+  background-color: rgba(50, 250, 250);
+  z-index: 1; /* Sit on top */
+}
+
+.overlay-content-newanmelder {
+  width:500px;
+  height:740px;
+  position: fixed;
+  top: 50vh;
+  left: 50vw;
+  margin-top: -370px;
+  margin-left: -250px;
+
+  background-color: rgba(250, 50, 250);
+  z-index: 1; /* Sit on top */
+}
+
+.example-container {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .example-is-mobile .example-toolbar {
+    position: fixed;
+    /* Make sure the toolbar will stay on top of the content as it scrolls past. */
+    z-index: 2;
+  }
+
+  h1.example-app-name {
+    margin-left: 8px;
+  }
+
+  .example-sidenav-container {
+    /* When the sidenav is not fixed, stretch the sidenav container to fill the available space. This
+       causes `<mat-sidenav-content>` to act as our scrolling element for desktop layouts. */
+    flex: 1;
+  }
+
+  .example-is-mobile .example-sidenav-container {
+    /* When the sidenav is fixed, don't constrain the height of the sidenav container. This allows the
+       `<body>` to be our scrolling element for mobile layouts. */
+    flex: 1 0 auto;
+  }

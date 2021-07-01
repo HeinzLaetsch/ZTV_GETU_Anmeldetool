@@ -1,0 +1,69 @@
+<ng-container>
+  <h1 class="label">Rollen</h1>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col">
+        <h2>verfügbare Rollen</h2>
+      </div>
+      <div class="col">
+        <h2>zugewiesene Rollen</h2>
+      </div>
+    </div>
+    <div  class ="row">
+        <div
+          cdkDropList
+          #allRolesList="cdkDropList"
+          [cdkDropListData]="allRoles"
+          [cdkDropListConnectedTo]="[assignedRolesList]"
+          class="drag-drop-list col"
+          (cdkDropListDropped)="drop($event)"
+        >
+          <div class="drag-drop-box" *ngFor="let role of allRoles" cdkDrag [cdkDragDisabled]="disableRole(role)">
+            <div
+              #tooltip="matTooltip"
+              matTooltip="Ziehe (Drag & Drop) die Rolle rüber"
+              matTooltipPosition="above"
+              matTooltipHideDelay="1000"
+            >
+              {{ role.name }}
+            </div>
+          </div>
+        </div>
+        <div
+        cdkDropList
+        #assignedRolesList="cdkDropList"
+        [cdkDropListData]="assignedRoles"
+        [cdkDropListConnectedTo]="[allRolesList]"
+        class="drag-drop-list col"
+        (cdkDropListDropped)="drop($event)"
+      >
+        <div
+          [ngStyle]="{ 'color': role.aktiv ? 'green' : 'red' }"
+          class="drag-drop-box"
+          *ngFor="let role of assignedRoles"
+          cdkDrag [cdkDragDisabled]="disableRole(role)"
+        >
+          <div class="block">
+            <div
+              #tooltip="matTooltip"
+              matTooltip="Ziehe (Drag & Drop) die Rolle rüber"
+              matTooltipPosition="above"
+              matTooltipHideDelay="1000"
+            >
+              <span [ngClass]="{'label-green' : role.aktiv , 'label-red' : !role.aktiv}">{{ role.name }}</span>
+              <br />
+              <mat-checkbox
+                [ngClass]="{'label-green' : role.aktiv , 'label-red' : !role.aktiv}"
+                [(ngModel)]="role.aktiv"
+                [disabled]="!isVereinsVerantwortlicher"
+                (click)="aktivChange(role)"
+                >Rolle ist aktiviert</mat-checkbox
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,12 @@
+sudo docker network create keycloak-network
+
+sudo docker run -d --name postgres --net keycloak-network -e POSTGRES_DB=keycloak -e POSTGRES_USER=keycloak -e POSTGRES_PASSWORD=password postgres
+
+sudo docker run -d --name keycloak -p 8080:8080 --net keycloak-network -e DB_USER=keycloak -e DB_PASSWORD=password -e DB_ADDR=postgres jboss/keycloak§:wq
+
+docker pull dpage/pgadmin4
+docker run -p 80:81 \
+    --net keycloak-network \
+    -e 'PGADMIN_DEFAULT_EMAIL=ztv@ztv.ch' \
+    -e 'PGADMIN_DEFAULT_PASSWORD=password' \
+    -d dpage/pgadmin4

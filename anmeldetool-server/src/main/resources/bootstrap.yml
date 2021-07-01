@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: disk-cockpit
+  cloud:
+    config:
+    # label: ${ESTA_CLOUDCONFIG_LABEL:develop}
+    # uri: ${ESTA_CLOUDCONFIG_CONFIG_SERVER_URL:http://localhost:8888/}
+  profiles:
+    active: ${ESTA_CLOUDPROFILES_ACTIVE:local}

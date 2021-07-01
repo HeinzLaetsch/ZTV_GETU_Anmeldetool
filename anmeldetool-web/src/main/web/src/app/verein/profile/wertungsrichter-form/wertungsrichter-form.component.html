@@ -1,0 +1,56 @@
+<ng-container>
+  <div class = "container" [formGroup]="form">
+      <h1 class="label">Wertungsrichter</h1>
+    <p>
+      <mat-label>Brevet</mat-label>
+      <mat-radio-group
+        aria-label="Wähle das Brevet"
+        class="radio-group"
+        formControlName="brevetControl">
+        <mat-radio-button class="radio-button" [value]="1"
+          >Brevet 1</mat-radio-button
+        >
+        <mat-radio-button class="radio-button" [value]="2"
+          >Brevet 2</mat-radio-button
+        >
+      </mat-radio-group>
+    </p>
+    <p>
+      <mat-form-field class="full-width" appearance="fill">
+        <mat-label>letzter FK</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="letzterFkControl"/>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </p>
+    <div class="radio-group">
+      <mat-label [ngClass]="{
+        'label-green': wertungsrichter.gueltig,
+        'label-red': !wertungsrichter.gueltig
+      }">Brevet gültig</mat-label>
+      <mat-checkbox
+        [ngClass]="{
+          'label-green': wertungsrichter.gueltig,
+          'label-red': !wertungsrichter.gueltig
+        }"
+        formControlName="gueltigControl"
+        [disabled]="true"
+        >Brevet ist gültig</mat-checkbox
+      >
+    </div>
+    <div class="radio-group">
+      <mat-label [ngClass]="{
+        'label-green': wertungsrichter.gueltig,
+        'label-red': !wertungsrichter.gueltig
+      }">Bestätigt</mat-label>
+      <mat-checkbox
+        [ngClass]="{
+          'label-green': wertungsrichter.aktiv,
+          'label-red': !wertungsrichter.aktiv
+        }"
+        formControlName="bestaetigtControl"
+        [disabled]="true"
+        >Wertungsrichter hat bestätigt</mat-checkbox
+      >
+    </div>
+  </div>
+</ng-container>
