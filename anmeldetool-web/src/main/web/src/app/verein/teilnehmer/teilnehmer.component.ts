@@ -105,6 +105,7 @@ export class TeilnehmerComponent implements OnInit {
     this.needsCancel = false;
     this.needsSave = false;
     this.teilnehmerTable.saveTeilnehmer();
+    this.teilnehmerService.dirty = false;
   }
 
   addTurner(event: any) {

@@ -9,5 +9,6 @@ public enum KategorieEnum {
 	K6,
 	KD,
 	KH,
-	K7
+	K7,
+	KEIN_START
 }

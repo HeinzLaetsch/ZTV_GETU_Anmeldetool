@@ -1,4 +1,4 @@
-import { IAnlassLink } from "./IAnlassLink";
+import { IAnlassLinks } from "./IAnlassLinks";
 
 export interface ITeilnehmer {
   id: string;
@@ -6,5 +6,5 @@ export interface ITeilnehmer {
   vorname: string;
   jahrgang: number;
   dirty: boolean;
-  teilnahmen?: IAnlassLink[]
+  teilnahmen?: IAnlassLinks
 }

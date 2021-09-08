@@ -5,6 +5,9 @@ import { MatSort } from "@angular/material/sort";
 import { BehaviorSubject, Observable, of, Subject } from "rxjs";
 import { catchError, finalize, tap } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
+import { IAnlass } from "../model/IAnlass";
+import { IAnlassLink } from "../model/IAnlassLink";
+import { IAnlassLinks } from "../model/IAnlassLinks";
 import { ITeilnehmer } from "../model/ITeilnehmer";
 import { CachingTeilnehmerService } from "../service/caching-services/caching.teilnehmer.service";
 
@@ -29,6 +32,10 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     this.loadingSubject.complete();
   }
 
+  getTeilnehmer(row: number): ITeilnehmer {
+    return this.teilnehmerService.getTeilnehmer()[row];
+  }
+
   loadTeilnehmer(filter = ''): ITeilnehmer[] {
     this.teilnehmerService.loadTeilnehmer(this.verein).subscribe( result =>  {
       ;
@@ -37,36 +44,6 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     return this.teilnehmerService.getTeilnehmer();
   }
 
-  /*
-  loadTeilnehmer(filter = ''): Observable<ITeilnehmer[]> {
-    this.loadingSubject.next(true);
-    let direction = 'asc';
-    if (this.sort) {
-      direction = this.sort.direction;
-    }
-    let pageIndex = 0;
-    let pageSize = 15;
-    if (this.paginator) {
-      pageIndex = this.paginator.pageIndex;
-      pageSize = this.paginator.pageSize;
-      // this.paginator.length = 100;
-    }
-    console.log('DataSource: ', this.sort,' , this.paginator: ', this.paginator, ', ' ,pageIndex, ', ', pageSize)
-    this.teilnehmerService.getTeilnehmer()
-      .pipe(
-        catchError(() => of([])),
-        finalize(() => this.loadingSubject.next(false))
-      )
-      .subscribe((teilnehmer) => {
-        if (this.paginator) {
-          this.paginator.length = this.teilnehmerService.anzahlTeilnehmer;
-          console.log('DataSource: ', this.sort,' , this.paginator: ', this.paginator, ', ' ,pageIndex, ', ', pageSize)
-        }
-        this.teilnehmerSubject.next(teilnehmer)
-      });
-      return this.teilnehmerSubject.asObservable();
-  }
-  */
   // pageEvent: PageEvent,
   update(row: number, col: number, value: any) {
     // const effRow = pageEvent.previousPageIndex * this.paginator.pageSize + row;
@@ -88,7 +65,40 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
         break;
       }
     }
+    this.teilnehmerService.getTeilnehmer()[row].dirty = true;
   }
+    updateTeilnahme(row: number, col: number, value: any, anlass: IAnlass) {
+      // const effRow = pageEvent.previousPageIndex * this.paginator.pageSize + row;
+      if (!this.teilnehmerService.getTeilnehmer()) {
+        console.log('Empty');
+      }
+      console.log('Update Teilnahmen row: ' , row, ', old: ', this.teilnehmerService.getTeilnehmer()[row],', new: ', value);
+      const teilnehmer = this.teilnehmerService.getTeilnehmer()[row];
+      if (!teilnehmer.teilnahmen) {
+        const teilnahmen: IAnlassLinks = {
+          dirty: true,
+          anlassLinks: new Array<IAnlassLink>()
+        };
+        teilnehmer.teilnahmen = teilnahmen;
+      }
+      const links = teilnehmer.teilnahmen; // [col] = value;
+      const filtered = links.anlassLinks.filter( link => {
+        return link.anlassId === anlass.id
+      } );
+      links.dirty = true;
+      if (filtered.length > 0) {
+        filtered[0].kategorie = value;
+        filtered[0].dirty = true;
+      } else {
+        const newLink: IAnlassLink = {
+          anlassId: anlass.id,
+          teilnehmerId: teilnehmer.id,
+          kategorie: value,
+          dirty: true
+        }
+        links.anlassLinks.push(newLink);
+      }
+    }
 
 
   /*getTotal() {

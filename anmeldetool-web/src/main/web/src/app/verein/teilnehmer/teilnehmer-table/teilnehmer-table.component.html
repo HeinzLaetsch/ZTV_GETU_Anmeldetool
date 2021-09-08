@@ -1,3 +1,5 @@
+<div *ngIf="isTeilnahmenLoaded | async; else loading">
+
 <div class="example-header">
   <mat-form-field>
     <input
@@ -27,7 +29,7 @@
           matTooltip="Gib den Nachnamen ein"
           matTooltipPosition="below"
           matTooltipHideDelay="100"
-          (change)="change($event, row, rowIndex, 0)"
+          (change)="changeTeilnehmer($event, row, rowIndex, 0)"
         />
       </mat-cell>
     </ng-container>
@@ -48,7 +50,7 @@
           matTooltip="Gib den Vornamen ein"
           matTooltipPosition="below"
           matTooltipHideDelay="100"
-          (change)="change($event, row, rowIndex, 1)"
+          (change)="changeTeilnehmer($event, row, rowIndex, 1)"
         />
       </mat-cell>
     </ng-container>
@@ -69,7 +71,7 @@
           matTooltip="Gib den Jahrgang ein"
           matTooltipPosition="below"
           matTooltipHideDelay="100"
-          (change)="change($event, row, rowIndex, 2)"/>
+          (change)="changeTeilnehmer($event, row, rowIndex, 2)"/>
       </mat-cell>
       <!--
         [ngStyle]="{'color':'teilnehmerControls[rowIndex][2].errors' ? 'red'}"/>
@@ -101,12 +103,12 @@
           matTooltip="Wähle die Kategorie aus"
           matTooltipPosition="below"
           matTooltipHideDelay="100"
-          (selectionChange)="change($event, false ,row, rowIndex, colIndex)">
+          (selectionChange)="change($event, false ,row, rowIndex, colIndex, anlass)">
           <mat-option *ngFor="let option of getKategorien(anlass)" [value]="option">
             {{ option }}
           </mat-option>
         </mat-select>
-        />
+
         <!--mat-autocomplete #auto="matAutocomplete">
           <mat-option *ngFor="let option of getKategorien(anlass)" [value]="option" (optionSelected)="change($event, row, rowIndex, colIndex)">
             {{ option }}
@@ -128,8 +130,8 @@
             >
           </button>
         </mat-header-cell>
-        <mat-cell *matCellDef="let row" class="centered">
-          <button mat-raised-button (click)="copy($event, row, colIndex)" [disabled]="!checked[colIndex]">
+        <mat-cell *matCellDef="let row; let rowIndex = index" class="centered">
+          <button mat-raised-button (click)="copy($event, row, rowIndex, colIndex, anlass)" [disabled]="!checked[colIndex]">
             <mat-icon
               class="material-icons color_gray"
               aria-hidden="false"
@@ -177,4 +179,10 @@
     [length]="anzahlTeilnehmer"
   ></mat-paginator>
 </div>
+</div>
 
+<ng-template #loading>
+  <div class="center">
+    <mat-spinner style="margin: 0 auto"></mat-spinner>
+  </div>
+</ng-template>

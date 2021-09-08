@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.ztv.anmeldetool.anmeldetool.models.Anlass;
+import org.ztv.anmeldetool.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.anmeldetool.models.OrganisationAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.models.OrganisationPersonLink;
@@ -28,6 +29,7 @@ import org.ztv.anmeldetool.anmeldetool.repositories.TeilnehmerAnlassLinkReposito
 import org.ztv.anmeldetool.anmeldetool.repositories.TeilnehmerRepository;
 import org.ztv.anmeldetool.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.RolleDTO;
+import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerDTO;
 import org.ztv.anmeldetool.anmeldetool.util.PersonHelper;
 import org.ztv.anmeldetool.anmeldetool.util.TeilnehmerHelper;
@@ -142,7 +144,7 @@ public class TeilnehmerService {
 		return ResponseEntity.ok(teilnehmerDTO);
 	}
 	
-	public ResponseEntity updateAnlassTeilnahmen(UUID anlassId, UUID teilnehmerId, boolean nimmtTeil) {
+	public ResponseEntity updateAnlassTeilnahmen(UUID anlassId, UUID teilnehmerId, TeilnehmerAnlassLinkDTO tal) {
 
 		Anlass anlass = anlassSrv.findAnlassById(anlassId);
 
@@ -155,14 +157,18 @@ public class TeilnehmerService {
 		TeilnehmerAnlassLink teilnehmerAnlassLink;
 		if (teilnahmen.iterator().hasNext()) {
 			teilnehmerAnlassLink = teilnahmen.iterator().next(); 
-			teilnehmerAnlassLink.setAktiv(nimmtTeil);
-			teilnehmerAnlassLink.setAnlass(anlass);
-			teilnehmerAnlassLink.setTeilnehmer(teilnehmerOptional.get());
 		} else {
 			teilnehmerAnlassLink = new TeilnehmerAnlassLink();
-			teilnehmerAnlassLink.setAktiv(nimmtTeil);
-			teilnehmerAnlassLink.setAnlass(anlass);
-			teilnehmerAnlassLink.setTeilnehmer(teilnehmerOptional.get());
+		}
+		
+		teilnehmerAnlassLink.setAnlass(anlass);
+		teilnehmerAnlassLink.setOrganisation(teilnehmerOptional.get().getOrganisation());
+		teilnehmerAnlassLink.setTeilnehmer(teilnehmerOptional.get());
+		teilnehmerAnlassLink.setAktiv(true);
+		if (KategorieEnum.KEIN_START.toString().equals(tal.getKategorie())) {
+			teilnehmerAnlassLink.setAktiv(false);
+		} else {
+			teilnehmerAnlassLink.setKategorie(KategorieEnum.valueOf(tal.getKategorie()));
 		}
 		teilnehmerAnlassLinkRepository.save(teilnehmerAnlassLink);			
 		

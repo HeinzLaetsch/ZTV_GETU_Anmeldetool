@@ -55,6 +55,7 @@ import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationenDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.RolleDTO;
+import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.VerbandDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterDTO;
@@ -118,8 +119,17 @@ public class AdminController {
 		return anlassSrv.getVereinsStarts(anlassId);
 	}
 	@PatchMapping("/anlaesse/{anlassId}/organisationen/{orgId}")
-	public @ResponseBody ResponseEntity patch(HttpServletRequest request, @PathVariable UUID anlassId, @PathVariable UUID orgId, @RequestBody OrganisationAnlassLinkDTO oal) {
+	public @ResponseBody ResponseEntity patchAnlassVereine(HttpServletRequest request, @PathVariable UUID anlassId, @PathVariable UUID orgId, @RequestBody OrganisationAnlassLinkDTO oal) {
 		return anlassSrv.updateTeilnehmendeVereine(anlassId, orgId, oal);   
+	}
+	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}/teilnehmer/")
+	public ResponseEntity<Collection<TeilnehmerAnlassLinkDTO>> getTeilnehmer(HttpServletRequest request, @PathVariable UUID anlassId, @PathVariable UUID orgId) {
+		return anlassSrv.getTeilnahmen(anlassId, orgId);
+	}
+	//             /anlaesse/a977a103-5512-4e97-9773-24d465d62ba1/teilnehmer/
+	@PatchMapping("/anlaesse/{anlassId}/organisationen/{orgId}/teilnehmer/{teilnehmerId}")
+	public @ResponseBody ResponseEntity patchAnlassTeilnehmer(HttpServletRequest request, @PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable UUID teilnehmerId, @RequestBody TeilnehmerAnlassLinkDTO tal) {
+		return teilnehmerSrv.updateAnlassTeilnahmen(anlassId, teilnehmerId, tal);   
 	}
 	
 	// http://localhost:8080/admin/organisationen

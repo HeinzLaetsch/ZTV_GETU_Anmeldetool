@@ -5,4 +5,17 @@
 **/node
 **/node_modules
 **/dist
+**/tmp
+**/out-tsc
+**/DevProfile
+# IDEs and editors
+**/.idea
+.project
+.classpath
+*.iml
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
 

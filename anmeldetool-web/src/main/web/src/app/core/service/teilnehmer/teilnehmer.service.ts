@@ -5,6 +5,7 @@ import { Observable, of } from 'rxjs';
 import { IAnlassLink } from '../../model/IAnlassLink';
 import { ITeilnehmer } from '../../model/ITeilnehmer';
 import { IVerein } from 'src/app/verein/verein';
+import { IAnlass } from '../../model/IAnlass';
 
 @Injectable({
   providedIn: 'root'
@@ -15,24 +16,12 @@ export class TeilnehmerService {
   private url: string = 'http://localhost:8080/admin/organisationen/';
   private _anzahlTeilnehmer = 0;
   teilnehmer: ITeilnehmer[] = [];
-  teilnahmen: IAnlassLink[] = [  {id: '1', anlassId: '1', kategorie: 'k1'}, {id: '2', anlassId: '2', kategorie: ''}, {id: '3', anlassId: '3', kategorie: ''}, {id: '4', anlassId: '4', kategorie: ''}];
+  // teilnahmen: IAnlassLink[] = [  {id: '1', anlassId: '1', kategorie: 'k1'}, {id: '2', anlassId: '2', kategorie: ''}, {id: '3', anlassId: '3', kategorie: ''}, {id: '4', anlassId: '4', kategorie: ''}];
 
   constructor(private http: HttpClient) {
-    this.loadTeilnehmer();
+    // this.loadTeilnehmer();
   }
 
-  private loadTeilnehmer() {
-    this.teilnehmer = this.teilnehmer.slice(0,0);
-    for (let i = 1; i <= 100; i++) {
-      this.teilnehmer.push(createTeilnehmer(i, this.teilnahmen));
-    }
-  }
-  /*
-  getTeilnehmer(filter = '',  sortDirection = 'asc', pageIndex = 0, pageSize = 3): Observable<ITeilnehmer[]> {
-    const start = pageIndex * pageSize;
-    return of(this.teilnehmer.slice(start,start + pageSize));
-  }
-*/
 getTeilnehmer(verein: IVerein, filter = '',  sortDirection = 'asc', pageIndex = 0, pageSize = 3): Observable<ITeilnehmer[]> {
     console.log('getTeilnehmer called');
     this.updateCount(verein, filter);
@@ -42,7 +31,7 @@ getTeilnehmer(verein: IVerein, filter = '',  sortDirection = 'asc', pageIndex = 
   }
 
   reset() {
-    this.loadTeilnehmer();
+    // this.loadTeilnehmer();
   }
   get anzahlTeilnehmer() {
     return this._anzahlTeilnehmer;

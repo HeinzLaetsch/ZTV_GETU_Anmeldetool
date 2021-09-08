@@ -2,7 +2,9 @@ package org.ztv.anmeldetool.anmeldetool.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +19,15 @@ import org.ztv.anmeldetool.anmeldetool.models.Verband;
 import org.ztv.anmeldetool.anmeldetool.repositories.AnlassRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.OrganisationAnlassLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.OrganisationsRepository;
+import org.ztv.anmeldetool.anmeldetool.repositories.TeilnehmerAnlassLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.transfer.AnlassDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationenDTO;
+import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.util.AnlassHelper;
 import org.ztv.anmeldetool.anmeldetool.util.OrganisationAnlassLinkHelper;
 import org.ztv.anmeldetool.anmeldetool.util.OrganisationHelper;
+import org.ztv.anmeldetool.anmeldetool.util.TeilnehmerAnlassLinkHelper;
 
 import lombok.extern.slf4j.Slf4j;
 /**
@@ -42,6 +47,9 @@ public class AnlassService {
 	@Autowired
 	OrganisationAnlassLinkRepository orgAnlassRepo;
 	
+	@Autowired
+	TeilnehmerAnlassLinkRepository teilnehmerAnlassLinkRepository;
+	
 	public ResponseEntity<Collection<AnlassDTO>> getAllAnlaesse() {
 		Collection<AnlassDTO> anlaessDto = new ArrayList<AnlassDTO>();
 		Iterable<Anlass> anlaesse = anlassRepo.findByAktivOrderByAnlassBezeichnung(true);
@@ -52,6 +60,13 @@ public class AnlassService {
 			anlaessDto.add(anlassDTO);
 		}
 		return ResponseEntity.ok(anlaessDto);
+	}
+
+	public ResponseEntity<Collection<TeilnehmerAnlassLinkDTO>> getTeilnahmen(UUID anlassId, UUID OrgId) {
+		Anlass anlass = this.findAnlassById(anlassId);
+		Organisation organisation = organisationSrv.findOrganisationById(OrgId);
+		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndOrganisation(anlass, organisation);	
+		return ResponseEntity.ok(TeilnehmerAnlassLinkHelper.getTeilnehmerAnlassLinkDTOForTeilnehmerAnlassLink(teilnahmen));
 	}
 	
 	public ResponseEntity<Boolean> getVereinStarts(UUID anlassId,  UUID orgId) {

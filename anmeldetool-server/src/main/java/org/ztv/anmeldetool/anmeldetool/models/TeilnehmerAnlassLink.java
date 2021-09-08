@@ -30,4 +30,9 @@ public class TeilnehmerAnlassLink extends Base {
     @JoinColumn(name="ANLASS_ID", nullable=false, insertable=true, updatable=true)
     @ToString.Exclude
 	private Anlass anlass;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="ORGANISATION_ID", nullable=false, insertable=true, updatable=true)
+    @ToString.Exclude
+	private Organisation organisation;
 }

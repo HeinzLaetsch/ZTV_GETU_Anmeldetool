@@ -8,23 +8,33 @@ import {
   EventEmitter,
   Input,
 } from "@angular/core";
-import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from "@angular/forms";
 import { MatPaginator, PageEvent } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
-import { Subscription } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { TeilnehmerDataSource } from "src/app/core/datasource/TeilnehmerDataSource";
 import { IAnlass } from "src/app/core/model/IAnlass";
+import { IAnlassLink } from "src/app/core/model/IAnlassLink";
 import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
+import { AnlassService } from "src/app/core/service/anlass/anlass.service";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
 import { CachingTeilnehmerService } from "src/app/core/service/caching-services/caching.teilnehmer.service";
 import { CachingVereinService } from "src/app/core/service/caching-services/caching.verein.service";
 import { IVerein } from "../../verein";
-import { IChangeEvent } from "../change-event";
 import { IStart } from "../starts";
 
+interface TeilnahmeControl {
+  formControl: FormControl;
+  anlassLink?: IAnlassLink;
+}
 /**
  * @title Data table with sorting, pagination, and filtering.
  */
@@ -40,6 +50,7 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
   populating = true;
   checked: Array<boolean>;
 
+  // teilnahmenControls = new Array<Array<TeilnahmeControl>>();
   teilnahmenControls = new Array<Array<FormControl>>();
   teilnehmerControls = new Array<Array<FormControl>>();
   check1 = new FormControl();
@@ -56,14 +67,6 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
     "K7",
     "KD",
   ];
-  /*
-  anlaesse: IAnlass[] = [
-    { id: "1", name: "Frühlings wettkampf Ti 14.7.21" },
-    { id: "2", name: "Geräteturnerinnen tag 14.7.21" },
-    { id: "3", name: "Gerätewettkampf Ti 14.7.21" },
-    { id: "4", name: "Kant. Geräteturn meisterschaften 14.7.21" },
-  ];
-*/
 
   allDisplayedColumns: string[];
   displayedColumns = ["name", "vorname", "jahrgang"];
@@ -82,7 +85,10 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
     private anlassService: CachingAnlassService
   ) {
     // Assign the data to the data source for the table to render
-    this.dataSource = new TeilnehmerDataSource(this.teilnehmerService, this.authService.currentVerein);
+    this.dataSource = new TeilnehmerDataSource(
+      this.teilnehmerService,
+      this.authService.currentVerein
+    );
     this._startsChanges = new Array<IStart>();
 
     let localSubscription1: Subscription = undefined;
@@ -107,12 +113,23 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
     this.paginator.firstPage();
   }
 
+  get isTeilnahmenLoaded(): Observable<boolean> {
+    // console.log('TeilnehmerComponent::isTeilnehmerLoaded')
+    return this.anlassService.isTeilnahmenLoaded();
+  }
+
   getKategorien(anlass: IAnlass): String[] {
     const tiefste = anlass.tiefsteKategorie;
     const hoechste = anlass.hoechsteKategorie;
-    let kd = Object.keys(KategorieEnum).findIndex( key => key === KategorieEnum.KD);
-    const start = Object.keys(KategorieEnum).findIndex( key => key === anlass.tiefsteKategorie);
-    let end = Object.keys(KategorieEnum).findIndex( key => key === anlass.hoechsteKategorie);
+    let kd = Object.keys(KategorieEnum).findIndex(
+      (key) => key === KategorieEnum.KD
+    );
+    const start = Object.keys(KategorieEnum).findIndex(
+      (key) => key === anlass.tiefsteKategorie
+    );
+    let end = Object.keys(KategorieEnum).findIndex(
+      (key) => key === anlass.hoechsteKategorie
+    );
     let filtered = Object.values(KategorieEnum).slice(0, 1);
     if (end > kd) {
       filtered = filtered.concat(Object.values(KategorieEnum).slice(start, kd));
@@ -121,9 +138,11 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
       } else {
         filtered.push(KategorieEnum.KH);
       }
-        filtered.push(KategorieEnum.K7);
+      filtered.push(KategorieEnum.K7);
     } else {
-      filtered = filtered.concat(Object.values(KategorieEnum).slice(start, end+1));
+      filtered = filtered.concat(
+        Object.values(KategorieEnum).slice(start, end + 1)
+      );
     }
     return filtered;
   }
@@ -133,13 +152,13 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
 
   public addNewTeilnehmer() {
     console.log("addNewTeilnehmer");
-    this.dataSource.add(this.authService.currentVerein).subscribe( teilnehmer => {
-      console.log('Teilnehmer added: ' , teilnehmer);
-      this.paginator.lastPage();
-      this.loadTeilnehmerPage();
-  });
-    // this.paginator.length++; // = this.dataSource.getTotal();
-    // console.log("added NewTeilnehmer: ", this.paginator.length, ', from Service: ', this.dataSource.getTotal());
+    this.dataSource
+      .add(this.authService.currentVerein)
+      .subscribe((teilnehmer) => {
+        console.log("Teilnehmer added: ", teilnehmer);
+        this.paginator.lastPage();
+        this.loadTeilnehmerPage();
+      });
   }
   public saveTeilnehmer() {
     console.log("saveTeilnehmer");
@@ -154,35 +173,46 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
           console.log("updateVereinsStart");
         });
     });
-    this.dataSource.saveAll(this.authService.currentVerein).subscribe(results => {
-      console.log('result of SaveAll: ', results);
-    });
+    this.dataSource
+      .saveAll(this.authService.currentVerein)
+      .subscribe((results) => {
+        console.log("result of SaveAll: ", results);
+      });
   }
 
   getControl(row: number, col: number): FormControl {
-    let control = undefined;
+    let control: FormControl = undefined;
     if (col !== 2) {
-      control = new FormControl(row + ":", [Validators.minLength(2), Validators.required, Validators.pattern('[a-zA-Z ]*')]);
+      control = new FormControl(row + ":", [
+        Validators.minLength(2),
+        Validators.required,
+        Validators.pattern(
+          "[a-zA-Z -_.\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]*"
+        ),
+      ]);
     } else {
-      control = new FormControl(row + ":", [Validators.minLength(4), Validators.required, Validators.pattern('[1,2][0-9]*')]);
+      control = new FormControl(row + ":", [
+        Validators.minLength(4),
+        Validators.required,
+        Validators.pattern("[1,2][0-9]*"),
+      ]);
     }
-    control.valueChanges.subscribe((value) => {
-      if (!this.populating) {
-        console.log("Emit Event: ", control);
-        /*
-        const event: IChangeEvent = {
-          colIndex: col,
-          rowIndex: row,
-          dirty: control.dirty,
-          error: !! control.errors
-        }
-        this.status.emit(event);
-        */
-       //   change(event: any, row: any, rowIndex: any, colIndex: any)
-       this.change(undefined, value, row, col);
-      }
-    });
     return control;
+  }
+  private teilnahmenloader(anlass: IAnlass, isLast: boolean): void {
+    this.anlassService
+      .loadTeilnahmen(anlass, this.authService.currentVerein, isLast)
+      .subscribe((result) => {
+        console.log(
+          "Teilnahme loaded: ",
+          anlass.anlassBezeichnung,
+          "Result: ",
+          result
+        );
+        if (result) {
+          this.fillTeilnahmenControls(anlass);
+        }
+      });
   }
   ngOnInit(): void {
     let localSubscription2: Subscription = undefined;
@@ -193,20 +223,33 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
           return;
         }
         this.anlaesse = this.anlassService.getAnlaesse();
-        console.log("TeilnehmerTableComponent:: ngOnInit: ", this.anlaesse);
+        // console.log("TeilnehmerTableComponent:: ngOnInit: ", this.anlaesse);
         if (localSubscription2) {
           localSubscription2.unsubscribe();
         }
         let colIndex = 0;
+        let currentAnlass = 0;
         this.checked = new Array();
+
         this.anlaesse.forEach((anlass) => {
+          // console.log("Prepare Anlass: ", anlass);
           this.anlassService
             .getVereinStart(anlass, this.authService.currentVerein)
             .subscribe((result) => {
-              // console.log("getVereinStart Result is: ", result);
+              console.log("getVereinStart Result is: ", result);
               this.checked.push(result);
-              this.checkForIndex(colIndex++, result);
+              // this.checkForIndex(colIndex++, result);
+              this.teilnahmenControls.forEach((line) => {
+                const cntr = new FormControl({
+                  value: this.options[3],
+                  disabled: true,
+                });
+                line.push(cntr);
+              });
+              const isLast = currentAnlass++ === this.anlaesse.length - 1;
+              this.teilnahmenloader(anlass, isLast);
             });
+
         });
         this.allDisplayedColumns = this.displayedColumns.map((col) => col);
         this.anlaesse.forEach((anlass) => {
@@ -215,13 +258,7 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
         });
         this.allDisplayedColumns.pop();
         this.allDisplayedColumns.push("aktion");
-        //     });
-        //    this.anlassService.isAnlaesseLoaded().subscribe((result) => {
-        //      console.log('Anlässe loadded: ', result);
-        //      if (!result) {
-        //        return;
-        //      }
-        // this.myForm = this.formBuilder.group();
+
         let anzahlControls = this.pageSize;
         for (let i = 0; i <= anzahlControls; i++) {
           const teilnehmerLineControls = new Array<FormControl>();
@@ -232,33 +269,54 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
 
           const lineControls = new Array<FormControl>();
           this.teilnahmenControls.push(lineControls);
-          let pos = 0;
-          this.anlaesse.forEach((anlass) => {
-            if (!this.checked[pos]) {
-              const cntr = new FormControl({
-                value: this.options[0],
-                disabled: this.checked[pos],
-              })
-            lineControls.push(cntr);
-            } else {
-              const cntr = new FormControl({
-                value: i + ":" + anlass.anlassBezeichnung.slice(0, 5),
-                disabled: this.checked[pos],
-              })
-            lineControls.push(cntr);
-            }
-            pos++;
-          });
         }
         this.loadTeilnehmerPage();
       });
   }
 
-  /*
-  get anzahlTeilnehmer(): number {
-    return this.dataSource.getTotal();
+  fillTeilnahmenControls(anlassOrg: IAnlass) {
+    let teilnehmerPos = 0;
+    this.teilnahmenControls.forEach((line) => {
+      let pos = 0;
+      console.log("Line: ", line);
+      this.anlaesse.forEach((anlass) => {
+        // Lokale Variable (für was ??) die für jeden Anlass/Teilnehmer die Kategorie speichert
+        // Mit Resolver sperren ???
+        // console.log("Before: " , anlass.anlassBezeichnung , ", Line :", teilnehmerPos, "/", pos, " Pos: ", line[pos].value);
+        if (anlassOrg === anlass) {
+          const teilnehmerKategorie = new Array<string>();
+            const link = this.getTeilnahme(teilnehmerPos, anlass);
+            console.log("Old Line :", teilnehmerPos, "/", pos, " Pos: ", line[pos].value);
+            line[pos].setValue(link?.kategorie);
+            if (this.checked[pos]) {
+              line[pos].enable();
+            }
+            console.log("New Line :", teilnehmerPos, "/", pos, " Pos: ", line[pos].value);
+        }
+        pos++;
+      });
+      teilnehmerPos++;
+    });
   }
-  */
+
+  getTeilnahme(teilnehmerRecord: number, anlass: IAnlass): IAnlassLink {
+    const teilnehmer = this.anlassService.getTeilnehmer(anlass);
+    if (teilnehmer) {
+      const tr = this.dataSource.getTeilnehmer(teilnehmerRecord);
+      if (tr) {
+        const link = teilnehmer.anlassLinks.find((value) => {
+          console.log("Teilnahme: ", value.teilnehmerId, "Current: ", tr.id);
+          return value.teilnehmerId === tr.id;
+        });
+        return link;
+        // return element.teilnehmerId === tr.id
+      }
+      return undefined;
+    }
+    console.log("Teilnehmer yet not Loaded: ", anlass.anlassBezeichnung);
+    return undefined;
+  }
+
   private checkForIndex(colIndex: number, check: boolean) {
     // console.log("Clicked: ", colIndex, ", ", check);
     this.checked[colIndex] = check;
@@ -269,7 +327,6 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
         this.teilnahmenControls[i][colIndex].enable();
       } else {
         this.teilnahmenControls[i][colIndex].disable();
-        this.teilnahmenControls[i][colIndex].setValue(this.options[0]);
       }
     }
   }
@@ -290,15 +347,15 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
       this._startsChanges.push(newStart);
       start = newStart;
     }
-    this.anlassService.updateVereinsStart(
-      start.anlass,
-      this.authService.currentVerein,
-      start.start
-    )
-    .subscribe((response) => {
-      console.log("VereinsStart updated");
-    });
-
+    this.anlassService
+      .updateVereinsStart(
+        start.anlass,
+        this.authService.currentVerein,
+        start.start
+      )
+      .subscribe((response) => {
+        console.log("VereinsStart updated");
+      });
   }
   /**
    * Set the paginator and sort after the view init since this component will
@@ -341,18 +398,9 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
   }
   loadTeilnehmerPage() {
     console.log("Load Teilnehmer Page");
-    this.dataSource.loading$.subscribe( result =>  {
+    this.dataSource.loading$.subscribe((result) => {
       this.populateTeilnehmer(this.dataSource.loadTeilnehmer());
     });
-    /*
-    this.dataSource
-      .loadTeilnehmer(this.authService.currentVerein, "")
-      .subscribe((allTeilnehmer) => {
-        console.log("All Teilnehmer: ", allTeilnehmer);
-        this.populateTeilnehmer(allTeilnehmer);
-        // this.paginator.length = this.dataSource.getTotal();
-      });
-      */
   }
   populateTeilnehmer(allTeilnehmer: ITeilnehmer[]) {
     let i = 0;
@@ -362,15 +410,6 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
       this.teilnehmerControls[i][0].setValue(teilnehmer.name);
       this.teilnehmerControls[i][1].setValue(teilnehmer.vorname);
       this.teilnehmerControls[i][2].setValue(teilnehmer.jahrgang);
-      /*
-      const event: IChangeEvent = {
-        colIndex: 0,
-        rowIndex: i,
-        dirty: false,
-        error: false,
-      }
-      this.status.emit(event);
-      */
       i++;
     });
     this.populating = false;
@@ -380,25 +419,56 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
     filterValue = filterValue.toLowerCase(); // Datasource defaults to lowercase matches
     this.dataSource.filter = filterValue;
   }
-  copy(event: any, row: any, colIndex: any) {
+  copy(event: any, row: any, rowIndex: number, colIndex: any, anlass: IAnlass) {
     console.log(
       "Copy clicked: ",
       event,
       " row: ",
       row,
+      " ,rowIndex: ",
+      rowIndex,
       " ,colIndex: ",
       colIndex
     );
+    this.teilnahmenControls[rowIndex][colIndex + 1].setValue(this.teilnahmenControls[rowIndex][colIndex].value)
+    this.updateTeilnahmen(rowIndex, colIndex+1);
   }
   copyAll(event: any, colIndex: any) {
+    let rowIndex = 0;
+    this.teilnahmenControls.forEach( anlassCntrLine => {
+      anlassCntrLine[colIndex + 1].setValue(anlassCntrLine[colIndex].value);
+      this.updateTeilnahmen(rowIndex, colIndex+1);
+      rowIndex++;
+    })
     console.log("Copy All clicked: ", event, " ,colIndex: ", colIndex);
   }
   vchange(rowIndex: number, colIndex: number, value: any) {
     console.log("Value Change fired: ", value);
   }
-  // row, rowIndex, 2
-  change(event: any, teilnehmer: boolean, row: any, rowIndex: any, colIndex: any) {
-    if (teilnehmer) {
+
+
+  private updateTeilnahmen(rowIndex: any, colIndex: any) {
+    const anlass = this.anlaesse[colIndex];
+    this.dataSource.valid = this.teilnahmenControls[rowIndex][colIndex].valid;
+    this.dataSource.updateTeilnahme(
+      rowIndex,
+      colIndex,
+      this.teilnahmenControls[rowIndex][colIndex].value,
+      anlass
+    );
+    this.dataSource.dirty = true;
+  }
+
+  private updateTeilnehmer(rowIndex: any, colIndex: any) {
+    this.dataSource.valid = this.teilnehmerControls[rowIndex][colIndex].valid;
+    this.dataSource.update(
+      rowIndex,
+      colIndex,
+      this.teilnehmerControls[rowIndex][colIndex].value
+    );
+    this.dataSource.dirty = true;
+  }
+  changeTeilnehmer(event: any, row: any, rowIndex: any, colIndex: any) {
     console.log(
       "change fired: ",
       // event,
@@ -413,14 +483,32 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
       " Valid: ",
       this.teilnehmerControls[rowIndex][colIndex].valid
     );
-    // pageEvent: PageEvent, row: number, col: number, value: any
+    this.updateTeilnehmer(rowIndex, colIndex);
+    /*
     this.dataSource.valid = this.teilnehmerControls[rowIndex][colIndex].valid;
-    this.dataSource.update(rowIndex, colIndex, this.teilnehmerControls[rowIndex][colIndex].value);
-    } else {
-    this.dataSource.valid = this.teilnahmenControls[rowIndex][colIndex].valid;
-    this.dataSource.update(rowIndex, colIndex, this.teilnahmenControls[rowIndex][colIndex].value);
-    }
+    this.dataSource.update(
+      rowIndex,
+      colIndex,
+      this.teilnehmerControls[rowIndex][colIndex].value
+    );
     this.dataSource.dirty = true;
+    */
+  }
+
+  change(
+    event: any,
+    teilnehmer: boolean,
+    row: any,
+    rowIndex: any,
+    colIndex: any,
+    anlass: IAnlass
+  ) {
+    this.updateTeilnahmen(rowIndex, colIndex);
+    /*
+    this.dataSource.valid = this.teilnahmenControls[rowIndex][colIndex].valid;
+    this.dataSource.updateTeilnahme(rowIndex, colIndex, event.value, anlass);
+    this.dataSource.dirty = true;
+    */
   }
   delete(event: any, row: any, rowIndex: any) {
     console.log("click fired: ", event, " row: ", row, " rowIndex: ", rowIndex);

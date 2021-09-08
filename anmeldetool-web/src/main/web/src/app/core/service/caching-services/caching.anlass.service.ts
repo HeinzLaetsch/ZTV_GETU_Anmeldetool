@@ -2,13 +2,19 @@ import { Injectable } from '@angular/core';
 import { Subject, Observable, of, BehaviorSubject, Subscription } from 'rxjs';
 import { IVerein } from 'src/app/verein/verein';
 import { IAnlass } from '../../model/IAnlass';
+import { IAnlassLinks } from '../../model/IAnlassLinks';
 import { AnlassService } from '../anlass/anlass.service';
+
+export interface IHash {
+  [anlassId: string] : IAnlassLinks;
+}
 
 @Injectable({
   providedIn: 'root'
 })
-
 export class CachingAnlassService {
+  // private teilnahmenLoaded: BehaviorSubject<boolean>;
+  private teilnahmenLoaded: BehaviorSubject<boolean>;
 
   private anlaesseLoaded: BehaviorSubject<boolean>;
 
@@ -18,8 +24,12 @@ export class CachingAnlassService {
 
   private anlaesse: IAnlass[];
 
+  private teilnamen: IHash = {};
+
   constructor(private anlassService: AnlassService) {
     this.anlaesseLoaded = new BehaviorSubject<boolean>(undefined);
+    this.teilnahmenLoaded = new BehaviorSubject<boolean>(false);
+
   }
   reset(): Observable<boolean> {
     this.loaded = false;
@@ -27,6 +37,12 @@ export class CachingAnlassService {
   }
   getVereinStart(anlass: IAnlass, verein: IVerein): Observable<boolean> {
     return this.anlassService.getVereinStart(anlass, verein);
+  }
+  getTeilnehmer(anlass: IAnlass) {
+    if (this.teilnamen) {
+      return this.teilnamen[anlass.id];
+    }
+    return undefined;
   }
   updateVereinsStart(anlass: IAnlass, verein: IVerein, started: boolean): Observable<boolean> {
     return this.anlassService.updateVereinsStart(anlass, verein, started);
@@ -65,5 +81,23 @@ export class CachingAnlassService {
       return this.anlaesse.find( verein => verein.id = id);
     }
     return undefined;
+  }
+  loadTeilnahmen(anlass: IAnlass, verein: IVerein, isLast: boolean): Observable<boolean> {
+    this.anlassService.getTeilnehmer(anlass, verein).subscribe( anlassLinkArray => {
+      const anlassLinks: IAnlassLinks = {
+        dirty: false,
+        anlassLinks: anlassLinkArray
+      }
+      this.teilnamen[anlass.id] = anlassLinks;
+      // Fuer jeden Anlass ein Observable
+      console.log("Teilnahme loaded: ", anlass.anlassBezeichnung, ' Verein: ', verein.name, ' isLast: ', isLast);
+      if (isLast) {
+        this.teilnahmenLoaded.next(true);
+      }
+    });
+    return this.teilnahmenLoaded.asObservable();
+  }
+  isTeilnahmenLoaded(): Observable<boolean> {
+    return this.teilnahmenLoaded.asObservable();
   }
 }

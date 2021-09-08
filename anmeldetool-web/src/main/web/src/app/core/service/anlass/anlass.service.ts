@@ -5,6 +5,8 @@ import { IUser } from '../../model/IUser';
 import { Observable, of } from 'rxjs';
 import { IAnlass } from '../../model/IAnlass';
 import { IVerein } from 'src/app/verein/verein';
+import { IAnlassLink } from '../../model/IAnlassLink';
+import { IAnlassLinks } from '../../model/IAnlassLinks';
 
 @Injectable({
   providedIn: 'root'
@@ -46,6 +48,21 @@ export class AnlassService {
     console.log('updateVereinsStart called: ' , combinedUrl , ' , data: ' , started);
     return this.http.patch<boolean>(combinedUrl, {anlassId: anlass.id, organisationsId: verein.id, started: started})
       .pipe(catchError(this.handleError<boolean>('updateVereinsStart', )));
+  }
+
+  saveTeilnahme(verein: IVerein, anlassLink: IAnlassLink): Observable<boolean>{
+    console.log('Service save Teilnahme: ', anlassLink);
+    const combinedUrl = this.url + '/' + anlassLink.anlassId + '/'+'organisationen'+'/'+ verein.id + '/teilnehmer/' + anlassLink.teilnehmerId;
+    return this.http.patch<boolean>(combinedUrl, anlassLink)
+      .pipe(catchError(this.handleError<boolean>('saveTeilnahme')));
+  }
+
+  // /anlaesse/{anlassId}/organisationen/{orgId}/teilnehmer/
+  getTeilnehmer(anlass: IAnlass, verein: IVerein): Observable<IAnlassLink[]> {
+    const combinedUrl = this.url+'/'+anlass.id+'/'+'organisationen' + '/' + verein.id + '/teilnehmer/';
+    console.log('getTeilnehmer called: ', combinedUrl);
+    return this.http.get<IAnlassLink[]>(combinedUrl)
+      .pipe(catchError(this.handleError<IAnlassLink[]>('getTeilnehmer', [])));
   }
 
   private handleError<T>(operation = 'operation', result?: T) {

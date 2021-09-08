@@ -5,6 +5,7 @@ import { Observable, BehaviorSubject, Subject, forkJoin, of } from "rxjs";
 import { reduce, tap } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
 import { ITeilnehmer } from "../../model/ITeilnehmer";
+import { AnlassService } from "../anlass/anlass.service";
 import { TeilnehmerService } from "../teilnehmer/teilnehmer.service";
 
 @Injectable({
@@ -24,7 +25,7 @@ export class CachingTeilnehmerService {
   private teilnehmer: ITeilnehmer[];
   // private orgUsers: IUser[];
 
-  constructor(private teilnehmerService: TeilnehmerService) {
+  constructor(private teilnehmerService: TeilnehmerService, private anlassService: AnlassService) {
     this.teilnehmerLoaded = new BehaviorSubject<boolean>(undefined);
   }
   reset(verein: IVerein): Observable<boolean> {
@@ -130,12 +131,23 @@ export class CachingTeilnehmerService {
     // return newTeilnehmerObs;
   }
 
-  saveAll(verein: IVerein): Observable<ITeilnehmer []> {
-    const observables = new Array<Observable<ITeilnehmer>>();
+  saveAll(verein: IVerein): Observable<any []> {
+    const observables = new Array<Observable<any>>();
     this.teilnehmer.forEach( teilnehmer => {
-      teilnehmer.dirty = false;
-      this.dirty = false;
-      observables.push(this.teilnehmerService.save(verein, teilnehmer));
+      if (teilnehmer.dirty) {
+        teilnehmer.dirty = false;
+        this.dirty = false;
+        observables.push(this.teilnehmerService.save(verein, teilnehmer));
+      }
+      if (teilnehmer.teilnahmen && teilnehmer.teilnahmen.anlassLinks && teilnehmer.teilnahmen.dirty) {
+        teilnehmer.teilnahmen.anlassLinks.forEach (value => {
+          if (value.dirty) {
+            observables.push(this.anlassService.saveTeilnahme(verein, value));
+            value.dirty = false;
+          }
+        });
+        teilnehmer.teilnahmen.dirty = false;
+      }
     });
     return forkJoin(observables);
   }
