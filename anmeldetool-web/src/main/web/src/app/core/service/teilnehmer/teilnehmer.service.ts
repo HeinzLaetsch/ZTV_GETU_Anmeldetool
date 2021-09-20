@@ -6,6 +6,7 @@ import { IAnlassLink } from '../../model/IAnlassLink';
 import { ITeilnehmer } from '../../model/ITeilnehmer';
 import { IVerein } from 'src/app/verein/verein';
 import { IAnlass } from '../../model/IAnlass';
+import { TiTuEnum } from '../../model/TiTuEnum';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,7 @@ export class TeilnehmerService {
     // this.loadTeilnehmer();
   }
 
-getTeilnehmer(verein: IVerein, filter = '',  sortDirection = 'asc', pageIndex = 0, pageSize = 3): Observable<ITeilnehmer[]> {
+  getTeilnehmer(verein: IVerein, filter = '', sortDirection = 'asc', pageIndex = 0, pageSize = 3): Observable<ITeilnehmer[]> {
     console.log('getTeilnehmer called');
     this.updateCount(verein, filter);
     const combinedUrl = this.url + verein.id + '/teilnehmer?page=' + pageIndex + '&size=' + pageSize;
@@ -40,7 +41,7 @@ getTeilnehmer(verein: IVerein, filter = '',  sortDirection = 'asc', pageIndex = 
     const combinedUrl = this.url + verein.id + '/teilnehmer/count';
     this.http.get<number>(combinedUrl)
       .pipe(catchError(this.handleError<number>('count')))
-      .subscribe( anzahl => this._anzahlTeilnehmer = anzahl);
+      .subscribe(anzahl => this._anzahlTeilnehmer = anzahl);
   }
 
   add(verein: IVerein): Observable<ITeilnehmer> {
@@ -61,33 +62,34 @@ getTeilnehmer(verein: IVerein, filter = '',  sortDirection = 'asc', pageIndex = 
   }
 
   private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any) :Observable<T> => {
+    return (error: any): Observable<T> => {
       console.error(error);
-      return of (result as T);
+      return of(result as T);
     }
   }
 }
-  /** Constants used to fill up our data base. */
+/** Constants used to fill up our data base. */
 const SURNAMES = ['Maia', 'Asher', 'Olivia', 'Atticus', 'Amelia', 'Jack',
-'Charlotte', 'Theodore', 'Isla', 'Oliver', 'Isabella', 'Jasper',
-'Cora', 'Levi', 'Violet', 'Arthur', 'Mia', 'Thomas', 'Elizabeth'];
+  'Charlotte', 'Theodore', 'Isla', 'Oliver', 'Isabella', 'Jasper',
+  'Cora', 'Levi', 'Violet', 'Arthur', 'Mia', 'Thomas', 'Elizabeth'];
 
 const NAMES = ['Balmer', 'Bärtschi', 'Meier', 'Müller', 'Keller', 'Brandenberger',
   'Schmidhauser', 'Kneubühler', 'Hochmuth', 'Berset', 'Trump', 'Einstein',
   'Hase', 'Schneemann', 'Cologna', 'Federer', 'Bretscher', 'Züllig', 'Marti'];
 
-  /** Builds and returns a new User. */
+/** Builds and returns a new User. */
 function createTeilnehmer(id: number, teilnahmen): ITeilnehmer {
   const name =
-      NAMES[Math.round(Math.random() * (NAMES.length - 1))] + ' ' + id;
+    NAMES[Math.round(Math.random() * (NAMES.length - 1))] + ' ' + id;
   const vorname =
-      SURNAMES[Math.round(Math.random() * (SURNAMES.length - 1))] + ' ' + id;
+    SURNAMES[Math.round(Math.random() * (SURNAMES.length - 1))] + ' ' + id;
 
   return {
     id: id.toString(),
     name: name,
     vorname: vorname,
     jahrgang: 2000 + Math.round(Math.random() * 15),
+    tiTu: TiTuEnum.Ti,
     teilnahmen: teilnahmen,
     dirty: false
   };

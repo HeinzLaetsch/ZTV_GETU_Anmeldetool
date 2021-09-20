@@ -1,10 +1,12 @@
 import { FocusKeyManager } from "@angular/cdk/a11y";
 import { Injectable } from "@angular/core";
+import { MatPaginator } from "@angular/material/paginator";
 import { EventEmitter } from "events";
 import { Observable, BehaviorSubject, Subject, forkJoin, of } from "rxjs";
 import { reduce, tap } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
 import { ITeilnehmer } from "../../model/ITeilnehmer";
+import { TiTuEnum } from "../../model/TiTuEnum";
 import { AnlassService } from "../anlass/anlass.service";
 import { TeilnehmerService } from "../teilnehmer/teilnehmer.service";
 
@@ -12,7 +14,7 @@ import { TeilnehmerService } from "../teilnehmer/teilnehmer.service";
   providedIn: "root",
 })
 export class CachingTeilnehmerService {
-  private teilnehmerLoaded: BehaviorSubject<boolean>;
+  private teilnehmerLoaded: BehaviorSubject<number>;
 
   private _loadRunning = false;
 
@@ -26,20 +28,20 @@ export class CachingTeilnehmerService {
   // private orgUsers: IUser[];
 
   constructor(private teilnehmerService: TeilnehmerService, private anlassService: AnlassService) {
-    this.teilnehmerLoaded = new BehaviorSubject<boolean>(undefined);
+    this.teilnehmerLoaded = new BehaviorSubject<number>(undefined);
   }
-  reset(verein: IVerein): Observable<boolean> {
+  reset(verein: IVerein): Observable<number> {
     this.loaded = false;
     this.dirty = false;
     this.valid = true
     return this.loadTeilnehmer(verein);
   }
 
-  isTeilnehmerLoaded(): Observable<boolean> {
+  isTeilnehmerLoaded(): Observable<number> {
     return this.teilnehmerLoaded.asObservable();
   }
 
-  loadTeilnehmer(verein: IVerein): Observable<boolean> {
+  loadTeilnehmer(verein: IVerein): Observable<number> {
     console.log('Teilnehmer Caching loadTeilnehmer');
     if (!this._loadRunning && !this.loaded) {
       this._loadRunning = true;
@@ -52,51 +54,65 @@ export class CachingTeilnehmerService {
         this.loaded = true;
         this.dirty = false;
         this.valid = true;
-        this.teilnehmerLoaded.next(true);
+        this.teilnehmerLoaded.next(teilnehmer.length);
         console.log("Teilnehmer Loaded");
       });
     } else {
       if (this.loaded) {
-        this.teilnehmerLoaded.next(true);
+        this.teilnehmerLoaded.next(this.teilnehmer.length);
       }
     }
     return this.teilnehmerLoaded.asObservable();
   }
-/*
-  private copyTeilnehmer(teilnehmer: ITeilnehmer[]): ITeilnehmer[] {
-    return teilnehmer.map((teilnehmer) => {
-      console.log("Orginal 1: ", teilnehmer);
-      const userCopy: ITeilnehmer = Object.assign(teilnehmer);
-      userCopy.benutzername = userCopy.benutzername + "_copy";
-      console.log("Clone: ", userCopy);
-      console.log("Orginal 2: ", user);
-      return userCopy;
-    });
-  }
-  */
+  /*
+    private copyTeilnehmer(teilnehmer: ITeilnehmer[]): ITeilnehmer[] {
+      return teilnehmer.map((teilnehmer) => {
+        console.log("Orginal 1: ", teilnehmer);
+        const userCopy: ITeilnehmer = Object.assign(teilnehmer);
+        userCopy.benutzername = userCopy.benutzername + "_copy";
+        console.log("Clone: ", userCopy);
+        console.log("Orginal 2: ", user);
+        return userCopy;
+      });
+    }
+    */
   //public static
   private deepCopy<T>(source: T): T {
     return Array.isArray(source)
       ? source.map((item) => this.deepCopy(item))
       : source instanceof Date
-      ? new Date(source.getTime())
-      : source && typeof source === "object"
-      ? Object.getOwnPropertyNames(source).reduce((o, prop) => {
-          Object.defineProperty(
-            o,
-            prop,
-            Object.getOwnPropertyDescriptor(source, prop)
-          );
-          o[prop] = this.deepCopy(source[prop]);
-          return o;
-        }, Object.create(Object.getPrototypeOf(source)))
-      : (source as T);
+        ? new Date(source.getTime())
+        : source && typeof source === "object"
+          ? Object.getOwnPropertyNames(source).reduce((o, prop) => {
+            Object.defineProperty(
+              o,
+              prop,
+              Object.getOwnPropertyDescriptor(source, prop)
+            );
+            o[prop] = this.deepCopy(source[prop]);
+            return o;
+          }, Object.create(Object.getPrototypeOf(source)))
+          : (source as T);
+  }
+  getTiTuTeilnehmer(tiTu: TiTuEnum): ITeilnehmer[] {
+    const tituFiltered = this.teilnehmer.filter(teilnehmer => {
+      const key = TiTuEnum[teilnehmer.tiTu];
+      return key === tiTu;
+    });
+    return tituFiltered;
   }
 
-  getTeilnehmer(): ITeilnehmer[] {
+  getTeilnehmer(tiTu: TiTuEnum, paginator: MatPaginator): ITeilnehmer[] {
     if (this.loaded) {
       // console.log('Vereins User: ' , this.users);
-      return this.teilnehmer;
+      const start = paginator.pageSize * paginator.pageIndex;
+      let end = paginator.pageSize * (paginator.pageIndex + 1);
+      if (paginator.length > 0 && end > paginator.length) {
+        end = paginator.length;
+      }
+      const tituFiltered = this.getTiTuTeilnehmer(tiTu);
+      const paged = tituFiltered.slice(start, end);
+      return paged;
     }
     return undefined;
   }
@@ -122,25 +138,25 @@ export class CachingTeilnehmerService {
     })
     */
     return this.teilnehmerService.add(verein).pipe(
-      tap ( teilnehmer => {
+      tap(teilnehmer => {
         this.teilnehmer.push(teilnehmer);
         this.dirty = true;
         console.log('From Tap:', teilnehmer)
         // newTeilnehmerObs.next(teilnehmer);
-    }));
+      }));
     // return newTeilnehmerObs;
   }
 
-  saveAll(verein: IVerein): Observable<any []> {
+  saveAll(verein: IVerein): Observable<any[]> {
     const observables = new Array<Observable<any>>();
-    this.teilnehmer.forEach( teilnehmer => {
+    this.teilnehmer.forEach(teilnehmer => {
       if (teilnehmer.dirty) {
         teilnehmer.dirty = false;
         this.dirty = false;
         observables.push(this.teilnehmerService.save(verein, teilnehmer));
       }
       if (teilnehmer.teilnahmen && teilnehmer.teilnahmen.anlassLinks && teilnehmer.teilnahmen.dirty) {
-        teilnehmer.teilnahmen.anlassLinks.forEach (value => {
+        teilnehmer.teilnahmen.anlassLinks.forEach(value => {
           if (value.dirty) {
             observables.push(this.anlassService.saveTeilnahme(verein, value));
             value.dirty = false;

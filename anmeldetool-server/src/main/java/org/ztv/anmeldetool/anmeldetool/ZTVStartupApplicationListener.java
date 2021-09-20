@@ -16,6 +16,8 @@ import org.ztv.anmeldetool.anmeldetool.models.Person;
 import org.ztv.anmeldetool.anmeldetool.models.Rolle;
 import org.ztv.anmeldetool.anmeldetool.models.RollenEnum;
 import org.ztv.anmeldetool.anmeldetool.models.RollenLink;
+import org.ztv.anmeldetool.anmeldetool.models.Teilnehmer;
+import org.ztv.anmeldetool.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.anmeldetool.models.Verband;
 import org.ztv.anmeldetool.anmeldetool.models.VerbandEnum;
 import org.ztv.anmeldetool.anmeldetool.repositories.AnlassRepository;
@@ -26,6 +28,7 @@ import org.ztv.anmeldetool.anmeldetool.repositories.PersonenRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.RollenRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.VerbandsRepository;
 import org.ztv.anmeldetool.anmeldetool.service.PersonService;
+import org.ztv.anmeldetool.anmeldetool.service.TeilnehmerService;
 import org.ztv.anmeldetool.anmeldetool.service.VerbandService;
 import org.ztv.anmeldetool.anmeldetool.repositories.RollenLinkRepository;
 
@@ -58,6 +61,9 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 	
 	@Autowired
 	OrganisationAnlassLinkRepository orgAnlassLinkRepo;
+	
+	@Autowired
+	TeilnehmerService teilnehmerService;
 	
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -152,11 +158,13 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 		
 		person = personSrv.create(person, true);
 
+		createListOfTeilnehmer(verein1, 33);
 	}
 	
 	private Rolle getRolle(RollenEnum rollenEnum) {
 		return rollenRepo.findByName(rollenEnum.name());
 	}
+	
 	private void createRollen() {
 		for (RollenEnum rollenEnum : RollenEnum.values()) {
 			Rolle rolle = rollenRepo.findByName(rollenEnum.name());
@@ -168,4 +176,30 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 		}
 		
 	}
+	
+	private void createListOfTeilnehmer(Organisation verein, int anzahl) {
+		for (int i = 0; i < anzahl; i++)
+			createTeilnehmer(verein, TiTuEnum.Ti, i);
+		for (int i = 0; i < anzahl / 2; i++)
+			createTeilnehmer(verein, TiTuEnum.Tu, i);
+	}
+	
+	private void createTeilnehmer(Organisation verein, TiTuEnum tiTu, int i) {
+		int random_int = (int)Math.floor(Math.random() * 18);
+		String surname = SURNAMES[random_int] + "_" + tiTu;
+		random_int = (int)Math.floor(Math.random() * 19);
+		String name = NAMES[random_int] + "_" + i;
+		random_int = (2021-45) + (int)Math.floor(Math.random() * 45);
+		Teilnehmer teilnehmer = Teilnehmer.builder().name(name).vorname(surname).jahrgang(random_int).tiTu(tiTu).organisation(verein).build();
+		teilnehmerService.create(teilnehmer);	
+	}
+	
+	  /** Constants used to fill up our data base. */
+	private static String[] SURNAMES = {"Maia", "Asher", "Olivia", "Atticus", "Amelia", "Jack",
+	"Charlotte", "Theodore", "Isla", "Oliver", "Isabella", "Jasper",
+	"Cora", "Levi", "Violet", "Arthur", "Mia", "Thomas", "Elizabeth"};
+
+	private static String[] NAMES = {"Balmer", "Bärtschi", "Meier", "Müller", "Keller", "Brandenberger",
+	  "Schmidhauser", "Kneubühler", "Hochmuth", "Berset", "Trump", "Einstein",
+	  "Hase", "Schneemann", "Cologna", "Federer", "Bretscher", "Züllig", "Marti"};
 }

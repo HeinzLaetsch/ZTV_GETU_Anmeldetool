@@ -43,7 +43,7 @@ interface TeilnahmeControl {
   styleUrls: ["teilnehmer-table.component.css"],
   templateUrl: "teilnehmer-table.component.html",
 })
-export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
+export class TeilnehmerTableComponent implements AfterViewInit {
   @Input()
   tiTu: TiTuEnum;
 
@@ -56,6 +56,7 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
   check1 = new FormControl();
   pageSize = 15;
 
+  /*
   options: string[] = [
     "keine Teilnahme",
     "K1",
@@ -66,7 +67,7 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
     "K6",
     "K7",
     "KD",
-  ];
+  ];*/
 
   allDisplayedColumns: string[];
   displayedColumns = ["name", "vorname", "jahrgang"];
@@ -106,6 +107,70 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
       });
   }
 
+  private initAll() {
+    let localSubscription2: Subscription = undefined;
+    localSubscription2 = this.anlassService
+      .loadAnlaesse()
+      .subscribe((result) => {
+        if (!result) {
+          return;
+        }
+        this.anlaesse = this.anlassService.getAnlaesse();
+        // console.log("TeilnehmerTableComponent:: ngOnInit: ", this.anlaesse);
+        if (localSubscription2) {
+          localSubscription2.unsubscribe();
+        }
+        this.allDisplayedColumns = this.displayedColumns.map((col) => col);
+        this.anlaesse.forEach((anlass) => {
+          this.allDisplayedColumns.push(anlass.anlassBezeichnung);
+          this.allDisplayedColumns.push(anlass.anlassBezeichnung + "Btn");
+        });
+        this.allDisplayedColumns.pop();
+        this.allDisplayedColumns.push("aktion");
+
+        let anzahlControls = this.pageSize;
+        for (let i = 0; i <= anzahlControls; i++) {
+          const teilnehmerLineControls = new Array<FormControl>();
+          teilnehmerLineControls.push(this.getControl(i, 0));
+          teilnehmerLineControls.push(this.getControl(i, 1));
+          teilnehmerLineControls.push(this.getControl(i, 2));
+          this.teilnehmerControls.push(teilnehmerLineControls);
+
+          const lineControls = new Array<FormControl>();
+          this.teilnahmenControls.push(lineControls);
+        }
+        this.loadTeilnehmerPage();
+        this.loadTeilnahmen(true);
+      });
+  }
+  private loadTeilnahmen(createControl: boolean) {
+    // let colIndex = 0;
+    this.checked = new Array();
+    let currentAnlass = 0;
+    this.anlaesse.forEach((anlass) => {
+      // console.log("Prepare Anlass: ", anlass);
+      this.anlassService
+        .getVereinStart(anlass, this.authService.currentVerein)
+        .subscribe((result) => {
+          console.log("getVereinStart Result is: ", result);
+          this.checked.push(result);
+          // this.checkForIndex(colIndex++, result);
+          if (createControl) {
+            this.teilnahmenControls.forEach((line) => {
+              // line = line.slice(0, 0);
+              const cntr = new FormControl({
+                value: KategorieEnum.KEINE_TEILNAHME,
+                disabled: true,
+              });
+              line.push(cntr);
+            });
+          }
+          const isLast = currentAnlass++ === this.anlaesse.length - 1;
+          this.teilnahmenloader(anlass, isLast);
+        });
+
+    });
+  }
   public resetDataSource() {
     console.log("resetDataSource");
     this.dataSource.reset(this.authService.currentVerein);
@@ -119,8 +184,6 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
   }
 
   getKategorien(anlass: IAnlass): String[] {
-    const tiefste = anlass.tiefsteKategorie;
-    const hoechste = anlass.hoechsteKategorie;
     let kd = Object.keys(KategorieEnum).findIndex(
       (key) => key === KategorieEnum.KD
     );
@@ -203,74 +266,15 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
     this.anlassService
       .loadTeilnahmen(anlass, this.authService.currentVerein, isLast)
       .subscribe((result) => {
-        console.log(
-          "Teilnahme loaded: ",
-          anlass.anlassBezeichnung,
-          "Result: ",
-          result
-        );
+        // console.log(
+        //  "Teilnahme loaded: ",
+        //  anlass.anlassBezeichnung,
+        //  "Result: ",
+        //  result
+        // );
         if (result) {
           this.fillTeilnahmenControls(anlass);
         }
-      });
-  }
-  ngOnInit(): void {
-    let localSubscription2: Subscription = undefined;
-    localSubscription2 = this.anlassService
-      .loadAnlaesse()
-      .subscribe((result) => {
-        if (!result) {
-          return;
-        }
-        this.anlaesse = this.anlassService.getAnlaesse();
-        // console.log("TeilnehmerTableComponent:: ngOnInit: ", this.anlaesse);
-        if (localSubscription2) {
-          localSubscription2.unsubscribe();
-        }
-        let colIndex = 0;
-        let currentAnlass = 0;
-        this.checked = new Array();
-
-        this.anlaesse.forEach((anlass) => {
-          // console.log("Prepare Anlass: ", anlass);
-          this.anlassService
-            .getVereinStart(anlass, this.authService.currentVerein)
-            .subscribe((result) => {
-              console.log("getVereinStart Result is: ", result);
-              this.checked.push(result);
-              // this.checkForIndex(colIndex++, result);
-              this.teilnahmenControls.forEach((line) => {
-                const cntr = new FormControl({
-                  value: this.options[3],
-                  disabled: true,
-                });
-                line.push(cntr);
-              });
-              const isLast = currentAnlass++ === this.anlaesse.length - 1;
-              this.teilnahmenloader(anlass, isLast);
-            });
-
-        });
-        this.allDisplayedColumns = this.displayedColumns.map((col) => col);
-        this.anlaesse.forEach((anlass) => {
-          this.allDisplayedColumns.push(anlass.anlassBezeichnung);
-          this.allDisplayedColumns.push(anlass.anlassBezeichnung + "Btn");
-        });
-        this.allDisplayedColumns.pop();
-        this.allDisplayedColumns.push("aktion");
-
-        let anzahlControls = this.pageSize;
-        for (let i = 0; i <= anzahlControls; i++) {
-          const teilnehmerLineControls = new Array<FormControl>();
-          teilnehmerLineControls.push(this.getControl(i, 0));
-          teilnehmerLineControls.push(this.getControl(i, 1));
-          teilnehmerLineControls.push(this.getControl(i, 2));
-          this.teilnehmerControls.push(teilnehmerLineControls);
-
-          const lineControls = new Array<FormControl>();
-          this.teilnahmenControls.push(lineControls);
-        }
-        this.loadTeilnehmerPage();
       });
   }
 
@@ -278,20 +282,20 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
     let teilnehmerPos = 0;
     this.teilnahmenControls.forEach((line) => {
       let pos = 0;
-      console.log("Line: ", line);
+      // console.log("Line: ", line);
       this.anlaesse.forEach((anlass) => {
         // Lokale Variable (für was ??) die für jeden Anlass/Teilnehmer die Kategorie speichert
         // Mit Resolver sperren ???
         // console.log("Before: " , anlass.anlassBezeichnung , ", Line :", teilnehmerPos, "/", pos, " Pos: ", line[pos].value);
         if (anlassOrg === anlass) {
-          const teilnehmerKategorie = new Array<string>();
-            const link = this.getTeilnahme(teilnehmerPos, anlass);
-            console.log("Old Line :", teilnehmerPos, "/", pos, " Pos: ", line[pos].value);
-            line[pos].setValue(link?.kategorie);
-            if (this.checked[pos]) {
-              line[pos].enable();
-            }
-            console.log("New Line :", teilnehmerPos, "/", pos, " Pos: ", line[pos].value);
+          // const teilnehmerKategorie = new Array<string>();
+          const link = this.getTeilnahme(teilnehmerPos, anlass);
+          // console.log("Old Line :", teilnehmerPos, "/", pos, " Pos: ", line[pos].value);
+          line[pos].setValue(link?.kategorie);
+          if (this.checked[pos]) {
+            line[pos].enable();
+          }
+          // console.log("New Line :", teilnehmerPos, "/", pos, " Pos: ", line[pos].value);
         }
         pos++;
       });
@@ -300,12 +304,28 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
   }
 
   getTeilnahme(teilnehmerRecord: number, anlass: IAnlass): IAnlassLink {
+    const tr = this.dataSource.getTeilnehmer(this.tiTu, teilnehmerRecord);
+    if (tr) {
+      if (tr.teilnahmen && tr.teilnahmen.anlassLinks) {
+        const link = tr.teilnahmen.anlassLinks.find((value) => {
+          // console.log("Teilnahme: ", value.teilnehmerId, "Current: ", tr.id);
+          return value.anlassId === anlass.id;
+        });
+        return link;
+      }
+      // return element.teilnehmerId === tr.id
+    }
+    // console.log("Teilnehmer yet not Loaded: ", anlass.anlassBezeichnung);
+    return undefined;
+  }
+
+  getTeilnahmeOld(teilnehmerRecord: number, anlass: IAnlass): IAnlassLink {
     const teilnehmer = this.anlassService.getTeilnehmer(anlass);
     if (teilnehmer) {
-      const tr = this.dataSource.getTeilnehmer(teilnehmerRecord);
+      const tr = this.dataSource.getTeilnehmer(this.tiTu, teilnehmerRecord);
       if (tr) {
         const link = teilnehmer.anlassLinks.find((value) => {
-          console.log("Teilnahme: ", value.teilnehmerId, "Current: ", tr.id);
+          // console.log("Teilnahme: ", value.teilnehmerId, "Current: ", tr.id);
           return value.teilnehmerId === tr.id;
         });
         return link;
@@ -362,22 +382,21 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
    * be able to query its view for the initialized paginator and sort.
    */
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-    this.paginator.page
-      /*
-      .pipe(
-        tap(() => {
-          this.checkIfDirty();
+    // console.log('Init Table: ', this.tiTu);
+    if (this.paginator) {
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+      this.paginator.page
+        .subscribe((pageEvent) => {
+          this.checkIfDirty(pageEvent);
+          console.log("PageEvent: ", pageEvent);
+          this.loadTeilnahmen(false);
           this.loadTeilnehmerPage();
-        })
-      )*/
-      .subscribe((pageEvent) => {
-        this.checkIfDirty(pageEvent);
-        console.log("PageEvent: ", pageEvent);
-      });
-    // this.paginator.length = this.dataSource.getTotal();
+        });
+      this.initAll();
+    }
   }
+
   checkIfDirty(pageEvent: PageEvent) {
     let row = 0;
     this.teilnehmerControls.forEach((teilnehmerLine) => {
@@ -385,7 +404,7 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
       teilnehmerLine.forEach((control) => {
         if (control.dirty) {
           console.log("Control dirty: ", row, ", ", col);
-          this.dataSource.update(row, col, control.value);
+          this.dataSource.update(this.tiTu, row, col, control.value);
           //control.reset();
         }
         if (control.touched) {
@@ -399,7 +418,7 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
   loadTeilnehmerPage() {
     console.log("Load Teilnehmer Page");
     this.dataSource.loading$.subscribe((result) => {
-      this.populateTeilnehmer(this.dataSource.loadTeilnehmer());
+      this.populateTeilnehmer(this.dataSource.loadTeilnehmer(this.tiTu));
     });
   }
   populateTeilnehmer(allTeilnehmer: ITeilnehmer[]) {
@@ -430,14 +449,18 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
       " ,colIndex: ",
       colIndex
     );
-    this.teilnahmenControls[rowIndex][colIndex + 1].setValue(this.teilnahmenControls[rowIndex][colIndex].value)
-    this.updateTeilnahmen(rowIndex, colIndex+1);
+    const rest = this.checked.slice(colIndex + 1);
+    const newIndex = rest.findIndex(element => element) + colIndex + 1;
+    this.teilnahmenControls[rowIndex][newIndex].setValue(this.teilnahmenControls[rowIndex][colIndex].value)
+    this.updateTeilnahmen(rowIndex, newIndex);
   }
   copyAll(event: any, colIndex: any) {
     let rowIndex = 0;
-    this.teilnahmenControls.forEach( anlassCntrLine => {
-      anlassCntrLine[colIndex + 1].setValue(anlassCntrLine[colIndex].value);
-      this.updateTeilnahmen(rowIndex, colIndex+1);
+    const rest = this.checked.slice(colIndex + 1);
+    const newIndex = rest.findIndex(element => element) + colIndex + 1;
+    this.teilnahmenControls.forEach(anlassCntrLine => {
+      anlassCntrLine[newIndex].setValue(anlassCntrLine[colIndex].value);
+      this.updateTeilnahmen(rowIndex, newIndex);
       rowIndex++;
     })
     console.log("Copy All clicked: ", event, " ,colIndex: ", colIndex);
@@ -450,7 +473,7 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
   private updateTeilnahmen(rowIndex: any, colIndex: any) {
     const anlass = this.anlaesse[colIndex];
     this.dataSource.valid = this.teilnahmenControls[rowIndex][colIndex].valid;
-    this.dataSource.updateTeilnahme(
+    this.dataSource.updateTeilnahme(this.tiTu,
       rowIndex,
       colIndex,
       this.teilnahmenControls[rowIndex][colIndex].value,
@@ -461,7 +484,7 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
 
   private updateTeilnehmer(rowIndex: any, colIndex: any) {
     this.dataSource.valid = this.teilnehmerControls[rowIndex][colIndex].valid;
-    this.dataSource.update(
+    this.dataSource.update(this.tiTu,
       rowIndex,
       colIndex,
       this.teilnehmerControls[rowIndex][colIndex].value
@@ -484,15 +507,6 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
       this.teilnehmerControls[rowIndex][colIndex].valid
     );
     this.updateTeilnehmer(rowIndex, colIndex);
-    /*
-    this.dataSource.valid = this.teilnehmerControls[rowIndex][colIndex].valid;
-    this.dataSource.update(
-      rowIndex,
-      colIndex,
-      this.teilnehmerControls[rowIndex][colIndex].value
-    );
-    this.dataSource.dirty = true;
-    */
   }
 
   change(
@@ -504,11 +518,6 @@ export class TeilnehmerTableComponent implements OnInit, AfterViewInit {
     anlass: IAnlass
   ) {
     this.updateTeilnahmen(rowIndex, colIndex);
-    /*
-    this.dataSource.valid = this.teilnahmenControls[rowIndex][colIndex].valid;
-    this.dataSource.updateTeilnahme(rowIndex, colIndex, event.value, anlass);
-    this.dataSource.dirty = true;
-    */
   }
   delete(event: any, row: any, rowIndex: any) {
     console.log("click fired: ", event, " row: ", row, " rowIndex: ", rowIndex);

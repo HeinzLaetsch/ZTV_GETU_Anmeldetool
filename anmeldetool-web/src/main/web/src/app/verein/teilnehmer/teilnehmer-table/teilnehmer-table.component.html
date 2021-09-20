@@ -1,185 +1,127 @@
 <div *ngIf="isTeilnahmenLoaded | async; else loading">
 
-<div class="example-header">
-  <mat-form-field>
-    <input
-      matInput
-      (keyup)="applyFilter($event.target.value)"
-      placeholder="Filter"
-    />
-  </mat-form-field>
-</div>
+  <div class="example-header">
+    <mat-form-field>
+      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter" />
+    </mat-form-field>
+  </div>
 
-<div class="example-container mat-elevation-z8">
-  <!-- 'name', 'vorname', 'jahrgang.', 'Kat.', 'Aktion' -->
-  <mat-table [dataSource]="dataSource" matSort>
-    <!-- Name Column -->
-    <ng-container matColumnDef="name">
-      <mat-header-cell *matHeaderCellDef mat-sort-header class="w_20">
-        Name
-      </mat-header-cell>
-      <mat-cell *matCellDef="let row; let rowIndex = index" class="w_20">
-        <input
-          type="text"
-          placeholder="Nachname"
-          aria-label="Nachname"
-          matInput
-          [formControl]="teilnehmerControls[rowIndex][0]"
-          #tooltip="matTooltip"
-          matTooltip="Gib den Nachnamen ein"
-          matTooltipPosition="below"
-          matTooltipHideDelay="100"
-          (change)="changeTeilnehmer($event, row, rowIndex, 0)"
-        />
-      </mat-cell>
-    </ng-container>
+  <div class="example-container mat-elevation-z8">
+    <!-- 'name', 'vorname', 'jahrgang.', 'Kat.', 'Aktion' -->
+    <mat-table [dataSource]="dataSource" matSort>
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="w_20">
+          Name
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row; let rowIndex = index" class="w_20">
+          <input type="text" placeholder="Nachname" aria-label="Nachname" matInput
+            [formControl]="teilnehmerControls[rowIndex][0]" #tooltip="matTooltip" matTooltip="Gib den Nachnamen ein"
+            matTooltipPosition="below" matTooltipHideDelay="100"
+            (change)="changeTeilnehmer($event, row, rowIndex, 0)" />
+        </mat-cell>
+      </ng-container>
 
-    <!-- Vorname Column -->
-    <ng-container matColumnDef="vorname">
-      <mat-header-cell *matHeaderCellDef mat-sort-header class="w_20">
-        Vorname
-      </mat-header-cell>
-      <mat-cell *matCellDef="let row; let rowIndex = index" class="w_20">
-        <input
-          type="text"
-          placeholder="Vorname"
-          aria-label="Vorname"
-          matInput
-          [formControl]="teilnehmerControls[rowIndex][1]"
-          #tooltip="matTooltip"
-          matTooltip="Gib den Vornamen ein"
-          matTooltipPosition="below"
-          matTooltipHideDelay="100"
-          (change)="changeTeilnehmer($event, row, rowIndex, 1)"
-        />
-      </mat-cell>
-    </ng-container>
+      <!-- Vorname Column -->
+      <ng-container matColumnDef="vorname">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="w_20">
+          Vorname
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row; let rowIndex = index" class="w_20">
+          <input type="text" placeholder="Vorname" aria-label="Vorname" matInput
+            [formControl]="teilnehmerControls[rowIndex][1]" #tooltip="matTooltip" matTooltip="Gib den Vornamen ein"
+            matTooltipPosition="below" matTooltipHideDelay="100"
+            (change)="changeTeilnehmer($event, row, rowIndex, 1)" />
+        </mat-cell>
+      </ng-container>
 
-    <!-- Jahrg Column -->
-    <ng-container matColumnDef="jahrgang">
-      <mat-header-cell *matHeaderCellDef mat-sort-header class="w_5">
-        Jahrg
-      </mat-header-cell>
-      <mat-cell *matCellDef="let row; let rowIndex = index" class="w_5">
-        <input
-          type="text"
-          placeholder="Jahrg"
-          aria-label="Jahrgang"
-          matInput
-          [formControl]="teilnehmerControls[rowIndex][2]"
-          #tooltip="matTooltip"
-          matTooltip="Gib den Jahrgang ein"
-          matTooltipPosition="below"
-          matTooltipHideDelay="100"
-          (change)="changeTeilnehmer($event, row, rowIndex, 2)"/>
-      </mat-cell>
-      <!--
+      <!-- Jahrg Column -->
+      <ng-container matColumnDef="jahrgang">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="w_5">
+          Jahrg
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row; let rowIndex = index" class="w_5">
+          <input type="text" placeholder="Jahrg" aria-label="Jahrgang" matInput
+            [formControl]="teilnehmerControls[rowIndex][2]" #tooltip="matTooltip" matTooltip="Gib den Jahrgang ein"
+            matTooltipPosition="below" matTooltipHideDelay="100"
+            (change)="changeTeilnehmer($event, row, rowIndex, 2)" />
+        </mat-cell>
+        <!--
         [ngStyle]="{'color':'teilnehmerControls[rowIndex][2].errors' ? 'red'}"/>
 
          -->
-    </ng-container>
+      </ng-container>
 
-    <!-- Anlass Column -->
-    <ng-container
-      *ngFor="let anlass of anlaesse; let colIndex = index; let last = last"
-      [matColumnDef]="anlass.anlassBezeichnung"
-    >
-      <mat-header-cell *matHeaderCellDef mat-sort-header class="kategorie">
-        <div class="rotate">
-          <span> {{ anlass.anlassBezeichnung }}</span>
-        </div>
-        <div class="below">
-          <mat-checkbox (change)="checkedClicked($event, colIndex)" [ngModel]="checked[colIndex]">Teilnahme</mat-checkbox>
-        </div>
-      </mat-header-cell>
-      <mat-cell *matCellDef="let row; let rowIndex = index" class="kategorie">
-        <mat-select
-          type="text"
-          placeholder="keine Teilnahme"
-          aria-label="Kategorie"
-          matInput
-          [formControl]="teilnahmenControls[rowIndex][colIndex]"
-          #tooltip="matTooltip"
-          matTooltip="Wähle die Kategorie aus"
-          matTooltipPosition="below"
-          matTooltipHideDelay="100"
-          (selectionChange)="change($event, false ,row, rowIndex, colIndex, anlass)">
-          <mat-option *ngFor="let option of getKategorien(anlass)" [value]="option">
-            {{ option }}
-          </mat-option>
-        </mat-select>
+      <!-- Anlass Column -->
+      <ng-container *ngFor="let anlass of anlaesse; let colIndex = index; let last = last"
+        [matColumnDef]="anlass.anlassBezeichnung">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="kategorie">
+          <div class="rotate">
+            <span> {{ anlass.anlassBezeichnung }}</span>
+          </div>
+          <div class="below">
+            <mat-checkbox (change)="checkedClicked($event, colIndex)" [ngModel]="checked[colIndex]">Teilnahme
+            </mat-checkbox>
+          </div>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row; let rowIndex = index" class="kategorie">
+          <mat-select type="text" placeholder="keine Teilnahme" aria-label="Kategorie" matInput
+            [formControl]="teilnahmenControls[rowIndex][colIndex]" #tooltip="matTooltip"
+            matTooltip="Wähle die Kategorie aus" matTooltipPosition="below" matTooltipHideDelay="100"
+            (selectionChange)="change($event, false ,row, rowIndex, colIndex, anlass)">
+            <mat-option *ngFor="let option of getKategorien(anlass)" [value]="option">
+              {{ option }}
+            </mat-option>
+          </mat-select>
 
-        <!--mat-autocomplete #auto="matAutocomplete">
+          <!--mat-autocomplete #auto="matAutocomplete">
           <mat-option *ngFor="let option of getKategorien(anlass)" [value]="option" (optionSelected)="change($event, row, rowIndex, colIndex)">
             {{ option }}
           </mat-option>
         </mat-autocomplete-->
-      </mat-cell>
-      <ng-container *ngIf="!last" [matColumnDef]="anlass.anlassBezeichnung + 'Btn'">
-        <mat-header-cell *matHeaderCellDef class="centeredHeader">
-          <button mat-raised-button (click)="copyAll($event, colIndex)" [disabled]="!checked[colIndex]">
-            <mat-icon
-              class="material-icons color_gray"
-              aria-hidden="false"
-              aria-label="Kategorie kopieren"
-              #tooltip="matTooltip"
-              matTooltip="Kategorien aller Teilnehmenden kopieren"
-              matTooltipPosition="below"
-              matTooltipHideDelay="100"
-              >arrow_right_alt</mat-icon
-            >
-          </button>
+        </mat-cell>
+        <ng-container *ngIf="!last" [matColumnDef]="anlass.anlassBezeichnung + 'Btn'">
+          <mat-header-cell *matHeaderCellDef class="centeredHeader">
+            <button mat-raised-button (click)="copyAll($event, colIndex)" [disabled]="!checked[colIndex]">
+              <mat-icon class="material-icons color_gray" aria-hidden="false" aria-label="Kategorie kopieren"
+                #tooltip="matTooltip" matTooltip="Kategorien aller Teilnehmenden kopieren" matTooltipPosition="below"
+                matTooltipHideDelay="100">arrow_right_alt</mat-icon>
+            </button>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row; let rowIndex = index" class="centered">
+            <button mat-raised-button (click)="copy($event, row, rowIndex, colIndex, anlass)"
+              [disabled]="!checked[colIndex]">
+              <mat-icon class="material-icons color_gray" aria-hidden="false" aria-label="Kategorie kopieren"
+                #tooltip="matTooltip" matTooltip="Kategorie kopieren" matTooltipPosition="below"
+                matTooltipHideDelay="100">arrow_right_alt</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+      </ng-container>
+
+      <!-- Color Column -->
+      <ng-container matColumnDef="aktion">
+        <mat-header-cell *matHeaderCellDef class="aktion centered">
+          Aktion
         </mat-header-cell>
-        <mat-cell *matCellDef="let row; let rowIndex = index" class="centered">
-          <button mat-raised-button (click)="copy($event, row, rowIndex, colIndex, anlass)" [disabled]="!checked[colIndex]">
-            <mat-icon
-              class="material-icons color_gray"
-              aria-hidden="false"
-              aria-label="Kategorie kopieren"
-              #tooltip="matTooltip"
-              matTooltip="Kategorie kopieren"
-              matTooltipPosition="below"
-              matTooltipHideDelay="100"
-              >arrow_right_alt</mat-icon
-            >
+        <mat-cell *matCellDef="let row; let rowIndex = index" class="aktion">
+          <button mat-raised-button>
+            <mat-icon class="material-icons color_gray" aria-hidden="false" aria-label="Teilnehmer löschen"
+              #tooltip="matTooltip" matTooltip="Teilnehmer löschen" matTooltipPosition="below" matTooltipHideDelay="100"
+              (click)="delete($event, row, rowIndex)">delete</mat-icon>
           </button>
         </mat-cell>
       </ng-container>
-    </ng-container>
 
-    <!-- Color Column -->
-    <ng-container matColumnDef="aktion">
-      <mat-header-cell *matHeaderCellDef class="aktion centered">
-        Aktion
-      </mat-header-cell>
-      <mat-cell *matCellDef="let row; let rowIndex = index" class="aktion">
-        <button mat-raised-button>
-          <mat-icon
-            class="material-icons color_gray"
-            aria-hidden="false"
-            aria-label="Teilnehmer löschen"
-            #tooltip="matTooltip"
-            matTooltip="Teilnehmer löschen"
-            matTooltipPosition="below"
-            matTooltipHideDelay="100"
-            (click)="delete($event, row, rowIndex)"
-            >delete</mat-icon
-          >
-        </button>
-      </mat-cell>
-    </ng-container>
+      <mat-header-row *matHeaderRowDef="allDisplayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: allDisplayedColumns"> </mat-row>
+    </mat-table>
 
-    <mat-header-row *matHeaderRowDef="allDisplayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: allDisplayedColumns"> </mat-row>
-  </mat-table>
-
-  <mat-paginator
-    [pageSize]="pageSize"
-    [pageSizeOptions]="[15, 20, 25, 50, 100]"
-    [length]="anzahlTeilnehmer"
-  ></mat-paginator>
+  </div>
 </div>
-</div>
+
+<mat-paginator [pageSize]="pageSize" [pageSizeOptions]="[15, 20, 25, 50, 100]" [length]="anzahlTeilnehmer">
+</mat-paginator>
 
 <ng-template #loading>
   <div class="center">

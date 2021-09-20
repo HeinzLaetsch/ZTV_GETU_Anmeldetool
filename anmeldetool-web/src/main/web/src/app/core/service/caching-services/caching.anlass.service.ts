@@ -6,7 +6,7 @@ import { IAnlassLinks } from '../../model/IAnlassLinks';
 import { AnlassService } from '../anlass/anlass.service';
 
 export interface IHash {
-  [anlassId: string] : IAnlassLinks;
+  [anlassId: string]: IAnlassLinks;
 }
 
 @Injectable({
@@ -51,9 +51,9 @@ export class CachingAnlassService {
     return this.anlaesseLoaded.asObservable();
   }
   loadAnlaesse(): Observable<boolean> {
-    if(!this._loadRunning && !this.loaded) {
+    if (!this._loadRunning && !this.loaded) {
       this._loadRunning = true;
-       this.anlassService.getAnlaesse().subscribe( anlaesse => {
+      this.anlassService.getAnlaesse().subscribe(anlaesse => {
         this.anlaesse = anlaesse;
         this._loadRunning = false;
         this.loaded = true
@@ -78,19 +78,19 @@ export class CachingAnlassService {
   }
   getAnlassById(id: string) {
     if (this.loaded) {
-      return this.anlaesse.find( verein => verein.id = id);
+      return this.anlaesse.find(verein => verein.id = id);
     }
     return undefined;
   }
   loadTeilnahmen(anlass: IAnlass, verein: IVerein, isLast: boolean): Observable<boolean> {
-    this.anlassService.getTeilnehmer(anlass, verein).subscribe( anlassLinkArray => {
+    this.anlassService.getTeilnehmer(anlass, verein).subscribe(anlassLinkArray => {
       const anlassLinks: IAnlassLinks = {
         dirty: false,
         anlassLinks: anlassLinkArray
       }
       this.teilnamen[anlass.id] = anlassLinks;
       // Fuer jeden Anlass ein Observable
-      console.log("Teilnahme loaded: ", anlass.anlassBezeichnung, ' Verein: ', verein.name, ' isLast: ', isLast);
+      // console.log("Teilnahme loaded: ", anlass.anlassBezeichnung, ' Verein: ', verein.name, ' isLast: ', isLast);
       if (isLast) {
         this.teilnahmenLoaded.next(true);
       }

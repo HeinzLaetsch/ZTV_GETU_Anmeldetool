@@ -55,8 +55,8 @@ export class TeilnehmerComponent implements OnInit {
     // console.log("ProfileComponent::ngOnInit: ", this.authService.currentUser);
     this.currentUser = this.authService.currentUser;
     this._vereinsUser = this.userService.getUser();
-    this.teilnehmerService.loadTeilnehmer(this.authService.currentVerein).subscribe( result => {
-      console.log('TeilnehmerComponent::ngOnInit 1: ' , result);
+    this.teilnehmerService.loadTeilnehmer(this.authService.currentVerein).subscribe(result => {
+      console.log('TeilnehmerComponent::ngOnInit 1: ', result);
     });;
   }
 
@@ -64,7 +64,7 @@ export class TeilnehmerComponent implements OnInit {
     return this._vereinsUser;
   }
 
-  get isTeilnehmerLoaded(): Observable<boolean> {
+  get isTeilnehmerLoaded(): Observable<number> {
     // console.log('TeilnehmerComponent::isTeilnehmerLoaded')
     return this.teilnehmerService.isTeilnehmerLoaded();
   }
@@ -101,7 +101,7 @@ export class TeilnehmerComponent implements OnInit {
     this.teilnehmerTable.addNewTeilnehmer();
   }
 
-  saveTurnerinnen(event: any) {
+  saveTeilnehmer(event: any) {
     this.needsCancel = false;
     this.needsSave = false;
     this.teilnehmerTable.saveTeilnehmer();
@@ -137,48 +137,4 @@ export class TeilnehmerComponent implements OnInit {
   get tu(): TiTuEnum {
     return TiTuEnum.Tu;
   }
-  /*
-  get allowAdd(): boolean {
-    // console.log('this.teilnehmerTable?.pageSize :', this.teilnehmerTable?.pageSize, ', ', this.events.length);
-    return this.teilnehmerTable?.pageSize <= this.events.length;
-  }
-  get allowCancel(): boolean {
-    return this.events.reduce( (last, tmp) => (last && !tmp.dirty), true);
-  }
-  get allowSave(): boolean {
-    const dirty = !this.events.reduce( (last, tmp) => (last && !tmp.dirty), true);
-    const error = !this.events.reduce( (last, tmp) => (last && !tmp.error), true);
-    // console.log('Dirty: ', dirty, 'Error: ', error);
-    if (error) {
-      return true;
-    }
-    if (dirty)
-      return false;
-    return true;
-  }
-
-  statusFired(event: IChangeEvent) {
-    let tmpEvent = this.events.find(
-      (ev) => ev.rowIndex === event.rowIndex && ev.colIndex === event.colIndex
-    );
-    if (!tmpEvent) {
-      tmpEvent = {
-        colIndex: -1,
-        rowIndex: -1,
-        dirty: false,
-        error: false,
-      };
-      this.events.push(tmpEvent);
-    }
-    tmpEvent.dirty = event.dirty;
-    tmpEvent.colIndex = event.colIndex;
-    tmpEvent.rowIndex = event.rowIndex;
-    tmpEvent.error = event.error;
-
-    this.needsCancel = event.dirty;
-    this.hasErrors = event.error;
-    this.needsSave = event.dirty && !event.error;
-    console.error("Table has Errors: ", event);
-  }
-  */
 }
