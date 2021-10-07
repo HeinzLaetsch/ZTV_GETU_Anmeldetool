@@ -22,9 +22,9 @@ public class AnlassDTO {
 	
 	String halle;
 	
-	Calendar startDate;
+	Calendar startDatum;
 	
-	Calendar endDate;
+	Calendar endDatum;
 	
 	TiTuEnum tiTu;
 	

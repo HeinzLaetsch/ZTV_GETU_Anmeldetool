@@ -47,6 +47,8 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   @Input()
   tiTu: TiTuEnum;
 
+  filterValue: string;
+
   populating = true;
   checked: Array<boolean>;
 
@@ -115,7 +117,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
         if (!result) {
           return;
         }
-        this.anlaesse = this.anlassService.getAnlaesse();
+        this.anlaesse = this.anlassService.getAnlaesse(this.tiTu);
         // console.log("TeilnehmerTableComponent:: ngOnInit: ", this.anlaesse);
         if (localSubscription2) {
           localSubscription2.unsubscribe();
@@ -304,7 +306,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   }
 
   getTeilnahme(teilnehmerRecord: number, anlass: IAnlass): IAnlassLink {
-    const tr = this.dataSource.getTeilnehmer(this.tiTu, teilnehmerRecord);
+    const tr = this.dataSource.getTeilnehmer(this.filterValue, this.tiTu, teilnehmerRecord);
     if (tr) {
       if (tr.teilnahmen && tr.teilnahmen.anlassLinks) {
         const link = tr.teilnahmen.anlassLinks.find((value) => {
@@ -316,24 +318,6 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       // return element.teilnehmerId === tr.id
     }
     // console.log("Teilnehmer yet not Loaded: ", anlass.anlassBezeichnung);
-    return undefined;
-  }
-
-  getTeilnahmeOld(teilnehmerRecord: number, anlass: IAnlass): IAnlassLink {
-    const teilnehmer = this.anlassService.getTeilnehmer(anlass);
-    if (teilnehmer) {
-      const tr = this.dataSource.getTeilnehmer(this.tiTu, teilnehmerRecord);
-      if (tr) {
-        const link = teilnehmer.anlassLinks.find((value) => {
-          // console.log("Teilnahme: ", value.teilnehmerId, "Current: ", tr.id);
-          return value.teilnehmerId === tr.id;
-        });
-        return link;
-        // return element.teilnehmerId === tr.id
-      }
-      return undefined;
-    }
-    console.log("Teilnehmer yet not Loaded: ", anlass.anlassBezeichnung);
     return undefined;
   }
 
@@ -404,7 +388,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       teilnehmerLine.forEach((control) => {
         if (control.dirty) {
           console.log("Control dirty: ", row, ", ", col);
-          this.dataSource.update(this.tiTu, row, col, control.value);
+          this.dataSource.update(this.filterValue, this.tiTu, row, col, control.value);
           //control.reset();
         }
         if (control.touched) {
@@ -418,7 +402,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   loadTeilnehmerPage() {
     console.log("Load Teilnehmer Page");
     this.dataSource.loading$.subscribe((result) => {
-      this.populateTeilnehmer(this.dataSource.loadTeilnehmer(this.tiTu));
+      this.populateTeilnehmer(this.dataSource.loadTeilnehmer(this.filterValue, this.tiTu));
     });
   }
   populateTeilnehmer(allTeilnehmer: ITeilnehmer[]) {
@@ -435,8 +419,12 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   }
   applyFilter(filterValue: string) {
     filterValue = filterValue.trim(); // Remove whitespace
-    filterValue = filterValue.toLowerCase(); // Datasource defaults to lowercase matches
+    this.filterValue = filterValue.toLowerCase(); // Datasource defaults to lowercase matches
     this.dataSource.filter = filterValue;
+    // this.checkIfDirty(pageEvent);
+    // console.log("PageEvent: ", pageEvent);
+    this.loadTeilnahmen(false);
+    this.loadTeilnehmerPage();
   }
   copy(event: any, row: any, rowIndex: number, colIndex: any, anlass: IAnlass) {
     console.log(
@@ -473,7 +461,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   private updateTeilnahmen(rowIndex: any, colIndex: any) {
     const anlass = this.anlaesse[colIndex];
     this.dataSource.valid = this.teilnahmenControls[rowIndex][colIndex].valid;
-    this.dataSource.updateTeilnahme(this.tiTu,
+    this.dataSource.updateTeilnahme(this.filterValue, this.tiTu,
       rowIndex,
       colIndex,
       this.teilnahmenControls[rowIndex][colIndex].value,
@@ -484,7 +472,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
 
   private updateTeilnehmer(rowIndex: any, colIndex: any) {
     this.dataSource.valid = this.teilnehmerControls[rowIndex][colIndex].valid;
-    this.dataSource.update(this.tiTu,
+    this.dataSource.update(this.filterValue, this.tiTu,
       rowIndex,
       colIndex,
       this.teilnehmerControls[rowIndex][colIndex].value

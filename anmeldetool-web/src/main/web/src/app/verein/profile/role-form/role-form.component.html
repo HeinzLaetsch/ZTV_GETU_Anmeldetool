@@ -9,27 +9,32 @@
         <h2>zugewiesene Rollen</h2>
       </div>
     </div>
-    <div  class ="row">
+    <div class="row">
+      <div
+        cdkDropList
+        #allRolesList="cdkDropList"
+        [cdkDropListData]="allRoles"
+        [cdkDropListConnectedTo]="[assignedRolesList]"
+        class="drag-drop-list col"
+        (cdkDropListDropped)="drop($event)"
+      >
         <div
-          cdkDropList
-          #allRolesList="cdkDropList"
-          [cdkDropListData]="allRoles"
-          [cdkDropListConnectedTo]="[assignedRolesList]"
-          class="drag-drop-list col"
-          (cdkDropListDropped)="drop($event)"
+          class="drag-drop-box"
+          *ngFor="let role of allRoles"
+          cdkDrag
+          [cdkDragDisabled]="disableRole(role)"
         >
-          <div class="drag-drop-box" *ngFor="let role of allRoles" cdkDrag [cdkDragDisabled]="disableRole(role)">
-            <div
-              #tooltip="matTooltip"
-              matTooltip="Ziehe (Drag & Drop) die Rolle rüber"
-              matTooltipPosition="above"
-              matTooltipHideDelay="1000"
-            >
-              {{ role.name }}
-            </div>
+          <div
+            #tooltip="matTooltip"
+            matTooltip="Ziehe (Drag & Drop) die Rolle rüber"
+            matTooltipPosition="above"
+            matTooltipHideDelay="1000"
+          >
+            {{ role.name }}
           </div>
         </div>
-        <div
+      </div>
+      <div
         cdkDropList
         #assignedRolesList="cdkDropList"
         [cdkDropListData]="assignedRoles"
@@ -38,10 +43,11 @@
         (cdkDropListDropped)="drop($event)"
       >
         <div
-          [ngStyle]="{ 'color': role.aktiv ? 'green' : 'red' }"
+          [ngStyle]="{ color: role.aktiv ? 'green' : 'red' }"
           class="drag-drop-box"
           *ngFor="let role of assignedRoles"
-          cdkDrag [cdkDragDisabled]="disableRole(role)"
+          cdkDrag
+          [cdkDragDisabled]="disableRole(role)"
         >
           <div class="block">
             <div
@@ -50,10 +56,19 @@
               matTooltipPosition="above"
               matTooltipHideDelay="1000"
             >
-              <span [ngClass]="{'label-green' : role.aktiv , 'label-red' : !role.aktiv}">{{ role.name }}</span>
+              <span
+                [ngClass]="{
+                  'label-green': role.aktiv,
+                  'label-red': !role.aktiv
+                }"
+                >{{ role.name }}</span
+              >
               <br />
               <mat-checkbox
-                [ngClass]="{'label-green' : role.aktiv , 'label-red' : !role.aktiv}"
+                [ngClass]="{
+                  'label-green': role.aktiv,
+                  'label-red': !role.aktiv
+                }"
                 [(ngModel)]="role.aktiv"
                 [disabled]="!isVereinsVerantwortlicher"
                 (click)="aktivChange(role)"
@@ -63,7 +78,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </ng-container>

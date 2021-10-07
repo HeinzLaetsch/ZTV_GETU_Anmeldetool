@@ -102,7 +102,7 @@ export class CachingTeilnehmerService {
     return tituFiltered;
   }
 
-  getTeilnehmer(tiTu: TiTuEnum, paginator: MatPaginator): ITeilnehmer[] {
+  getTeilnehmer(filter: string, tiTu: TiTuEnum, paginator: MatPaginator): ITeilnehmer[] {
     if (this.loaded) {
       // console.log('Vereins User: ' , this.users);
       const start = paginator.pageSize * paginator.pageIndex;
@@ -110,13 +110,28 @@ export class CachingTeilnehmerService {
       if (paginator.length > 0 && end > paginator.length) {
         end = paginator.length;
       }
-      const tituFiltered = this.getTiTuTeilnehmer(tiTu);
+      let tituFiltered = this.getTiTuTeilnehmer(tiTu);
+      tituFiltered = this.filterByName(filter, tituFiltered);
       const paged = tituFiltered.slice(start, end);
       return paged;
     }
     return undefined;
   }
 
+  private filterByName(filter: string, teilnehmer: ITeilnehmer[]): ITeilnehmer[] {
+    if (!filter || filter.length === 0) {
+      return teilnehmer;
+    }
+    return teilnehmer.filter(teilnehmer => {
+      if (teilnehmer.name.toLowerCase().indexOf(filter) > -1) {
+        return true;
+      }
+      if (teilnehmer.vorname.toLowerCase().indexOf(filter) > -1) {
+        return true;
+      }
+      return false;
+    })
+  }
   getTeilnehmerById(id: string) {
     if (this.loaded) {
       const newTeilnehmer = this.teilnehmer.find((newTeilnehmer) => newTeilnehmer.id === id);

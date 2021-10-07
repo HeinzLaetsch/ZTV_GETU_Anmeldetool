@@ -19,7 +19,9 @@ export class AnmeldeToolComponent implements OnInit, AfterViewInit {
   dialogOpen = false;
   _authenticated: boolean;
 
-  constructor(private authService: AuthService, public vereinService: CachingVereinService, private router: ActivatedRoute, public dialog: MatDialog) {}
+  constructor(private authService: AuthService, public vereinService: CachingVereinService, private router: ActivatedRoute, public dialog: MatDialog) {
+    console.log('Konst');
+  }
 
   fillerNav = Array.from({ length: 10 }, (_, i) => `Nav Item ${i + 1}`);
 

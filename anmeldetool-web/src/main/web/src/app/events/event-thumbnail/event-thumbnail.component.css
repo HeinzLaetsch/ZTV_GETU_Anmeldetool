@@ -1,19 +1,24 @@
 .thumbnail {
-    min-height: 210px;
+  min-height: 210px;
+  padding: 10px;
+  margin: 5px;
 }
 
+h2 {
+  color: cornsilk;
+}
 .pad-left {
-    margin-left: 10px;
+  margin-left: 10px;
 }
 
 .well div {
-    color: #bbb;
+  color: #bbb;
 }
 
 .green {
-    color: #01d801 !important;
+  color: #01d801 !important;
 }
 
 .bold {
-    font-weight: bold;
+  font-weight: bold;
 }

@@ -20,6 +20,7 @@ export class CachingVereinService {
   private vereine: IVerein[];
 
   constructor(private vereinService: VereinService) {
+    // this.vereineLoaded = new BehaviorSubject<boolean>(undefined);
     this.vereineLoaded = new BehaviorSubject<boolean>(undefined);
   }
   reset(): Observable<boolean> {

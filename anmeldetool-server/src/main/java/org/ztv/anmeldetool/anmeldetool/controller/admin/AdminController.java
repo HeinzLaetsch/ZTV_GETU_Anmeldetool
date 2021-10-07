@@ -58,6 +58,7 @@ import org.ztv.anmeldetool.anmeldetool.transfer.RolleDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.VerbandDTO;
+import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterDTO;
 import org.ztv.anmeldetool.anmeldetool.util.PersonHelper;
 
@@ -131,6 +132,11 @@ public class AdminController {
 	public @ResponseBody ResponseEntity patchAnlassTeilnehmer(HttpServletRequest request, @PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable UUID teilnehmerId, @RequestBody TeilnehmerAnlassLinkDTO tal) {
 		return teilnehmerSrv.updateAnlassTeilnahmen(anlassId, teilnehmerId, tal);   
 	}
+	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter")
+	// @ResponseBody
+	public ResponseEntity<WertungsrichterAnlassLinkDTO> getEingeteilteWertungsrichter(HttpServletRequest request, @PathVariable UUID anlassId, @PathVariable UUID orgId) {
+		return anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId);
+	}
 	
 	// http://localhost:8080/admin/organisationen
 	@GetMapping("/organisationen")
@@ -160,15 +166,11 @@ public class AdminController {
 	public ResponseEntity<TeilnehmerDTO> updateNewTeilnehmer(HttpServletRequest request, @PathVariable UUID orgId, @RequestBody TeilnehmerDTO teilnehmerDTO) {
 		return teilnehmerSrv.update(orgId, teilnehmerDTO);
 	}
-
-	// http://localhost:8080/admin/organisationen
 	@GetMapping("/verbaende")
 	// @ResponseBody
 	public ResponseEntity<Collection<VerbandDTO>> getVerbaende() {
 		return verbandsSrv.getVerbaende();
 	}
-
-	// http://localhost:8080/admin/login?organisationsname=ZTV&benutzername=admin&passwort=test
 	@GetMapping("/login")
 	// @ResponseBody
 	public ResponseEntity<PersonDTO> loginGet(HttpServletRequest request, @RequestParam String organisationsname, @RequestParam String benutzername, @RequestParam String passwort) {
@@ -225,28 +227,6 @@ public class AdminController {
 	public @ResponseBody ResponseEntity<WertungsrichterDTO> updateWertungsrichter(HttpServletRequest request,@PathVariable String id, @RequestBody WertungsrichterDTO wertungsrichterDTO) {
 		return wertungsrichterSrv.update(id, wertungsrichterDTO);   
 	}
-
-	/*
-	 	LoginData loginData = new LoginData();
-		// loginData.setOrganisationName("ZTV");
-		loginData.setUsername("admin");
-		//loginData.setPasswordEncrypted(getEncodedPassword("test"));
-		loginData.setPassword("test");
-		log.debug("Submitted Password:" + loginData.getPassword());
-		Person person = doesUserExistsInOrganisation(loginData.getOrganisationId(), loginData.getUsername());
-		if (person == null) {
-		    return new ResponseEntity<String>("Wrong Credentials" , HttpStatus.FORBIDDEN);			
-		}
-		UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken(loginData.getUsername(), loginData.getPassword());
-	    
-	    Authentication auth = authenticationManager.authenticate(authReq);
-	    
-	    SecurityContext sc = SecurityContextHolder.getContext();
-	    sc.setAuthentication(auth);
-	    HttpSession session = request.getSession(true);
-	    session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, sc);
-
-	 */
 
 	private Person doesUserExistsInOrganisation(UUID organisationId, String username) {
 		Person person = personSrv.findPersonByBenutzername(username);

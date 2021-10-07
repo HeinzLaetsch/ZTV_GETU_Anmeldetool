@@ -11,8 +11,8 @@ public class AnlassHelper {
 
 	public static AnlassDTO createAnlassDTO(Anlass anlass) {
 		return AnlassDTO.builder().id(anlass.getId()).anlassBezeichnung(anlass.getAnlassBezeichnung())
-				.ort(anlass.getOrt()).halle(anlass.getHalle()).startDate(anlass.getStartDate())
-				.endDate(anlass.getEndDate()).tiefsteKategorie(anlass.getTiefsteKategorie())
+				.ort(anlass.getOrt()).halle(anlass.getHalle()).startDatum(anlass.getStartDate())
+				.endDatum(anlass.getEndDate()).tiefsteKategorie(anlass.getTiefsteKategorie())
 				.hoechsteKategorie(anlass.getHoechsteKategorie()).tiTu(anlass.getTiTu()).build();
 	}
 	/*

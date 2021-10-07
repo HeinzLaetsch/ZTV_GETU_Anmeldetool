@@ -16,12 +16,12 @@ import { NewVereinComponent } from './verein/new-verein/new-verein.component';
 const routes: Routes = [
   //   {path: 'newVerein', component: NewVereinComponent},
   //   {path: 'newAnmelder', component: NewAnmelderComponent},
-  {path: 'events', component: EventListComponent},
+  {path: 'anlass', component: EventListComponent},
   // {path: 'events', component: EventListComponent, resolve: [{activated: AuthServiceResolverService}, {events: EventListResolverService}]},
   // {path: 'events/new', component: CreateEventComponent, canDeactivate: ['canDeactivateCreateEvent']},
-  // {path: 'events/:id', component: EventsDetailComponent, canActivate: [ EventRouteActivatorService] , data: { roles: ['Admin', 'Anmelder'] }},
+  {path: 'anlass/:id', component: EventsDetailComponent, canActivate: [ EventRouteActivatorService] , data: { roles: ['Admin', 'Anmelder'] }},
   // {path: 'page404', component: Page404Component},
-  {path: '', redirectTo: 'events', pathMatch: 'full'},
+  {path: '', redirectTo: 'anlass', pathMatch: 'full'},
   {path: 'teilnehmer', loadChildren: './verein/teilnehmer.module#TeilnehmerModule'},
   {path: 'user', loadChildren: './verein/user.module#UserModule'}
 ];

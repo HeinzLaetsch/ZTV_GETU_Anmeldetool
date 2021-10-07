@@ -24,6 +24,7 @@ import org.ztv.anmeldetool.anmeldetool.transfer.AnlassDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationenDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
+import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.util.AnlassHelper;
 import org.ztv.anmeldetool.anmeldetool.util.OrganisationAnlassLinkHelper;
 import org.ztv.anmeldetool.anmeldetool.util.OrganisationHelper;
@@ -50,6 +51,9 @@ public class AnlassService {
 	@Autowired
 	TeilnehmerAnlassLinkRepository teilnehmerAnlassLinkRepository;
 	
+	public ResponseEntity<WertungsrichterAnlassLinkDTO> getEingeteilteWertungsrichter(UUID anlassId, UUID orgId) {
+		return ResponseEntity.notFound().build();
+	}
 	public ResponseEntity<Collection<AnlassDTO>> getAllAnlaesse() {
 		Collection<AnlassDTO> anlaessDto = new ArrayList<AnlassDTO>();
 		Iterable<Anlass> anlaesse = anlassRepo.findByAktivOrderByAnlassBezeichnung(true);

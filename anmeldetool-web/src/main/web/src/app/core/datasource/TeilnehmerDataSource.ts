@@ -33,49 +33,49 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     this.loadingSubject.complete();
   }
 
-  getTeilnehmer(tiTu: TiTuEnum, row: number): ITeilnehmer {
-    return this.teilnehmerService.getTeilnehmer(tiTu, this.paginator)[row];
+  getTeilnehmer(filter: string, tiTu: TiTuEnum, row: number): ITeilnehmer {
+    return this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row];
   }
 
-  loadTeilnehmer(tiTu: TiTuEnum, filter = ''): ITeilnehmer[] {
+  loadTeilnehmer(filter: string, tiTu: TiTuEnum): ITeilnehmer[] {
     this.teilnehmerService.loadTeilnehmer(this.verein).subscribe(result => {
-      const loadedTeilnehmer = this.teilnehmerService.getTeilnehmer(tiTu, this.paginator);
+      const loadedTeilnehmer = this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator);
       this.teilnehmerSubject.next(loadedTeilnehmer);
       this.paginator.length = this.teilnehmerService.getTiTuTeilnehmer(tiTu).length;
     })
-    return this.teilnehmerService.getTeilnehmer(tiTu, this.paginator);
+    return this.teilnehmerService.getTeilnehmer(filter,tiTu, this.paginator);
   }
 
   // pageEvent: PageEvent,
-  update(tiTu: TiTuEnum, row: number, col: number, value: any) {
+  update(filter: string, tiTu: TiTuEnum, row: number, col: number, value: any) {
     // const effRow = pageEvent.previousPageIndex * this.paginator.pageSize + row;
-    if (!this.teilnehmerService.getTeilnehmer(tiTu, this.paginator)) {
+    if (!this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)) {
       console.log('Empty');
     }
-    console.log('Update row: ', row, ', old: ', this.teilnehmerService.getTeilnehmer(tiTu, this.paginator)[row], ', new: ', value);
+    console.log('Update row: ', row, ', old: ', this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row], ', new: ', value);
     switch (col) {
       case 0: {
-        this.teilnehmerService.getTeilnehmer(tiTu, this.paginator)[row].name = value;
+        this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row].name = value;
         break;
       }
       case 1: {
-        this.teilnehmerService.getTeilnehmer(tiTu, this.paginator)[row].vorname = value;
+        this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row].vorname = value;
         break;
       }
       case 2: {
-        this.teilnehmerService.getTeilnehmer(tiTu, this.paginator)[row].jahrgang = value;
+        this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row].jahrgang = value;
         break;
       }
     }
-    this.teilnehmerService.getTeilnehmer(tiTu, this.paginator)[row].dirty = true;
+    this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row].dirty = true;
   }
-  updateTeilnahme(tiTu: TiTuEnum, row: number, col: number, value: any, anlass: IAnlass) {
+  updateTeilnahme(filter: string, tiTu: TiTuEnum, row: number, col: number, value: any, anlass: IAnlass) {
     // const effRow = pageEvent.previousPageIndex * this.paginator.pageSize + row;
-    if (!this.teilnehmerService.getTeilnehmer(tiTu, this.paginator)) {
+    if (!this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)) {
       console.log('Empty');
     }
-    console.log('Update Teilnahmen row: ', row, ', old: ', this.teilnehmerService.getTeilnehmer(tiTu, this.paginator)[row], ', new: ', value);
-    const teilnehmer = this.teilnehmerService.getTeilnehmer(tiTu, this.paginator)[row];
+    console.log('Update Teilnahmen row: ', row, ', old: ', this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row], ', new: ', value);
+    const teilnehmer = this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row];
     if (!teilnehmer.teilnahmen) {
       const teilnahmen: IAnlassLinks = {
         dirty: true,

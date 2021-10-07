@@ -1,7 +1,22 @@
-<div [routerLink]="['/events/', event.id]" class="well hoverwell thumbnail">
-    <h4>{{event.name}}</h4>
-    <div [class.green]="event.start_datum === '14.05.2020'">Date: {{event.start_datum}}</div>
-    <div [ngClass]="getStartTimeClass()">Date: {{event.start_datum}}</div>
-    <div *ngIf="event.start_datum!=event.end_datum">Date: {{event.end_datum}}</div>
-    <button class="btn-btn-primary" (click)="handleClickMe()">Click Me</button>
+<div [routerLink]="['/anlass/', anlass?.id]" class="well hoverwell thumbnail">
+<!--div class="well hoverwell thumbnail"-->
+<div class="row">
+    <div class="col-sm">
+        <h2>{{anlass.anlassBezeichnung}}</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm" [ngClass]="getStartTimeClass()">
+        <span *ngIf="anlass.startDatum!==anlass.endDatum">von</span><span *ngIf="anlass.startDatum!==anlass.endDatum">am</span>: {{anlass.startDatum | date :'EEEE, d MMMM , y'}}</div>
+    <div class="col-sm" *ngIf="anlass.startDatum===anlass.endDatum">bis: {{anlass.endDatum | date :'EEEE, d MMMM , y'}}</div>
+</div>
+<div class="row">
+    <div class="col-sm">Geschlecht: {{anlass.tiTu}}</div>
+    <div class="col-sm">Startberechtigt: {{anlass.tiefsteKategorie}} bis {{anlass.hoechsteKategorie}}</div>
+</div>
+    <mat-checkbox [(ngModel)]="vereinStarted" (click)="vereinStartedClicked($event)">Verein started</mat-checkbox>
+<div *ngIf="vereinStarted" class="row">
+    <div class="col-sm">Teilnehmer: {{anzahlTeilnehmer}}</div>
+    <div class="col-sm">Wertungsrichter: {{statusWertungsrichter}}</div>
+</div>
 </div>
