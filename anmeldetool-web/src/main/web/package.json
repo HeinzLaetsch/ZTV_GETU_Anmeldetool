@@ -23,7 +23,7 @@
     "@angular/platform-browser-dynamic": "~12.2.7",
     "@angular/router": "~12.2.7",
     "@ng-bootstrap/ng-bootstrap": "^10.0.0",
-    "@popperjs/core": "^2.10.1",
+    "@popperjs/core": "^2.10.2",
     "bootstrap": "^4.6.0",
     "jquery": "^3.6.0",
     "jquery-min": "^0.0.2",
