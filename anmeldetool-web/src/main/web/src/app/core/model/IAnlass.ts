@@ -10,5 +10,5 @@ export interface IAnlass {
   endDatum: Date;
   tiTu: TiTuEnum;
   tiefsteKategorie: KategorieEnum;
-  hoechsteKategorie: KategorieEnum
+  hoechsteKategorie: KategorieEnum;
 }

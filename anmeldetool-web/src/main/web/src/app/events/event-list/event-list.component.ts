@@ -4,7 +4,7 @@ import { IEvent } from "../shared";
 import { EventService } from "src/app/core/service/event/event.service";
 import { ToastrService } from "src/app/core/service/toastr/toastr.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
-import { Observable, of, Subscription } from "rxjs";
+import { BehaviorSubject, Observable, of, Subscription } from "rxjs";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 
@@ -18,6 +18,7 @@ export class EventListComponent implements OnInit {
   localAdresseEmitter: EventEmitter<boolean>;
   loaded = false;
   localObs: Observable<boolean>;
+  // localObs: BehaviorSubject<boolean>;
 
   constructor(
     private anlassService: CachingAnlassService,
@@ -26,6 +27,7 @@ export class EventListComponent implements OnInit {
   ) {
     this.localAdresseEmitter = new EventEmitter();
     this.localObs = this.localAdresseEmitter.asObservable();
+    // this.localObs = new BehaviorSubject(false);
   }
 
   ngOnInit() {
@@ -44,20 +46,19 @@ export class EventListComponent implements OnInit {
           localSubscription2.unsubscribe();
         }
       });
+    this.anlassService.isAnlaesseLoaded().subscribe((result) => {
+      if (result) {
+        console.log("now loaded");
+        this.loaded = true;
+        this.localAdresseEmitter.emit(true);
+      }
+    });
   }
 
   get anlaesseLoaded(): Observable<boolean> {
     if (this.loaded) {
       console.log("Already loaded");
       this.localAdresseEmitter.emit(true);
-    } else {
-      this.anlassService.isAnlaesseLoaded().subscribe((result) => {
-        if (result) {
-          console.log("now loaded");
-          this.loaded = true;
-          this.localAdresseEmitter.emit(true);
-        }
-      });
     }
     return this.localObs;
   }

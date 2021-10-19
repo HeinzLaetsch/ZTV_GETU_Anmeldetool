@@ -7,14 +7,11 @@ import lombok.Value;
 
 @Value
 @AllArgsConstructor
-public class WertungsrichterAnlassLinkDTO {
-	UUID id;
+public class PersonAnlassLinkDTO {
 	
 	UUID anlassId;
 	
 	UUID personId;
-	
-	UUID wertungsrichterId;
 	
 	boolean dirty;
 }

@@ -11,6 +11,9 @@ import {
   transferArrayItem,
 } from "@angular/cdk/drag-drop";
 import { IWertungsrichterAnlassLink } from "src/app/core/model/IWertungsrichterAnlassLink";
+import { CachingTeilnehmerService } from "src/app/core/service/caching-services/caching.teilnehmer.service";
+import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
+import { IUser } from "src/app/core/model/IUser";
 
 @Component({
   selector: "app-events-detail",
@@ -20,13 +23,14 @@ import { IWertungsrichterAnlassLink } from "src/app/core/model/IWertungsrichterA
 export class EventsDetailComponent implements OnInit {
   anlass: IAnlass;
   vereinStarted: boolean;
-  wrs = ["Wr1 1", "Wr 2"];
-  assignedWrs = new Array<string>();
+  wrs = new Array<IUser>();
+  assignedWrs = new Array<IUser>();
   _wrAnlassLink: IWertungsrichterAnlassLink[];
 
   constructor(
     public authService: AuthService,
     private anlassService: CachingAnlassService,
+    private userService: CachingUserService,
     private route: ActivatedRoute
   ) {}
 
@@ -44,10 +48,34 @@ export class EventsDetailComponent implements OnInit {
         this.anlass,
         this.authService.currentVerein
       )
-      .subscribe((result) => {
-        this._wrAnlassLink = result;
-      });
+      .subscribe(
+        (result) => {
+          this._wrAnlassLink = result;
+          this.assignedWrs = this.assignedWrs.slice(0, 0);
+          if (result) {
+            this._wrAnlassLink.map((link) => {
+              const user = this.userService.getUserById(link.personId);
+              this.assignedWrs.push(user);
+            });
+          }
+        },
+        (error) => {
+          switch (error.status) {
+            case 404: {
+              break;
+            }
+            default: {
+              console.error(error);
+            }
+          }
+        }
+      );
+    this.wrs = this.userService.getAllWertungsrichter(1);
   }
+  getCleaned(): string {
+    return this.anlass.anlassBezeichnung.replace("%", "");
+  }
+
   get anzahlTeilnehmer(): number {
     if (
       this.anlassService.getTeilnehmer(this.anlass) &&
@@ -60,7 +88,7 @@ export class EventsDetailComponent implements OnInit {
   get statusWertungsrichter(): string {
     return "nicht komplett";
   }
-  get availableWertungsrichter(): string[] {
+  get availableWertungsrichter(): IUser[] {
     return this.wrs;
   }
   drop(event: CdkDragDrop<String[]>) {

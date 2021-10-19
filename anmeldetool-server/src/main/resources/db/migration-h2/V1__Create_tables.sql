@@ -181,19 +181,19 @@ CREATE INDEX idx_ANLASS_AKTIV ON ANLASS (AKTIV);
 
 CREATE INDEX idx_ANLASS_TI_TU ON ANLASS (TI_TU);
 
-INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE) VALUES (random_uuid(), true, false, 'Frühlings wettkampf', 'Effretikon', 'Eselried',
+INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE) VALUES (random_uuid(), true, false, 'Frühlings%wettkampf', 'Effretikon', 'Eselried',
  parsedatetime('17-4-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), parsedatetime('18-4-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), 'Ti', 'K1', 'K4');
 
 INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE) VALUES (random_uuid(), true, false, 'Geräteturnertag', 'Bonstettetn', 'Im Schachen',
  parsedatetime('13-5-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), parsedatetime('13-5-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), 'Tu', 'K1', 'K7');
 
-INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE) VALUES (random_uuid(), true, false, 'Geräteturnerinnen tag', 'Regensdorf', 'Wisacher',
+INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE) VALUES (random_uuid(), true, false, 'Geräteturnerinnen%tag', 'Regensdorf', 'Wisacher',
  parsedatetime('12-6-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), parsedatetime('13-6-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), 'Ti', 'K1', 'K7');
 
 INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE) VALUES (random_uuid(), true, false, 'Gerätewettkampf', 'Rafz', 'Rafz',
  parsedatetime('10-7-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), parsedatetime('11-7-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), 'Ti', 'K1', 'K7');
 
-INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE) VALUES (random_uuid(), true, false, 'Kant. Geräte meisterschaften', 'Bonstetten', 'Im Schachen',
+INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE) VALUES (random_uuid(), true, false, 'Kant. Geräte%meisterschaften', 'Bonstetten', 'Im Schachen',
  parsedatetime('04-09-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), parsedatetime('05-09-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), 'Alle', 'K1', 'K7');
 
 create table ORGANISATION_ANLASS_LINK
@@ -270,3 +270,25 @@ CREATE INDEX idx_TEILNEHMER_ANLASS_LINK_ORGANISATION_ID ON TEILNEHMER_ANLASS_LIN
 
 CREATE INDEX idx_TEILNEHMER_ANLASS_LINK_ANLASS_ID ON TEILNEHMER_ANLASS_LINK (ANLASS_ID);
 
+create table PERSON_ANLASS_LINK
+(
+    ID            	uuid          default random_uuid(),
+    AKTIV         	BOOLEAN,
+    DELETED       	BOOLEAN,
+    CHANGE_DATE   	TIMESTAMP(6),
+    DELETION_DATE 	TIMESTAMP(6),
+ 
+    PERSON_ID 	uuid not null,
+    ANLASS_ID       uuid not null,
+    ORGANISATION_ID uuid not null,
+    
+    PRIMARY KEY (ID)
+);
+
+CREATE INDEX idx_PERSON_ANLASS_LINK_DELETED ON PERSON_ANLASS_LINK (DELETED);
+
+CREATE INDEX idx_PERSON_ANLASS_LINK_PERSON_ID ON PERSON_ANLASS_LINK (PERSON_ID);
+
+CREATE INDEX idx_PERSON_ANLASS_LINK_ORGANISATION_ID ON PERSON_ANLASS_LINK (ORGANISATION_ID);
+
+CREATE INDEX idx_PERSON_ANLASS_LINK_ANLASS_ID ON PERSON_ANLASS_LINK (ANLASS_ID);

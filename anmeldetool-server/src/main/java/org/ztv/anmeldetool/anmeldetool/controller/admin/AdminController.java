@@ -58,7 +58,7 @@ import org.ztv.anmeldetool.anmeldetool.transfer.RolleDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.VerbandDTO;
-import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterAnlassLinkDTO;
+import org.ztv.anmeldetool.anmeldetool.transfer.PersonAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterDTO;
 import org.ztv.anmeldetool.anmeldetool.util.PersonHelper;
 
@@ -134,7 +134,7 @@ public class AdminController {
 	}
 	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter")
 	// @ResponseBody
-	public ResponseEntity<WertungsrichterAnlassLinkDTO> getEingeteilteWertungsrichter(HttpServletRequest request, @PathVariable UUID anlassId, @PathVariable UUID orgId) {
+	public ResponseEntity<Collection<PersonAnlassLinkDTO>> getEingeteilteWertungsrichter(HttpServletRequest request, @PathVariable UUID anlassId, @PathVariable UUID orgId) {
 		return anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId);
 	}
 	

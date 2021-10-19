@@ -13,21 +13,24 @@ import org.springframework.stereotype.Service;
 import org.ztv.anmeldetool.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.anmeldetool.models.OrganisationAnlassLink;
+import org.ztv.anmeldetool.anmeldetool.models.PersonAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.models.Teilnehmer;
 import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.models.Verband;
 import org.ztv.anmeldetool.anmeldetool.repositories.AnlassRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.OrganisationAnlassLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.OrganisationsRepository;
+import org.ztv.anmeldetool.anmeldetool.repositories.PersonAnlassLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.TeilnehmerAnlassLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.transfer.AnlassDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationenDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
-import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterAnlassLinkDTO;
+import org.ztv.anmeldetool.anmeldetool.transfer.PersonAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.util.AnlassHelper;
 import org.ztv.anmeldetool.anmeldetool.util.OrganisationAnlassLinkHelper;
 import org.ztv.anmeldetool.anmeldetool.util.OrganisationHelper;
+import org.ztv.anmeldetool.anmeldetool.util.PersonAnlassLinkHelper;
 import org.ztv.anmeldetool.anmeldetool.util.TeilnehmerAnlassLinkHelper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -50,9 +53,20 @@ public class AnlassService {
 	
 	@Autowired
 	TeilnehmerAnlassLinkRepository teilnehmerAnlassLinkRepository;
+
+	@Autowired
+	PersonAnlassLinkRepository personAnlassLinkRepository;
 	
-	public ResponseEntity<WertungsrichterAnlassLinkDTO> getEingeteilteWertungsrichter(UUID anlassId, UUID orgId) {
-		return ResponseEntity.notFound().build();
+	public ResponseEntity<Collection<PersonAnlassLinkDTO>> getEingeteilteWertungsrichter(UUID anlassId, UUID orgId) {
+		Anlass anlass = this.findAnlassById(anlassId);
+		Organisation organisation = organisationSrv.findOrganisationById(orgId);
+		List<PersonAnlassLink> pal = personAnlassLinkRepository.findByAnlassAndOrganisation(anlass, organisation);
+		Collection<PersonAnlassLinkDTO> palDTOs = PersonAnlassLinkHelper.getPersonAnlassLinkDTOForPersonAnlassLink(pal);
+		if (palDTOs.size() == 0) {
+			return ResponseEntity.notFound().build();
+		} else {
+			return ResponseEntity.ok(palDTOs);
+		}
 	}
 	public ResponseEntity<Collection<AnlassDTO>> getAllAnlaesse() {
 		Collection<AnlassDTO> anlaessDto = new ArrayList<AnlassDTO>();

@@ -94,6 +94,19 @@ export class CachingUserService {
     }
     return undefined;
   }
+
+  getAllWertungsrichter(brevet: number): IUser[] {
+    if (this.loaded) {
+      // console.log('Vereins User: ' , this.users);
+      this.users.map((user) => {
+        this.getWertungsrichter(user.id).subscribe((wr) => {
+          console.log("WR: ", wr);
+        });
+      });
+    }
+    return undefined;
+  }
+
   updateRoles(user: IUser, roles: IRolle[]): Observable<IUser> {
     return this.userService.updateRoles(user, roles);
   }

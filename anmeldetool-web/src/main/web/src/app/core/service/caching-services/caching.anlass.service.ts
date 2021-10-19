@@ -36,12 +36,14 @@ export class CachingAnlassService {
     this.loaded = false;
     return this.loadAnlaesse();
   }
+
   getEingeteilteWertungsrichter(
     anlass: IAnlass,
     verein: IVerein
   ): Observable<IWertungsrichterAnlassLink[]> {
     return this.anlassService.getEingeteilteWertungsrichter(anlass, verein);
   }
+
   getVereinStart(anlass: IAnlass, verein: IVerein): Observable<boolean> {
     return this.anlassService.getVereinStart(anlass, verein);
   }
