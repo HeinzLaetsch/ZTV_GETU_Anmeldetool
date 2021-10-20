@@ -43,7 +43,7 @@ public class WertungsrichterService {
 	public ResponseEntity<WertungsrichterDTO> getWertungsrichterForUserId(String id) {
 		Wertungsrichter wr = getWertungsrichterByPersonId(UUID.fromString(id));
 		if (wr != null) {
-			WertungsrichterDTO wrDTO = WertungsrichterDTO.builder().aktiv(wr.isAktiv()).brevet(wr.getBrevet()).gueltig(wr.isGueltig()).id(wr.getId()).letzterFk(wr.getLetzterFk()).build();
+			WertungsrichterDTO wrDTO = WertungsrichterDTO.builder().personId(UUID.fromString(id)).aktiv(wr.isAktiv()).brevet(wr.getBrevet()).gueltig(wr.isGueltig()).id(wr.getId()).letzterFk(wr.getLetzterFk()).build();
 			return ResponseEntity.ok(wrDTO);
 		}
 		return ResponseEntity.notFound().build();
@@ -51,23 +51,20 @@ public class WertungsrichterService {
 
 	public ResponseEntity<WertungsrichterDTO> update(String id, WertungsrichterDTO wertungsrichterDTO) {
 		if (wertungsrichterDTO.getId() == null) {
-			Wertungsrichter wr = new Wertungsrichter();
 			Person person = personSrv.findPersonById(UUID.fromString(id));
-			wr.setPerson(person);
+			Wertungsrichter wr = Wertungsrichter.builder().person(person).brevet(wertungsrichterDTO.getBrevet()).letzterFk(wertungsrichterDTO.getLetzterFk()).build();
 			wr.setAktiv(wertungsrichterDTO.isAktiv());
 			wr.setGueltig(wertungsrichterDTO.isGueltig());
 			wr.setChangeDate(Calendar.getInstance());
-			wr.setLetzterFk(wr.getLetzterFk());
-			wr.setBrevet(wertungsrichterDTO.getBrevet());
 			wr = wertungsrichterRepo.save(wr);
-			WertungsrichterDTO wrDTO = WertungsrichterDTO.builder().aktiv(wr.isAktiv()).brevet(wr.getBrevet()).gueltig(wr.isGueltig()).id(wr.getId()).letzterFk(wr.getLetzterFk()).build();
+			WertungsrichterDTO wrDTO = WertungsrichterDTO.builder().personId(UUID.fromString(id)).aktiv(wr.isAktiv()).brevet(wr.getBrevet()).gueltig(wr.isGueltig()).id(wr.getId()).letzterFk(wr.getLetzterFk()).build();
 			return ResponseEntity.ok(wrDTO);			
 		}
 		Wertungsrichter wr = getWertungsrichterByPersonId(UUID.fromString(id));
 		if (wr != null) {
 			wr.setBrevet(wertungsrichterDTO.getBrevet());
 			wr = wertungsrichterRepo.save(wr);
-			WertungsrichterDTO wrDTO = WertungsrichterDTO.builder().aktiv(wr.isAktiv()).brevet(wr.getBrevet()).gueltig(wr.isGueltig()).id(wr.getId()).letzterFk(wr.getLetzterFk()).build();
+			WertungsrichterDTO wrDTO = WertungsrichterDTO.builder().personId(UUID.fromString(id)).aktiv(wr.isAktiv()).brevet(wr.getBrevet()).gueltig(wr.isGueltig()).id(wr.getId()).letzterFk(wr.getLetzterFk()).build();
 			return ResponseEntity.ok(wrDTO);
 		}
 		return ResponseEntity.notFound().build();

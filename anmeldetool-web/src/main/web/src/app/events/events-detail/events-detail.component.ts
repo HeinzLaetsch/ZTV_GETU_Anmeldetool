@@ -70,7 +70,18 @@ export class EventsDetailComponent implements OnInit {
           }
         }
       );
-    this.wrs = this.userService.getAllWertungsrichter(1);
+    this.userService.getAllWertungsrichter(1).subscribe((allUser) => {
+      this.wrs = allUser
+        .map((wr) => {
+          if (wr && wr.personId) {
+            const user = this.userService.getUserById(wr.personId);
+            user.wr = wr;
+            return user;
+          }
+          return undefined;
+        })
+        .filter((user) => user);
+    });
   }
   getCleaned(): string {
     return this.anlass.anlassBezeichnung.replace("%", "");

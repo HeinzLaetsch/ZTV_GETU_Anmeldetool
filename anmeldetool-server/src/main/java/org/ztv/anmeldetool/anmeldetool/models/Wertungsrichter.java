@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,4 +29,14 @@ public class Wertungsrichter extends Base {
 	
     @Temporal(TemporalType.DATE)
 	private Calendar letzterFk;
+    
+    public Wertungsrichter() {
+    }
+    
+    @Builder
+    public Wertungsrichter(Person person, int brevet, Calendar letzterFk) {
+    	this.person = person;
+    	this.brevet = brevet;
+    	this.letzterFk = letzterFk;
+    }
 }

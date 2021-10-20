@@ -39,7 +39,7 @@ public class Person extends Base {
     @ToString.Exclude
 	private Set<OrganisationPersonLink> organisationenLinks;
     
-    @OneToOne()
+    @OneToOne(cascade = { CascadeType.PERSIST , CascadeType.MERGE })
     @JoinColumn(name = "wertungsrichter_id", referencedColumnName = "id")
     private Wertungsrichter wertungsrichter;
     

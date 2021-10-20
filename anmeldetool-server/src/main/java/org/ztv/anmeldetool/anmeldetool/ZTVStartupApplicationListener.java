@@ -20,6 +20,7 @@ import org.ztv.anmeldetool.anmeldetool.models.Teilnehmer;
 import org.ztv.anmeldetool.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.anmeldetool.models.Verband;
 import org.ztv.anmeldetool.anmeldetool.models.VerbandEnum;
+import org.ztv.anmeldetool.anmeldetool.models.Wertungsrichter;
 import org.ztv.anmeldetool.anmeldetool.repositories.AnlassRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.OrganisationAnlassLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.OrganisationPersonLinkRepository;
@@ -27,6 +28,7 @@ import org.ztv.anmeldetool.anmeldetool.repositories.OrganisationsRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.PersonenRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.RollenRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.VerbandsRepository;
+import org.ztv.anmeldetool.anmeldetool.repositories.WertungsrichterRepository;
 import org.ztv.anmeldetool.anmeldetool.service.PersonService;
 import org.ztv.anmeldetool.anmeldetool.service.TeilnehmerService;
 import org.ztv.anmeldetool.anmeldetool.service.VerbandService;
@@ -64,6 +66,9 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 	
 	@Autowired
 	TeilnehmerService teilnehmerService;
+	
+	@Autowired
+	WertungsrichterRepository wertungsrichterRepo;
 	
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -119,26 +124,28 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 		opLink.setChangeDate(Calendar.getInstance());
 		verein1.addToPersonenLink(opLink);
 		String password = "pw";
+		
+		// Trainer 1
 		Person person = Person.builder().benutzername("trainer1@verein1.com").name("Trainer1").vorname("Best").handy("076 12 345 67").email("verein1@verein1.com").password(password).build();
 		person.setAktiv(true);
 		person.setChangeDate(Calendar.getInstance());
 		person.addToOrganisationenLink(opLink);
+		
 		RollenLink rollenLink = new RollenLink();
 		rollenLink.setLink(opLink);
 		rollenLink.setRolle(getRolle(RollenEnum.ANMELDER));
 		rollenLink.setAktiv(false);
-		orgRepo.save(verein1);
-		// persRepo.save(person);
-		person = personSrv.create(person, true);
-		// orgPersRepo.save(opLink); Cascade
 		rollenLinkRepo.save(rollenLink);
-		log.info("User created: " + person.getBenutzername());
-
+		
 		opLink = new OrganisationPersonLink();
 		opLink.setAktiv(true);
 		opLink.setChangeDate(Calendar.getInstance());
 		verein1.addToPersonenLink(opLink);
 
+		person = personSrv.create(person, true);
+		log.info("User created: " + person.getBenutzername());
+
+		// Trainer 2
 		person = Person.builder().benutzername("trainer2@tvverein1.ch").name("Trainer2").vorname("Super").handy("078 11 111 11").email("trainer2@tvverein1.ch").password(password).build();
 		person.setAktiv(true);
 		person.setChangeDate(Calendar.getInstance());
@@ -155,8 +162,61 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 		rollenLink.setRolle(getRolle(RollenEnum.VEREINSVERANTWORTLICHER));
 		rollenLink.setAktiv(true);
 		rollenLinkRepo.save(rollenLink);
+
+		opLink = new OrganisationPersonLink();
+		opLink.setAktiv(true);
+		opLink.setChangeDate(Calendar.getInstance());
+		verein1.addToPersonenLink(opLink);
 		
 		person = personSrv.create(person, true);
+		log.info("User created: " + person.getBenutzername());
+
+		// WR Brevet 1
+		person = Person.builder().benutzername("WR.Brevet_1@tvverein1.ch").name("Wertungsrichter").vorname("Brevet 1").handy("078 11 111 11").email("WR.Brevet_1@tvverein1.ch").password(password).build();
+		person.setAktiv(true);
+		person.setChangeDate(Calendar.getInstance());
+		person.addToOrganisationenLink(opLink);
+		
+		rollenLink = new RollenLink();
+		rollenLink.setLink(opLink);
+		rollenLink.setRolle(getRolle(RollenEnum.WERTUNGSRICHTER));
+		rollenLink.setAktiv(true);
+		rollenLinkRepo.save(rollenLink);
+		
+		opLink = new OrganisationPersonLink();
+		opLink.setAktiv(true);
+		opLink.setChangeDate(Calendar.getInstance());
+		verein1.addToPersonenLink(opLink);
+		
+		Wertungsrichter wertungsrichter = Wertungsrichter.builder().person(person).brevet(1).letzterFk(null).build();
+		// wertungsrichter = wertungsrichterRepo.save(wertungsrichter);
+		person.setWertungsrichter(wertungsrichter);
+		
+		person = personSrv.create(person, true);
+
+		log.info("User created: " + person.getBenutzername());
+
+		// WR Brevet 2
+		person = Person.builder().benutzername("WR.Brevet_2@tvverein1.ch").name("Wertungsrichter").vorname("Brevet 2").handy("078 11 111 11").email("WR.Brevet_2@tvverein1.ch").password(password).build();
+		person.setAktiv(true);
+		person.setChangeDate(Calendar.getInstance());
+		person.addToOrganisationenLink(opLink);
+		
+		rollenLink = new RollenLink();
+		rollenLink.setLink(opLink);
+		rollenLink.setRolle(getRolle(RollenEnum.WERTUNGSRICHTER));
+		rollenLink.setAktiv(true);
+		rollenLinkRepo.save(rollenLink);
+		
+		wertungsrichter = Wertungsrichter.builder().person(person).brevet(2).letzterFk(null).build();
+		// wertungsrichter = wertungsrichterRepo.save(wertungsrichter);
+		person.setWertungsrichter(wertungsrichter);
+		
+		person = personSrv.create(person, true);
+		
+		log.info("User created: " + person.getBenutzername());
+
+		verein1 = orgRepo.save(verein1);
 
 		createListOfTeilnehmer(verein1, 33);
 	}

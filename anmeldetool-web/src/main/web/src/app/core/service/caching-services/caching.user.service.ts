@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Observable, BehaviorSubject } from "rxjs";
+import { Observable, BehaviorSubject, forkJoin } from "rxjs";
 import { skip } from "rxjs/operators";
 import { UserService } from "../user/user.service";
 import { IUser } from "../../model/IUser";
@@ -95,14 +95,14 @@ export class CachingUserService {
     return undefined;
   }
 
-  getAllWertungsrichter(brevet: number): IUser[] {
+  getAllWertungsrichter(brevet: number): Observable<IWertungsrichter[]> {
+    const observables = new Array<Observable<IWertungsrichter>>();
     if (this.loaded) {
       // console.log('Vereins User: ' , this.users);
       this.users.map((user) => {
-        this.getWertungsrichter(user.id).subscribe((wr) => {
-          console.log("WR: ", wr);
-        });
+        observables.push(this.getWertungsrichter(user.id));
       });
+      return forkJoin(observables);
     }
     return undefined;
   }

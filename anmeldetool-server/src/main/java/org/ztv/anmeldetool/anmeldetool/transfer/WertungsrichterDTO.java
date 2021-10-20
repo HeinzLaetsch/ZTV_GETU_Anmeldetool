@@ -10,6 +10,7 @@ import lombok.Value;
 @Builder
 public class WertungsrichterDTO {
 	private UUID id;
+	private UUID personId;
 	private int brevet;
 	private boolean gueltig;
 	private Calendar letzterFk;
