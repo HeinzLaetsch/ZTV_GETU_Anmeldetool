@@ -88,7 +88,7 @@ public class AnlassService {
 		List<PersonAnlassLink> pals = personAnlassLinkRepository.findByPersonAndOrganisationAndAnlass(person,
 				organisation, anlass);
 		if (add) {
-			if (pals.size() == 0) {
+			if (pals.size() > 0) {
 				return ResponseEntity.badRequest().build();
 			} else {
 				PersonAnlassLink pal = new PersonAnlassLink();

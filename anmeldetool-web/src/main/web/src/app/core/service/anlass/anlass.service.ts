@@ -66,6 +66,7 @@ export class AnlassService {
       verein?.id +
       "/" +
       "wertungsrichter" +
+      "/" +
       user?.id;
     console.log("addWertungsrichterToAnlass called: ", combinedUrl);
     if (!anlass) {
@@ -94,6 +95,7 @@ export class AnlassService {
       verein?.id +
       "/" +
       "wertungsrichter" +
+      "/" +
       user?.id;
     console.log("deleteWertungsrichterFromAnlass called: ", combinedUrl);
     if (!anlass) {

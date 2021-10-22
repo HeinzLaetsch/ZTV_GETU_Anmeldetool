@@ -32,3 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 /.apt_generated_tests/
+/generated_sources/
+/generated_test_sources/
+/.target/

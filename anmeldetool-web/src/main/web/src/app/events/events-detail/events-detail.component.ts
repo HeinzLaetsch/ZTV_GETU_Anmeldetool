@@ -120,6 +120,14 @@ export class EventsDetailComponent implements OnInit {
         event.previousIndex,
         event.currentIndex
       );
+      console.log("Data: ", event.container.data[0]);
+      this.anlassService
+        .addWertungsrichterToAnlass(
+          this.anlass,
+          this.authService.currentVerein,
+          event.container.data[event.currentIndex] as unknown as IUser
+        )
+        .subscribe((result) => {});
     }
   }
   vereinStartedClicked(event: PointerEvent) {
