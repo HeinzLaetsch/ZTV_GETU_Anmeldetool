@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -133,14 +134,22 @@ public class AdminController {
 		return teilnehmerSrv.updateAnlassTeilnahmen(anlassId, teilnehmerId, tal);   
 	}
 	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter")
-	// @ResponseBody
 	public ResponseEntity<Collection<PersonAnlassLinkDTO>> getEingeteilteWertungsrichter(HttpServletRequest request, @PathVariable UUID anlassId, @PathVariable UUID orgId) {
 		return anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId);
 	}
 	
+	@PostMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter/${personId}")
+	public ResponseEntity<PersonAnlassLinkDTO> postEingeteilteWertungsrichter(HttpServletRequest request, @PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable UUID personId) {
+		return anlassSrv.updateEingeteilteWertungsrichter(anlassId, orgId, personId, true);
+	}
+	
+	@DeleteMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter/${personId}")
+	public ResponseEntity<PersonAnlassLinkDTO> deleteEingeteilteWertungsrichter(HttpServletRequest request, @PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable UUID personId) {
+		return anlassSrv.updateEingeteilteWertungsrichter(anlassId, orgId, personId, true);
+	}
+	
 	// http://localhost:8080/admin/organisationen
 	@GetMapping("/organisationen")
-	// @ResponseBody
 	public ResponseEntity<Collection<OrganisationenDTO>> getOrganisationen() {
 		return organisationSrv.getAllOrganisations();
 	}

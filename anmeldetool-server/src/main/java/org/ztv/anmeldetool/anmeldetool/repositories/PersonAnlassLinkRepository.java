@@ -12,7 +12,7 @@ import org.ztv.anmeldetool.anmeldetool.models.PersonAnlassLink;
 
 @Repository
 public interface PersonAnlassLinkRepository extends JpaRepository<PersonAnlassLink, UUID> {
-	List<PersonAnlassLink> findByPersonAndAnlass(Person person, Anlass anlass);
+	List<PersonAnlassLink> findByPersonAndOrganisationAndAnlass(Person person, Organisation organisation, Anlass anlass);
 	List<PersonAnlassLink> findByAnlass(Anlass anlass);
 	List<PersonAnlassLink> findByAnlassAndOrganisation(Anlass anlass, Organisation organisation);
 }

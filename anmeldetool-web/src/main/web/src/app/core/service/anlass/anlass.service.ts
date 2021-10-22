@@ -51,6 +51,62 @@ export class AnlassService {
     );
   }
 
+  addWertungsrichterToAnlass(
+    anlass: IAnlass,
+    verein: IVerein,
+    user: IUser
+  ): Observable<IWertungsrichterAnlassLink> {
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "organisationen" +
+      "/" +
+      verein?.id +
+      "/" +
+      "wertungsrichter" +
+      user?.id;
+    console.log("addWertungsrichterToAnlass called: ", combinedUrl);
+    if (!anlass) {
+      return of(undefined);
+    }
+    return this.http.post<IWertungsrichterAnlassLink>(combinedUrl, {}).pipe(
+      catchError((error) => {
+        this.handleError<boolean>("addWertungsrichterToAnlass");
+        return of(undefined);
+      })
+    );
+  }
+
+  deleteWertungsrichterFromAnlass(
+    anlass: IAnlass,
+    verein: IVerein,
+    user: IUser
+  ): Observable<IWertungsrichterAnlassLink> {
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "organisationen" +
+      "/" +
+      verein?.id +
+      "/" +
+      "wertungsrichter" +
+      user?.id;
+    console.log("deleteWertungsrichterFromAnlass called: ", combinedUrl);
+    if (!anlass) {
+      return of(undefined);
+    }
+    return this.http.delete<IWertungsrichterAnlassLink>(combinedUrl).pipe(
+      catchError((error) => {
+        this.handleError<boolean>("deleteWertungsrichterFromAnlass");
+        return of(undefined);
+      })
+    );
+  }
+
   getVereinStart(anlass: IAnlass, verein: IVerein): Observable<boolean> {
     const combinedUrl =
       this.url + "/" + anlass?.id + "/" + "organisationen" + "/" + verein?.id;

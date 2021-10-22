@@ -3,6 +3,7 @@ import { Subject, Observable, of, BehaviorSubject, Subscription } from "rxjs";
 import { IVerein } from "src/app/verein/verein";
 import { IAnlass } from "../../model/IAnlass";
 import { IAnlassLinks } from "../../model/IAnlassLinks";
+import { IUser } from "../../model/IUser";
 import { IWertungsrichterAnlassLink } from "../../model/IWertungsrichterAnlassLink";
 import { TiTuEnum } from "../../model/TiTuEnum";
 import { AnlassService } from "../anlass/anlass.service";
@@ -42,6 +43,26 @@ export class CachingAnlassService {
     verein: IVerein
   ): Observable<IWertungsrichterAnlassLink[]> {
     return this.anlassService.getEingeteilteWertungsrichter(anlass, verein);
+  }
+
+  addWertungsrichterToAnlass(
+    anlass: IAnlass,
+    verein: IVerein,
+    user: IUser
+  ): Observable<IWertungsrichterAnlassLink> {
+    return this.anlassService.addWertungsrichterToAnlass(anlass, verein, user);
+  }
+
+  deleteWertungsrichterFromAnlass(
+    anlass: IAnlass,
+    verein: IVerein,
+    user: IUser
+  ): Observable<IWertungsrichterAnlassLink> {
+    return this.anlassService.deleteWertungsrichterFromAnlass(
+      anlass,
+      verein,
+      user
+    );
   }
 
   getVereinStart(anlass: IAnlass, verein: IVerein): Observable<boolean> {

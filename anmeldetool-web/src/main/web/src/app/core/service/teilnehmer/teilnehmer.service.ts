@@ -45,7 +45,7 @@ export class TeilnehmerService {
   }
 
   add(verein: IVerein): Observable<ITeilnehmer> {
-    console.log('getTeilnehmer called');
+    console.log('add Verein called');
     this._anzahlTeilnehmer++;
     const combinedUrl = this.url + verein.id + '/teilnehmer';
     return this.http.post<ITeilnehmer>(combinedUrl, {})
