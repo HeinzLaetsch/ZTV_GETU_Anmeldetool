@@ -1,26 +1,16 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from "@angular/forms";
-import { last } from "rxjs/operators";
-import { Router } from "@angular/router";
-import { AuthService } from "src/app/core/service/auth/auth.service";
-import { ConfirmedValidator } from "src/app/shared/validators/ConfirmedValidator";
-import { IUser } from "src/app/core/model/IUser";
-import { IVerein } from "../verein";
-import { VereinService } from "src/app/core/service/verein/verein.service";
-import { CachingVereinService } from "src/app/core/service/caching-services/caching.verein.service";
-import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
-import { THIS_EXPR } from "@angular/compiler/src/output/output_ast";
+import { FormBuilder } from "@angular/forms";
 import { MatTabGroup } from "@angular/material/tabs";
-import { TeilnehmerTableComponent } from "./teilnehmer-table/teilnehmer-table.component";
-import { IChangeEvent } from "./change-event";
-import { CachingTeilnehmerService } from "src/app/core/service/caching-services/caching.teilnehmer.service";
+import { Router } from "@angular/router";
 import { Observable } from "rxjs";
+import { IUser } from "src/app/core/model/IUser";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
+import { AuthService } from "src/app/core/service/auth/auth.service";
+import { CachingTeilnehmerService } from "src/app/core/service/caching-services/caching.teilnehmer.service";
+import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
+import { IVerein } from "../verein";
+import { IChangeEvent } from "./change-event";
+import { TeilnehmerTableComponent } from "./teilnehmer-table/teilnehmer-table.component";
 
 @Component({
   selector: "app-teilnehmer",
@@ -55,9 +45,11 @@ export class TeilnehmerComponent implements OnInit {
     // console.log("ProfileComponent::ngOnInit: ", this.authService.currentUser);
     this.currentUser = this.authService.currentUser;
     this._vereinsUser = this.userService.getUser();
+    /*
     this.teilnehmerService.loadTeilnehmer(this.authService.currentVerein).subscribe(result => {
       console.log('TeilnehmerComponent::ngOnInit 1: ', result);
     });;
+    */
   }
 
   get vereinsUsers(): IUser[] {

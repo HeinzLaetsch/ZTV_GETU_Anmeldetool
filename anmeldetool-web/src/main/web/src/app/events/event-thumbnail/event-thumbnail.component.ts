@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
@@ -14,6 +14,7 @@ export class EventThumbnailComponent implements OnInit {
 
   someProperty: any = "some Text";
   vereinStarted: boolean;
+  anzahlTeilnehmer: number;
 
   constructor(
     public authService: AuthService,
@@ -23,6 +24,10 @@ export class EventThumbnailComponent implements OnInit {
   ngOnInit() {
     console.log(
       "Anlass: ",
+      this.anlass?.id,
+      " , ",
+      this.anlass?.anlassBezeichnung,
+      " , ",
       this.anlass?.startDatum,
       " , ",
       this.anlass?.startDatum
@@ -32,8 +37,42 @@ export class EventThumbnailComponent implements OnInit {
       .subscribe((result) => {
         this.vereinStarted = result;
       });
+    this.anzahlTeilnehmer = 0;
+    this.anlassService
+      .loadTeilnahmen(this.anlass, this.authService.currentVerein, true)
+      .subscribe((result) => {
+        if (result) {
+          const links = this.anlassService.getTeilnehmerForAnlass(this.anlass);
+          if (links) {
+            if (links.anlassLinks)
+              this.anzahlTeilnehmer = links.anlassLinks.length;
+          }
+        }
+      });
   }
 
+  getStartedClass() {
+    if (!this.vereinStarted) {
+      return { redNoMargin: true };
+    } else {
+      return { greenNoMargin: true };
+    }
+  }
+
+  getTeilnehmerClass() {
+    if (this.anzahlTeilnehmer === 0) {
+      return { redNoMargin: true };
+    } else {
+      return { greenNoMargin: true };
+    }
+  }
+  getWertungsrichterClass() {
+    if (this.anzahlTeilnehmer !== 0) {
+      return { redNoMargin: true };
+    } else {
+      return { greenNoMargin: true };
+    }
+  }
   handleClickMe() {
     this.anlassClick.emit(this.anlass.anlassBezeichnung);
   }
@@ -50,16 +89,6 @@ export class EventThumbnailComponent implements OnInit {
       .subscribe((result) => {
         console.log("Clicked: ", result);
       });
-  }
-
-  get anzahlTeilnehmer(): number {
-    if (
-      this.anlassService.getTeilnehmer(this.anlass) &&
-      this.anlassService.getTeilnehmer(this.anlass).anlassLinks
-    ) {
-      return this.anlassService.getTeilnehmer(this.anlass).anlassLinks.length;
-    }
-    return 0;
   }
 
   get statusWertungsrichter(): string {

@@ -5,18 +5,42 @@
     <mat-tab label="Turnerinnen">
       <app-teilnehmer-table [tiTu]="ti"></app-teilnehmer-table>
       <div>
-        <button mat-fab [disabled]="disAllowAdd" color="primary" #tooltip="matTooltip"
-          matTooltip="Neue Turnerin anlegen" matTooltipPosition="below" matTooltipHideDelay="500"
-          (click)="addTurnerin($event)">
+        <button
+          mat-fab
+          [disabled]="disAllowAdd"
+          color="primary"
+          #tooltip="matTooltip"
+          matTooltip="Neue Turnerin anlegen"
+          matTooltipPosition="below"
+          matTooltipHideDelay="500"
+          (click)="addTurnerin($event)"
+        >
           Neu
         </button>
-        <button [disabled]="disAllowSave" class="mat-fab2" mat-fab color="primary" #tooltip="matTooltip"
-          matTooltip="Änderungen speichern" matTooltipPosition="below" matTooltipHideDelay="500"
-          (click)="saveTeilnehmer($event)">
+        <button
+          [disabled]="disAllowSave"
+          class="mat-fab2"
+          mat-fab
+          color="primary"
+          #tooltip="matTooltip"
+          matTooltip="Änderungen speichern"
+          matTooltipPosition="below"
+          matTooltipHideDelay="500"
+          (click)="saveTeilnehmer($event)"
+        >
           Speichern
         </button>
-        <button [disabled]="disAllowCancel" class="mat-fab3" mat-fab color="primary" #tooltip="matTooltip"
-          matTooltip="Änderungen verwerfen" matTooltipPosition="below" matTooltipHideDelay="500" (click)="cancel()">
+        <button
+          [disabled]="disAllowCancel"
+          class="mat-fab3"
+          mat-fab
+          color="primary"
+          #tooltip="matTooltip"
+          matTooltip="Änderungen verwerfen"
+          matTooltipPosition="below"
+          matTooltipHideDelay="500"
+          (click)="cancel()"
+        >
           Verwerfen
         </button>
       </div>
@@ -24,21 +48,45 @@
     <mat-tab label="Turner">
       <app-teilnehmer-table [tiTu]="tu"></app-teilnehmer-table>
       <div>
-        <button mat-fab [disabled]="disAllowAdd" color="primary" #tooltip="matTooltip" matTooltip="Neuen Turner anlegen"
-          matTooltipPosition="below" matTooltipHideDelay="500" (click)="addTurner($event)">
+        <button
+          mat-fab
+          [disabled]="disAllowAdd"
+          color="primary"
+          #tooltip="matTooltip"
+          matTooltip="Neuen Turner anlegen"
+          matTooltipPosition="below"
+          matTooltipHideDelay="500"
+          (click)="addTurner($event)"
+        >
           Neu
         </button>
-        <button [disabled]="disAllowSave" class="mat-fab2" mat-fab color="primary" #tooltip="matTooltip"
-          matTooltip="Änderungen speichern" matTooltipPosition="below" matTooltipHideDelay="500"
-          (click)="saveTeilnehmer($event)">
+        <button
+          [disabled]="disAllowSave"
+          class="mat-fab2"
+          mat-fab
+          color="primary"
+          #tooltip="matTooltip"
+          matTooltip="Änderungen speichern"
+          matTooltipPosition="below"
+          matTooltipHideDelay="500"
+          (click)="saveTeilnehmer($event)"
+        >
           Speichern
         </button>
-        <button [disabled]="disAllowCancel" class="mat-fab3" mat-fab color="primary" #tooltip="matTooltip"
-          matTooltip="Änderungen verwerfen" matTooltipPosition="below" matTooltipHideDelay="500" (click)="cancel()">
+        <button
+          [disabled]="disAllowCancel"
+          class="mat-fab3"
+          mat-fab
+          color="primary"
+          #tooltip="matTooltip"
+          matTooltip="Änderungen verwerfen"
+          matTooltipPosition="below"
+          matTooltipHideDelay="500"
+          (click)="cancel()"
+        >
           Verwerfen
         </button>
       </div>
-
     </mat-tab>
   </mat-tab-group>
 </div>

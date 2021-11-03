@@ -1,5 +1,5 @@
 import { BrowserModule } from "@angular/platform-browser";
-import { NgModule } from "@angular/core";
+import { APP_INITIALIZER, NgModule } from "@angular/core";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
@@ -27,6 +27,18 @@ import { LoginDialogComponent } from "./verein/login/login-dialog.component";
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from "@angular/material/form-field";
 import { HttpSecurityInterceptorService } from "./core/interceptor/http.security.interceptor.service";
 import { SharedComponentsModule } from "./shared/component/shared.components.module";
+import { VereinService } from "./core/service/verein/verein.service";
+import { CachingVereinService } from "./core/service/caching-services/caching.verein.service";
+import { skip, tap } from "rxjs/operators";
+
+export function initVereinservice(
+  vereinService: CachingVereinService
+): Function {
+  return () =>
+    vereinService
+      .loadVereine()
+      .pipe(tap((value) => console.log("Vereinservice loaded, ", value)));
+}
 
 @NgModule({
   declarations: [
@@ -54,20 +66,12 @@ import { SharedComponentsModule } from "./shared/component/shared.components.mod
     SharedComponentsModule,
   ],
   providers: [
-    //EventRouteActivatorService,
-    /*{
-      provide: 'canDeactivateCreateEvent', useValue: checkDirtyState Ist zum verhindern, dass ein Dialog mit geänderten Daten ohne speichern verlassen wird
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initVereinservice,
+      deps: [CachingVereinService],
+      multi: true,
     },
-    */
-    //EventListResolverService, Wartet bis Eventliste bereitsteht
-    /*
-  {
-    provide: APP_INITIALIZER,
-    useFactory: initializeKeycloak,
-    multi: true,
-    deps: [KeycloakService],
-  },
-  */
     {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
       useValue: { floatLabel: "always" },

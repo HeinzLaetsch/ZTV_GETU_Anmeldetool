@@ -2,11 +2,11 @@ import { AfterViewInit, Component, EventEmitter, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { LoginDialogComponent } from "./verein/login/login-dialog.component";
 import { MatDialog } from "@angular/material/dialog";
-import { AuthService } from './core/service/auth/auth.service';
-import { NewVereinComponent } from './verein/new-verein/new-verein.component';
-import { NewAnmelderComponent } from './verein/new-anmelder/new-anmelder.component';
-import { CachingVereinService } from './core/service/caching-services/caching.verein.service';
-import { Observable } from 'rxjs';
+import { AuthService } from "./core/service/auth/auth.service";
+import { NewVereinComponent } from "./verein/new-verein/new-verein.component";
+import { NewAnmelderComponent } from "./verein/new-anmelder/new-anmelder.component";
+import { CachingVereinService } from "./core/service/caching-services/caching.verein.service";
+import { Observable } from "rxjs";
 
 /** @title Main Component */
 @Component({
@@ -19,16 +19,21 @@ export class AnmeldeToolComponent implements OnInit, AfterViewInit {
   dialogOpen = false;
   _authenticated: boolean;
 
-  constructor(private authService: AuthService, public vereinService: CachingVereinService, private router: ActivatedRoute, public dialog: MatDialog) {
-    console.log('Konst');
+  constructor(
+    private authService: AuthService,
+    public vereinService: CachingVereinService,
+    private router: ActivatedRoute,
+    public dialog: MatDialog
+  ) {
+    console.log("Konst");
   }
 
   fillerNav = Array.from({ length: 10 }, (_, i) => `Nav Item ${i + 1}`);
 
   ngOnInit() {
-      this.vereinService.loadVereine().subscribe( result => {
-        console.log('AnmeldeToolComponent::ngOnInit 1: ' , result);
-      });
+    this.vereinService.loadVereine().subscribe((result) => {
+      console.log("AnmeldeToolComponent::ngOnInit 1: ", result);
+    });
 
     if (!this.authService.isAuthenticated()) {
       // console.log('AnmeldeToolComponent::ngOnInit 2: ');
@@ -36,22 +41,21 @@ export class AnmeldeToolComponent implements OnInit, AfterViewInit {
     }
   }
 
-  ngAfterViewInit(): void {
-  }
+  ngAfterViewInit(): void {}
 
   openLoginDialog() {
     this.dialogOpen = true;
 
-    console.log('Dialog open');
+    console.log("Dialog open");
 
     let dialogRef = this.dialog.open(LoginDialogComponent, {
       height: "500px",
       width: "500px",
-      disableClose: true
+      disableClose: true,
     });
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('Dialog Closed' , result);
-      if (result === 'OK') {
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log("Dialog Closed", result);
+      if (result === "OK") {
         this.dialogOpen = false;
       }
       if (result === 1) {
@@ -66,11 +70,11 @@ export class AnmeldeToolComponent implements OnInit, AfterViewInit {
     let dialogRef1 = this.dialog.open(NewVereinComponent, {
       height: "900px",
       width: "500px",
-      disableClose: true
+      disableClose: true,
     });
-    dialogRef1.afterClosed().subscribe(result => {
-      console.log('Dialog 1 Closed', result);
-      if (result !== 'OK') {
+    dialogRef1.afterClosed().subscribe((result) => {
+      console.log("Dialog 1 Closed", result);
+      if (result !== "OK") {
         this.openLoginDialog();
       } else {
         this.dialogOpen = false;
@@ -78,19 +82,20 @@ export class AnmeldeToolComponent implements OnInit, AfterViewInit {
     });
   }
   openNewAnmelderDialog() {
-  let dialogRef2 = this.dialog.open(NewAnmelderComponent, {
-    height: "770px",
-    width: "500px",
-    disableClose: true
-  });
-  dialogRef2.afterClosed().subscribe(result => {
-    console.log('Dialog 2 Closed' , result);
-    this.openLoginDialog();
-  });
+    let dialogRef2 = this.dialog.open(NewAnmelderComponent, {
+      height: "770px",
+      width: "500px",
+      disableClose: true,
+    });
+    dialogRef2.afterClosed().subscribe((result) => {
+      console.log("Dialog 2 Closed", result);
+      this.openLoginDialog();
+    });
   }
+  /* 
   get vereineLoaded(): Observable<boolean> {
     return this.vereinService.isVereineLoaded();
-  }
+  }*/
 
   get authenticated() {
     // console.log('ngOnInit 2: ');
@@ -112,20 +117,9 @@ export class AnmeldeToolComponent implements OnInit, AfterViewInit {
   }
   getOverlayContentClass(): string {
     if (this.authenticated) {
-      return '';
+      return "";
     } else {
-      return 'overlay-content-login';
-    }
-    switch (this.showPage) {
-      case 0:
-        // return 'overlay-content-login'
-        break;
-      case 1:
-        return "overlay-content-newverein";
-        break;
-      case 2:
-        return "overlay-content-newanmelder";
-        break;
+      return "overlay-content-login";
     }
   }
 }

@@ -41,8 +41,8 @@ public class PersonService {
 	@Autowired
 	PersonenRepository persRepo;
 
-	public Collection<PersonDTO> findPersonsByOrganisation(String orgId) {
-		Collection<Person> persons = persRepo.findByBenutzernameOrganisationId(orgId);
+	public Collection<PersonDTO> findPersonsByOrganisation(UUID orgId) {
+		Collection<Person> persons = persRepo.findByOrganisationId(orgId);
 		List<PersonDTO> personDTOs = new ArrayList<PersonDTO>();
 		for (Person person : persons) {
 			personDTOs.add(PersonHelper.createPersonDTO(person, orgId));
@@ -148,7 +148,7 @@ public class PersonService {
 							found = true;
 							rl.setChangeDate(Calendar.getInstance());
 							rl.setAktiv(rolleDTO.isAktiv());
-							
+
 						}
 					}
 					if (!found) {

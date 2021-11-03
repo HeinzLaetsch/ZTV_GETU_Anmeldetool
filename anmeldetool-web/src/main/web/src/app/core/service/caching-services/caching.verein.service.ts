@@ -1,17 +1,13 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Subject, Observable, of, BehaviorSubject, Subscription } from 'rxjs';
-import { IVerein } from 'src/app/verein/verein';
-import { catchError, skip } from 'rxjs/operators';
-import { VereinService } from '../verein/verein.service';
+import { Injectable } from "@angular/core";
+import { Observable, Subject } from "rxjs";
+import { IVerein } from "src/app/verein/verein";
+import { VereinService } from "../verein/verein.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
-
 export class CachingVereinService {
-
-  private vereineLoaded: BehaviorSubject<boolean>;
+  private vereineLoaded: Subject<boolean>;
 
   private _loadRunning = false;
 
@@ -20,33 +16,35 @@ export class CachingVereinService {
   private vereine: IVerein[];
 
   constructor(private vereinService: VereinService) {
-    // this.vereineLoaded = new BehaviorSubject<boolean>(undefined);
-    this.vereineLoaded = new BehaviorSubject<boolean>(undefined);
+    this.vereineLoaded = new Subject<boolean>();
   }
+
   reset(): Observable<boolean> {
     this.loaded = false;
     return this.loadVereine();
   }
-  isVereineLoaded(): Observable<boolean> {
-    return this.vereineLoaded.asObservable();
-  }
+
   loadVereine(): Observable<boolean> {
-    if(!this._loadRunning && !this.loaded) {
+    if (!this._loadRunning && !this.loaded) {
       this._loadRunning = true;
-       this.vereinService.getVereine().subscribe( vereine => {
+      this.vereinService.getVereine().subscribe((vereine) => {
         this.vereine = vereine;
         this._loadRunning = false;
-        this.loaded = true
+        this.loaded = true;
+        console.log("Vereine Loaded");
         this.vereineLoaded.next(true);
-        console.log('Vereine Loaded');
+        console.log("Vereine Loaded 2");
       });
     } else {
       if (this.loaded) {
-        console.log('Vereine already loaded');
+        console.log("Vereine already loaded");
         this.vereineLoaded.next(true);
       }
     }
-    // return this.vereineLoaded.asObservable().pipe(skip(1));
+    this.vereineLoaded.asObservable().subscribe((result) => {
+      console.log("loadVereine : ", result);
+      this.vereineLoaded.complete();
+    });
     return this.vereineLoaded.asObservable();
   }
 
@@ -58,7 +56,7 @@ export class CachingVereinService {
   }
   getVereinById(id: string) {
     if (this.loaded) {
-      return this.vereine.find( verein => verein.id = id);
+      return this.vereine.find((verein) => verein.id === id);
     }
     return undefined;
   }

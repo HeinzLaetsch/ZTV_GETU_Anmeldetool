@@ -118,13 +118,8 @@
               {{ option }}
             </mat-option>
           </mat-select>
-
-          <!--mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let option of getKategorien(anlass)" [value]="option" (optionSelected)="change($event, row, rowIndex, colIndex)">
-            {{ option }}
-          </mat-option>
-        </mat-autocomplete-->
         </mat-cell>
+
         <ng-container
           *ngIf="!last"
           [matColumnDef]="anlass.anlassBezeichnung + 'Btn'"

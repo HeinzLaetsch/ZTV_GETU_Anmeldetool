@@ -12,6 +12,24 @@
   color: #01d801 !important;
 }
 
+.red {
+  color: #d31010 !important;
+}
+
+.greenNoMargin {
+  color: #01d801 !important;
+  margin-left: 0px;
+}
+
+.redNoMargin {
+  color: #d31010 !important;
+  margin-left: 0px;
+}
+
 .bold {
   font-weight: bold;
+}
+
+.cyan {
+  background-color: #488dd6;
 }

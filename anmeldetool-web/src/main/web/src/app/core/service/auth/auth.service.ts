@@ -1,21 +1,19 @@
+import { HttpClient } from "@angular/common/http";
 import { EventEmitter, Injectable } from "@angular/core";
+import { Observable, of, throwError } from "rxjs";
 import { IUser } from "src/app/core/model/IUser";
-import { Observable, of, Subscription, throwError } from "rxjs";
-import {
-  HttpClient,
-} from "@angular/common/http";
+import { IVerein } from "src/app/verein/verein";
 import { ILoginData } from "../../model/ILoginData";
-import { IVerein } from 'src/app/verein/verein';
-import { CachingVereinService } from '../caching-services/caching.verein.service';
-import { CachingUserService } from '../caching-services/caching.user.service';
+import { CachingUserService } from "../caching-services/caching.user.service";
+import { CachingVereinService } from "../caching-services/caching.verein.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class AuthService {
-  private loginUrl    = "http://localhost:8080/admin/login";
-  private VereineUrl  = "http://localhost:8080/admin/organisationen";
-  private userUrl     = "http://localhost:8080/admin/user";
+  private loginUrl = "http://localhost:8080/admin/login";
+  private VereineUrl = "http://localhost:8080/admin/organisationen";
+  private userUrl = "http://localhost:8080/admin/user";
 
   isLoggedIn: boolean = false;
   token: string;
@@ -23,9 +21,13 @@ export class AuthService {
   currentUser: IUser;
   currentVerein: IVerein;
 
-  constructor(private http: HttpClient, private vereinService: CachingVereinService, private userService: CachingUserService) {
+  constructor(
+    private http: HttpClient,
+    private vereinService: CachingVereinService,
+    private userService: CachingUserService
+  ) {
     console.info("Service created");
-    this.token = 'undefined';
+    this.token = "undefined";
   }
 
   setToken(token: string) {
@@ -36,42 +38,43 @@ export class AuthService {
   }
 
   createVereinAndUser(verein: IVerein, user: IUser): Observable<IUser> {
-    console.log('Verein 1: ' , verein);
+    console.log("Verein 1: ", verein);
     const emitter: EventEmitter<IUser> = new EventEmitter();
-    this.http.post<IVerein>(this.VereineUrl, verein).subscribe(
-    verein => {
+    this.http.post<IVerein>(this.VereineUrl, verein).subscribe((verein) => {
       this.currentVerein = verein;
-      console.log('Verein 2: ' , verein);
+      console.log("Verein 2: ", verein);
       user.organisationid = verein.id;
-      this.vereinService.reset().subscribe( result => console.log('Vereins Cache reloaded: ' , result));
-      this.createUser(user).subscribe( user => {
+      this.vereinService
+        .reset()
+        .subscribe((result) => console.log("Vereins Cache reloaded: ", result));
+      this.createUser(user).subscribe((user) => {
         emitter.emit(user);
-        this.userService.reset().subscribe( result => console.log('User Cache reloaded: ' , result));
-      })
+        this.userService
+          .reset()
+          .subscribe((result) => console.log("User Cache reloaded: ", result));
+      });
     });
     return emitter.asObservable();
   }
 
   createUser(user: IUser): Observable<IUser> {
     const emitter: EventEmitter<IUser> = new EventEmitter();
-    this.http.post<IUser>(this.userUrl, user).subscribe(
-      user => {
-        this.currentUser = user;
-        console.log('User: ' , user);
-        emitter.emit(user);
-      });
-      return emitter.asObservable();
+    this.http.post<IUser>(this.userUrl, user).subscribe((user) => {
+      this.currentUser = user;
+      console.log("User: ", user);
+      emitter.emit(user);
+    });
+    return emitter.asObservable();
   }
 
   updateUser(user: IUser): Observable<IUser> {
     const emitter: EventEmitter<IUser> = new EventEmitter();
-    this.http.patch<IUser>(this.userUrl, user).subscribe(
-      user => {
-        this.currentUser = user;
-        console.log('User: ' , user);
-        emitter.emit(user);
-      });
-      return emitter.asObservable();
+    this.http.patch<IUser>(this.userUrl, user).subscribe((user) => {
+      this.currentUser = user;
+      console.log("User: ", user);
+      emitter.emit(user);
+    });
+    return emitter.asObservable();
   }
 
   login(
@@ -86,17 +89,18 @@ export class AuthService {
     };
     const emitter: EventEmitter<IUser> = new EventEmitter();
     this.http.post<IUser>(this.loginUrl, loginData).subscribe(
-      user => {
+      (user) => {
         console.log("Response: ", user);
         this.currentUser = user;
+        this.currentVerein = this.vereinService.getVereinById(
+          user.organisationid
+        );
+        this.userService.loadUser().subscribe((result) => {
+          console.log("Users loaded: ", result);
+        });
         emitter.emit(user);
-        user.organisationid
-        this.currentVerein = this.vereinService.getVereinById(user.organisationid);
-        this.userService.loadUser().subscribe( result => {
-          console.log('Users loaded: ' , result);
-        })
       },
-      error => {
+      (error) => {
         console.log("Error: ", error);
         return throwError(error);
       }
@@ -104,8 +108,8 @@ export class AuthService {
     return emitter.asObservable();
     //  .pipe(catchError(this.handleError<IUser>()));
   }
-/*
-      */
+  /*
+   */
   isAuthenticated(): boolean {
     if (this.currentUser == null) {
       // console.log('not logged in');
@@ -117,7 +121,9 @@ export class AuthService {
   }
 
   private hasRole(roleName: string): boolean {
-    const rollen = this.currentUser.rollen.filter( role => role.name === roleName);
+    const rollen = this.currentUser.rollen.filter(
+      (role) => role.name === roleName
+    );
     // console.log('Rollen: ' , rollen, ' , Name: ', roleName);
     if (rollen && rollen.length > 0) {
       return rollen[0].aktiv;
@@ -126,16 +132,16 @@ export class AuthService {
   }
 
   isVereinsAnmmelder() {
-    return this.hasRole('ANMELDER');
+    return this.hasRole("ANMELDER");
   }
 
   isVereinsVerantwortlicher() {
-    return this.hasRole('VEREINSVERANTWORTLICHER');
+    return this.hasRole("VEREINSVERANTWORTLICHER");
   }
 
   isWertungsrichter() {
-    return this.hasRole('WERTUNGSRICHTER');
- }
+    return this.hasRole("WERTUNGSRICHTER");
+  }
 
   private handleError<T>(operation = "operation", result?: T) {
     return (error: any): Observable<T> => {

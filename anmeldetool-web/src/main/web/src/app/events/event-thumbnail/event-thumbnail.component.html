@@ -1,5 +1,4 @@
 <div [routerLink]="['/anlass/', anlass?.id]" class="well hoverwell thumbnail">
-  <!--div class="well hoverwell thumbnail"-->
   <div class="row">
     <div class="col-sm">
       <h2>{{ getCleaned() }}</h2>
@@ -22,13 +21,19 @@
       {{ anlass.hoechsteKategorie }}
     </div>
   </div>
-  <mat-checkbox
-    [(ngModel)]="vereinStarted"
-    (click)="vereinStartedClicked($event)"
-    >Verein started</mat-checkbox
-  >
+  <div class="row" [ngClass]="getStartedClass()">
+    <mat-checkbox
+      [(ngModel)]="vereinStarted"
+      (click)="vereinStartedClicked($event)"
+      >Verein started</mat-checkbox
+    >
+  </div>
   <div *ngIf="vereinStarted" class="row">
-    <div class="col-sm">Teilnehmer: {{ anzahlTeilnehmer }}</div>
-    <div class="col-sm">Wertungsrichter: {{ statusWertungsrichter }}</div>
+    <div class="col-sm" [ngClass]="getTeilnehmerClass()">
+      Teilnehmer: {{ anzahlTeilnehmer }}
+    </div>
+    <div class="col-sm" [ngClass]="getWertungsrichterClass()">
+      Wertungsrichter: {{ statusWertungsrichter }}
+    </div>
   </div>
 </div>

@@ -44,10 +44,10 @@ public class PersonHelper {
 				.organisationid(organisation.getId()).rollen(rollenDto).aktiv(person.isAktiv()).build();
 	}
 
-	public static PersonDTO createPersonDTO(Person person, String orgId) {
+	public static PersonDTO createPersonDTO(Person person, UUID orgId) {
 		return PersonDTO.builder().id(person.getId()).benutzername(person.getBenutzername()).name(person.getName())
-				.email(person.getEmail()).handy(person.getHandy()).vorname(person.getVorname())
-				.organisationid(UUID.fromString(orgId)).aktiv(person.isAktiv()).build();
+				.email(person.getEmail()).handy(person.getHandy()).vorname(person.getVorname()).organisationid(orgId)
+				.aktiv(person.isAktiv()).build();
 	}
 
 	public static Person createPerson(PersonDTO personDTO) {

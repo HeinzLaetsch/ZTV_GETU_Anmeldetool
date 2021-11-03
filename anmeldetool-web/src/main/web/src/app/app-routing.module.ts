@@ -1,22 +1,18 @@
 import { NgModule } from "@angular/core";
-import { Routes, RouterModule } from "@angular/router";
-import { Page404Component } from "./error/page404/page404.component";
-
+import { RouterModule, Routes } from "@angular/router";
 import {
   EventListComponent,
-  EventsDetailComponent,
-  CreateEventComponent,
   EventRouteActivatorService,
-  EventListResolverService,
+  EventsDetailComponent,
 } from "./events/index";
-import { AuthServiceResolverService } from "./core/routing/authService-resolver.service";
-import { NewAnmelderComponent } from "./verein/new-anmelder/new-anmelder.component";
-import { NewVereinComponent } from "./verein/new-verein/new-verein.component";
 
 const routes: Routes = [
   //   {path: 'newVerein', component: NewVereinComponent},
   //   {path: 'newAnmelder', component: NewAnmelderComponent},
-  { path: "anlass", component: EventListComponent },
+  {
+    path: "anlass",
+    component: EventListComponent,
+  },
   // {path: 'events', component: EventListComponent, resolve: [{activated: AuthServiceResolverService}, {events: EventListResolverService}]},
   // {path: 'events/new', component: CreateEventComponent, canDeactivate: ['canDeactivateCreateEvent']},
   {
@@ -30,6 +26,7 @@ const routes: Routes = [
     path: "teilnehmer",
     loadChildren: () =>
       import("./verein/teilnehmer.module").then((m) => m.TeilnehmerModule),
+    // resolve: [{ anzahlTeilnehmer: TeilnehmerResolverService }],
   },
   {
     path: "user",

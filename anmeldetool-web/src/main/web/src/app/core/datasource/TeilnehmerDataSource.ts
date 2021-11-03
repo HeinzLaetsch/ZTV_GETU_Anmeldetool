@@ -10,6 +10,7 @@ import { IAnlassLink } from "../model/IAnlassLink";
 import { IAnlassLinks } from "../model/IAnlassLinks";
 import { ITeilnehmer } from "../model/ITeilnehmer";
 import { TiTuEnum } from "../model/TiTuEnum";
+import { CachingAnlassService } from "../service/caching-services/caching.anlass.service";
 import { CachingTeilnehmerService } from "../service/caching-services/caching.teilnehmer.service";
 
 export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
@@ -22,7 +23,10 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
 
   public loading$ = this.loadingSubject.asObservable();
 
-  constructor(private teilnehmerService: CachingTeilnehmerService, private verein: IVerein) { }
+  constructor(
+    private teilnehmerService: CachingTeilnehmerService,
+    private verein: IVerein
+  ) {}
 
   connect(collectionViewer: CollectionViewer): Observable<ITeilnehmer[]> {
     return this.teilnehmerSubject.asObservable();
@@ -34,58 +38,98 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
   }
 
   getTeilnehmer(filter: string, tiTu: TiTuEnum, row: number): ITeilnehmer {
-    return this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row];
+    return this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[
+      row
+    ];
   }
 
   loadTeilnehmer(filter: string, tiTu: TiTuEnum): ITeilnehmer[] {
-    this.teilnehmerService.loadTeilnehmer(this.verein).subscribe(result => {
-      const loadedTeilnehmer = this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator);
+    this.teilnehmerService.loadTeilnehmer(this.verein).subscribe((result) => {
+      const loadedTeilnehmer = this.teilnehmerService.getTeilnehmer(
+        filter,
+        tiTu,
+        this.paginator
+      );
       this.teilnehmerSubject.next(loadedTeilnehmer);
-      this.paginator.length = this.teilnehmerService.getTiTuTeilnehmer(tiTu).length;
-    })
-    return this.teilnehmerService.getTeilnehmer(filter,tiTu, this.paginator);
+      this.paginator.length =
+        this.teilnehmerService.getTiTuTeilnehmer(tiTu).length;
+    });
+    return this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator);
   }
 
   // pageEvent: PageEvent,
   update(filter: string, tiTu: TiTuEnum, row: number, col: number, value: any) {
     // const effRow = pageEvent.previousPageIndex * this.paginator.pageSize + row;
     if (!this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)) {
-      console.log('Empty');
+      console.log("Empty");
     }
-    console.log('Update row: ', row, ', old: ', this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row], ', new: ', value);
+    console.log(
+      "Update row: ",
+      row,
+      ", old: ",
+      this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row],
+      ", new: ",
+      value
+    );
     switch (col) {
       case 0: {
-        this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row].name = value;
+        this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[
+          row
+        ].name = value;
         break;
       }
       case 1: {
-        this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row].vorname = value;
+        this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[
+          row
+        ].vorname = value;
         break;
       }
       case 2: {
-        this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row].jahrgang = value;
+        this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[
+          row
+        ].jahrgang = value;
         break;
       }
     }
-    this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row].dirty = true;
+    this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[
+      row
+    ].dirty = true;
   }
-  updateTeilnahme(filter: string, tiTu: TiTuEnum, row: number, col: number, value: any, anlass: IAnlass) {
+  updateTeilnahme(
+    filter: string,
+    tiTu: TiTuEnum,
+    row: number,
+    col: number,
+    value: any,
+    anlass: IAnlass
+  ) {
     // const effRow = pageEvent.previousPageIndex * this.paginator.pageSize + row;
     if (!this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)) {
-      console.log('Empty');
+      console.log("Empty");
     }
-    console.log('Update Teilnahmen row: ', row, ', old: ', this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row], ', new: ', value);
-    const teilnehmer = this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row];
+    console.log(
+      "Update Teilnahmen row: ",
+      row,
+      ", old: ",
+      this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row],
+      ", new: ",
+      value
+    );
+    const teilnehmer = this.teilnehmerService.getTeilnehmer(
+      filter,
+      tiTu,
+      this.paginator
+    )[row];
     if (!teilnehmer.teilnahmen) {
       const teilnahmen: IAnlassLinks = {
         dirty: true,
-        anlassLinks: new Array<IAnlassLink>()
+        anlassLinks: new Array<IAnlassLink>(),
       };
       teilnehmer.teilnahmen = teilnahmen;
     }
     const links = teilnehmer.teilnahmen; // [col] = value;
-    const filtered = links.anlassLinks.filter(link => {
-      return link.anlassId === anlass.id
+    const filtered = links.anlassLinks.filter((link) => {
+      return link.anlassId === anlass.id;
     });
     links.dirty = true;
     if (filtered.length > 0) {
@@ -96,24 +140,23 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
         anlassId: anlass.id,
         teilnehmerId: teilnehmer.id,
         kategorie: value,
-        dirty: true
-      }
+        dirty: true,
+      };
       links.anlassLinks.push(newLink);
     }
   }
-
 
   /*getTotal() {
     return this.teilnehmerService.anzahlTeilnehmer
   }*/
 
   reset(verein: IVerein) {
-    console.log('Reset');
+    console.log("Reset");
     this.teilnehmerService.reset(verein);
   }
 
   add(verein: IVerein): Observable<ITeilnehmer> {
-    console.log('Add');
+    console.log("Add");
     return this.teilnehmerService.add(verein);
   }
   set dirty(dirty: boolean) {

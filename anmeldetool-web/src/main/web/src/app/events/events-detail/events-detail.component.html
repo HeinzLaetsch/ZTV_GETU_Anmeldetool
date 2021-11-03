@@ -1,28 +1,28 @@
 <div class="container">
   <div class="row">
-    <div class="col-md-11">
+    <div class="col-md-12">
       <h2>{{ getCleaned() }}</h2>
     </div>
   </div>
   <div class="row">
-    <div class="col-sm">
+    <div class="col-md-3">
       <span *ngIf="anlass.startDatum !== anlass.endDatum">von</span
       ><span *ngIf="anlass.startDatum === anlass.endDatum">am</span>:
       {{ anlass.startDatum | date: "EEEE, d MMMM , y" }}
     </div>
-    <div class="col-sm" *ngIf="anlass.startDatum !== anlass.endDatum">
+    <div class="col-md-3" *ngIf="anlass.startDatum !== anlass.endDatum">
       bis: {{ anlass.endDatum | date: "EEEE, d MMMM , y" }}
     </div>
   </div>
   <div class="row">
-    <div class="col-sm">Geschlecht: {{ anlass.tiTu }}</div>
-    <div class="col-sm">
+    <div class="col-md-3">Geschlecht: {{ anlass.tiTu }}</div>
+    <div class="col-md-3">
       Startberechtigt: {{ anlass.tiefsteKategorie }} bis
       {{ anlass.hoechsteKategorie }}
     </div>
   </div>
   <div class="row">
-    <div class="col-sm">
+    <div class="col-md-12">
       <mat-checkbox
         [(ngModel)]="vereinStarted"
         (click)="vereinStartedClicked($event)"
@@ -31,23 +31,30 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-sm">Teilnehmer: {{ anzahlTeilnehmer }}</div>
+    <div class="col-md-3">Teilnehmer: {{ anzahlTeilnehmer }}</div>
+    <div class="col-md-3">Teilnehmer K1-K4: {{ anzahlTeilnehmerBrevet1 }}</div>
+    <div class="col-md-3">Teilnehmer K5-K7: {{ anzahlTeilnehmerBrevet2 }}</div>
   </div>
   <div class="row">
-    <div class="col-sm">
-      Benötigte Wertungsrichter Brevet 1: {{ statusWertungsrichter }}
+    <h3 class="padding">Wertungsrichter</h3>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      Benötigte Wertungsrichter Brevet 1: {{ wertungsrichterPflichtBrevet1 }}
     </div>
+    <div class="col-md">Status Brevet 1: {{ statusBr1 }}</div>
   </div>
   <div class="row">
-    <div class="col-sm">
-      Benötigte Wertungsrichter Brevet 2: {{ statusWertungsrichter }}
+    <div class="col-md-3">
+      Benötigte Wertungsrichter Brevet 2: {{ wertungsrichterPflichtBrevet2 }}
     </div>
+    <div class="col-md">Status Brevet 2: {{ statusBr2 }}</div>
   </div>
   <div class="row">
-    <div class="col-sm">
+    <div class="col-md-12">
       <div class="row">
-        <div class="col-sm"><h3>Verfügbare Wertungsrichter</h3></div>
-        <div class="col-sm"><h3>Ausgewählte Wertungsrichter</h3></div>
+        <div class="col-sm"><h3>Verfügbare Wertungsrichter Brevet 1</h3></div>
+        <div class="col-sm"><h3>Ausgewählte Wertungsrichter Brevet 1</h3></div>
       </div>
       <div class="row">
         <div class="col-sm">
@@ -55,20 +62,20 @@
             aria-label="Wertungsrichter"
             class="drag-drop-list col"
             cdkDropList
-            #allWrsList="cdkDropList"
-            [cdkDropListData]="availableWertungsrichter"
-            [cdkDropListConnectedTo]="[assignedWrList]"
+            #allWr1sList="cdkDropList"
+            [cdkDropListData]="availableWertungsrichter1"
+            [cdkDropListConnectedTo]="[assignedWr1List]"
             cdkDropListOrientation="vertical"
-            (cdkDropListDropped)="drop($event)"
+            (cdkDropListDropped)="drop($event, '1')"
           >
             <mat-chip
               class="drag-drop-box"
-              *ngFor="let wr of availableWertungsrichter"
+              *ngFor="let wr of availableWertungsrichter1"
               cdkDrag
               #tooltip="matTooltip"
               matTooltip="Ziehe (Drag & Drop) den Wertungsrichter rüber"
               matTooltipPosition="above"
-              matTooltipHideDelay="1000"
+              matTooltipHideDelay="100"
             >
               {{ wr.vorname + " " + wr.name }}
             </mat-chip>
@@ -77,20 +84,72 @@
         <div class="col-sm">
           <mat-chip-list
             cdkDropList
-            #assignedWrList="cdkDropList"
-            [cdkDropListData]="assignedWrs"
-            [cdkDropListConnectedTo]="[allWrsList]"
+            #assignedWr1List="cdkDropList"
+            [cdkDropListData]="assignedWr1s"
+            [cdkDropListConnectedTo]="[allWr1sList]"
             class="drag-drop-list col"
-            (cdkDropListDropped)="drop($event)"
+            (cdkDropListDropped)="drop($event, '2')"
           >
             <mat-chip
               class="drag-drop-box"
-              *ngFor="let wr of assignedWrs"
+              *ngFor="let wr of assignedWr1s"
               cdkDrag
               #tooltip="matTooltip"
               matTooltip="Ziehe (Drag & Drop) den Wertungsrichter rüber"
               matTooltipPosition="above"
-              matTooltipHideDelay="1000"
+              matTooltipHideDelay="100"
+            >
+              {{ wr.vorname + " " + wr.name }}
+            </mat-chip>
+          </mat-chip-list>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm"><h3>Verfügbare Wertungsrichter Brevet 2</h3></div>
+        <div class="col-sm"><h3>Ausgewählte Wertungsrichter Brevet 2</h3></div>
+      </div>
+      <div class="row">
+        <div class="col-sm">
+          <mat-chip-list
+            aria-label="Wertungsrichter"
+            class="drag-drop-list col"
+            cdkDropList
+            #allWr2sList="cdkDropList"
+            [cdkDropListData]="availableWertungsrichter2"
+            [cdkDropListConnectedTo]="[assignedWr2List]"
+            cdkDropListOrientation="vertical"
+            (cdkDropListDropped)="drop($event, '1')"
+          >
+            <mat-chip
+              class="drag-drop-box"
+              *ngFor="let wr of availableWertungsrichter2"
+              cdkDrag
+              #tooltip="matTooltip"
+              matTooltip="Ziehe (Drag & Drop) den Wertungsrichter rüber"
+              matTooltipPosition="above"
+              matTooltipHideDelay="100"
+            >
+              {{ wr.vorname + " " + wr.name }}
+            </mat-chip>
+          </mat-chip-list>
+        </div>
+        <div class="col-sm">
+          <mat-chip-list
+            cdkDropList
+            #assignedWr2List="cdkDropList"
+            [cdkDropListData]="assignedWr2s"
+            [cdkDropListConnectedTo]="[allWr2sList]"
+            class="drag-drop-list col"
+            (cdkDropListDropped)="drop($event, '2')"
+          >
+            <mat-chip
+              class="drag-drop-box"
+              *ngFor="let wr of assignedWr2s"
+              cdkDrag
+              #tooltip="matTooltip"
+              matTooltip="Ziehe (Drag & Drop) den Wertungsrichter rüber"
+              matTooltipPosition="above"
+              matTooltipHideDelay="100"
             >
               {{ wr.vorname + " " + wr.name }}
             </mat-chip>
@@ -98,13 +157,10 @@
         </div>
       </div>
     </div>
-    <div class="col-sm">
+    <div class="col-md">
       <div [routerLink]="['/user/user']" class="well hoverwell thumbnail">
         Wertungsrichter bearbeiten
       </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-sm">Wertungsrichter: {{ statusWertungsrichter }}</div>
   </div>
 </div>

@@ -1,12 +1,11 @@
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { HttpClient, HttpParams } from "@angular/common/http";
-import { catchError } from "rxjs/operators";
-import { IUser } from "../../model/IUser";
 import { Observable, of } from "rxjs";
-import { IAnlass } from "../../model/IAnlass";
+import { catchError } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
+import { IAnlass } from "../../model/IAnlass";
 import { IAnlassLink } from "../../model/IAnlassLink";
-import { IAnlassLinks } from "../../model/IAnlassLinks";
+import { IUser } from "../../model/IUser";
 import { IWertungsrichterAnlassLink } from "../../model/IWertungsrichterAnlassLink";
 
 @Injectable({
@@ -23,9 +22,43 @@ export class AnlassService {
       .get<IAnlass[]>(this.url)
       .pipe(catchError(this.handleError<IAnlass[]>("getAnlaesse", [])));
   }
+  getVerfuegbareWertungsrichter(
+    anlass: IAnlass,
+    verein: IVerein,
+    brevet: number
+  ): Observable<IUser[]> {
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "organisationen" +
+      "/" +
+      verein?.id +
+      "/" +
+      "wertungsrichter" +
+      "/" +
+      brevet +
+      "/" +
+      "verfuegbar";
+    console.log("getVerfuegbareWertungsrichter called: ", combinedUrl);
+    if (!anlass) {
+      return of(undefined);
+    }
+    return this.http.get<IUser>(combinedUrl).pipe(
+      catchError((error) => {
+        if (error.status === 404) {
+          return of(undefined);
+        }
+        this.handleError<boolean>("getVerfuegbareWertungsrichter");
+      })
+    );
+  }
+
   getEingeteilteWertungsrichter(
     anlass: IAnlass,
-    verein: IVerein
+    verein: IVerein,
+    brevet: number
   ): Observable<IWertungsrichterAnlassLink[]> {
     const combinedUrl =
       this.url +
@@ -36,8 +69,12 @@ export class AnlassService {
       "/" +
       verein?.id +
       "/" +
-      "wertungsrichter";
-    console.log("getEingeteilteWertungsrichter called: ", combinedUrl);
+      "wertungsrichter" +
+      "/" +
+      brevet +
+      "/" +
+      "eingeteilt";
+    // console.log("getEingeteilteWertungsrichter called: ", combinedUrl);
     if (!anlass) {
       return of(undefined);
     }
@@ -112,7 +149,7 @@ export class AnlassService {
   getVereinStart(anlass: IAnlass, verein: IVerein): Observable<boolean> {
     const combinedUrl =
       this.url + "/" + anlass?.id + "/" + "organisationen" + "/" + verein?.id;
-    console.log("getVereinStart called: ", combinedUrl);
+    // console.log("getVereinStart called: ", combinedUrl);
     if (!anlass) {
       return of(false);
     }
@@ -187,7 +224,7 @@ export class AnlassService {
       "/" +
       verein.id +
       "/teilnehmer/";
-    console.log("getTeilnehmer called: ", combinedUrl);
+    // console.log("getTeilnehmer called: ", combinedUrl);
     return this.http
       .get<IAnlassLink[]>(combinedUrl)
       .pipe(catchError(this.handleError<IAnlassLink[]>("getTeilnehmer", [])));

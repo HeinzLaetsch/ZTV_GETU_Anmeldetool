@@ -1,14 +1,8 @@
-<ng-template #loading>
-  <div class="center">
-    <mat-spinner style="margin: 0 auto"></mat-spinner>
-  </div>
-</ng-template>
-
 <div class="container">
   <h1>Login</h1>
   <hr />
 
-  <mat-dialog-content *ngIf="vereinService.isVereineLoaded() | async; else loading">
+  <mat-dialog-content>
     <p>
       <mat-form-field [appearance]="appearance">
         <mat-label>Verein</mat-label>
@@ -71,7 +65,8 @@
       Login
     </button>
     <mat-error *ngIf="loginError" class="error">
-    Benutzername oder Passwort falsch</mat-error>
+      Benutzername oder Passwort falsch</mat-error
+    >
     <!--button mat-button mat-dialog-close>Abbrechen</button-->
   </div>
   <div>

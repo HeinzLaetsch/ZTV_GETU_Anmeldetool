@@ -1,6 +1,6 @@
 package org.ztv.anmeldetool.anmeldetool.repositories;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +12,7 @@ import org.ztv.anmeldetool.anmeldetool.models.Person;
 public interface PersonenRepository extends CrudRepository<Person, UUID> {
 
 	Person findByBenutzername(String benutzername);
-	
-	@Query(value = "SELECT p.* from PERSON p, organisation_person_link opl, ORGANISATION org where opl.PERSON_ID=p.id AND opl.ORGANISATION_ID=org.id AND org.id=?1", nativeQuery = true )
-	Collection<Person> findByBenutzernameOrganisationId(String orgId);
+
+	@Query(value = "SELECT p.* from PERSON p, organisation_person_link opl, ORGANISATION org where opl.PERSON_ID=p.id AND opl.ORGANISATION_ID=org.id AND org.id=?1", nativeQuery = true)
+	List<Person> findByOrganisationId(UUID orgId);
 }

@@ -1,19 +1,5 @@
-import { ThrowStmt } from "@angular/compiler";
-import {
-  AfterViewInit,
-  Component,
-  OnInit,
-  ViewChild,
-  Output,
-  EventEmitter,
-  Input,
-} from "@angular/core";
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from "@angular/forms";
+import { AfterViewInit, Component, Input, ViewChild } from "@angular/core";
+import { FormControl, Validators } from "@angular/forms";
 import { MatPaginator, PageEvent } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
 import { Observable, Subscription } from "rxjs";
@@ -23,7 +9,6 @@ import { IAnlassLink } from "src/app/core/model/IAnlassLink";
 import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
-import { AnlassService } from "src/app/core/service/anlass/anlass.service";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
 import { CachingTeilnehmerService } from "src/app/core/service/caching-services/caching.teilnehmer.service";
@@ -52,24 +37,10 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   populating = true;
   checked: Array<boolean>;
 
-  // teilnahmenControls = new Array<Array<TeilnahmeControl>>();
   teilnahmenControls = new Array<Array<FormControl>>();
   teilnehmerControls = new Array<Array<FormControl>>();
   check1 = new FormControl();
   pageSize = 15;
-
-  /*
-  options: string[] = [
-    "keine Teilnahme",
-    "K1",
-    "K2",
-    "K3",
-    "K4",
-    "K5",
-    "K6",
-    "K7",
-    "KD",
-  ];*/
 
   allDisplayedColumns: string[];
   displayedColumns = ["name", "vorname", "jahrgang"];
@@ -151,26 +122,26 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     let currentAnlass = 0;
     this.anlaesse.forEach((anlass) => {
       // console.log("Prepare Anlass: ", anlass);
+      if (createControl) {
+        this.teilnahmenControls.forEach((line) => {
+          // line = line.slice(0, 0);
+          const cntr = new FormControl({
+            value: KategorieEnum.KEINE_TEILNAHME,
+            disabled: true,
+          });
+          line.push(cntr);
+        });
+      }
+
       this.anlassService
         .getVereinStart(anlass, this.authService.currentVerein)
         .subscribe((result) => {
           console.log("getVereinStart Result is: ", result);
           this.checked.push(result);
           // this.checkForIndex(colIndex++, result);
-          if (createControl) {
-            this.teilnahmenControls.forEach((line) => {
-              // line = line.slice(0, 0);
-              const cntr = new FormControl({
-                value: KategorieEnum.KEINE_TEILNAHME,
-                disabled: true,
-              });
-              line.push(cntr);
-            });
-          }
           const isLast = currentAnlass++ === this.anlaesse.length - 1;
           this.teilnahmenloader(anlass, isLast);
         });
-
     });
   }
   public resetDataSource() {
@@ -306,8 +277,15 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   }
 
   getTeilnahme(teilnehmerRecord: number, anlass: IAnlass): IAnlassLink {
-    const tr = this.dataSource.getTeilnehmer(this.filterValue, this.tiTu, teilnehmerRecord);
+    const tr = this.dataSource.getTeilnehmer(
+      this.filterValue,
+      this.tiTu,
+      teilnehmerRecord
+    );
     if (tr) {
+      return this.anlassService.getTeilnehmer(anlass, tr);
+
+      /*
       if (tr.teilnahmen && tr.teilnahmen.anlassLinks) {
         const link = tr.teilnahmen.anlassLinks.find((value) => {
           // console.log("Teilnahme: ", value.teilnehmerId, "Current: ", tr.id);
@@ -316,6 +294,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
         return link;
       }
       // return element.teilnehmerId === tr.id
+      */
     }
     // console.log("Teilnehmer yet not Loaded: ", anlass.anlassBezeichnung);
     return undefined;
@@ -370,13 +349,12 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     if (this.paginator) {
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
-      this.paginator.page
-        .subscribe((pageEvent) => {
-          this.checkIfDirty(pageEvent);
-          console.log("PageEvent: ", pageEvent);
-          this.loadTeilnahmen(false);
-          this.loadTeilnehmerPage();
-        });
+      this.paginator.page.subscribe((pageEvent) => {
+        this.checkIfDirty(pageEvent);
+        console.log("PageEvent: ", pageEvent);
+        this.loadTeilnahmen(false);
+        this.loadTeilnehmerPage();
+      });
       this.initAll();
     }
   }
@@ -388,7 +366,13 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       teilnehmerLine.forEach((control) => {
         if (control.dirty) {
           console.log("Control dirty: ", row, ", ", col);
-          this.dataSource.update(this.filterValue, this.tiTu, row, col, control.value);
+          this.dataSource.update(
+            this.filterValue,
+            this.tiTu,
+            row,
+            col,
+            control.value
+          );
           //control.reset();
         }
         if (control.touched) {
@@ -402,7 +386,9 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   loadTeilnehmerPage() {
     console.log("Load Teilnehmer Page");
     this.dataSource.loading$.subscribe((result) => {
-      this.populateTeilnehmer(this.dataSource.loadTeilnehmer(this.filterValue, this.tiTu));
+      this.populateTeilnehmer(
+        this.dataSource.loadTeilnehmer(this.filterValue, this.tiTu)
+      );
     });
   }
   populateTeilnehmer(allTeilnehmer: ITeilnehmer[]) {
@@ -438,30 +424,33 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       colIndex
     );
     const rest = this.checked.slice(colIndex + 1);
-    const newIndex = rest.findIndex(element => element) + colIndex + 1;
-    this.teilnahmenControls[rowIndex][newIndex].setValue(this.teilnahmenControls[rowIndex][colIndex].value)
+    const newIndex = rest.findIndex((element) => element) + colIndex + 1;
+    this.teilnahmenControls[rowIndex][newIndex].setValue(
+      this.teilnahmenControls[rowIndex][colIndex].value
+    );
     this.updateTeilnahmen(rowIndex, newIndex);
   }
   copyAll(event: any, colIndex: any) {
     let rowIndex = 0;
     const rest = this.checked.slice(colIndex + 1);
-    const newIndex = rest.findIndex(element => element) + colIndex + 1;
-    this.teilnahmenControls.forEach(anlassCntrLine => {
+    const newIndex = rest.findIndex((element) => element) + colIndex + 1;
+    this.teilnahmenControls.forEach((anlassCntrLine) => {
       anlassCntrLine[newIndex].setValue(anlassCntrLine[colIndex].value);
       this.updateTeilnahmen(rowIndex, newIndex);
       rowIndex++;
-    })
+    });
     console.log("Copy All clicked: ", event, " ,colIndex: ", colIndex);
   }
   vchange(rowIndex: number, colIndex: number, value: any) {
     console.log("Value Change fired: ", value);
   }
 
-
   private updateTeilnahmen(rowIndex: any, colIndex: any) {
     const anlass = this.anlaesse[colIndex];
     this.dataSource.valid = this.teilnahmenControls[rowIndex][colIndex].valid;
-    this.dataSource.updateTeilnahme(this.filterValue, this.tiTu,
+    this.dataSource.updateTeilnahme(
+      this.filterValue,
+      this.tiTu,
       rowIndex,
       colIndex,
       this.teilnahmenControls[rowIndex][colIndex].value,
@@ -472,7 +461,9 @@ export class TeilnehmerTableComponent implements AfterViewInit {
 
   private updateTeilnehmer(rowIndex: any, colIndex: any) {
     this.dataSource.valid = this.teilnehmerControls[rowIndex][colIndex].valid;
-    this.dataSource.update(this.filterValue, this.tiTu,
+    this.dataSource.update(
+      this.filterValue,
+      this.tiTu,
       rowIndex,
       colIndex,
       this.teilnehmerControls[rowIndex][colIndex].value

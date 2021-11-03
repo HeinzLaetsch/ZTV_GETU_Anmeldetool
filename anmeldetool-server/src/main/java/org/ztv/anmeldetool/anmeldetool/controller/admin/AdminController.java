@@ -1,8 +1,12 @@
 package org.ztv.anmeldetool.anmeldetool.controller.admin;
 
+import java.net.URI;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,9 +29,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.ztv.anmeldetool.anmeldetool.models.LoginData;
 import org.ztv.anmeldetool.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.anmeldetool.models.Person;
+import org.ztv.anmeldetool.anmeldetool.models.PersonAnlassLink;
+import org.ztv.anmeldetool.anmeldetool.models.Wertungsrichter;
 import org.ztv.anmeldetool.anmeldetool.service.AnlassService;
 import org.ztv.anmeldetool.anmeldetool.service.LoginService;
 import org.ztv.anmeldetool.anmeldetool.service.OrganisationService;
@@ -46,7 +53,10 @@ import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.VerbandDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterDTO;
+import org.ztv.anmeldetool.anmeldetool.util.PersonAnlassLinkMapper;
 import org.ztv.anmeldetool.anmeldetool.util.PersonHelper;
+import org.ztv.anmeldetool.anmeldetool.util.PersonMapper;
+import org.ztv.anmeldetool.anmeldetool.util.WertungsrichterMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -82,6 +92,15 @@ public class AdminController {
 
 	@Autowired
 	TeilnehmerService teilnehmerSrv;
+
+	@Autowired
+	WertungsrichterMapper wrMapper;
+
+	@Autowired
+	PersonAnlassLinkMapper palMapper;
+
+	@Autowired
+	PersonMapper personMapper;
 
 	@Autowired
 	PasswordEncoder passwordEncoder;
@@ -125,17 +144,36 @@ public class AdminController {
 		return anlassSrv.getTeilnahmen(anlassId, orgId);
 	}
 
-	// /anlaesse/a977a103-5512-4e97-9773-24d465d62ba1/teilnehmer/
 	@PatchMapping("/anlaesse/{anlassId}/organisationen/{orgId}/teilnehmer/{teilnehmerId}")
 	public @ResponseBody ResponseEntity patchAnlassTeilnehmer(HttpServletRequest request, @PathVariable UUID anlassId,
 			@PathVariable UUID orgId, @PathVariable UUID teilnehmerId, @RequestBody TeilnehmerAnlassLinkDTO tal) {
 		return teilnehmerSrv.updateAnlassTeilnahmen(anlassId, teilnehmerId, tal);
 	}
 
-	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter")
+	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter/{brevet}/verfuegbar")
+	public ResponseEntity<Collection<PersonDTO>> getVerfuegbareWertungsrichter(HttpServletRequest request,
+			@PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable int brevet) {
+		List<Person> wrs = anlassSrv.getVerfuegbareWertungsrichter(anlassId, orgId, brevet);
+		Collection<PersonDTO> wrDTOs = wrs.stream().map(person -> personMapper.PersonToPersonDTO(person))
+				.collect(Collectors.toList());
+		if (wrDTOs.size() == 0) {
+			return ResponseEntity.notFound().build();
+		} else {
+			return ResponseEntity.ok(wrDTOs);
+		}
+	}
+
+	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter/{brevet}/eingeteilt")
 	public ResponseEntity<Collection<PersonAnlassLinkDTO>> getEingeteilteWertungsrichter(HttpServletRequest request,
-			@PathVariable UUID anlassId, @PathVariable UUID orgId) {
-		return anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId);
+			@PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable int brevet) {
+		List<PersonAnlassLink> pals = anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId, brevet);
+		Collection<PersonAnlassLinkDTO> palDTOs = pals.stream()
+				.map(pal -> palMapper.PersonAnlassLinkToPersonAnlassLinkDTO(pal)).collect(Collectors.toList());
+		if (palDTOs.size() == 0) {
+			return ResponseEntity.notFound().build();
+		} else {
+			return ResponseEntity.ok(palDTOs);
+		}
 	}
 
 	@PostMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter/{personId}")
@@ -147,7 +185,7 @@ public class AdminController {
 	@DeleteMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter/{personId}")
 	public ResponseEntity<PersonAnlassLinkDTO> deleteEingeteilteWertungsrichter(HttpServletRequest request,
 			@PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable UUID personId) {
-		return anlassSrv.updateEingeteilteWertungsrichter(anlassId, orgId, personId, true);
+		return anlassSrv.updateEingeteilteWertungsrichter(anlassId, orgId, personId, false);
 	}
 
 	// http://localhost:8080/admin/organisationen
@@ -226,7 +264,7 @@ public class AdminController {
 
 	@GetMapping("/user")
 	public @ResponseBody ResponseEntity<Collection<PersonDTO>> get(HttpServletRequest request,
-			@RequestHeader("userid") String userId, @RequestHeader("vereinsid") String vereinsId) {
+			@RequestHeader("userid") String userId, @RequestHeader("vereinsid") UUID vereinsId) {
 		log.debug("Headers= authToken: {}, userId: {}, vereinsId: {}", userId, vereinsId);
 		Collection<PersonDTO> persons = personSrv.findPersonsByOrganisation(vereinsId);
 		return ResponseEntity.ok(persons);
@@ -246,14 +284,22 @@ public class AdminController {
 
 	@GetMapping("/user/{id}/wertungsrichter")
 	public @ResponseBody ResponseEntity<WertungsrichterDTO> getWertungsrichterForUserId(HttpServletRequest request,
-			@PathVariable String id) {
-		return wertungsrichterSrv.getWertungsrichterForUserId(id);
+			@PathVariable UUID id) {
+		Optional<Wertungsrichter> optWr = wertungsrichterSrv.getWertungsrichterByPersonId(id);
+		if (optWr.isPresent()) {
+			return ResponseEntity.ok(wrMapper.WertungsrichterToWertungsrichterDTO(optWr.get()));
+		}
+		URI requestURI = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+		return ResponseEntity.notFound().location(requestURI).build();
+
 	}
 
 	@PutMapping("/user/{id}/wertungsrichter")
 	public @ResponseBody ResponseEntity<WertungsrichterDTO> updateWertungsrichter(HttpServletRequest request,
 			@PathVariable String id, @RequestBody WertungsrichterDTO wertungsrichterDTO) {
-		return wertungsrichterSrv.update(id, wertungsrichterDTO);
+		Wertungsrichter wertungsrichter = wrMapper.WertungsrichterDTOToWertungsrichter(wertungsrichterDTO);
+		URI requestURI = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+		return ResponseEntity.created(requestURI).build();
 	}
 
 	private Person doesUserExistsInOrganisation(UUID organisationId, String username) {

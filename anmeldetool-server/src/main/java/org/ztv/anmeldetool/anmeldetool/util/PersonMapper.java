@@ -1,5 +1,7 @@
 package org.ztv.anmeldetool.anmeldetool.util;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
 import org.ztv.anmeldetool.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.anmeldetool.models.OrganisationPersonLink;
 import org.ztv.anmeldetool.anmeldetool.models.Person;
@@ -8,13 +10,12 @@ import org.ztv.anmeldetool.anmeldetool.transfer.PersonDTO;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-// @Mapper(componentModel = "spring", uses = {AnforderungMapper.class}, imports = Anforderung.class)
-// @Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+// @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {
+//		WertungsrichterMapper.class }, imports = Wertungsrichter.class)
 public abstract class PersonMapper {
 
-	// @Mappings({ @Mapping(source = "organisationenLinks", target =
-	// "organisationId") })
-	public abstract PersonDTO PersonToPersonDTO(Person person, Organisation organisation);
+	public abstract PersonDTO PersonToPersonDTO(Person person);
 
 	public static boolean isPersonMemberOfOrganisation(Person person, Organisation organisation) {
 		if (person == null || organisation == null) {

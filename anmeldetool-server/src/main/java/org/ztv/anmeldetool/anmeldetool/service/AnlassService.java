@@ -19,6 +19,7 @@ import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.repositories.AnlassRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.OrganisationAnlassLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.PersonAnlassLinkRepository;
+import org.ztv.anmeldetool.anmeldetool.repositories.PersonenRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.TeilnehmerAnlassLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.transfer.AnlassDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationAnlassLinkDTO;
@@ -26,7 +27,6 @@ import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationenDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.PersonAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.util.AnlassHelper;
-import org.ztv.anmeldetool.anmeldetool.util.PersonAnlassLinkMapper;
 import org.ztv.anmeldetool.anmeldetool.util.TeilnehmerAnlassLinkHelper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +49,9 @@ public class AnlassService {
 	PersonService personSrv;
 
 	@Autowired
+	WertungsrichterService wrSrv;
+
+	@Autowired
 	OrganisationAnlassLinkRepository orgAnlassRepo;
 
 	@Autowired
@@ -58,19 +61,36 @@ public class AnlassService {
 	PersonAnlassLinkRepository personAnlassLinkRepository;
 
 	@Autowired
-	PersonAnlassLinkMapper palMapper;
+	PersonenRepository personRepository;
 
-	public ResponseEntity<Collection<PersonAnlassLinkDTO>> getEingeteilteWertungsrichter(UUID anlassId, UUID orgId) {
+	public List<Person> getVerfuegbareWertungsrichter(UUID anlassId, UUID orgId, int brevet) {
+		Organisation organisation = organisationSrv.findOrganisationById(orgId);
+		List<Person> personen = personRepository.findByOrganisationId(organisation.getId());
+		List<Person> wrs = personen.stream().filter(person -> {
+			return (person.getWertungsrichter() != null && person.getWertungsrichter().getBrevet() == brevet);
+		}).collect(Collectors.toList());
+
+		List<PersonAnlassLink> eingeteilteWrs = getEingeteilteWertungsrichter(anlassId, orgId, brevet);
+
+		List<Person> verfuegbare = wrs.stream().filter(person -> {
+			if (eingeteilteWrs.size() == 0) {
+				return true;
+			}
+			return eingeteilteWrs.stream().filter(pal -> {
+				return !pal.getPerson().getId().equals(person.getId());
+			}).count() > 0;
+		}).collect(Collectors.toList());
+		return verfuegbare;
+	}
+
+	public List<PersonAnlassLink> getEingeteilteWertungsrichter(UUID anlassId, UUID orgId, int brevet) {
 		Anlass anlass = this.findAnlassById(anlassId);
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		List<PersonAnlassLink> pals = personAnlassLinkRepository.findByAnlassAndOrganisation(anlass, organisation);
-		Collection<PersonAnlassLinkDTO> palDTOs = pals.stream()
-				.map(pal -> palMapper.PersonAnlassLinkToPersonAnlassLinkDTO(pal)).collect(Collectors.toList());
-		if (palDTOs.size() == 0) {
-			return ResponseEntity.notFound().build();
-		} else {
-			return ResponseEntity.ok(palDTOs);
-		}
+		pals = pals.stream().filter(pal -> {
+			return pal.getPerson().getWertungsrichter().getBrevet() == brevet;
+		}).collect(Collectors.toList());
+		return pals;
 	}
 
 	public ResponseEntity<PersonAnlassLinkDTO> updateEingeteilteWertungsrichter(UUID anlassId, UUID orgId,
