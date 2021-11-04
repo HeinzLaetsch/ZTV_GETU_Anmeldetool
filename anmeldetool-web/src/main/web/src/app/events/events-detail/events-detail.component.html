@@ -58,7 +58,7 @@
       </div>
       <div class="row">
         <div class="col-sm">
-          <mat-chip-list
+          <div
             aria-label="Wertungsrichter"
             class="drag-drop-list col"
             cdkDropList
@@ -68,7 +68,7 @@
             cdkDropListOrientation="vertical"
             (cdkDropListDropped)="drop($event, '1')"
           >
-            <mat-chip
+            <app-wertungsrichter-chip
               class="drag-drop-box"
               *ngFor="let wr of availableWertungsrichter1"
               cdkDrag
@@ -76,13 +76,13 @@
               matTooltip="Ziehe (Drag & Drop) den Wertungsrichter rüber"
               matTooltipPosition="above"
               matTooltipHideDelay="100"
-            >
-              {{ wr.vorname + " " + wr.name }}
-            </mat-chip>
-          </mat-chip-list>
+              [isAllWertungsrichterList]="true"
+              [wertungsrichterUser]="wr"
+            ></app-wertungsrichter-chip>
+          </div>
         </div>
         <div class="col-sm">
-          <mat-chip-list
+          <div
             cdkDropList
             #assignedWr1List="cdkDropList"
             [cdkDropListData]="assignedWr1s"
@@ -90,7 +90,7 @@
             class="drag-drop-list col"
             (cdkDropListDropped)="drop($event, '2')"
           >
-            <mat-chip
+            <app-wertungsrichter-chip
               class="drag-drop-box"
               *ngFor="let wr of assignedWr1s"
               cdkDrag
@@ -98,10 +98,10 @@
               matTooltip="Ziehe (Drag & Drop) den Wertungsrichter rüber"
               matTooltipPosition="above"
               matTooltipHideDelay="100"
-            >
-              {{ wr.vorname + " " + wr.name }}
-            </mat-chip>
-          </mat-chip-list>
+              [isAllWertungsrichterList]="false"
+              [wertungsrichterUser]="wr"
+            ></app-wertungsrichter-chip>
+          </div>
         </div>
       </div>
       <div class="row">
@@ -110,7 +110,7 @@
       </div>
       <div class="row">
         <div class="col-sm">
-          <mat-chip-list
+          <div
             aria-label="Wertungsrichter"
             class="drag-drop-list col"
             cdkDropList
@@ -120,7 +120,7 @@
             cdkDropListOrientation="vertical"
             (cdkDropListDropped)="drop($event, '1')"
           >
-            <mat-chip
+            <app-wertungsrichter-chip
               class="drag-drop-box"
               *ngFor="let wr of availableWertungsrichter2"
               cdkDrag
@@ -128,13 +128,14 @@
               matTooltip="Ziehe (Drag & Drop) den Wertungsrichter rüber"
               matTooltipPosition="above"
               matTooltipHideDelay="100"
+              [isAllWertungsrichterList]="false"
+              [wertungsrichterUser]="wr"
             >
-              {{ wr.vorname + " " + wr.name }}
-            </mat-chip>
-          </mat-chip-list>
+            </app-wertungsrichter-chip>
+          </div>
         </div>
         <div class="col-sm">
-          <mat-chip-list
+          <div
             cdkDropList
             #assignedWr2List="cdkDropList"
             [cdkDropListData]="assignedWr2s"
@@ -142,7 +143,7 @@
             class="drag-drop-list col"
             (cdkDropListDropped)="drop($event, '2')"
           >
-            <mat-chip
+            <app-wertungsrichter-chip
               class="drag-drop-box"
               *ngFor="let wr of assignedWr2s"
               cdkDrag
@@ -150,10 +151,11 @@
               matTooltip="Ziehe (Drag & Drop) den Wertungsrichter rüber"
               matTooltipPosition="above"
               matTooltipHideDelay="100"
+              [isAllWertungsrichterList]="false"
+              [wertungsrichterUser]="wr"
             >
-              {{ wr.vorname + " " + wr.name }}
-            </mat-chip>
-          </mat-chip-list>
+            </app-wertungsrichter-chip>
+          </div>
         </div>
       </div>
     </div>

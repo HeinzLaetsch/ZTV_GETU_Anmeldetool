@@ -1,35 +1,30 @@
-import { BrowserModule } from "@angular/platform-browser";
-import { APP_INITIALIZER, NgModule } from "@angular/core";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-
-import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
-
-import { AppRoutingModule } from "./app-routing.module";
-
-import { AnmeldeToolComponent } from "./app.component";
-
-import {
-  EventListComponent,
-  EventThumbnailComponent,
-  EventsDetailComponent,
-  CreateEventComponent,
-} from "./events/index";
-
-import { NavBarComponent } from "./nav/nav-bar/nav-bar.component";
-import { Page404Component } from "./error/page404/page404.component";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { ServiceModule } from "./core/service/service.module";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
+import { APP_INITIALIZER, NgModule } from "@angular/core";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from "@angular/material/form-field";
+import { BrowserModule } from "@angular/platform-browser";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
+import { tap } from "rxjs/operators";
+import { AppRoutingModule } from "./app-routing.module";
+import { AnmeldeToolComponent } from "./app.component";
+import { HttpSecurityInterceptorService } from "./core/interceptor/http.security.interceptor.service";
+import { CachingVereinService } from "./core/service/caching-services/caching.verein.service";
+import { ServiceModule } from "./core/service/service.module";
+import { Page404Component } from "./error/page404/page404.component";
+import {
+  CreateEventComponent,
+  EventListComponent,
+  EventsDetailComponent,
+  EventThumbnailComponent,
+  WertungsrichterChipComponent,
+} from "./events/index";
+import { MaterialModule } from "./material-module";
+import { NavBarComponent } from "./nav/nav-bar/nav-bar.component";
+import { SharedComponentsModule } from "./shared/component/shared.components.module";
+import { LoginDialogComponent } from "./verein/login/login-dialog.component";
 import { NewAnmelderComponent } from "./verein/new-anmelder/new-anmelder.component";
 import { NewVereinComponent } from "./verein/new-verein/new-verein.component";
-import { MaterialModule } from "./material-module";
-import { LoginDialogComponent } from "./verein/login/login-dialog.component";
-import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from "@angular/material/form-field";
-import { HttpSecurityInterceptorService } from "./core/interceptor/http.security.interceptor.service";
-import { SharedComponentsModule } from "./shared/component/shared.components.module";
-import { VereinService } from "./core/service/verein/verein.service";
-import { CachingVereinService } from "./core/service/caching-services/caching.verein.service";
-import { skip, tap } from "rxjs/operators";
 
 export function initVereinservice(
   vereinService: CachingVereinService
@@ -44,6 +39,7 @@ export function initVereinservice(
   declarations: [
     AnmeldeToolComponent,
     EventListComponent,
+    WertungsrichterChipComponent,
     EventThumbnailComponent,
     NavBarComponent,
     EventsDetailComponent,

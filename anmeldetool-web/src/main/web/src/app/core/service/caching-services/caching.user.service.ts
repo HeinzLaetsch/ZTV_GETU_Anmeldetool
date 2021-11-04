@@ -1,10 +1,9 @@
 import { Injectable } from "@angular/core";
-import { Observable, BehaviorSubject, forkJoin } from "rxjs";
-import { skip } from "rxjs/operators";
-import { UserService } from "../user/user.service";
-import { IUser } from "../../model/IUser";
+import { BehaviorSubject, forkJoin, Observable } from "rxjs";
 import { IRolle } from "../../model/IRolle";
+import { IUser } from "../../model/IUser";
 import { IWertungsrichter } from "../../model/IWertungsrichter";
+import { UserService } from "../user/user.service";
 
 @Injectable({
   providedIn: "root",

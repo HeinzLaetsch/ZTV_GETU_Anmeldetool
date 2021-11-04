@@ -1,0 +1,22 @@
+<div class="chip">
+  <span
+    [ngClass]="{
+      'label-green': wertungsrichter.gueltig,
+      'label-red': !wertungsrichter.gueltig
+    }"
+    >{{ wertungsrichterUser.vorname + " " + wertungsrichterUser.name }}</span
+  ><br />
+  <span>Brevet: {{ wertungsrichter.brevet }}</span>
+  <br />
+  <mat-checkbox
+    [ngClass]="{
+      'label-green': wertungsrichter.gueltig,
+      'label-red': !wertungsrichter.gueltig
+    }"
+    [(ngModel)]="wertungsrichter.gueltig"
+    [disabled]="true"
+    >Wertungsrichter hat FK</mat-checkbox
+  >
+  <ng-container *ngIf="isAllWertungsrichterList"> </ng-container>
+  <ng-container *ngIf="!isAllWertungsrichterList"> </ng-container>
+</div>
