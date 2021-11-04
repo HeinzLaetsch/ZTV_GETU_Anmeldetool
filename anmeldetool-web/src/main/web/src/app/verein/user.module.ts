@@ -1,22 +1,23 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { UserRoutes } from './user.routes';
-import { ProfileComponent } from './profile/profile.component';
-import { MaterialModule } from '../material-module';
-import { SharedComponentsModule } from '../shared/component/shared.components.module';
-import { UserFormComponent } from './profile/user-form/user-form.component';
-import { RoleFormComponent } from './profile/role-form/role-form.component';
-import { WertungsrichterFormComponent } from './profile/wertungsrichter-form/wertungsrichter-form.component';
-
+import { CommonModule } from "@angular/common";
+import { NgModule } from "@angular/core";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { RouterModule } from "@angular/router";
+import { MaterialModule } from "../material-module";
+import { SharedComponentsModule } from "../shared/component/shared.components.module";
+import { ProfileComponent } from "./profile/profile.component";
+import { RoleChipComponent } from "./profile/role-form/role-chip/role-chip.component";
+import { RoleFormComponent } from "./profile/role-form/role-form.component";
+import { UserFormComponent } from "./profile/user-form/user-form.component";
+import { WertungsrichterFormComponent } from "./profile/wertungsrichter-form/wertungsrichter-form.component";
+import { UserRoutes } from "./user.routes";
 
 @NgModule({
   declarations: [
     ProfileComponent,
     UserFormComponent,
     RoleFormComponent,
-    WertungsrichterFormComponent
+    RoleChipComponent,
+    WertungsrichterFormComponent,
   ],
   imports: [
     CommonModule,
@@ -24,8 +25,8 @@ import { WertungsrichterFormComponent } from './profile/wertungsrichter-form/wer
     ReactiveFormsModule,
     MaterialModule,
     SharedComponentsModule,
-    RouterModule.forChild(UserRoutes)
+    RouterModule.forChild(UserRoutes),
   ],
-  providers: []
+  providers: [],
 })
-export class UserModule { }
+export class UserModule {}

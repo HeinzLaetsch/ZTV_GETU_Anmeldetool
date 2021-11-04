@@ -24,14 +24,7 @@
           cdkDrag
           [cdkDragDisabled]="disableRole(role)"
         >
-          <div
-            #tooltip="matTooltip"
-            matTooltip="Ziehe (Drag & Drop) die Rolle rüber"
-            matTooltipPosition="above"
-            matTooltipHideDelay="1000"
-          >
-            {{ role.name }}
-          </div>
+          <app-role-chip [role]="role" [isAllRolesList]="true"></app-role-chip>
         </div>
       </div>
       <div
@@ -43,39 +36,12 @@
         (cdkDropListDropped)="drop($event)"
       >
         <div
-          [ngStyle]="{ color: role.aktiv ? 'green' : 'red' }"
           class="drag-drop-box"
           *ngFor="let role of assignedRoles"
           cdkDrag
           [cdkDragDisabled]="disableRole(role)"
         >
-          <div class="block">
-            <div
-              #tooltip="matTooltip"
-              matTooltip="Ziehe (Drag & Drop) die Rolle rüber"
-              matTooltipPosition="above"
-              matTooltipHideDelay="1000"
-            >
-              <span
-                [ngClass]="{
-                  'label-green': role.aktiv,
-                  'label-red': !role.aktiv
-                }"
-                >{{ role.name }}</span
-              >
-              <br />
-              <mat-checkbox
-                [ngClass]="{
-                  'label-green': role.aktiv,
-                  'label-red': !role.aktiv
-                }"
-                [(ngModel)]="role.aktiv"
-                [disabled]="!isVereinsVerantwortlicher"
-                (click)="aktivChange(role)"
-                >Rolle ist aktiviert</mat-checkbox
-              >
-            </div>
-          </div>
+          <app-role-chip [role]="role" [isAllRolesList]="false"></app-role-chip>
         </div>
       </div>
     </div>

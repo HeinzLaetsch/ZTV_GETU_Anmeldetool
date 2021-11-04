@@ -1,0 +1,31 @@
+<div
+  class="chip"
+  #tooltip="matTooltip"
+  matTooltip="Ziehe (Drag & Drop) die Rolle rüber"
+  matTooltipPosition="above"
+  matTooltipHideDelay="200"
+>
+  <ng-container *ngIf="isAllRolesList">
+    <span>{{ role.name }}</span>
+  </ng-container>
+  <ng-container *ngIf="!isAllRolesList">
+    <span
+      [ngClass]="{
+        'label-green': role.aktiv,
+        'label-red': !role.aktiv
+      }"
+      >{{ role.name }}</span
+    >
+    <br />
+    <mat-checkbox
+      [ngClass]="{
+        'label-green': role.aktiv,
+        'label-red': !role.aktiv
+      }"
+      [(ngModel)]="role.aktiv"
+      [disabled]="!isVereinsVerantwortlicher"
+      (click)="aktivChange(role)"
+      >Rolle ist aktiviert</mat-checkbox
+    >
+  </ng-container>
+</div>
