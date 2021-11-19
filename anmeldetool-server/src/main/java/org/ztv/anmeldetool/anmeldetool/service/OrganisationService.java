@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.ztv.anmeldetool.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.anmeldetool.models.Verband;
 import org.ztv.anmeldetool.anmeldetool.repositories.OrganisationsRepository;
-import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationenDTO;
+import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationDTO;
 import org.ztv.anmeldetool.anmeldetool.util.OrganisationHelper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +30,8 @@ public class OrganisationService {
 	@Autowired
 	VerbandService verbandSrv;
 
-	public ResponseEntity<Collection<OrganisationenDTO>> getAllOrganisations() {
-		Collection<OrganisationenDTO> orgsDto = new ArrayList<OrganisationenDTO>();
+	public ResponseEntity<Collection<OrganisationDTO>> getAllOrganisations() {
+		Collection<OrganisationDTO> orgsDto = new ArrayList<OrganisationDTO>();
 		Iterable<Organisation> orgs = orgRepo.findByAktivOrderByName(true);
 		for (Organisation org : orgs) {
 			log.debug("Organisation: " + orgs);
@@ -46,7 +46,7 @@ public class OrganisationService {
 		Optional<Organisation> optOrg = orgRepo.findById(organisationId);
 		return optOrg.get();
 	}
-	public ResponseEntity<OrganisationenDTO> create(OrganisationenDTO organisationDTO) {
+	public ResponseEntity<OrganisationDTO> create(OrganisationDTO organisationDTO) {
 		Verband verband = verbandSrv.getVerband(organisationDTO.getVerbandId());
 		Organisation organisation = OrganisationHelper.createOrganisation(organisationDTO, verband);
 		organisation = orgRepo.save(organisation);

@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.ztv.anmeldetool.anmeldetool.models.Anlass;
+import org.ztv.anmeldetool.anmeldetool.models.WertungsrichterSlot;
 
 /**
  * 
@@ -13,8 +14,8 @@ import org.ztv.anmeldetool.anmeldetool.models.Anlass;
  *         https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#jpa.query-methods
  */
 @Repository
-public interface AnlassRepository extends CrudRepository<Anlass, UUID> {
+public interface WertungsrichterSlotRepository extends CrudRepository<WertungsrichterSlot, UUID> {
 
-	List<Anlass> findByAktivOrderByAnlassBezeichnung(boolean aktiv);
+	List<WertungsrichterSlot> findByAnlass(Anlass anlass);
 
 }

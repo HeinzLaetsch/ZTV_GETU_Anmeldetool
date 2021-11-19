@@ -1,6 +1,7 @@
 package org.ztv.anmeldetool.anmeldetool.controller.admin;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.ztv.anmeldetool.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.anmeldetool.models.LoginData;
 import org.ztv.anmeldetool.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.anmeldetool.models.Person;
@@ -45,14 +47,18 @@ import org.ztv.anmeldetool.anmeldetool.service.VerbandService;
 import org.ztv.anmeldetool.anmeldetool.service.WertungsrichterService;
 import org.ztv.anmeldetool.anmeldetool.transfer.AnlassDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationAnlassLinkDTO;
-import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationenDTO;
+import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.PersonAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.RolleDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.VerbandDTO;
+import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterDTO;
+import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterSlotDTO;
+import org.ztv.anmeldetool.anmeldetool.util.AnlassMapper;
+import org.ztv.anmeldetool.anmeldetool.util.OrganisationMapper;
 import org.ztv.anmeldetool.anmeldetool.util.PersonAnlassLinkMapper;
 import org.ztv.anmeldetool.anmeldetool.util.PersonHelper;
 import org.ztv.anmeldetool.anmeldetool.util.PersonMapper;
@@ -103,6 +109,12 @@ public class AdminController {
 	PersonMapper personMapper;
 
 	@Autowired
+	AnlassMapper anlassMapper;
+
+	@Autowired
+	OrganisationMapper organisationMapper;
+
+	@Autowired
 	PasswordEncoder passwordEncoder;
 
 	// curl -d @login.json -H "Content-Type: application/json"
@@ -115,7 +127,15 @@ public class AdminController {
 	@GetMapping("/anlaesse")
 	// @ResponseBody
 	public ResponseEntity<Collection<AnlassDTO>> getAnlaesse() {
-		return anlassSrv.getAllAnlaesse();
+		List<Anlass> anlaesse = anlassSrv.getAllAnlaesse();
+		List<AnlassDTO> anlaesseDTO = anlaesse.stream().map(anlass -> {
+			return anlassMapper.ToDto(anlass);
+		}).collect(Collectors.toList());
+		if (anlaesseDTO.size() == 0) {
+			return ResponseEntity.notFound().build();
+		} else {
+			return ResponseEntity.ok(anlaesseDTO);
+		}
 	}
 
 	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}")
@@ -127,9 +147,18 @@ public class AdminController {
 
 	@GetMapping("/anlaesse/{anlassId}/organisationen/")
 	// @ResponseBody
-	public ResponseEntity<Collection<OrganisationenDTO>> getVereinsStarts(HttpServletRequest request,
+	public ResponseEntity<Collection<OrganisationDTO>> getVereinsStarts(HttpServletRequest request,
 			@PathVariable UUID anlassId) {
-		return anlassSrv.getVereinsStarts(anlassId);
+		List<Organisation> orgs = anlassSrv.getVereinsStarts(anlassId);
+		List<OrganisationDTO> orgsDTO = orgs.stream().map(org -> {
+			return organisationMapper.ToDto(org);
+		}).collect(Collectors.toList());
+
+		if (orgsDTO.size() == 0) {
+			return ResponseEntity.notFound().build();
+		} else {
+			return ResponseEntity.ok(orgsDTO);
+		}
 	}
 
 	@PatchMapping("/anlaesse/{anlassId}/organisationen/{orgId}")
@@ -176,6 +205,18 @@ public class AdminController {
 		}
 	}
 
+	// TODO replace Person ID with WertungsrichterID
+	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter/{personId}")
+	public ResponseEntity<WertungsrichterAnlassLinkDTO> getSlots(HttpServletRequest request,
+			@PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable UUID personId) {
+		List<WertungsrichterSlotDTO> slots = new ArrayList<WertungsrichterSlotDTO>();
+		slots.add(WertungsrichterSlotDTO.builder().id(UUID.randomUUID()).build());
+		WertungsrichterAnlassLinkDTO wrAnlassLink = WertungsrichterAnlassLinkDTO.builder().id(UUID.randomUUID())
+				.anlassId(anlassId).personId(personId).wertungsrichterId(UUID.randomUUID()).slots(slots).build();
+
+		return ResponseEntity.ok(wrAnlassLink);
+	}
+
 	@PostMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter/{personId}")
 	public ResponseEntity<PersonAnlassLinkDTO> postEingeteilteWertungsrichter(HttpServletRequest request,
 			@PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable UUID personId) {
@@ -190,13 +231,13 @@ public class AdminController {
 
 	// http://localhost:8080/admin/organisationen
 	@GetMapping("/organisationen")
-	public ResponseEntity<Collection<OrganisationenDTO>> getOrganisationen() {
+	public ResponseEntity<Collection<OrganisationDTO>> getOrganisationen() {
 		return organisationSrv.getAllOrganisations();
 	}
 
 	@PostMapping("/organisationen")
-	public @ResponseBody ResponseEntity<OrganisationenDTO> post(HttpServletRequest request,
-			@RequestBody OrganisationenDTO organisation) {
+	public @ResponseBody ResponseEntity<OrganisationDTO> post(HttpServletRequest request,
+			@RequestBody OrganisationDTO organisation) {
 		return organisationSrv.create(organisation);
 	}
 

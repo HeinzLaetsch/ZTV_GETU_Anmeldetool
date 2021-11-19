@@ -60,12 +60,12 @@ export class LoginDialogComponent implements OnInit {
             self.dialogRef.close("OK");
             self.loginError = false;
             self.userService.loadUser().subscribe((result) => {
-              console.log("Login UserService loaded");
+              // console.log("Login UserService loaded");
             });
             self.teilnehmerService
               .loadTeilnehmer(self.vwVereinControl.value)
               .subscribe((result) => {
-                console.log("Login teilnehmerService loaded");
+                // console.log("Login teilnehmerService loaded");
               });
           },
           error(msg) {

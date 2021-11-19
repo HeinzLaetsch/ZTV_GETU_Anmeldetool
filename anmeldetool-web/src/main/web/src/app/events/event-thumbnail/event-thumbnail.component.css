@@ -3,9 +3,23 @@
   padding: 10px;
   margin: 5px;
 }
-
+.status-ok {
+  background-color: #488dd6;
+  color: #ffff;
+  cursor: pointer;
+}
+.status-ok-aktiv {
+  background-color: #ffff;
+  border: 1px solid #022447;
+  color: #aef726;
+  cursor: pointer;
+}
 .pad-left {
   margin-left: 10px;
+}
+
+.margin-left {
+  margin-left: -3px;
 }
 
 .green {

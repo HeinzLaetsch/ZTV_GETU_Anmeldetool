@@ -40,7 +40,7 @@ export class EventsDetailComponent implements OnInit {
 
   ngOnInit() {
     const anlassId: string = this.route.snapshot.params.id;
-    console.log("url param: ", anlassId);
+    // console.log("url param: ", anlassId);
     this.anlass = this.anlassService.getAnlassById(anlassId);
     this.anlassService
       .getVereinStart(this.anlass, this.authService.currentVerein)

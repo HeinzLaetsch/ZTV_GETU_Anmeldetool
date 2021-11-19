@@ -3,11 +3,9 @@ import {
   HttpHandler,
   HttpInterceptor,
   HttpRequest,
-  HttpResponse,
 } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { tap } from "rxjs/operators";
 import { AuthService } from "../service/auth/auth.service";
 @Injectable()
 export class HttpSecurityInterceptorService implements HttpInterceptor {
@@ -29,7 +27,7 @@ export class HttpSecurityInterceptorService implements HttpInterceptor {
           .append("vereinsid", this.authService.currentVerein.id);
       }
     } else {
-      console.log("Dont do anything");
+      // console.log("Dont do anything");
     }
     const authReq = req.clone({ withCredentials: true, headers: newHeaders });
     return next.handle(authReq);

@@ -7,7 +7,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class OrganisationenDTO {
+public class OrganisationDTO {
 
 	private UUID id;
 

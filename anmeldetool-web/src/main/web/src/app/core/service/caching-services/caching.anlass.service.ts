@@ -63,6 +63,13 @@ export class CachingAnlassService {
       brevet
     );
   }
+  getWrEinsatz(
+    anlass: IAnlass,
+    verein: IVerein,
+    user: IUser
+  ): Observable<IWertungsrichterAnlassLink> {
+    return this.anlassService.getWrEinsatz(anlass, verein, user);
+  }
 
   addWertungsrichterToAnlass(
     anlass: IAnlass,

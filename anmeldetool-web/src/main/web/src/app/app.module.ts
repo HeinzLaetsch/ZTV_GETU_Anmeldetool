@@ -1,3 +1,4 @@
+import { DatePipe } from "@angular/common";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { APP_INITIALIZER, NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -8,6 +9,7 @@ import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { tap } from "rxjs/operators";
 import { AppRoutingModule } from "./app-routing.module";
 import { AnmeldeToolComponent } from "./app.component";
+import { HoverOverDirective } from "./core/directive/hover.directive";
 import { HttpSecurityInterceptorService } from "./core/interceptor/http.security.interceptor.service";
 import { CachingVereinService } from "./core/service/caching-services/caching.verein.service";
 import { ServiceModule } from "./core/service/service.module";
@@ -18,6 +20,7 @@ import {
   EventsDetailComponent,
   EventThumbnailComponent,
   WertungsrichterChipComponent,
+  WertungsrichterSlotComponent,
 } from "./events/index";
 import { MaterialModule } from "./material-module";
 import { NavBarComponent } from "./nav/nav-bar/nav-bar.component";
@@ -40,6 +43,7 @@ export function initVereinservice(
     AnmeldeToolComponent,
     EventListComponent,
     WertungsrichterChipComponent,
+    WertungsrichterSlotComponent,
     EventThumbnailComponent,
     NavBarComponent,
     EventsDetailComponent,
@@ -48,6 +52,7 @@ export function initVereinservice(
     NewAnmelderComponent,
     NewVereinComponent,
     LoginDialogComponent,
+    HoverOverDirective,
   ],
   imports: [
     BrowserModule,
@@ -62,6 +67,7 @@ export function initVereinservice(
     SharedComponentsModule,
   ],
   providers: [
+    DatePipe,
     {
       provide: APP_INITIALIZER,
       useFactory: initVereinservice,

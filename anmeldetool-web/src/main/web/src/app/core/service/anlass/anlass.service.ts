@@ -41,7 +41,7 @@ export class AnlassService {
       brevet +
       "/" +
       "verfuegbar";
-    console.log("getVerfuegbareWertungsrichter called: ", combinedUrl);
+    // console.log("getVerfuegbareWertungsrichter called: ", combinedUrl);
     if (!anlass) {
       return of(undefined);
     }
@@ -88,6 +88,37 @@ export class AnlassService {
     );
   }
 
+  getWrEinsatz(
+    anlass: IAnlass,
+    verein: IVerein,
+    wertungsrichter: IUser
+  ): Observable<IWertungsrichterAnlassLink> {
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "organisationen" +
+      "/" +
+      verein?.id +
+      "/" +
+      "wertungsrichter" +
+      "/" +
+      wertungsrichter.id;
+
+    if (!anlass) {
+      return of(undefined);
+    }
+    return this.http.get<IWertungsrichterAnlassLink>(combinedUrl).pipe(
+      catchError((error) => {
+        if (error.status === 404) {
+          return of(undefined);
+        }
+        this.handleError<boolean>("getWrEinsatz");
+      })
+    );
+  }
+
   addWertungsrichterToAnlass(
     anlass: IAnlass,
     verein: IVerein,
@@ -105,7 +136,7 @@ export class AnlassService {
       "wertungsrichter" +
       "/" +
       user?.id;
-    console.log("addWertungsrichterToAnlass called: ", combinedUrl);
+    // console.log("addWertungsrichterToAnlass called: ", combinedUrl);
     if (!anlass) {
       return of(undefined);
     }

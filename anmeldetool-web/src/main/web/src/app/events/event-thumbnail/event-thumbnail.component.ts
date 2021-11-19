@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
@@ -22,16 +23,6 @@ export class EventThumbnailComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log(
-      "Anlass: ",
-      this.anlass?.id,
-      " , ",
-      this.anlass?.anlassBezeichnung,
-      " , ",
-      this.anlass?.startDatum,
-      " , ",
-      this.anlass?.startDatum
-    );
     this.anlassService
       .getVereinStart(this.anlass, this.authService.currentVerein)
       .subscribe((result) => {
@@ -51,12 +42,22 @@ export class EventThumbnailComponent implements OnInit {
       });
   }
 
+  getStatus() {
+    // Farbe entsprechend Anlass melde Status
+    // if (!this.vereinStarted) return AnzeigeStatusEnum.WARNUNG;
+    // else
+    return AnzeigeStatusEnum.OK;
+  }
   getStartedClass() {
     if (!this.vereinStarted) {
       return { redNoMargin: true };
     } else {
       return { greenNoMargin: true };
     }
+  }
+
+  get hasTeilnehmer(): boolean {
+    return this.anzahlTeilnehmer === 0;
   }
 
   getTeilnehmerClass() {
@@ -66,6 +67,7 @@ export class EventThumbnailComponent implements OnInit {
       return { greenNoMargin: true };
     }
   }
+
   getWertungsrichterClass() {
     if (this.anzahlTeilnehmer !== 0) {
       return { redNoMargin: true };
@@ -89,6 +91,10 @@ export class EventThumbnailComponent implements OnInit {
       .subscribe((result) => {
         console.log("Clicked: ", result);
       });
+  }
+
+  get isWertungsrichterOk(): boolean {
+    return this.statusWertungsrichter !== "nicht komplett";
   }
 
   get statusWertungsrichter(): string {

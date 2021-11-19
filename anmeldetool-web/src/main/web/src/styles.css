@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+/* https://emojipedia.org/samsung/one-ui-4.0/ */
 .well {
   background-color: #488dd6;
   color: #ffff;
@@ -10,6 +11,46 @@
   border: 1px solid #488dd6;
   color: #488dd6;
   cursor: pointer;
+}
+.verticalAlign {
+  position: relative;
+  bottom: -9px;
+  padding-left: 3px;
+}
+.spanBottom {
+  bottom: -5px;
+}
+.status-OK {
+  background-color: #488dd6;
+  color: #ffff;
+  cursor: pointer;
+}
+.status-OK-AKTIV {
+  background-color: #ffff;
+  border: 1px solid #022447;
+  color: #aef726;
+  cursor: pointer;
+}
+
+.label {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.label-green {
+  color: rgba(25, 124, 25, 0.8) !important;
+}
+
+.label-red {
+  color: rgba(235, 25, 25, 0.78) !important;
+}
+.doubleRow {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+.icon {
+  max-width: 25px;
+  max-height: 25px;
+  margin: 0px 3px 0px 3px;
 }
 
 .container {

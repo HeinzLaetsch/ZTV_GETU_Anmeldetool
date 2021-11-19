@@ -21,12 +21,9 @@ import org.ztv.anmeldetool.anmeldetool.repositories.OrganisationAnlassLinkReposi
 import org.ztv.anmeldetool.anmeldetool.repositories.PersonAnlassLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.PersonenRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.TeilnehmerAnlassLinkRepository;
-import org.ztv.anmeldetool.anmeldetool.transfer.AnlassDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationAnlassLinkDTO;
-import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationenDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.PersonAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
-import org.ztv.anmeldetool.anmeldetool.util.AnlassHelper;
 import org.ztv.anmeldetool.anmeldetool.util.TeilnehmerAnlassLinkHelper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -134,17 +131,9 @@ public class AnlassService {
 		}
 	}
 
-	public ResponseEntity<Collection<AnlassDTO>> getAllAnlaesse() {
-		Collection<AnlassDTO> anlaessDto = new ArrayList<AnlassDTO>();
-		Iterable<Anlass> anlaesse = anlassRepo.findByAktivOrderByAnlassBezeichnung(true);
-		for (Anlass anlass : anlaesse) {
-			log.debug("Anlass: " + anlass);
-			// Collection<OrganisationenDTO> orgDTOs =
-			// OrganisationAnlassLinkHelper.getOrganisationDTOForAnlassLink(anlass.getOrganisationenLinks());
-			AnlassDTO anlassDTO = AnlassHelper.createAnlassDTO(anlass);
-			anlaessDto.add(anlassDTO);
-		}
-		return ResponseEntity.ok(anlaessDto);
+	public List<Anlass> getAllAnlaesse() {
+		List<Anlass> anlaesse = anlassRepo.findByAktivOrderByAnlassBezeichnung(true);
+		return anlaesse;
 	}
 
 	public ResponseEntity<Collection<TeilnehmerAnlassLinkDTO>> getTeilnahmen(UUID anlassId, UUID OrgId) {
@@ -174,15 +163,16 @@ public class AnlassService {
 		return ResponseEntity.notFound().build();
 	}
 
-	public ResponseEntity<Collection<OrganisationenDTO>> getVereinsStarts(UUID anlassId) {
+	public List<Organisation> getVereinsStarts(UUID anlassId) {
 		Anlass anlass = findAnlassById(anlassId);
 		if (anlass == null) {
-			return ResponseEntity.notFound().build();
+			return new ArrayList<Organisation>();
 		}
-		// Collection<OrganisationenDTO> orgDTOs =
-		// OrganisationAnlassLinkHelper.getOrganisationDTOForAnlassLink(anlass.getOrganisationenLinks());
-		AnlassDTO anlassDTO = AnlassHelper.createAnlassDTO(anlass);
-		return ResponseEntity.ok(anlassDTO.getOrganisationen());
+		List<OrganisationAnlassLink> orgLinks = anlass.getOrganisationenLinks();
+		List<Organisation> orgs = orgLinks.stream().map(orgLink -> {
+			return orgLink.getOrganisation();
+		}).collect(Collectors.toList());
+		return orgs;
 	}
 
 	public Anlass findAnlassById(UUID anlassId) {

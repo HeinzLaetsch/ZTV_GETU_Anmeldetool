@@ -13,7 +13,7 @@ import org.ztv.anmeldetool.anmeldetool.models.Rolle;
 import org.ztv.anmeldetool.anmeldetool.models.RollenLink;
 import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.service.RoleService;
-import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationenDTO;
+import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.RolleDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 

@@ -1,3 +1,4 @@
+import { IWertungsrichterSlot } from "./IWertungsrichterSlot";
 import { KategorieEnum } from "./KategorieEnum";
 import { TiTuEnum } from "./TiTuEnum";
 
@@ -11,4 +12,5 @@ export interface IAnlass {
   tiTu: TiTuEnum;
   tiefsteKategorie: KategorieEnum;
   hoechsteKategorie: KategorieEnum;
+  wertungsrichterSlots?: IWertungsrichterSlot[];
 }

@@ -1,22 +1,64 @@
-<div class="chip">
-  <span
-    [ngClass]="{
-      'label-green': wertungsrichter.gueltig,
-      'label-red': !wertungsrichter.gueltig
-    }"
-    >{{ wertungsrichterUser.vorname + " " + wertungsrichterUser.name }}</span
-  ><br />
-  <span>Brevet: {{ wertungsrichter.brevet }}</span>
-  <br />
-  <mat-checkbox
-    [ngClass]="{
-      'label-green': wertungsrichter.gueltig,
-      'label-red': !wertungsrichter.gueltig
-    }"
-    [(ngModel)]="wertungsrichter.gueltig"
-    [disabled]="true"
-    >Wertungsrichter hat FK</mat-checkbox
+<ng-container *ngIf="wrAnlassLink; else loading">
+  <div
+    class="container chip drag-drop-box"
+    cdkDrag
+    #tooltip="matTooltip"
+    matTooltip="Ziehe (Drag & Drop) den Wertungsrichter rüber"
+    matTooltipPosition="above"
+    matTooltipHideDelay="100"
   >
-  <ng-container *ngIf="isAllWertungsrichterList"> </ng-container>
-  <ng-container *ngIf="!isAllWertungsrichterList"> </ng-container>
-</div>
+    <div class="row">
+      <div class="col">
+        <span
+          [ngClass]="{
+            'label-green': wertungsrichterUser.gueltig,
+            'label-red': !wertungsrichterUser.gueltig
+          }"
+          >{{
+            wertungsrichterUser.vorname + " " + wertungsrichterUser.name
+          }}</span
+        >
+      </div>
+    </div>
+    <div class="row">
+      <!--div class="col">
+      <span>Brevet: {{ wertungsrichterUser.brevet }}</span>
+    </div-->
+      <div class="col">
+        <mat-checkbox
+          [ngClass]="{
+            'label-green': wertungsrichterUser.gueltig,
+            'label-red': !wertungsrichterUser.gueltig
+          }"
+          [(ngModel)]="wertungsrichterUser.gueltig"
+          [disabled]="true"
+          >Wertungsrichter hat FK</mat-checkbox
+        >
+      </div>
+    </div>
+    <div class="row" *ngIf="!isAllWertungsrichterList">
+      <div class="col">Einsätze</div>
+    </div>
+    <div class="row" *ngIf="!isAllWertungsrichterList">
+      <div class="row doubleRow">
+        <div class="col">
+          <app-wertungsrichter-slot
+            *ngFor="let slot of anlass.wertungsrichterSlots"
+            [slot]="slot"
+            [wrAnlassLink]="wrAnlassLink"
+            [wertungsrichter]="wertungsrichterUser"
+            [einsatz]="getEinsatzForSlot(slot)"
+          >
+          </app-wertungsrichter-slot>
+          {{ wrAnlassLink?.kommentar }}
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #loading>
+  <div class="center">
+    <mat-spinner style="margin: 0 auto"></mat-spinner>
+  </div>
+</ng-template>

@@ -1,39 +1,90 @@
-<div [routerLink]="['/anlass/', anlass?.id]" class="well hoverwell thumbnail">
+<!-- well hoverwell -->
+<div
+  hover
+  [status]="getStatus()"
+  [routerLink]="['/anlass/', anlass?.id]"
+  class="thumbnail"
+>
   <div class="row">
-    <div class="col-sm">
+    <div class="col-sm-8">
       <h2>{{ getCleaned() }}</h2>
     </div>
+    <div class="col-sm-1">
+      <img
+        *ngIf="vereinStarted"
+        class="icon"
+        src="assets/images/skype/beaming-face-with-smiling-eyes_1f601.png"
+      />
+      <img
+        *ngIf="!vereinStarted"
+        class="icon"
+        src="assets/images/skype/slightly-frowning-face_1f641.png"
+      />
+    </div>
+    <div class="col-sm-3 verticalAlign">Dein Verein started</div>
   </div>
   <div class="row">
-    <div class="col-sm" [ngClass]="getStartTimeClass()">
+    <div class="col-sm-4" [ngClass]="getStartTimeClass()">
       <span *ngIf="anlass.startDatum !== anlass.endDatum">am</span>
       <span *ngIf="anlass.startDatum === anlass.endDatum">von</span>:
       {{ anlass.startDatum | date: "EEEE, d MMMM , y" }}
     </div>
-    <div class="col-sm" *ngIf="anlass.startDatum === anlass.endDatum">
+    <div class="col-sm-4" *ngIf="anlass.startDatum === anlass.endDatum">
       bis: {{ anlass.endDatum | date: "EEEE, d MMMM , y" }}
     </div>
   </div>
   <div class="row">
-    <div class="col-sm">Geschlecht: {{ anlass.tiTu }}</div>
-    <div class="col-sm">
+    <div class="col-sm-4">Geschlecht: {{ anlass.tiTu }}</div>
+    <div class="col-sm-4">
       Startberechtigt: {{ anlass.tiefsteKategorie }} bis
       {{ anlass.hoechsteKategorie }}
     </div>
   </div>
-  <div class="row" [ngClass]="getStartedClass()">
+  <!--div class="row">
     <mat-checkbox
       [(ngModel)]="vereinStarted"
       (click)="vereinStartedClicked($event)"
       >Verein started</mat-checkbox
     >
+  </div-->
+  <div *ngIf="vereinStarted" class="row">
+    <div class="col-sm-8">
+      <span class="verticalAlign margin-left"
+        >Teilnehmer: {{ anzahlTeilnehmer }}</span
+      >
+    </div>
+    <div class="col-sm-1">
+      <img
+        *ngIf="hasTeilnehmer"
+        class="icon"
+        src="assets/images/smiley-emoji.png"
+      />
+      <img
+        *ngIf="!hasTeilnehmer"
+        class="icon"
+        src="assets/images/frowning-face_2639-fe0f.png"
+      />
+    </div>
+    <div class="col-sm-3 verticalAlign">Teilnehmer gemeldet</div>
   </div>
   <div *ngIf="vereinStarted" class="row">
-    <div class="col-sm" [ngClass]="getTeilnehmerClass()">
-      Teilnehmer: {{ anzahlTeilnehmer }}
+    <div class="col-sm-8">
+      <span class="verticalAlign margin-left"
+        >Wertungsrichter: {{ statusWertungsrichter }}</span
+      >
     </div>
-    <div class="col-sm" [ngClass]="getWertungsrichterClass()">
-      Wertungsrichter: {{ statusWertungsrichter }}
+    <div class="col-sm-1">
+      <img
+        *ngIf="isWertungsrichterOk"
+        class="icon"
+        src="assets/images/smiley-emoji.png"
+      />
+      <img
+        *ngIf="!isWertungsrichterOk"
+        class="icon"
+        src="assets/images/slightly-frowning-face_1f641.png"
+      />
     </div>
+    <div class="col-sm-3 verticalAlign">WR Kontingent erfüllt</div>
   </div>
 </div>

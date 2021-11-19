@@ -1,0 +1,11 @@
+<div class="slot">
+  <mat-checkbox
+    [ngClass]="{
+      'label-green': wertungsrichter.gueltig,
+      'label-red': !wertungsrichter.gueltig
+    }"
+    [(ngModel)]="einsatz.eingesetzt"
+    [disabled]="canEdit()"
+    >{{ getSlotText() }}</mat-checkbox
+  >
+</div>
