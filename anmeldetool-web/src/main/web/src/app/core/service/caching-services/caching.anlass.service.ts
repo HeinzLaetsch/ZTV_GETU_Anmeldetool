@@ -4,9 +4,10 @@ import { IVerein } from "src/app/verein/verein";
 import { IAnlass } from "../../model/IAnlass";
 import { IAnlassLink } from "../../model/IAnlassLink";
 import { IAnlassLinks } from "../../model/IAnlassLinks";
+import { IPersonAnlassLink } from "../../model/IPersonAnlassLink";
 import { ITeilnehmer } from "../../model/ITeilnehmer";
 import { IUser } from "../../model/IUser";
-import { IWertungsrichterAnlassLink } from "../../model/IWertungsrichterAnlassLink";
+import { IWertungsrichterEinsatz } from "../../model/IWertungsrichterEinsatz";
 import { KategorieEnum } from "../../model/KategorieEnum";
 import { TiTuEnum } from "../../model/TiTuEnum";
 import { AnlassService } from "../anlass/anlass.service";
@@ -56,34 +57,47 @@ export class CachingAnlassService {
     anlass: IAnlass,
     verein: IVerein,
     brevet: number
-  ): Observable<IWertungsrichterAnlassLink[]> {
+  ): Observable<IPersonAnlassLink[]> {
     return this.anlassService.getEingeteilteWertungsrichter(
       anlass,
       verein,
       brevet
     );
   }
+
   getWrEinsatz(
     anlass: IAnlass,
     verein: IVerein,
     user: IUser
-  ): Observable<IWertungsrichterAnlassLink> {
+  ): Observable<IPersonAnlassLink> {
     return this.anlassService.getWrEinsatz(anlass, verein, user);
   }
-
+  updateWrEinsatz(
+    verein: IVerein,
+    anlassLink: IPersonAnlassLink,
+    einsatz: IWertungsrichterEinsatz
+  ): Observable<IWertungsrichterEinsatz> {
+    return this.anlassService.updateWrEinsatz(verein, anlassLink, einsatz);
+  }
   addWertungsrichterToAnlass(
     anlass: IAnlass,
     verein: IVerein,
     user: IUser
-  ): Observable<IWertungsrichterAnlassLink> {
+  ): Observable<IPersonAnlassLink> {
     return this.anlassService.addWertungsrichterToAnlass(anlass, verein, user);
+  }
+  updateAnlassLink(
+    pal: IPersonAnlassLink,
+    verein: IVerein
+  ): Observable<IPersonAnlassLink> {
+    return this.anlassService.updateAnlassLink(pal, verein);
   }
 
   deleteWertungsrichterFromAnlass(
     anlass: IAnlass,
     verein: IVerein,
     user: IUser
-  ): Observable<IWertungsrichterAnlassLink> {
+  ): Observable<IPersonAnlassLink> {
     return this.anlassService.deleteWertungsrichterFromAnlass(
       anlass,
       verein,

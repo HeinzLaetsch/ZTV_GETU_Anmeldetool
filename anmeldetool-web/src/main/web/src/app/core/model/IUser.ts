@@ -1,3 +1,4 @@
+import { IPersonAnlassLink } from "./IPersonAnlassLink";
 import { IRolle } from "./IRolle";
 import { IWertungsrichter } from "./IWertungsrichter";
 
@@ -13,4 +14,5 @@ export interface IUser {
   password?: string;
   rollen?: IRolle[];
   wr?: IWertungsrichter;
+  pal?: IPersonAnlassLink;
 }

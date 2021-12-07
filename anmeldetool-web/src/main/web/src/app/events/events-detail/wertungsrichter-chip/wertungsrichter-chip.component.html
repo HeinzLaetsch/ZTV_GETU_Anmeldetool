@@ -1,4 +1,4 @@
-<ng-container *ngIf="wrAnlassLink; else loading">
+<ng-container *ngIf="wertungsrichter !== undefined; else loading">
   <div
     class="container chip drag-drop-box"
     cdkDrag
@@ -11,8 +11,8 @@
       <div class="col">
         <span
           [ngClass]="{
-            'label-green': wertungsrichterUser.gueltig,
-            'label-red': !wertungsrichterUser.gueltig
+            'h2-green': wertungsrichterUser.gueltig,
+            'h2-red': !wertungsrichterUser.gueltig
           }"
           >{{
             wertungsrichterUser.vorname + " " + wertungsrichterUser.name
@@ -21,9 +21,6 @@
       </div>
     </div>
     <div class="row">
-      <!--div class="col">
-      <span>Brevet: {{ wertungsrichterUser.brevet }}</span>
-    </div-->
       <div class="col">
         <mat-checkbox
           [ngClass]="{
@@ -36,22 +33,44 @@
         >
       </div>
     </div>
-    <div class="row" *ngIf="!isAllWertungsrichterList">
+    <div
+      class="row"
+      *ngIf="!isAllWertungsrichterList && wertungsrichterUser.pal"
+    >
       <div class="col">Einsätze</div>
     </div>
     <div class="row" *ngIf="!isAllWertungsrichterList">
-      <div class="row doubleRow">
-        <div class="col">
-          <app-wertungsrichter-slot
-            *ngFor="let slot of anlass.wertungsrichterSlots"
-            [slot]="slot"
-            [wrAnlassLink]="wrAnlassLink"
-            [wertungsrichter]="wertungsrichterUser"
-            [einsatz]="getEinsatzForSlot(slot)"
+      <div class="col doubleRow">
+        <app-wertungsrichter-slot
+          *ngFor="let slot of getSlotsForBrevet()"
+          [slot]="slot"
+          [wrAnlassLink]="wrAnlassLink"
+          [wertungsrichter]="wertungsrichterUser"
+          [einsatz]="getEinsatzForSlot(slot)"
+        >
+        </app-wertungsrichter-slot>
+        <mat-form-field
+          *ngIf="wertungsrichterUser.pal"
+          class="full-width"
+          appearance="fill"
+        >
+          <mat-label>Kommentar</mat-label>
+          <input
+            matInput
+            placeholder="Kommentar"
+            [(ngModel)]="wertungsrichterUser.pal.kommentar"
+            (change)="kommentarChange($event)"
+          />
+          <button
+            *ngIf="wertungsrichterUser.pal.kommentar"
+            matSuffix
+            mat-icon-button
+            aria-label="leeren"
+            (click)="wertungsrichterUser.pal.kommentar = ''"
           >
-          </app-wertungsrichter-slot>
-          {{ wrAnlassLink?.kommentar }}
-        </div>
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
       </div>
     </div>
   </div>

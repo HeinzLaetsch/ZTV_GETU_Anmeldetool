@@ -8,44 +8,41 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @MappedSuperclass
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 public abstract class Base {
 	@Id
-	// @GeneratedValue
-	private UUID id;
-	
-    private boolean aktiv;
-    
-    private boolean deleted;
+	@Builder.Default
+	private UUID id = UUID.randomUUID();
+	@Builder.Default
+	private boolean aktiv = false;
+	@Builder.Default
+	private boolean deleted = false;
+	@Builder.Default
+	@Temporal(TemporalType.DATE)
+	private Calendar changeDate = Calendar.getInstance();
+	@Builder.Default
+	@Temporal(TemporalType.DATE)
+	private Calendar deletionDate = null;
 
-    @Temporal(TemporalType.DATE)
-    private Calendar changeDate;
+	public Base(Boolean aktiv) {
+		this.id = UUID.randomUUID();
+		this.aktiv = aktiv;
+	}
 
-    @Temporal(TemporalType.DATE)
-    private Calendar deletionDate;
-    
-    public Base() {
-    	initFields(false, false, Calendar.getInstance(), null);
-    }
-
-    public Base(Boolean aktiv) {
-    	initFields(aktiv, false, Calendar.getInstance(), null);
-    }
-
-    public Base(Boolean aktiv, Calendar changeDate) {
-    	initFields(aktiv, false, changeDate, null);
-    }
-    
-    private void initFields(Boolean aktiv, Boolean deleted, Calendar changeDate, Calendar deletionDate) {
-    	this.id = UUID.randomUUID();
-    	this.aktiv = aktiv;
-    	this.deleted = deleted;
-    	this.changeDate = changeDate;
-    	this.deletionDate = deletionDate;    	
-    }
+	public Base(Boolean aktiv, Calendar changeDate) {
+		this.aktiv = aktiv;
+		this.changeDate = changeDate;
+	}
 }

@@ -1,7 +1,6 @@
 export interface IWertungsrichterEinsatz {
   id: string;
-  slotId: string;
-  wertungsrichterId: string;
-  wertungsrichterAnlassLinkId: string;
+  wertungsrichterSlotId: string;
+  personAnlassLinkId: string;
   eingesetzt: boolean;
 }

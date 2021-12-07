@@ -6,7 +6,7 @@ import org.mapstruct.MappingConstants;
 import org.ztv.anmeldetool.anmeldetool.models.PersonAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.transfer.PersonAnlassLinkDTO;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = { WertungsrichterEinsatzMapper.class })
 public interface PersonAnlassLinkMapper {
 	@Mapping(source = "anlass.id", target = "anlassId")
 	@Mapping(source = "organisation.id", target = "organisationId")

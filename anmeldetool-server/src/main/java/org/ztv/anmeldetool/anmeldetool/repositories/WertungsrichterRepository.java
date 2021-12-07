@@ -10,7 +10,6 @@ import org.ztv.anmeldetool.anmeldetool.models.Wertungsrichter;
 
 @Repository
 public interface WertungsrichterRepository extends CrudRepository<Wertungsrichter, UUID> {
-
 	List<Wertungsrichter> findAllByAktiv(boolean aktiv);
 
 	Optional<Wertungsrichter> findByPersonId(UUID id);

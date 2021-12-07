@@ -18,25 +18,25 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Wertungsrichter extends Base {
-	
-    @OneToOne()
-    @JoinColumn(name = "person_id", referencedColumnName = "id")
-    Person person;
-	
-	private int brevet;
-	
+
+	@OneToOne()
+	@JoinColumn(name = "person_id", referencedColumnName = "id")
+	Person person;
+
+	private WertungsrichterBrevetEnum brevet;
+
 	private boolean gueltig;
-	
-    @Temporal(TemporalType.DATE)
+
+	@Temporal(TemporalType.DATE)
 	private Calendar letzterFk;
-    
-    public Wertungsrichter() {
-    }
-    
-    @Builder
-    public Wertungsrichter(Person person, int brevet, Calendar letzterFk) {
-    	this.person = person;
-    	this.brevet = brevet;
-    	this.letzterFk = letzterFk;
-    }
+
+	public Wertungsrichter() {
+	}
+
+	@Builder
+	public Wertungsrichter(Person person, WertungsrichterBrevetEnum brevet, Calendar letzterFk) {
+		this.person = person;
+		this.brevet = brevet;
+		this.letzterFk = letzterFk;
+	}
 }

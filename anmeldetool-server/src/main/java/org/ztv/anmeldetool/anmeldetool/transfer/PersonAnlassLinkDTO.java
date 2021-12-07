@@ -1,5 +1,6 @@
 package org.ztv.anmeldetool.anmeldetool.transfer;
 
+import java.util.List;
 import java.util.UUID;
 
 import lombok.Builder;
@@ -17,4 +18,8 @@ public class PersonAnlassLinkDTO {
 	UUID organisationId;
 
 	boolean dirty;
+
+	private String kommentar;
+
+	private List<WertungsrichterEinsatzDTO> einsaetze;
 }

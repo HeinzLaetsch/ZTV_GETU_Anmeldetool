@@ -5,8 +5,9 @@ import { catchError } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
 import { IAnlass } from "../../model/IAnlass";
 import { IAnlassLink } from "../../model/IAnlassLink";
+import { IPersonAnlassLink } from "../../model/IPersonAnlassLink";
 import { IUser } from "../../model/IUser";
-import { IWertungsrichterAnlassLink } from "../../model/IWertungsrichterAnlassLink";
+import { IWertungsrichterEinsatz } from "../../model/IWertungsrichterEinsatz";
 
 @Injectable({
   providedIn: "root",
@@ -59,7 +60,7 @@ export class AnlassService {
     anlass: IAnlass,
     verein: IVerein,
     brevet: number
-  ): Observable<IWertungsrichterAnlassLink[]> {
+  ): Observable<IPersonAnlassLink[]> {
     const combinedUrl =
       this.url +
       "/" +
@@ -78,7 +79,7 @@ export class AnlassService {
     if (!anlass) {
       return of(undefined);
     }
-    return this.http.get<IWertungsrichterAnlassLink[]>(combinedUrl).pipe(
+    return this.http.get<IPersonAnlassLink[]>(combinedUrl).pipe(
       catchError((error) => {
         if (error.status === 404) {
           return of(undefined);
@@ -92,7 +93,7 @@ export class AnlassService {
     anlass: IAnlass,
     verein: IVerein,
     wertungsrichter: IUser
-  ): Observable<IWertungsrichterAnlassLink> {
+  ): Observable<IPersonAnlassLink> {
     const combinedUrl =
       this.url +
       "/" +
@@ -104,17 +105,49 @@ export class AnlassService {
       "/" +
       "wertungsrichter" +
       "/" +
-      wertungsrichter.id;
+      wertungsrichter.id +
+      "/" +
+      "einsaetze";
 
     if (!anlass) {
       return of(undefined);
     }
-    return this.http.get<IWertungsrichterAnlassLink>(combinedUrl).pipe(
+    return this.http.get<IPersonAnlassLink>(combinedUrl).pipe(
       catchError((error) => {
         if (error.status === 404) {
           return of(undefined);
         }
-        this.handleError<boolean>("getWrEinsatz");
+        this.handleError<IPersonAnlassLink>("getWrEinsatz");
+      })
+    );
+  }
+
+  updateWrEinsatz(
+    verein: IVerein,
+    anlassLink: IPersonAnlassLink,
+    einsatz: IWertungsrichterEinsatz
+  ): Observable<IWertungsrichterEinsatz> {
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlassLink?.anlassId +
+      "/" +
+      "organisationen" +
+      "/" +
+      verein?.id +
+      "/" +
+      "wertungsrichter" +
+      "/" +
+      anlassLink?.personId +
+      "/" +
+      "einsaetze";
+
+    return this.http.post<IWertungsrichterEinsatz>(combinedUrl, einsatz).pipe(
+      catchError((error) => {
+        if (error.status === 404) {
+          return of(undefined);
+        }
+        this.handleError<IWertungsrichterEinsatz>("getWrEinsatz");
       })
     );
   }
@@ -123,7 +156,7 @@ export class AnlassService {
     anlass: IAnlass,
     verein: IVerein,
     user: IUser
-  ): Observable<IWertungsrichterAnlassLink> {
+  ): Observable<IPersonAnlassLink> {
     const combinedUrl =
       this.url +
       "/" +
@@ -140,9 +173,33 @@ export class AnlassService {
     if (!anlass) {
       return of(undefined);
     }
-    return this.http.post<IWertungsrichterAnlassLink>(combinedUrl, {}).pipe(
+    return this.http.post<IPersonAnlassLink>(combinedUrl, {}).pipe(
       catchError((error) => {
         this.handleError<boolean>("addWertungsrichterToAnlass");
+        return of(undefined);
+      })
+    );
+  }
+
+  updateAnlassLink(
+    pal: IPersonAnlassLink,
+    verein: IVerein
+  ): Observable<IPersonAnlassLink> {
+    const combinedUrl =
+      this.url +
+      "/" +
+      pal.anlassId +
+      "/" +
+      "organisationen" +
+      "/" +
+      verein.id +
+      "/" +
+      "wertungsrichter" +
+      "/" +
+      pal.personId;
+    return this.http.post<IPersonAnlassLink>(combinedUrl, pal).pipe(
+      catchError((error) => {
+        this.handleError<boolean>("updateAnlassLink");
         return of(undefined);
       })
     );
@@ -152,7 +209,7 @@ export class AnlassService {
     anlass: IAnlass,
     verein: IVerein,
     user: IUser
-  ): Observable<IWertungsrichterAnlassLink> {
+  ): Observable<IPersonAnlassLink> {
     const combinedUrl =
       this.url +
       "/" +
@@ -169,7 +226,7 @@ export class AnlassService {
     if (!anlass) {
       return of(undefined);
     }
-    return this.http.delete<IWertungsrichterAnlassLink>(combinedUrl).pipe(
+    return this.http.delete<IPersonAnlassLink>(combinedUrl).pipe(
       catchError((error) => {
         this.handleError<boolean>("deleteWertungsrichterFromAnlass");
         return of(undefined);

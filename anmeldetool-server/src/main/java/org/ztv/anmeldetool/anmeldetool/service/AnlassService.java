@@ -16,6 +16,7 @@ import org.ztv.anmeldetool.anmeldetool.models.OrganisationAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.models.Person;
 import org.ztv.anmeldetool.anmeldetool.models.PersonAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
+import org.ztv.anmeldetool.anmeldetool.models.WertungsrichterBrevetEnum;
 import org.ztv.anmeldetool.anmeldetool.repositories.AnlassRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.OrganisationAnlassLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.PersonAnlassLinkRepository;
@@ -60,11 +61,11 @@ public class AnlassService {
 	@Autowired
 	PersonenRepository personRepository;
 
-	public List<Person> getVerfuegbareWertungsrichter(UUID anlassId, UUID orgId, int brevet) {
+	public List<Person> getVerfuegbareWertungsrichter(UUID anlassId, UUID orgId, WertungsrichterBrevetEnum brevet) {
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		List<Person> personen = personRepository.findByOrganisationId(organisation.getId());
 		List<Person> wrs = personen.stream().filter(person -> {
-			return (person.getWertungsrichter() != null && person.getWertungsrichter().getBrevet() == brevet);
+			return (person.getWertungsrichter() != null && person.getWertungsrichter().getBrevet().equals(brevet));
 		}).collect(Collectors.toList());
 
 		List<PersonAnlassLink> eingeteilteWrs = getEingeteilteWertungsrichter(anlassId, orgId, brevet);
@@ -80,55 +81,71 @@ public class AnlassService {
 		return verfuegbare;
 	}
 
-	public List<PersonAnlassLink> getEingeteilteWertungsrichter(UUID anlassId, UUID orgId, int brevet) {
+	public List<PersonAnlassLink> getEingeteilteWertungsrichter(UUID anlassId, UUID orgId,
+			WertungsrichterBrevetEnum brevet) {
 		Anlass anlass = this.findAnlassById(anlassId);
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		List<PersonAnlassLink> pals = personAnlassLinkRepository.findByAnlassAndOrganisation(anlass, organisation);
 		pals = pals.stream().filter(pal -> {
-			return pal.getPerson().getWertungsrichter().getBrevet() == brevet;
+			return pal.getPerson().getWertungsrichter().getBrevet().equals(brevet);
 		}).collect(Collectors.toList());
 		return pals;
 	}
 
 	public ResponseEntity<PersonAnlassLinkDTO> updateEingeteilteWertungsrichter(UUID anlassId, UUID orgId,
-			UUID personId, boolean add) {
+			UUID personId, boolean add) throws Exception {
+
+		PersonAnlassLink pal = getAnlassLink(anlassId, orgId, personId);
+		if (add) {
+			if (pal != null) {
+				return ResponseEntity.badRequest().build();
+			}
+			Anlass anlass = this.findAnlassById(anlassId);
+			Organisation organisation = organisationSrv.findOrganisationById(orgId);
+			Person person = this.personSrv.findPersonById(personId);
+			pal = new PersonAnlassLink();
+			pal.setAktiv(true);
+			pal.setAnlass(anlass);
+			pal.setOrganisation(organisation);
+			pal.setPerson(person);
+			pal = personAnlassLinkRepository.save(pal);
+			PersonAnlassLinkDTO palDTO = PersonAnlassLinkDTO.builder().anlassId(pal.getAnlass().getId())
+					.organisationId(pal.getOrganisation().getId()).personId(pal.getPerson().getId()).build();
+			return ResponseEntity.ok(palDTO);
+		} else {
+			if (pal == null) {
+				return ResponseEntity.badRequest().build();
+			}
+			personAnlassLinkRepository.delete(pal);
+			PersonAnlassLinkDTO palDTO = PersonAnlassLinkDTO.builder().anlassId(pal.getAnlass().getId())
+					.organisationId(pal.getOrganisation().getId()).personId(pal.getPerson().getId()).build();
+			return ResponseEntity.ok(palDTO);
+		}
+	}
+
+	public PersonAnlassLink getAnlassLink(UUID anlassId, UUID orgId, UUID personId) throws Exception {
 		Anlass anlass = this.findAnlassById(anlassId);
 		if (anlass == null) {
-			// return ResponseEntity.notFound("Anlass mit Id " + anlassId + " nicht
-			// gefunden").build();
 		}
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		Person person = this.personSrv.findPersonById(personId);
 		if (anlass == null || organisation == null || person == null) {
-			return ResponseEntity.notFound().build();
+			return null;
 		}
 		List<PersonAnlassLink> pals = personAnlassLinkRepository.findByPersonAndOrganisationAndAnlass(person,
 				organisation, anlass);
-		if (add) {
-			if (pals.size() > 0) {
-				return ResponseEntity.badRequest().build();
-			} else {
-				PersonAnlassLink pal = new PersonAnlassLink();
-				pal.setAktiv(true);
-				pal.setAnlass(anlass);
-				pal.setOrganisation(organisation);
-				pal.setPerson(person);
-				pal = personAnlassLinkRepository.save(pal);
-				PersonAnlassLinkDTO palDTO = PersonAnlassLinkDTO.builder().anlassId(pal.getAnlass().getId())
-						.organisationId(pal.getOrganisation().getId()).personId(pal.getPerson().getId()).build();
-				return ResponseEntity.ok(palDTO);
-			}
-		} else {
-			if (pals.size() == 0) {
-				return ResponseEntity.badRequest().build();
-			} else {
-				personAnlassLinkRepository.delete(pals.get(0));
-				PersonAnlassLinkDTO palDTO = PersonAnlassLinkDTO.builder().anlassId(pals.get(0).getAnlass().getId())
-						.organisationId(pals.get(0).getOrganisation().getId()).personId(pals.get(0).getPerson().getId())
-						.build();
-				return ResponseEntity.ok(palDTO);
-			}
+		if (pals.size() > 1) {
+			log.error("Elements: {}", pals.size());
+			throw new Exception("too many elements");
 		}
+		if (pals.size() == 0) {
+			return null;
+		}
+		return pals.get(0);
+	}
+
+	public PersonAnlassLink updateAnlassLink(PersonAnlassLink pal) {
+		return personAnlassLinkRepository.save(pal);
 	}
 
 	public List<Anlass> getAllAnlaesse() {

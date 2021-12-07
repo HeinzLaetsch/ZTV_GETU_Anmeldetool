@@ -1,7 +1,7 @@
 import { DatePipe } from "@angular/common";
 import { Component, Input, OnInit } from "@angular/core";
+import { IPersonAnlassLink } from "src/app/core/model/IPersonAnlassLink";
 import { IWertungsrichter } from "src/app/core/model/IWertungsrichter";
-import { IWertungsrichterAnlassLink } from "src/app/core/model/IWertungsrichterAnlassLink";
 import { IWertungsrichterEinsatz } from "src/app/core/model/IWertungsrichterEinsatz";
 import { IWertungsrichterSlot } from "src/app/core/model/IWertungsrichterSlot";
 import { AuthService } from "src/app/core/service/auth/auth.service";
@@ -23,9 +23,10 @@ export class WertungsrichterSlotComponent implements OnInit {
   @Input()
   wertungsrichter: IWertungsrichter;
   @Input()
-  wrAnlassLink: IWertungsrichterAnlassLink;
+  wrAnlassLink: IPersonAnlassLink;
+
   @Input()
-  einsatz: IWertungsrichterEinsatz;
+  private einsatz: IWertungsrichterEinsatz;
 
   constructor(
     private authservice: AuthService,
@@ -36,7 +37,16 @@ export class WertungsrichterSlotComponent implements OnInit {
   ngOnInit(): void {
     // console.log("Einsatz: ", this.einsatz);
   }
-
+  userEingesetztgmodelchange(value): void {
+    this.einsatz.eingesetzt = value;
+    this.anlassService
+      .updateWrEinsatz(
+        this.authservice.currentVerein,
+        this.wrAnlassLink,
+        this.einsatz
+      )
+      .subscribe((wrEinsatz) => {});
+  }
   getSlotText(): string {
     let text = "";
     if (this.slot.tag) {

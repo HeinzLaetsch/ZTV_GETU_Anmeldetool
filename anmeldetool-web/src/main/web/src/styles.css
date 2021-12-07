@@ -43,6 +43,17 @@
 .label-red {
   color: rgba(235, 25, 25, 0.78) !important;
 }
+.h2-green {
+  font-size: 1rem;
+  font-weight: 800;
+  color: rgba(25, 124, 25, 0.8) !important;
+}
+
+.h2-red {
+  font-size: 1rem;
+  font-weight: 800;
+  color: rgba(235, 25, 25, 0.78) !important;
+}
 .doubleRow {
   margin-left: 0px;
   margin-right: 0px;

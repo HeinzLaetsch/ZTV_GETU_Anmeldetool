@@ -1,7 +1,6 @@
 package org.ztv.anmeldetool.anmeldetool.controller.admin;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +36,8 @@ import org.ztv.anmeldetool.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.anmeldetool.models.Person;
 import org.ztv.anmeldetool.anmeldetool.models.PersonAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.models.Wertungsrichter;
+import org.ztv.anmeldetool.anmeldetool.models.WertungsrichterBrevetEnum;
+import org.ztv.anmeldetool.anmeldetool.models.WertungsrichterEinsatz;
 import org.ztv.anmeldetool.anmeldetool.service.AnlassService;
 import org.ztv.anmeldetool.anmeldetool.service.LoginService;
 import org.ztv.anmeldetool.anmeldetool.service.OrganisationService;
@@ -44,6 +45,7 @@ import org.ztv.anmeldetool.anmeldetool.service.PersonService;
 import org.ztv.anmeldetool.anmeldetool.service.RoleService;
 import org.ztv.anmeldetool.anmeldetool.service.TeilnehmerService;
 import org.ztv.anmeldetool.anmeldetool.service.VerbandService;
+import org.ztv.anmeldetool.anmeldetool.service.WertungsrichterEinsatzService;
 import org.ztv.anmeldetool.anmeldetool.service.WertungsrichterService;
 import org.ztv.anmeldetool.anmeldetool.transfer.AnlassDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationAnlassLinkDTO;
@@ -54,14 +56,14 @@ import org.ztv.anmeldetool.anmeldetool.transfer.RolleDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.VerbandDTO;
-import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterDTO;
-import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterSlotDTO;
+import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterEinsatzDTO;
 import org.ztv.anmeldetool.anmeldetool.util.AnlassMapper;
 import org.ztv.anmeldetool.anmeldetool.util.OrganisationMapper;
 import org.ztv.anmeldetool.anmeldetool.util.PersonAnlassLinkMapper;
 import org.ztv.anmeldetool.anmeldetool.util.PersonHelper;
 import org.ztv.anmeldetool.anmeldetool.util.PersonMapper;
+import org.ztv.anmeldetool.anmeldetool.util.WertungsrichterEinsatzMapper;
 import org.ztv.anmeldetool.anmeldetool.util.WertungsrichterMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -100,6 +102,9 @@ public class AdminController {
 	TeilnehmerService teilnehmerSrv;
 
 	@Autowired
+	WertungsrichterEinsatzService wertungsrichterEinsatzSrv;
+
+	@Autowired
 	WertungsrichterMapper wrMapper;
 
 	@Autowired
@@ -113,6 +118,9 @@ public class AdminController {
 
 	@Autowired
 	OrganisationMapper organisationMapper;
+
+	@Autowired
+	WertungsrichterEinsatzMapper wertungsrichterEinsatzMapper;
 
 	@Autowired
 	PasswordEncoder passwordEncoder;
@@ -182,7 +190,13 @@ public class AdminController {
 	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter/{brevet}/verfuegbar")
 	public ResponseEntity<Collection<PersonDTO>> getVerfuegbareWertungsrichter(HttpServletRequest request,
 			@PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable int brevet) {
-		List<Person> wrs = anlassSrv.getVerfuegbareWertungsrichter(anlassId, orgId, brevet);
+		WertungsrichterBrevetEnum brevetEnum;
+		if (WertungsrichterBrevetEnum.Brevet_1.brevet == brevet) {
+			brevetEnum = WertungsrichterBrevetEnum.Brevet_1;
+		} else {
+			brevetEnum = WertungsrichterBrevetEnum.Brevet_2;
+		}
+		List<Person> wrs = anlassSrv.getVerfuegbareWertungsrichter(anlassId, orgId, brevetEnum);
 		Collection<PersonDTO> wrDTOs = wrs.stream().map(person -> personMapper.PersonToPersonDTO(person))
 				.collect(Collectors.toList());
 		if (wrDTOs.size() == 0) {
@@ -195,7 +209,13 @@ public class AdminController {
 	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter/{brevet}/eingeteilt")
 	public ResponseEntity<Collection<PersonAnlassLinkDTO>> getEingeteilteWertungsrichter(HttpServletRequest request,
 			@PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable int brevet) {
-		List<PersonAnlassLink> pals = anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId, brevet);
+		WertungsrichterBrevetEnum brevetEnum;
+		if (WertungsrichterBrevetEnum.Brevet_1.brevet == brevet) {
+			brevetEnum = WertungsrichterBrevetEnum.Brevet_1;
+		} else {
+			brevetEnum = WertungsrichterBrevetEnum.Brevet_2;
+		}
+		List<PersonAnlassLink> pals = anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId, brevetEnum);
 		Collection<PersonAnlassLinkDTO> palDTOs = pals.stream()
 				.map(pal -> palMapper.PersonAnlassLinkToPersonAnlassLinkDTO(pal)).collect(Collectors.toList());
 		if (palDTOs.size() == 0) {
@@ -205,28 +225,71 @@ public class AdminController {
 		}
 	}
 
-	// TODO replace Person ID with WertungsrichterID
-	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter/{personId}")
-	public ResponseEntity<WertungsrichterAnlassLinkDTO> getSlots(HttpServletRequest request,
-			@PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable UUID personId) {
-		List<WertungsrichterSlotDTO> slots = new ArrayList<WertungsrichterSlotDTO>();
-		slots.add(WertungsrichterSlotDTO.builder().id(UUID.randomUUID()).build());
-		WertungsrichterAnlassLinkDTO wrAnlassLink = WertungsrichterAnlassLinkDTO.builder().id(UUID.randomUUID())
-				.anlassId(anlassId).personId(personId).wertungsrichterId(UUID.randomUUID()).slots(slots).build();
+	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter/{personId}/einsaetze")
+	public ResponseEntity<PersonAnlassLinkDTO> getEinsatze(HttpServletRequest request, @PathVariable UUID anlassId,
+			@PathVariable UUID orgId, @PathVariable UUID personId) {
 
-		return ResponseEntity.ok(wrAnlassLink);
+		PersonAnlassLink pal;
+		try {
+			pal = anlassSrv.getAnlassLink(anlassId, orgId, personId);
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().build();
+		}
+		if (pal == null) {
+			return ResponseEntity.notFound().build();
+		}
+		if (pal.getEinsaetze() == null || pal.getEinsaetze().isEmpty()) {
+			if (pal.getAnlass().getWertungsrichterSlots() != null) {
+				List<WertungsrichterEinsatz> wrEs = pal.getAnlass().getWertungsrichterSlots().stream().map(slot -> {
+					WertungsrichterEinsatz wrE = WertungsrichterEinsatz.builder().personAnlassLink(pal)
+							.eingesetzt(false).wertungsrichterSlot(slot).build();
+					wrE.setId(UUID.randomUUID());
+					wrE.setAktiv(true);
+					return wrE;
+				}).collect(Collectors.toList());
+				pal.setEinsaetze(wrEs);
+			}
+		}
+		PersonAnlassLinkDTO palDTO = this.palMapper.PersonAnlassLinkToPersonAnlassLinkDTO(pal);
+		return ResponseEntity.ok(palDTO);
 	}
 
 	@PostMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter/{personId}")
 	public ResponseEntity<PersonAnlassLinkDTO> postEingeteilteWertungsrichter(HttpServletRequest request,
-			@PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable UUID personId) {
-		return anlassSrv.updateEingeteilteWertungsrichter(anlassId, orgId, personId, true);
+			@PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable UUID personId,
+			@RequestBody PersonAnlassLinkDTO personAnlassLinkDTO) {
+		try {
+			PersonAnlassLink pal = anlassSrv.getAnlassLink(anlassId, orgId, personId);
+			if (pal != null) {
+				pal.setKommentar(personAnlassLinkDTO.getKommentar());
+				PersonAnlassLinkDTO palDTO = this.palMapper.PersonAnlassLinkToPersonAnlassLinkDTO(pal);
+				return ResponseEntity.ok(palDTO);
+			} else {
+				return anlassSrv.updateEingeteilteWertungsrichter(anlassId, orgId, personId, true);
+			}
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().build();
+		}
 	}
 
 	@DeleteMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter/{personId}")
 	public ResponseEntity<PersonAnlassLinkDTO> deleteEingeteilteWertungsrichter(HttpServletRequest request,
 			@PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable UUID personId) {
-		return anlassSrv.updateEingeteilteWertungsrichter(anlassId, orgId, personId, false);
+		try {
+			return anlassSrv.updateEingeteilteWertungsrichter(anlassId, orgId, personId, false);
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().build();
+		}
+	}
+
+	@PostMapping("/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichter/{personId}/einsaetze")
+	public ResponseEntity<WertungsrichterEinsatzDTO> postWertungsrichterEinsatz(HttpServletRequest request,
+			@PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable UUID personId,
+			@RequestBody WertungsrichterEinsatzDTO wertungsrichterEinsatzDTO) {
+		WertungsrichterEinsatz wrEinsatz = this.wertungsrichterEinsatzMapper.ToEntity(wertungsrichterEinsatzDTO);
+		wrEinsatz = this.wertungsrichterEinsatzSrv.update(wrEinsatz);
+		WertungsrichterEinsatzDTO dto = this.wertungsrichterEinsatzMapper.ToDto(wrEinsatz);
+		return ResponseEntity.ok(dto);
 	}
 
 	// http://localhost:8080/admin/organisationen

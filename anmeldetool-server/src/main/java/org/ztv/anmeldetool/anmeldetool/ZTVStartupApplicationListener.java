@@ -226,7 +226,8 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 		opLink.setChangeDate(Calendar.getInstance());
 		verein1.addToPersonenLink(opLink);
 
-		Wertungsrichter wertungsrichter = Wertungsrichter.builder().person(person).brevet(1).letzterFk(null).build();
+		Wertungsrichter wertungsrichter = Wertungsrichter.builder().person(person)
+				.brevet(WertungsrichterBrevetEnum.Brevet_1).letzterFk(null).build();
 		// wertungsrichter = wertungsrichterRepo.save(wertungsrichter);
 		person.setWertungsrichter(wertungsrichter);
 
@@ -247,7 +248,8 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 		rollenLink.setAktiv(true);
 		rollenLinkRepo.save(rollenLink);
 
-		wertungsrichter = Wertungsrichter.builder().person(person).brevet(2).letzterFk(null).build();
+		wertungsrichter = Wertungsrichter.builder().person(person).brevet(WertungsrichterBrevetEnum.Brevet_2)
+				.letzterFk(null).build();
 		// wertungsrichter = wertungsrichterRepo.save(wertungsrichter);
 		person.setWertungsrichter(wertungsrichter);
 

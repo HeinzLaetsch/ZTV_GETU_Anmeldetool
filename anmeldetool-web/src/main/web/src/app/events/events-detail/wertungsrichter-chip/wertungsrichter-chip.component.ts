@@ -1,8 +1,13 @@
-import { Component, Input, OnInit } from "@angular/core";
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from "@angular/core";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IUser } from "src/app/core/model/IUser";
 import { IWertungsrichter } from "src/app/core/model/IWertungsrichter";
-import { IWertungsrichterAnlassLink } from "src/app/core/model/IWertungsrichterAnlassLink";
 import { IWertungsrichterEinsatz } from "src/app/core/model/IWertungsrichterEinsatz";
 import { IWertungsrichterSlot } from "src/app/core/model/IWertungsrichterSlot";
 import { AuthService } from "src/app/core/service/auth/auth.service";
@@ -14,7 +19,7 @@ import { CachingUserService } from "src/app/core/service/caching-services/cachin
   templateUrl: "./wertungsrichter-chip.component.html",
   styleUrls: ["./wertungsrichter-chip.component.css"],
 })
-export class WertungsrichterChipComponent implements OnInit {
+export class WertungsrichterChipComponent implements OnInit, OnChanges {
   @Input()
   isVereinsAnmelder: boolean;
   @Input()
@@ -27,13 +32,21 @@ export class WertungsrichterChipComponent implements OnInit {
   anlass: IAnlass;
 
   private wertungsrichter: IWertungsrichter;
-  private wrAnlassLink: IWertungsrichterAnlassLink;
 
   constructor(
     private authservice: AuthService,
     private userService: CachingUserService,
     private anlassService: CachingAnlassService
   ) {}
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.isAllWertungsrichterList &&
+      !changes.isAllWertungsrichterList.currentValue
+    ) {
+      console.error("Load Einsaetze");
+    }
+  }
+
   ngOnInit(): void {
     this.userService
       .getWertungsrichter(this.wertungsrichterUser.id)
@@ -42,39 +55,34 @@ export class WertungsrichterChipComponent implements OnInit {
           this.wertungsrichter = value;
         }
       });
+  }
+
+  kommentarChange(value): void {
+    console.log("Value changed: ", value);
+    this.wertungsrichterUser.pal.kommentar = value.target.value;
     this.anlassService
-      .getWrEinsatz(
-        this.anlass,
-        this.authservice.currentVerein,
-        this.wertungsrichterUser
+      .updateAnlassLink(
+        this.wertungsrichterUser.pal,
+        this.authservice.currentVerein
       )
-      .subscribe((link) => {
-        if (!link) {
-          console.error("No Link");
-        }
-        this.wrAnlassLink = link;
-        if (!this.wrAnlassLink.einsaetze) {
-          this.wrAnlassLink.einsaetze = new Array<IWertungsrichterEinsatz>();
-        }
-        //TODO Momentan löschen
-        this.wrAnlassLink.einsaetze = this.wrAnlassLink.einsaetze.slice(0, 0);
-        this.anlass.wertungsrichterSlots?.forEach((slot) => {
-          const einsatz: IWertungsrichterEinsatz = {
-            id: "",
-            slotId: slot.id,
-            wertungsrichterId: this.wertungsrichterUser.wr?.id,
-            wertungsrichterAnlassLinkId: this.wrAnlassLink.id,
-            eingesetzt: false,
-          };
-          this.wrAnlassLink.einsaetze.push(einsatz);
-        });
+      .subscribe((pal) => {
+        console.log("Pal saved: ", pal.kommentar);
       });
-    // console.log("Anlass: ", this.anlass);
+  }
+  getSlotsForBrevet(): IWertungsrichterSlot[] {
+    return this.anlass.wertungsrichterSlots.filter(
+      (slot) => slot.brevet === this.wertungsrichter.brevet
+    );
   }
 
   getEinsatzForSlot(slot: IWertungsrichterSlot): IWertungsrichterEinsatz {
-    return this.wrAnlassLink?.einsaetze?.filter((einsatz) => {
-      return einsatz.slotId === slot.id;
+    // console.log("getEinsatzForSlot: ", slot, this.wertungsrichterUser);
+    return this.wertungsrichterUser?.pal?.einsaetze?.filter((einsatz) => {
+      return einsatz.wertungsrichterSlotId === slot.id;
     })?.[0];
+  }
+
+  get wrAnlassLink() {
+    return this.wertungsrichterUser.pal;
   }
 }

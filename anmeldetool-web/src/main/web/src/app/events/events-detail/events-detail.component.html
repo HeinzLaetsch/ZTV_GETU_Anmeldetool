@@ -55,20 +55,18 @@
             <ng-template mat-tab-label
               >Brevet 1
               <img
-                *ngIf="getStatusWertungsrichterBr1() === 'OK'"
+                *ngIf="statusBr1 === 'OK'"
                 class="icon"
-                src="assets/images/smiley-emoji.png"
+                src="assets/images/skype/beaming-face-with-smiling-eyes_1f601.png"
               />
               <img
-                *ngIf="getStatusWertungsrichterBr1() !== 'OK'"
+                *ngIf="statusBr1 !== 'OK'"
                 class="icon"
-                src="assets/images/not-ok-icon.jpg"
+                src="assets/images/skype/slightly-frowning-face_1f641.png"
               />
             </ng-template>
             <div class="row doubleRow">
-              <div class="col">
-                Status Brevet 1: {{ getStatusWertungsrichterBr1() }}
-              </div>
+              <div class="col">Status Brevet 1: {{ statusBr1 }}</div>
             </div>
             <div class="row doubleRow">
               <div class="col">
@@ -129,20 +127,18 @@
           <ng-template mat-tab-label
             >Brevet 2
             <img
-              *ngIf="getStatusWertungsrichterBr2() === 'OK'"
+              *ngIf="statusBr2 === 'OK'"
               class="icon"
-              src="assets/images/smiley-emoji.png"
+              src="assets/images/skype/beaming-face-with-smiling-eyes_1f601.png"
             />
             <img
-              *ngIf="getStatusWertungsrichterBr2() !== 'OK'"
+              *ngIf="statusBr2 !== 'OK'"
               class="icon"
-              src="assets/images/not-ok-icon.jpg"
+              src="assets/images/skype/slightly-frowning-face_1f641.png"
             />
           </ng-template>
           <div class="row doubleRow">
-            <div class="col">
-              Status Brevet 2: {{ getStatusWertungsrichterBr2() }}
-            </div>
+            <div class="col">Status Brevet 2: {{ statusBr2 }}</div>
           </div>
           <div class="row doubleRow">
             <div class="col">

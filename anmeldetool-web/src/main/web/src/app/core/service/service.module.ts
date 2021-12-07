@@ -1,21 +1,19 @@
-import { NgModule } from '@angular/core';
-import { EventService } from './event/event.service';
-import { ToastrService } from './toastr/toastr.service';
-import { AuthService } from './auth/auth.service';
-import { VereinService } from './verein/verein.service';
-import { VerbandService } from './verband/verband.service';
+import { NgModule } from "@angular/core";
+import { AuthService } from "./auth/auth.service";
+import { EventService } from "./event/event.service";
+import { ToastrService } from "./toastr/toastr.service";
+import { VerbandService } from "./verband/verband.service";
+import { VereinService } from "./verein/verein.service";
 
 @NgModule({
-  declarations: [
-  ],
-  imports: [
-  ],
+  declarations: [],
+  imports: [],
   providers: [
-  	EventService,
-  	ToastrService,
+    EventService,
+    ToastrService,
     AuthService,
     VereinService,
-    VerbandService
-]
+    VerbandService,
+  ],
 })
-export class ServiceModule { }
+export class ServiceModule {}
