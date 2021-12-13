@@ -1,16 +1,171 @@
+import * as moment from "moment";
+import { Anzeigestatus, AnzeigeStatusEnum } from "./AnzeigeStatusEnum";
 import { IWertungsrichterSlot } from "./IWertungsrichterSlot";
 import { KategorieEnum } from "./KategorieEnum";
 import { TiTuEnum } from "./TiTuEnum";
 
-export interface IAnlass {
+export class IAnlass {
   id: string;
   anlassBezeichnung: string;
   ort: string;
   halle: string;
-  startDatum: Date;
-  endDatum: Date;
+  organisator: string;
+
+  set startDatum(startDatum: Date) {
+    this.startDatum_ = startDatum;
+  }
+  get startDatum(): Date {
+    return this.startDatum_;
+  }
+  startDatum_: Date;
+
+  set endDatum(endDatum: Date) {
+    this.endDatum_ = endDatum;
+    this.updateAnzeigeStatus();
+  }
+  get endDatum(): Date {
+    return this.endDatum_;
+  }
+  endDatum_: Date;
+
+  // Anmeldung ist eröffnet, es kann alles erfasst werden
+  set anmeldungBeginn(anmeldungBeginn: Date) {
+    this.anmeldungBeginn_ = anmeldungBeginn;
+    this.updateAnzeigeStatus();
+  }
+  get anmeldungBeginn(): Date {
+    return this.anmeldungBeginn_;
+  }
+  anmeldungBeginn_: Date;
+
+  // Neu Erfassen nicht mehr erlaubt
+  set erfassenGeschlossen(erfassenGeschlossen: Date) {
+    this.erfassenGeschlossen_ = erfassenGeschlossen;
+    this.updateAnzeigeStatus();
+  }
+  get erfassenGeschlossen(): Date {
+    return this.erfassenGeschlossen_;
+  }
+  erfassenGeschlossen_: Date;
+
+  // Cross Kategorie Aenderungen nicht mehr erlaubt
+  set crossKategorieAenderungenGeschlossen(
+    crossKategorieAenderungenGeschlossen: Date
+  ) {
+    this.crossKategorieAenderungenGeschlossen_ =
+      crossKategorieAenderungenGeschlossen;
+    this.updateAnzeigeStatus();
+  }
+  get crossKategorieAenderungenGeschlossen(): Date {
+    return this.crossKategorieAenderungenGeschlossen_;
+  }
+  crossKategorieAenderungenGeschlossen_: Date;
+
+  // Aenderungen innerhalb Kategorie nicht mehr erlaubt.
+  set aenderungenInKategorieGeschlossen(
+    aenderungenInKategorieGeschlossen: Date
+  ) {
+    this.aenderungenInKategorieGeschlossen_ = aenderungenInKategorieGeschlossen;
+    this.updateAnzeigeStatus();
+  }
+  get aenderungenInKategorieGeschlossen(): Date {
+    return this.aenderungenInKategorieGeschlossen_;
+  }
+  aenderungenInKategorieGeschlossen_: Date;
+
+  // Kurz vor Wettkampf, keine Mutationen mehr erlaubt
+  set aenderungenNichtMehrErlaubt(aenderungenNichtMehrErlaubt: Date) {
+    this.aenderungenNichtMehrErlaubt_ = aenderungenNichtMehrErlaubt;
+    this.updateAnzeigeStatus();
+  }
+  get aenderungenNichtMehrErlaubt(): Date {
+    return this.aenderungenNichtMehrErlaubt_;
+  }
+  aenderungenNichtMehrErlaubt_: Date;
+
+  // Anlass nicht anzeigen oder sperren kein Org
+  set published(published: boolean) {
+    this.published_ = published;
+    console.log("Published gesetzt: ", published);
+    this.updateAnzeigeStatus();
+  }
+  get published(): boolean {
+    return this.published_;
+  }
+  published_: boolean;
+
   tiTu: TiTuEnum;
   tiefsteKategorie: KategorieEnum;
   hoechsteKategorie: KategorieEnum;
   wertungsrichterSlots?: IWertungsrichterSlot[];
+
+  anzeigeStatus?: Anzeigestatus;
+
+  constructor() {
+    this.anzeigeStatus = new Anzeigestatus();
+  }
+
+  public updateAnzeigeStatus(): void {
+    if (this.anmeldungBeginn) {
+      const asMoment = moment(this.anmeldungBeginn);
+      if (asMoment.isBefore()) {
+        this.anzeigeStatus.setStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN);
+      } else {
+        this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN);
+      }
+    }
+    if (this.erfassenGeschlossen) {
+      const asMoment = moment(this.erfassenGeschlossen);
+      if (asMoment.isBefore()) {
+        this.anzeigeStatus.setStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED);
+      } else {
+        this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED);
+      }
+    }
+
+    if (this.crossKategorieAenderungenGeschlossen) {
+      const asMoment = moment(this.crossKategorieAenderungenGeschlossen);
+      if (asMoment.isBefore()) {
+        this.anzeigeStatus.setStatus(AnzeigeStatusEnum.CROSS_KATEGORIE_CLOSED);
+      } else {
+        this.anzeigeStatus.resetStatus(
+          AnzeigeStatusEnum.CROSS_KATEGORIE_CLOSED
+        );
+      }
+    }
+    if (this.aenderungenInKategorieGeschlossen) {
+      const asMoment = moment(this.aenderungenInKategorieGeschlossen);
+      if (asMoment.isBefore()) {
+        this.anzeigeStatus.setStatus(AnzeigeStatusEnum.IN_KATEGORIE_CLOSED);
+      } else {
+        this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.IN_KATEGORIE_CLOSED);
+      }
+    }
+
+    if (this.aenderungenNichtMehrErlaubt) {
+      const asMoment = moment(this.aenderungenNichtMehrErlaubt);
+      if (asMoment.isBefore()) {
+        this.anzeigeStatus.setStatus(AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED);
+      } else {
+        this.anzeigeStatus.resetStatus(
+          AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED
+        );
+      }
+    }
+
+    if (this.endDatum) {
+      const asMoment = moment(this.endDatum);
+      if (asMoment.isBefore()) {
+        this.anzeigeStatus.setStatus(AnzeigeStatusEnum.CLOSED);
+      } else {
+        this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.CLOSED);
+      }
+    }
+
+    if (this.published) {
+      this.anzeigeStatus.setStatus(AnzeigeStatusEnum.PUBLISHED);
+    } else {
+      this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.PUBLISHED);
+    }
+  }
 }

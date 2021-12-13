@@ -149,7 +149,7 @@ public class AnlassService {
 	}
 
 	public List<Anlass> getAllAnlaesse() {
-		List<Anlass> anlaesse = anlassRepo.findByAktivOrderByAnlassBezeichnung(true);
+		List<Anlass> anlaesse = anlassRepo.findByAktivOrderByStartDate(true);
 		return anlaesse;
 	}
 

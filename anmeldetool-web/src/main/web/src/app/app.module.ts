@@ -17,6 +17,7 @@ import { Page404Component } from "./error/page404/page404.component";
 import {
   CreateEventComponent,
   EventListComponent,
+  EventsDatesComponent,
   EventsDetailComponent,
   EventThumbnailComponent,
   WertungsrichterChipComponent,
@@ -45,6 +46,7 @@ export function initVereinservice(
     WertungsrichterChipComponent,
     WertungsrichterSlotComponent,
     EventThumbnailComponent,
+    EventsDatesComponent,
     NavBarComponent,
     EventsDetailComponent,
     CreateEventComponent,

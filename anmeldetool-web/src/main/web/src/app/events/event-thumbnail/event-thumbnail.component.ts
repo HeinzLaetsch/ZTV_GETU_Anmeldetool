@@ -1,8 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Router } from "@angular/router";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
+import { IUser } from "src/app/core/model/IUser";
+import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterStatusEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
+import { WertungsrichterService } from "src/app/core/service/wertungsrichter.service";
 
 @Component({
   selector: "app-event-thumbnail",
@@ -16,10 +20,14 @@ export class EventThumbnailComponent implements OnInit {
   someProperty: any = "some Text";
   vereinStarted: boolean;
   anzahlTeilnehmer: number;
+  assignedWr1s = new Array<IUser>();
+  assignedWr2s = new Array<IUser>();
 
   constructor(
     public authService: AuthService,
-    private anlassService: CachingAnlassService
+    private anlassService: CachingAnlassService,
+    private wertungsrichterService: WertungsrichterService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -40,14 +48,20 @@ export class EventThumbnailComponent implements OnInit {
           }
         }
       });
+    this.fillassignedWrs();
   }
 
-  getStatus() {
-    // Farbe entsprechend Anlass melde Status
-    // if (!this.vereinStarted) return AnzeigeStatusEnum.WARNUNG;
-    // else
-    return AnzeigeStatusEnum.OK;
+  isEnabled(): boolean {
+    return true;
   }
+
+  getClassForAnzeigeStatus(anzeigeStatus: AnzeigeStatusEnum): string {
+    if (this.anlass.anzeigeStatus.hasStatus(anzeigeStatus)) {
+      return "div-red";
+    }
+    return "div-green";
+  }
+
   getStartedClass() {
     if (!this.vereinStarted) {
       return { redNoMargin: true };
@@ -57,7 +71,7 @@ export class EventThumbnailComponent implements OnInit {
   }
 
   get hasTeilnehmer(): boolean {
-    return this.anzahlTeilnehmer === 0;
+    return this.anzahlTeilnehmer > 0;
   }
 
   getTeilnehmerClass() {
@@ -76,7 +90,8 @@ export class EventThumbnailComponent implements OnInit {
     }
   }
   handleClickMe() {
-    this.anlassClick.emit(this.anlass.anlassBezeichnung);
+    // this.anlassClick.emit(this.anlass.anlassBezeichnung);
+    this.router.navigate(["/anlass/", this.anlass?.id]);
   }
 
   vereinStartedClicked(event: PointerEvent) {
@@ -94,19 +109,51 @@ export class EventThumbnailComponent implements OnInit {
   }
 
   get isWertungsrichterOk(): boolean {
-    return this.statusWertungsrichter !== "nicht komplett";
+    if (this.hasTeilnehmer) {
+      return (
+        this.statusWertungsrichter === WertungsrichterStatusEnum.OK ||
+        this.statusWertungsrichter === WertungsrichterStatusEnum.KEINEPFLICHT
+      );
+    }
+    return true;
   }
 
-  get statusWertungsrichter(): string {
-    return "nicht komplett";
+  // TODO abfüllen
+  get statusWertungsrichter(): WertungsrichterStatusEnum {
+    const pflichtBrevet1 =
+      this.wertungsrichterService.getWertungsrichterPflichtBrevet1(this.anlass);
+    const pflichtBrevet2 =
+      this.wertungsrichterService.getWertungsrichterPflichtBrevet2(this.anlass);
+
+    const statusBrevet1 =
+      this.wertungsrichterService.getStatusWertungsrichterBr(
+        this.assignedWr1s,
+        pflichtBrevet1
+      );
+    const statusBrevet2 =
+      this.wertungsrichterService.getStatusWertungsrichterBr(
+        this.assignedWr2s,
+        pflichtBrevet2
+      );
+    if (statusBrevet1 === WertungsrichterStatusEnum.NOTOK) {
+      return WertungsrichterStatusEnum.NOTOK;
+    }
+    if (statusBrevet2 === WertungsrichterStatusEnum.NOTOK) {
+      return WertungsrichterStatusEnum.NOTOK;
+    }
+    return WertungsrichterStatusEnum.KEINEPFLICHT;
   }
 
   getCleaned(): string {
     return this.anlass.anlassBezeichnung.replace("%", "");
   }
 
-  getStartTimeClass() {
-    const isGreen = false; // this.anlass.startDatum === Date.now();
-    return { green: isGreen, bold: isGreen };
+  fillassignedWrs() {
+    this.wertungsrichterService
+      .getEingeteilteWertungsrichter(this.anlass, 1)
+      .subscribe((assignedWrs) => (this.assignedWr1s = assignedWrs));
+    this.wertungsrichterService
+      .getEingeteilteWertungsrichter(this.anlass, 2)
+      .subscribe((assignedWrs) => (this.assignedWr2s = assignedWrs));
   }
 }

@@ -1,15 +1,31 @@
 /* You can add global styles to this file, and also import other style files */
-/* https://emojipedia.org/samsung/one-ui-4.0/ */
+:root {
+  --ztv-blue: #488dd6;
+  --ztv-white: #ffff;
+  --ztv-black: rgba(0, 0, 0, 0.78);
+  --ztv-light-gray: rgb(184, 184, 184);
+  --ztv-gray: rgb(131, 128, 128);
+  --ztv-light-red: rgba(253, 177, 177, 0.78);
+  --ztv-error: rgba(235, 25, 25, 0.78);
+  --ztv-warning: #f89406;
+  --ztv-light-green: rgba(202, 241, 202, 0.8);
+  --ztv-ok: rgba(5, 151, 5, 0.8);
+  --ztv-erfassen-geschlossen: rgba(255, 160, 160, 0.78);
+  --ztv-cross-kategorie-geschlossen: rgba(255, 128, 128, 0.78);
+  --ztv-in-kategorie-geschlossen: rgba(240, 100, 100, 0.78);
+  --ztv-mutationen-geschlossen: rgba(220, 220, 220, 0.21);
+}
+/* https://emojipedia.org/samsung/one-ui-4.0/  https://emojipedia.org/skype/ */
 .well {
-  background-color: #488dd6;
-  color: #ffff;
+  background-color: var(--ztv-blue);
+  color: var(--ztv-white);
   cursor: pointer;
 }
 
 .hoverwell:hover {
-  background-color: #ffff;
-  border: 1px solid #488dd6;
-  color: #488dd6;
+  background-color: var(--ztv-white);
+  border: 1px solid var(--ztv-blue);
+  color: var(--ztv-blue);
   cursor: pointer;
 }
 .verticalAlign {
@@ -21,38 +37,38 @@
   bottom: -5px;
 }
 .status-OK {
-  background-color: #488dd6;
-  color: #ffff;
+  background-color: var(--ztv-blue);
+  color: var(--ztv-white);
   cursor: pointer;
 }
 .status-OK-AKTIV {
-  background-color: #ffff;
+  background-color: var(--ztv-white);
   border: 1px solid #022447;
   color: #aef726;
   cursor: pointer;
 }
 
 .label {
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--ztv-black);
 }
 
 .label-green {
-  color: rgba(25, 124, 25, 0.8) !important;
+  color: var(--ztv-ok) !important;
 }
 
 .label-red {
-  color: rgba(235, 25, 25, 0.78) !important;
+  color: var(--ztv-error) !important;
 }
 .h2-green {
   font-size: 1rem;
   font-weight: 800;
-  color: rgba(25, 124, 25, 0.8) !important;
+  color: var(--ztv-ok) !important;
 }
 
 .h2-red {
   font-size: 1rem;
   font-weight: 800;
-  color: rgba(235, 25, 25, 0.78) !important;
+  color: var(--ztv-error) !important;
 }
 .doubleRow {
   margin-left: 0px;
@@ -61,7 +77,7 @@
 .icon {
   max-width: 25px;
   max-height: 25px;
-  margin: 0px 3px 0px 3px;
+  margin: 3px 3px 3px 3px;
 }
 
 .container {
@@ -90,13 +106,20 @@ button {
   background-color: #2f96b4;
 }
 .toast-warning {
-  background-color: #f89406;
+  background-color: var(--ztv-warning);
 }
 html,
 body {
   height: 100%;
 }
-body {
+body,
+.mat-body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-size: 0.8rem !important;
+  font-weight: 300 !important;
+}
+.small {
+  font-size: 0.7rem;
+  font-weight: 300;
 }

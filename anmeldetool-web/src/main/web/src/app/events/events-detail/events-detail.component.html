@@ -1,31 +1,46 @@
 <div class="container-lg">
   <div class="row">
-    <div class="col-12">
+    <div class="col-11">
       <h2>{{ getCleaned() }}</h2>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-3">
-      <span *ngIf="anlass.startDatum !== anlass.endDatum">von</span
-      ><span *ngIf="anlass.startDatum === anlass.endDatum">am</span>:
-      {{ anlass.startDatum | date: "EEEE, d MMMM , y" }}
-    </div>
-    <div class="col-3" *ngIf="anlass.startDatum !== anlass.endDatum">
-      bis: {{ anlass.endDatum | date: "EEEE, d MMMM , y" }}
+    <div class="col-sm-1">
+      <h2>{{ anlass.tiTu }}</h2>
     </div>
   </div>
+
   <div class="row">
-    <div class="col-3">Geschlecht: {{ anlass.tiTu }}</div>
-    <div class="col-3">
+    <div class="col-sm-4">
+      <span *ngIf="anlass.startDatum === anlass.endDatum">am</span>
+      <span *ngIf="anlass.startDatum !== anlass.endDatum">von</span>:
+      {{ anlass.startDatum | date: "EEEE, d MMMM , yyyy" }}
+    </div>
+    <div class="col-sm-4" *ngIf="anlass.startDatum !== anlass.endDatum">
+      bis: {{ anlass.endDatum | date: "EEEE, d MMMM , yyyy" }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-4">
+      Geschlecht: <span style="font-weight: 550"> {{ anlass.tiTu }}</span>
+    </div>
+    <div class="col-sm-4">
       Startberechtigt: {{ anlass.tiefsteKategorie }} bis
       {{ anlass.hoechsteKategorie }}
     </div>
   </div>
+
+  <div class="row">
+    <div class="col-sm-4">Ort: {{ anlass.ort }}</div>
+    <div class="col-sm-4">Halle: {{ anlass.halle }}</div>
+    <div class="col-sm-4">Organisator: {{ anlass.organisator }}</div>
+  </div>
+  <!--  (click)="vereinStartedClicked($event)"        -->
   <div class="row">
     <div class="col-12">
       <mat-checkbox
         [(ngModel)]="vereinStarted"
-        (click)="vereinStartedClicked($event)"
+        [disabled]="isStartedCheckboxDisabled()"
+        (ngModelChange)="vereinStartedClicked($event)"
         >Verein started</mat-checkbox
       >
     </div>
@@ -41,28 +56,19 @@
   <div class="row">
     <div class="col-12">
       <mat-tab-group mat-align-tabs="start">
-        <!--mat-tab>
-          <ng-template matTabContent>
-            <ng-template mat-tab-label
-              >Test
-              <img class="icon" src="assets/images/ok-icon.jpg" />
-            </ng-template>
-            Content 1
-          </ng-template>
-        </mat-tab-->
         <mat-tab>
           <ng-template matTabContent>
             <ng-template mat-tab-label
               >Brevet 1
               <img
-                *ngIf="statusBr1 === 'OK'"
+                *ngIf="isWertungsrichter1Ok"
                 class="icon"
-                src="assets/images/skype/beaming-face-with-smiling-eyes_1f601.png"
+                src="assets/images/skype/beaming-face.png"
               />
               <img
-                *ngIf="statusBr1 !== 'OK'"
+                *ngIf="!isWertungsrichter1Ok"
                 class="icon"
-                src="assets/images/skype/slightly-frowning-face_1f641.png"
+                src="assets/images/skype/pouting-face.png"
               />
             </ng-template>
             <div class="row doubleRow">
@@ -88,6 +94,7 @@
                   aria-label="Wertungsrichter"
                   class="drag-drop-list col"
                   cdkDropList
+                  [cdkDropListDisabled]="true"
                   #allWr1sList="cdkDropList"
                   [cdkDropListData]="availableWertungsrichter1"
                   [cdkDropListConnectedTo]="[assignedWr1List]"
@@ -105,6 +112,7 @@
               <div class="col">
                 <div
                   cdkDropList
+                  [cdkDropListDisabled]="true"
                   #assignedWr1List="cdkDropList"
                   [cdkDropListData]="assignedWr1s"
                   [cdkDropListConnectedTo]="[allWr1sList]"
@@ -113,10 +121,12 @@
                 >
                   <app-wertungsrichter-chip
                     *ngFor="let wr of assignedWr1s"
-                    cdkDrag
                     [isAllWertungsrichterList]="false"
                     [wertungsrichterUser]="wr"
                     [anlass]="anlass"
+                    (wertungsrichterUserChange)="
+                      wertungsrichterUserChange($event)
+                    "
                   ></app-wertungsrichter-chip>
                 </div>
               </div>
@@ -127,14 +137,14 @@
           <ng-template mat-tab-label
             >Brevet 2
             <img
-              *ngIf="statusBr2 === 'OK'"
+              *ngIf="isWertungsrichter2Ok"
               class="icon"
-              src="assets/images/skype/beaming-face-with-smiling-eyes_1f601.png"
+              src="assets/images/skype/beaming-face.png"
             />
             <img
-              *ngIf="statusBr2 !== 'OK'"
+              *ngIf="!isWertungsrichter2Ok"
               class="icon"
-              src="assets/images/skype/slightly-frowning-face_1f641.png"
+              src="assets/images/skype/pouting-face.png"
             />
           </ng-template>
           <div class="row doubleRow">
@@ -165,6 +175,7 @@
                 [cdkDropListConnectedTo]="[assignedWr2List]"
                 cdkDropListOrientation="vertical"
                 (cdkDropListDropped)="drop($event, '1')"
+                [cdkDropListDisabled]="isStartedCheckboxDisabled()"
               >
                 <app-wertungsrichter-chip
                   *ngFor="let wr of availableWertungsrichter2"
@@ -183,12 +194,16 @@
                 [cdkDropListConnectedTo]="[allWr2sList]"
                 class="drag-drop-list col"
                 (cdkDropListDropped)="drop($event, '2')"
+                [cdkDropListDisabled]="isStartedCheckboxDisabled()"
               >
                 <app-wertungsrichter-chip
                   *ngFor="let wr of assignedWr2s"
                   [isAllWertungsrichterList]="false"
                   [wertungsrichterUser]="wr"
                   [anlass]="anlass"
+                  (wertungsrichterUserChange)="
+                    wertungsrichterUserChange($event)
+                  "
                 >
                 </app-wertungsrichter-chip>
               </div>
@@ -205,4 +220,5 @@
       </div>
     </div>
   </div>
+  <app-events-dates [anlass]="anlass"></app-events-dates>
 </div>

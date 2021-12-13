@@ -1,8 +1,10 @@
 import {
   Component,
+  EventEmitter,
   Input,
   OnChanges,
   OnInit,
+  Output,
   SimpleChanges,
 } from "@angular/core";
 import { IAnlass } from "src/app/core/model/IAnlass";
@@ -30,6 +32,8 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
   wertungsrichterUser: IUser;
   @Input()
   anlass: IAnlass;
+  @Output()
+  wertungsrichterUserChange = new EventEmitter<IUser>();
 
   private wertungsrichter: IWertungsrichter;
 
@@ -55,6 +59,10 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
           this.wertungsrichter = value;
         }
       });
+  }
+
+  wrEinsatzChange(wrEinsatz: IWertungsrichterEinsatz) {
+    this.wertungsrichterUserChange.emit(this.wertungsrichterUser);
   }
 
   kommentarChange(value): void {

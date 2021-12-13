@@ -1,0 +1,23 @@
+.div-green {
+  color: var(--ztv-black);
+  background-color: var(--ztv-light-green);
+}
+
+.div-gray {
+  color: var(--ztv-black);
+  background-color: var(--ztv-light-gray);
+}
+
+.div-red {
+  color: var(--ztv-black);
+  background-color: var(--ztv-light-red);
+}
+.pad-left-right {
+  padding: 0px 40px 10px 10px;
+  margin: 0px;
+  position: absolute;
+  bottom: 0;
+}
+h3 {
+  margin: 10px 0px 0px 0px;
+}

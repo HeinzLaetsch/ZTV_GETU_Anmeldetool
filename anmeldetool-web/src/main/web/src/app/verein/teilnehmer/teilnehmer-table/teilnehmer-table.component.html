@@ -10,35 +10,27 @@
   </div>
 
   <div class="example-container mat-elevation-z8">
-    <!-- 'name', 'vorname', 'jahrgang.', 'Kat.', 'Aktion' -->
     <mat-table [dataSource]="dataSource" matSort>
       <!-- Name Column -->
       <ng-container matColumnDef="name">
-        <mat-header-cell *matHeaderCellDef mat-sort-header class="w_20">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="w_15">
           Name
         </mat-header-cell>
-        <mat-cell *matCellDef="let row; let rowIndex = index" class="w_20">
-          <input
-            type="text"
-            placeholder="Nachname"
-            aria-label="Nachname"
-            matInput
-            [formControl]="teilnehmerControls[rowIndex][0]"
-            #tooltip="matTooltip"
-            matTooltip="Gib den Nachnamen ein"
-            matTooltipPosition="below"
-            matTooltipHideDelay="100"
-            (change)="changeTeilnehmer($event, row, rowIndex, 0)"
-          />
+        <mat-cell *matCellDef="let row; let rowIndex = index" class="w_15">
+          <input type="text" placeholder="Nachname" aria-label="Nachname"
+          matInput [formControl]="teilnehmerControls[rowIndex][0]"
+          #tooltip="matTooltip" matTooltip="Gib den Nachnamen ein"
+          matTooltipPosition="below" matTooltipHideDelay="100"
+          (change)="changeTeilnehmer($event, row, rowIndex, 0)" [disabled]= />
         </mat-cell>
       </ng-container>
 
       <!-- Vorname Column -->
       <ng-container matColumnDef="vorname">
-        <mat-header-cell *matHeaderCellDef mat-sort-header class="w_20">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="w_15">
           Vorname
         </mat-header-cell>
-        <mat-cell *matCellDef="let row; let rowIndex = index" class="w_20">
+        <mat-cell *matCellDef="let row; let rowIndex = index" class="w_15">
           <input
             type="text"
             placeholder="Vorname"
@@ -73,25 +65,46 @@
             (change)="changeTeilnehmer($event, row, rowIndex, 2)"
           />
         </mat-cell>
-        <!--
-        [ngStyle]="{'color':'teilnehmerControls[rowIndex][2].errors' ? 'red'}"/>
+      </ng-container>
 
-         -->
+      <!-- STV Nummer Column -->
+      <ng-container matColumnDef="stvnummer">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="w_8">
+          STV Nummer
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row; let rowIndex = index" class="w_8">
+          <input
+            type="text"
+            placeholder="STV Nummer"
+            aria-label="STV Nummer"
+            matInput
+            [formControl]="teilnehmerControls[rowIndex][3]"
+            #tooltip="matTooltip"
+            matTooltip="Gib die STV Nummer ein"
+            matTooltipPosition="below"
+            matTooltipHideDelay="100"
+            (change)="changeTeilnehmer($event, row, rowIndex, 3)"
+          />
+        </mat-cell>
       </ng-container>
 
       <!-- Anlass Column -->
       <ng-container
         *ngFor="let anlass of anlaesse; let colIndex = index; let last = last"
-        [matColumnDef]="anlass.anlassBezeichnung"
+        [matColumnDef]="
+          anlass.anlassBezeichnung + anlass.tiTu + anlass.tiefsteKategorie
+        "
       >
         <mat-header-cell *matHeaderCellDef mat-sort-header class="kategorie">
           <div class="rotate">
             <span> {{ anlass.anlassBezeichnung.replace("%", "-") }}</span>
           </div>
           <div class="below">
+            <!--               [disabled]="isChangesDisabled(anlass)" -->
             <mat-checkbox
-              (change)="checkedClicked($event, colIndex)"
+              (ngModelChange)="checkedClicked($event, colIndex)"
               [ngModel]="checked[colIndex]"
+              [disabled]="isChangesDisabled(anlass)"
               >Teilnahme
             </mat-checkbox>
           </div>
@@ -122,13 +135,18 @@
 
         <ng-container
           *ngIf="!last"
-          [matColumnDef]="anlass.anlassBezeichnung + 'Btn'"
+          [matColumnDef]="
+            anlass.anlassBezeichnung +
+            anlass.tiTu +
+            anlass.tiefsteKategorie +
+            'Btn'
+          "
         >
           <mat-header-cell *matHeaderCellDef class="centeredHeader">
             <button
               mat-raised-button
               (click)="copyAll($event, colIndex)"
-              [disabled]="!checked[colIndex]"
+              [disabled]="!mustEnableAnlass(colIndex)"
             >
               <mat-icon
                 class="material-icons color_gray"
@@ -149,7 +167,7 @@
             <button
               mat-raised-button
               (click)="copy($event, row, rowIndex, colIndex, anlass)"
-              [disabled]="!checked[colIndex]"
+              [disabled]="!mustEnableAnlass(colIndex)"
             >
               <mat-icon
                 class="material-icons color_gray"

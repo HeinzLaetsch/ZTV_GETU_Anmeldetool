@@ -1,16 +1,14 @@
 import { CollectionViewer } from "@angular/cdk/collections";
 import { DataSource } from "@angular/cdk/table";
-import { MatPaginator, PageEvent } from "@angular/material/paginator";
+import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
-import { BehaviorSubject, Observable, of, Subject } from "rxjs";
-import { catchError, finalize, tap } from "rxjs/operators";
+import { BehaviorSubject, Observable } from "rxjs";
 import { IVerein } from "src/app/verein/verein";
 import { IAnlass } from "../model/IAnlass";
 import { IAnlassLink } from "../model/IAnlassLink";
 import { IAnlassLinks } from "../model/IAnlassLinks";
 import { ITeilnehmer } from "../model/ITeilnehmer";
 import { TiTuEnum } from "../model/TiTuEnum";
-import { CachingAnlassService } from "../service/caching-services/caching.anlass.service";
 import { CachingTeilnehmerService } from "../service/caching-services/caching.teilnehmer.service";
 
 export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
@@ -90,6 +88,12 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
         ].jahrgang = value;
         break;
       }
+      case 3: {
+        this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[
+          row
+        ].stvNummer = value;
+        break;
+      }
     }
     this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[
       row
@@ -145,10 +149,6 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
       links.anlassLinks.push(newLink);
     }
   }
-
-  /*getTotal() {
-    return this.teilnehmerService.anzahlTeilnehmer
-  }*/
 
   reset(verein: IVerein) {
     console.log("Reset");

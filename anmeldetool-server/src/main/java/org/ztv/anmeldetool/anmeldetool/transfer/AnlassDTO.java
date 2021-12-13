@@ -1,6 +1,6 @@
 package org.ztv.anmeldetool.anmeldetool.transfer;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,9 +22,28 @@ public class AnlassDTO {
 
 	String halle;
 
-	Calendar startDatum;
+	String organisator;
 
-	Calendar endDatum;
+	LocalDateTime startDatum;
+
+	LocalDateTime endDatum;
+
+	// Anmeldung ist eröffnet, es kann alles erfasst werden
+	private LocalDateTime anmeldungBeginn;
+
+	// Neu Erfassen nicht mehr erlaubt
+	private LocalDateTime erfassenGeschlossen;
+
+	// Cross Kategorie Aenderungen nicht mehr erlaubt
+	private LocalDateTime crossKategorieAenderungenGeschlossen;
+
+	// Aenderungen innerhalb Kategorie nicht mehr erlaubt.
+	private LocalDateTime aenderungenInKategorieGeschlossen;
+
+	// Kurz vor Wettkampf, keine Mutationen mehr erlaubt
+	private LocalDateTime aenderungenNichtMehrErlaubt;
+
+	private boolean published;
 
 	TiTuEnum tiTu;
 

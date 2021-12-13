@@ -34,6 +34,9 @@ mat-header-cell {
 .w_20 {
   min-width: 20%;
 }
+.w_15 {
+  min-width: 15%;
+}
 
 .w_5 {
   min-width: 5%;
@@ -78,10 +81,8 @@ button {
 }
 div.rotate {
   transform:
-    /* Magic Numbers */
-    translate(25px, 51px)
-    /* 45 is really 360 - 45 */
-    rotate(315deg);
+    /* Magic Numbers */ translate(25px, 51px)
+    /* 45 is really 360 - 45 */ rotate(315deg);
   /* width: 30px; */
 }
 div.rotate > span {
@@ -90,7 +91,7 @@ div.rotate > span {
 }
 
 .material-icons.color_gray {
-  color: rgba(0,0,0,0.54);
+  color: rgba(0, 0, 0, 0.54);
 }
 .material-icons.color_green {
   color: #00ff00;
@@ -102,13 +103,14 @@ div.rotate > span {
 .kategorie {
   min-width: 120px;
 }
-.ng-valid[required], .ng-valid.required  {
-  border: 1px solid #42A948; /* green */
-  color: #42A948;
+.ng-valid[required],
+.ng-valid.required {
+  border: 1px solid #42a948; /* green */
+  color: #42a948;
 }
 
-.ng-invalid:not(form)  {
+.ng-invalid:not(form) {
   border: 1px solid #a94442; /* red */
   color: white;
-  background-image: linear-gradient(to right, #a94442 0%, white 100%)
+  background-image: linear-gradient(to right, #a94442 0%, white 100%);
 }

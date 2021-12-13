@@ -1,15 +1,15 @@
 .thumbnail {
-  min-height: 210px;
+  min-height: 301px;
   padding: 10px;
   margin: 5px;
 }
 .status-ok {
   background-color: #488dd6;
-  color: #ffff;
+  color: var(--ztv-white);
   cursor: pointer;
 }
 .status-ok-aktiv {
-  background-color: #ffff;
+  background-color: var(--ztv-white);
   border: 1px solid #022447;
   color: #aef726;
   cursor: pointer;
@@ -23,27 +23,62 @@
 }
 
 .green {
-  color: #01d801 !important;
+  color: var(--ztv-ok) !important;
 }
 
 .red {
-  color: #d31010 !important;
+  color: var(--ztv-error) !important;
 }
 
+.gray {
+  color: var(--ztv-gray);
+}
+
+.black {
+  color: var(--ztv-black);
+}
+
+.div-green {
+  color: var(--ztv-black);
+  background-color: var(--ztv-light-green);
+}
+
+.div-gray {
+  color: var(--ztv-black);
+  background-color: var(--ztv-light-gray);
+}
+
+.div-red {
+  color: var(--ztv-black);
+  background-color: var(--ztv-light-red);
+}
+
+h3 {
+  margin: 10px 0px 0px 0px;
+}
+.pad-left-right {
+  padding: 0px 10px 0px 10px;
+  margin: 0px;
+}
+.gray-border {
+  padding: 10px;
+  margin: 5px;
+  border: 1px solid var(--ztv-gray);
+}
 .greenNoMargin {
-  color: #01d801 !important;
+  color: var(--ztv-ok) !important;
   margin-left: 0px;
 }
 
 .redNoMargin {
-  color: #d31010 !important;
+  color: var(--ztv-error) !important;
   margin-left: 0px;
 }
 
 .bold {
-  font-weight: bold;
+  font-weight: 550;
 }
 
 .cyan {
-  background-color: #488dd6;
+  background-color: var(--ztv-blue);
 }

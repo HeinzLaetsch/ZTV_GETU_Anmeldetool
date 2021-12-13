@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { Observable, Subject } from "rxjs";
 import { IAnlass } from "../model/IAnlass";
 import { IUser } from "../model/IUser";
+import { WertungsrichterStatusEnum } from "../model/WertungsrichterStatusEnum";
 import { AuthService } from "./auth/auth.service";
 import { CachingAnlassService } from "./caching-services/caching.anlass.service";
 import { CachingUserService } from "./caching-services/caching.user.service";
@@ -59,7 +60,7 @@ export class WertungsrichterService {
   getStatusWertungsrichterBr(
     assignedWrs: IUser[],
     wertungsrichterPflicht: number
-  ): string {
+  ): WertungsrichterStatusEnum {
     if (assignedWrs && assignedWrs.length > 0) {
       let numberOfEinsaetze = 0;
       assignedWrs.forEach((user) => {
@@ -73,14 +74,26 @@ export class WertungsrichterService {
       });
 
       if (wertungsrichterPflicht <= numberOfEinsaetze) {
-        return "OK";
+        return WertungsrichterStatusEnum.OK;
       }
     } else {
-      if (wertungsrichterPflicht === 0) return "OK";
+      if (wertungsrichterPflicht === 0) return WertungsrichterStatusEnum.OK;
     }
     if (wertungsrichterPflicht === 0) {
-      return "OK";
+      return WertungsrichterStatusEnum.OK;
     }
-    return "unvollständig";
+    return WertungsrichterStatusEnum.NOTOK;
+  }
+
+  getWertungsrichterPflichtBrevet1(anlass: IAnlass): number {
+    const anzahlTeilnehmer = this.anlassService.getTeilnahmen(anlass, 1).length;
+    if (anzahlTeilnehmer > 0) return Math.ceil(anzahlTeilnehmer / 15);
+    return 0;
+  }
+
+  getWertungsrichterPflichtBrevet2(anlass: IAnlass): number {
+    const anzahlTeilnehmer = this.anlassService.getTeilnahmen(anlass, 2).length;
+    if (anzahlTeilnehmer > 0) return Math.ceil(anzahlTeilnehmer / 10);
+    return 0;
   }
 }

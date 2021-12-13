@@ -126,13 +126,53 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 			slot.setReihenfolge(0);
 			slots.add(slot);
 			wertungsrichterSlotRepo.save(slot);
+			slot = new WertungsrichterSlot();
+			slot.setAktiv(true);
+			slot.setAnlass(a);
+			slot.setBeschreibung("SA Mittag");
+			slot.setBrevet(WertungsrichterBrevetEnum.Brevet_1);
+			slot.setReihenfolge(1);
+			slots.add(slot);
+			wertungsrichterSlotRepo.save(slot);
+			slot = new WertungsrichterSlot();
+			slot.setAktiv(true);
+			slot.setAnlass(a);
+			slot.setBeschreibung("SO Morgen");
+			slot.setBrevet(WertungsrichterBrevetEnum.Brevet_1);
+			slot.setReihenfolge(2);
+			slots.add(slot);
+			wertungsrichterSlotRepo.save(slot);
+			slot = new WertungsrichterSlot();
+			slot.setAktiv(true);
+			slot.setAnlass(a);
+			slot.setBeschreibung("SO Mittag");
+			slot.setBrevet(WertungsrichterBrevetEnum.Brevet_1);
+			slot.setReihenfolge(3);
+			slots.add(slot);
+			wertungsrichterSlotRepo.save(slot);
 
 			slot = new WertungsrichterSlot();
 			slot.setAktiv(true);
 			slot.setAnlass(a);
 			slot.setBeschreibung("SA Mittag");
 			slot.setBrevet(WertungsrichterBrevetEnum.Brevet_2);
+			slot.setReihenfolge(0);
+			slots.add(slot);
+			wertungsrichterSlotRepo.save(slot);
+			slot = new WertungsrichterSlot();
+			slot.setAktiv(true);
+			slot.setAnlass(a);
+			slot.setBeschreibung("SO Morgen");
+			slot.setBrevet(WertungsrichterBrevetEnum.Brevet_2);
 			slot.setReihenfolge(1);
+			slots.add(slot);
+			wertungsrichterSlotRepo.save(slot);
+			slot = new WertungsrichterSlot();
+			slot.setAktiv(true);
+			slot.setAnlass(a);
+			slot.setBeschreibung("SO Mittag");
+			slot.setBrevet(WertungsrichterBrevetEnum.Brevet_2);
+			slot.setReihenfolge(2);
 			slots.add(slot);
 			wertungsrichterSlotRepo.save(slot);
 		}
@@ -209,7 +249,7 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 		log.info("User created: " + person.getBenutzername());
 
 		// WR Brevet 1
-		person = Person.builder().benutzername("WR.Brevet_1@tvverein1.ch").name("Wertungsrichter").vorname("Brevet 1")
+		person = Person.builder().benutzername("WR.Brevet_1@tvverein1.ch").name("Muster").vorname("Hans")
 				.handy("078 11 111 11").email("WR.Brevet_1@tvverein1.ch").password(password).build();
 		person.setAktiv(true);
 		person.setChangeDate(Calendar.getInstance());
@@ -236,7 +276,7 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 		log.info("User created: " + person.getBenutzername());
 
 		// WR Brevet 2
-		person = Person.builder().benutzername("WR.Brevet_2@tvverein1.ch").name("Wertungsrichter").vorname("Brevet 2")
+		person = Person.builder().benutzername("WR.Brevet_2@tvverein1.ch").name("Kein Muster").vorname("Sofie")
 				.handy("078 11 111 11").email("WR.Brevet_2@tvverein1.ch").password(password).build();
 		person.setAktiv(true);
 		person.setChangeDate(Calendar.getInstance());

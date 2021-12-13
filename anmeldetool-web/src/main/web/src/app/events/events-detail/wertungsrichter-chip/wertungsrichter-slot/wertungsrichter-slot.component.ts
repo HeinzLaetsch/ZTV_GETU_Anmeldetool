@@ -1,12 +1,13 @@
 import { DatePipe } from "@angular/common";
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
+import { IAnlass } from "src/app/core/model/IAnlass";
 import { IPersonAnlassLink } from "src/app/core/model/IPersonAnlassLink";
 import { IWertungsrichter } from "src/app/core/model/IWertungsrichter";
 import { IWertungsrichterEinsatz } from "src/app/core/model/IWertungsrichterEinsatz";
 import { IWertungsrichterSlot } from "src/app/core/model/IWertungsrichterSlot";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
-import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
 
 @Component({
   selector: "app-wertungsrichter-slot",
@@ -24,19 +25,36 @@ export class WertungsrichterSlotComponent implements OnInit {
   wertungsrichter: IWertungsrichter;
   @Input()
   wrAnlassLink: IPersonAnlassLink;
-
   @Input()
   private einsatz: IWertungsrichterEinsatz;
+  @Input()
+  private anlass: IAnlass;
+
+  @Output()
+  wrEinsatzChange = new EventEmitter<IWertungsrichterEinsatz>();
 
   constructor(
     private authservice: AuthService,
-    private userService: CachingUserService,
     private anlassService: CachingAnlassService,
     private datePipe: DatePipe
   ) {}
   ngOnInit(): void {
     // console.log("Einsatz: ", this.einsatz);
   }
+
+  isCheckboxDisabled() {
+    if (
+      !this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)
+    ) {
+      if (
+        !this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   userEingesetztgmodelchange(value): void {
     this.einsatz.eingesetzt = value;
     this.anlassService
@@ -45,7 +63,9 @@ export class WertungsrichterSlotComponent implements OnInit {
         this.wrAnlassLink,
         this.einsatz
       )
-      .subscribe((wrEinsatz) => {});
+      .subscribe((wrEinsatz) => {
+        this.wrEinsatzChange.emit(wrEinsatz);
+      });
   }
   getSlotText(): string {
     let text = "";
@@ -72,6 +92,9 @@ export class WertungsrichterSlotComponent implements OnInit {
   }
 
   canEdit() {
+    if (this.isCheckboxDisabled()) {
+      return false;
+    }
     return (
       this.authservice.isVereinsAnmmelder() ||
       this.authservice.isVereinsVerantwortlicher()

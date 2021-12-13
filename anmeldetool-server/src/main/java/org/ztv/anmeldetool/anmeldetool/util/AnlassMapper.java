@@ -22,6 +22,8 @@ public abstract class AnlassMapper {
 
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 	@Mapping(expression = "java(mapOrganisationenDTO(anlass.getOrganisationenLinks()))", target = "organisationen")
+	@Mapping(source = "startDate", target = "startDatum")
+	@Mapping(source = "endDate", target = "endDatum")
 	public abstract AnlassDTO ToDto(Anlass anlass);
 
 	public List<OrganisationDTO> mapOrganisationenDTO(List<OrganisationAnlassLink> links) {

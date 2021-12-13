@@ -47,6 +47,8 @@
           [wrAnlassLink]="wrAnlassLink"
           [wertungsrichter]="wertungsrichterUser"
           [einsatz]="getEinsatzForSlot(slot)"
+          [anlass]="anlass"
+          (wrEinsatzChange)="wrEinsatzChange($event)"
         >
         </app-wertungsrichter-slot>
         <mat-form-field

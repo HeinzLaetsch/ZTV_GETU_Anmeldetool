@@ -6,7 +6,8 @@ export interface ITeilnehmer {
   name: string;
   vorname: string;
   jahrgang: number;
+  stvNummer: string;
   tiTu: TiTuEnum;
   dirty: boolean;
-  teilnahmen?: IAnlassLinks
+  teilnahmen?: IAnlassLinks;
 }

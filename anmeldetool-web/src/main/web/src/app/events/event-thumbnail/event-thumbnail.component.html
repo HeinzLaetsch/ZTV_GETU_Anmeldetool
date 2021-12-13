@@ -1,52 +1,63 @@
-<!-- well hoverwell -->
+<!-- well hoverwell    [routerLink]="['/anlass/', anlass?.id]"
+ -->
 <div
   hover
-  [status]="getStatus()"
-  [routerLink]="['/anlass/', anlass?.id]"
+  [status]="anlass.anzeigeStatus"
   class="thumbnail"
+  (click)="isEnabled() ? handleClickMe($event) : $event.stopPropagation()"
 >
   <div class="row">
-    <div class="col-sm-8">
+    <div class="col-sm-7">
       <h2>{{ getCleaned() }}</h2>
+    </div>
+    <div class="col-sm-1">
+      <h2>{{ anlass.tiTu }}</h2>
     </div>
     <div class="col-sm-1">
       <img
         *ngIf="vereinStarted"
         class="icon"
-        src="assets/images/skype/beaming-face-with-smiling-eyes_1f601.png"
+        src="assets/images/skype/beaming-face.png"
       />
       <img
         *ngIf="!vereinStarted"
         class="icon"
-        src="assets/images/skype/slightly-frowning-face_1f641.png"
+        src="assets/images/skype/slightly-frowning-face.png"
       />
     </div>
-    <div class="col-sm-3 verticalAlign">Dein Verein started</div>
-  </div>
-  <div class="row">
-    <div class="col-sm-4" [ngClass]="getStartTimeClass()">
-      <span *ngIf="anlass.startDatum !== anlass.endDatum">am</span>
-      <span *ngIf="anlass.startDatum === anlass.endDatum">von</span>:
-      {{ anlass.startDatum | date: "EEEE, d MMMM , y" }}
+    <div *ngIf="vereinStarted" class="col-sm-3 verticalAlign">
+      Dein Verein started
     </div>
-    <div class="col-sm-4" *ngIf="anlass.startDatum === anlass.endDatum">
-      bis: {{ anlass.endDatum | date: "EEEE, d MMMM , y" }}
+    <div *ngIf="!vereinStarted" class="col-sm-3 verticalAlign">
+      Dein Verein started nicht
     </div>
   </div>
+
   <div class="row">
-    <div class="col-sm-4">Geschlecht: {{ anlass.tiTu }}</div>
+    <div class="col-sm-4">
+      <span *ngIf="anlass.startDatum === anlass.endDatum">am</span>
+      <span *ngIf="anlass.startDatum !== anlass.endDatum">von</span>:
+      {{ anlass.startDatum | date: "EEE, d MMMM , y" }}
+    </div>
+    <div class="col-sm-4" *ngIf="anlass.startDatum !== anlass.endDatum">
+      bis: {{ anlass.endDatum | date: "EEE, d MMMM , y" }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-4">
+      Geschlecht: <span style="font-weight: 550"> {{ anlass.tiTu }}</span>
+    </div>
     <div class="col-sm-4">
       Startberechtigt: {{ anlass.tiefsteKategorie }} bis
       {{ anlass.hoechsteKategorie }}
     </div>
   </div>
-  <!--div class="row">
-    <mat-checkbox
-      [(ngModel)]="vereinStarted"
-      (click)="vereinStartedClicked($event)"
-      >Verein started</mat-checkbox
-    >
-  </div-->
+  <div class="row">
+    <div class="col-sm-4">Ort: {{ anlass.ort }}</div>
+    <div class="col-sm-4">Halle: {{ anlass.halle }}</div>
+    <div class="col-sm-4">Organisator: {{ anlass.organisator }}</div>
+  </div>
+
   <div *ngIf="vereinStarted" class="row">
     <div class="col-sm-8">
       <span class="verticalAlign margin-left"
@@ -57,15 +68,20 @@
       <img
         *ngIf="hasTeilnehmer"
         class="icon"
-        src="assets/images/smiley-emoji.png"
+        src="assets/images/skype/beaming-face.png"
       />
       <img
         *ngIf="!hasTeilnehmer"
         class="icon"
-        src="assets/images/frowning-face_2639-fe0f.png"
+        src="assets/images/skype/slightly-frowning-face.png"
       />
     </div>
-    <div class="col-sm-3 verticalAlign">Teilnehmer gemeldet</div>
+    <div *ngIf="hasTeilnehmer" class="col-sm-3 verticalAlign">
+      Teilnehmer gemeldet
+    </div>
+    <div *ngIf="!hasTeilnehmer" class="col-sm-3 verticalAlign">
+      kein Teilnehmer gemeldet
+    </div>
   </div>
   <div *ngIf="vereinStarted" class="row">
     <div class="col-sm-8">
@@ -77,14 +93,20 @@
       <img
         *ngIf="isWertungsrichterOk"
         class="icon"
-        src="assets/images/smiley-emoji.png"
+        src="assets/images/skype/beaming-face.png"
       />
       <img
         *ngIf="!isWertungsrichterOk"
         class="icon"
-        src="assets/images/slightly-frowning-face_1f641.png"
+        src="assets/images/skype/pouting-face.png"
       />
     </div>
-    <div class="col-sm-3 verticalAlign">WR Kontingent erfüllt</div>
+    <div *ngIf="isWertungsrichterOk" class="col-sm-3 verticalAlign">
+      WR Kontingent erfüllt
+    </div>
+    <div *ngIf="!isWertungsrichterOk" class="col-sm-3 verticalAlign">
+      WR Kontingent nicht erfüllt
+    </div>
   </div>
+  <app-events-dates [anlass]="anlass"></app-events-dates>
 </div>

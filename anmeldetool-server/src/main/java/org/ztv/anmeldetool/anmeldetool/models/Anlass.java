@@ -1,7 +1,7 @@
 package org.ztv.anmeldetool.anmeldetool.models;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -11,8 +11,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -31,11 +29,28 @@ public class Anlass extends Base {
 
 	private String halle;
 
-	@Temporal(TemporalType.DATE)
-	private Calendar startDate;
+	private String organisator;
 
-	@Temporal(TemporalType.DATE)
-	private Calendar endDate;
+	private LocalDateTime startDate;
+
+	private LocalDateTime endDate;
+
+	// Anmeldung ist eröffnet, es kann alles erfasst werden
+	private LocalDateTime anmeldungBeginn;
+
+	// Neu Erfassen nicht mehr erlaubt
+	private LocalDateTime erfassenGeschlossen;
+
+	// Cross Kategorie Aenderungen nicht mehr erlaubt
+	private LocalDateTime crossKategorieAenderungenGeschlossen;
+
+	// Aenderungen innerhalb Kategorie nicht mehr erlaubt.
+	private LocalDateTime aenderungenInKategorieGeschlossen;
+
+	// Kurz vor Wettkampf, keine Mutationen mehr erlaubt
+	private LocalDateTime aenderungenNichtMehrErlaubt;
+
+	private boolean published;
 
 	@Enumerated(EnumType.STRING)
 	private TiTuEnum tiTu;
@@ -60,7 +75,7 @@ public class Anlass extends Base {
 	}
 
 	@Builder
-	public Anlass(String anlassBezeichnung, String ort, String halle, Calendar startDate, Calendar endDate,
+	public Anlass(String anlassBezeichnung, String ort, String halle, LocalDateTime startDate, LocalDateTime endDate,
 			TiTuEnum tiTu, KategorieEnum tiefsteKategorie, KategorieEnum hoechsteKategorie) {
 		super();
 		this.anlassBezeichnung = anlassBezeichnung;

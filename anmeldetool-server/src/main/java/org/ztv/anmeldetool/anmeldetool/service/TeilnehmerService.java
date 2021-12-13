@@ -5,33 +5,21 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.ztv.anmeldetool.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.anmeldetool.models.Organisation;
-import org.ztv.anmeldetool.anmeldetool.models.OrganisationAnlassLink;
-import org.ztv.anmeldetool.anmeldetool.models.OrganisationPersonLink;
-import org.ztv.anmeldetool.anmeldetool.models.Person;
-import org.ztv.anmeldetool.anmeldetool.models.Rolle;
-import org.ztv.anmeldetool.anmeldetool.models.RollenEnum;
-import org.ztv.anmeldetool.anmeldetool.models.RollenLink;
 import org.ztv.anmeldetool.anmeldetool.models.Teilnehmer;
 import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
-import org.ztv.anmeldetool.anmeldetool.repositories.PersonenRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.TeilnehmerAnlassLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.TeilnehmerRepository;
-import org.ztv.anmeldetool.anmeldetool.transfer.PersonDTO;
-import org.ztv.anmeldetool.anmeldetool.transfer.RolleDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerDTO;
-import org.ztv.anmeldetool.anmeldetool.util.PersonHelper;
 import org.ztv.anmeldetool.anmeldetool.util.TeilnehmerHelper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -48,12 +36,10 @@ public class TeilnehmerService {
 
 	@Autowired
 	TeilnehmerRepository teilnehmerRepository;
-	
+
 	@Autowired
 	TeilnehmerAnlassLinkRepository teilnehmerAnlassLinkRepository;
 
-
-	
 	public ResponseEntity<Integer> countTeilnehmerByOrganisation(UUID orgId) {
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		if (organisation == null) {
@@ -85,25 +71,27 @@ public class TeilnehmerService {
 	}
 
 	public List<Teilnehmer> findTeilnehmerByBenutzername(String name, String vorname) {
-		 List<Teilnehmer> teilnehmerList = teilnehmerRepository.findByNameAndVorname(name, vorname);
+		List<Teilnehmer> teilnehmerList = teilnehmerRepository.findByNameAndVorname(name, vorname);
 		return teilnehmerList;
 	}
 
 	public ResponseEntity<TeilnehmerDTO> create(UUID orgId) {
-		TeilnehmerDTO teilnehmerDTO = TeilnehmerDTO.builder().aktiv(false).id(UUID.randomUUID()).organisationid(orgId).dirty(true).build();
+		TeilnehmerDTO teilnehmerDTO = TeilnehmerDTO.builder().aktiv(false).id(UUID.randomUUID()).organisationid(orgId)
+				.dirty(true).build();
 		return create(teilnehmerDTO);
 	}
+
 	public ResponseEntity<TeilnehmerDTO> create(TeilnehmerDTO teilnehmerDTO) {
 		Organisation organisation = organisationSrv.findOrganisationById(teilnehmerDTO.getOrganisationid());
 		if (organisation == null) {
 			return ResponseEntity.notFound().build();
 		}
-		
+
 		Teilnehmer teilnehmer = TeilnehmerHelper.createTeilnehmer(teilnehmerDTO);
 		teilnehmer.setOrganisation(organisation);
-		
+
 		teilnehmerRepository.save(teilnehmer);
-		
+
 		teilnehmerDTO = TeilnehmerHelper.createTeilnehmerDTO(teilnehmer, organisation);
 		return ResponseEntity.ok(teilnehmerDTO);
 	}
@@ -119,9 +107,11 @@ public class TeilnehmerService {
 		}
 		return update(organisation, teilnehmerDTO);
 	}
+
 	public ResponseEntity<TeilnehmerDTO> update(TeilnehmerDTO teilnehmerDTO) {
 		return update(teilnehmerDTO.getOrganisationid(), teilnehmerDTO);
 	}
+
 	public ResponseEntity<TeilnehmerDTO> update(Organisation organisation, TeilnehmerDTO teilnehmerDTO) {
 		Optional<Teilnehmer> teilnehmerOptional = teilnehmerRepository.findById(teilnehmerDTO.getId());
 		if (teilnehmerOptional.isEmpty()) {
@@ -138,12 +128,13 @@ public class TeilnehmerService {
 		teilnehmer.setName(teilnehmer2.getName());
 		teilnehmer.setVorname(teilnehmer2.getVorname());
 		teilnehmer.setDirty(teilnehmer2.isDirty());
-		
+		teilnehmer.setStvNummer(teilnehmer2.getStvNummer());
+
 		teilnehmer = create(teilnehmer);
 		teilnehmerDTO = TeilnehmerHelper.createTeilnehmerDTO(teilnehmer, organisation);
 		return ResponseEntity.ok(teilnehmerDTO);
 	}
-	
+
 	public ResponseEntity updateAnlassTeilnahmen(UUID anlassId, UUID teilnehmerId, TeilnehmerAnlassLinkDTO tal) {
 
 		Anlass anlass = anlassSrv.findAnlassById(anlassId);
@@ -152,15 +143,16 @@ public class TeilnehmerService {
 		if (teilnehmerOptional.isEmpty()) {
 			return ResponseEntity.notFound().build();
 		}
-		
-		Iterable<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByTeilnehmerAndAnlass(teilnehmerOptional.get(), anlass);
+
+		Iterable<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository
+				.findByTeilnehmerAndAnlass(teilnehmerOptional.get(), anlass);
 		TeilnehmerAnlassLink teilnehmerAnlassLink;
 		if (teilnahmen.iterator().hasNext()) {
-			teilnehmerAnlassLink = teilnahmen.iterator().next(); 
+			teilnehmerAnlassLink = teilnahmen.iterator().next();
 		} else {
 			teilnehmerAnlassLink = new TeilnehmerAnlassLink();
 		}
-		
+
 		teilnehmerAnlassLink.setAnlass(anlass);
 		teilnehmerAnlassLink.setOrganisation(teilnehmerOptional.get().getOrganisation());
 		teilnehmerAnlassLink.setTeilnehmer(teilnehmerOptional.get());
@@ -170,8 +162,8 @@ public class TeilnehmerService {
 		} else {
 			teilnehmerAnlassLink.setKategorie(KategorieEnum.valueOf(tal.getKategorie()));
 		}
-		teilnehmerAnlassLinkRepository.save(teilnehmerAnlassLink);			
-		
+		teilnehmerAnlassLinkRepository.save(teilnehmerAnlassLink);
+
 		return ResponseEntity.ok().build();
 	}
 }

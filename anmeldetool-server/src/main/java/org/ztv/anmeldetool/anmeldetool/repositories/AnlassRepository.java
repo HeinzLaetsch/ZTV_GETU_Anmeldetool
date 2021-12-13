@@ -17,4 +17,5 @@ public interface AnlassRepository extends CrudRepository<Anlass, UUID> {
 
 	List<Anlass> findByAktivOrderByAnlassBezeichnung(boolean aktiv);
 
+	List<Anlass> findByAktivOrderByStartDate(boolean aktiv);
 }

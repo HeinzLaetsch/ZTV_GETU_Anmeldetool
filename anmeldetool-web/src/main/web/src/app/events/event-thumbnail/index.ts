@@ -1,1 +1,1 @@
-export * from './event-thumbnail.component';
+export * from "./event-thumbnail.component";

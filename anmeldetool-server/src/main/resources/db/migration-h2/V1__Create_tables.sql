@@ -166,12 +166,20 @@ CREATE table ANLASS
     ANLASS_BEZEICHNUNG	VARCHAR(100),
     ORT					VARCHAR(100),
     HALLE				VARCHAR(100),
+    ORGANISATOR			VARCHAR(100),
     START_DATE   		TIMESTAMP(6),
     END_DATE	 		TIMESTAMP(6),
     TI_TU				VARCHAR(4),
     TIEFSTE_KATEGORIE	VARCHAR(2),
     HOECHSTE_KATEGORIE	VARCHAR(2),
-     
+
+    ANMELDUNG_BEGINN		TIMESTAMP(6),
+    ERFASSEN_GESCHLOSSEN	TIMESTAMP(6),
+    CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN TIMESTAMP(6),
+    AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN TIMESTAMP(6),
+    AENDERUNGEN_NICHT_MEHR_ERLAUBT TIMESTAMP(6),
+    PUBLISHED		BOOLEAN default TRUE,
+
     PRIMARY KEY (ID)
 );
     
@@ -181,20 +189,40 @@ CREATE INDEX idx_ANLASS_AKTIV ON ANLASS (AKTIV);
 
 CREATE INDEX idx_ANLASS_TI_TU ON ANLASS (TI_TU);
 
-INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE) VALUES (random_uuid(), true, false, 'Frühlings%wettkampf', 'Effretikon', 'Eselried',
- parsedatetime('17-4-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), parsedatetime('18-4-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), 'Ti', 'K1', 'K4');
+INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
+ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (random_uuid(), true, false, 'Frühlings%wettkampf', 'Kloten', 'im Feld', 'TV Kloten',
+ parsedatetime('3-4-2022', 'dd-MM-yyyy'), parsedatetime('3-4-2022', 'dd-MM-yyyy'), 'Tu', 'K1', 'K7',
+ parsedatetime('01-12-2021', 'dd-MM-yyyy'),parsedatetime('30-1-2022', 'dd-MM-yyyy'),parsedatetime('28-2-2022', 'dd-MM-yyyy'),parsedatetime('27-3-2022', 'dd-MM-yyyy'),parsedatetime('1-4-2022', 'dd-MM-yyyy'));
 
-INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE) VALUES (random_uuid(), true, false, 'Geräteturnertag', 'Bonstettetn', 'Im Schachen',
- parsedatetime('13-5-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), parsedatetime('13-5-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), 'Tu', 'K1', 'K7');
+ INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
+ ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT, PUBLISHED) VALUES (random_uuid(), true, false, 'Frühlings%wettkampf', 'offen', '', '',
+ parsedatetime('9-4-2022 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), parsedatetime('10-4-2022', 'dd-MM-yyyy'), 'Ti', 'K1', 'K7',
+ parsedatetime('31-12-9999', 'dd-MM-yyyy'),parsedatetime('30-1-2022', 'dd-MM-yyyy'),parsedatetime('28-2-2022', 'dd-MM-yyyy'),parsedatetime('3-4-2022', 'dd-MM-yyyy'),parsedatetime('6-4-2022', 'dd-MM-yyyy'), FALSE);
 
-INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE) VALUES (random_uuid(), true, false, 'Geräteturnerinnen%tag', 'Regensdorf', 'Wisacher',
- parsedatetime('12-6-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), parsedatetime('13-6-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), 'Ti', 'K1', 'K7');
+INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
+ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (random_uuid(), true, false, 'Gerätewettkampf', 'Bonstetteten', 'Im Schachen', 'TSV Bonstetten',
+ parsedatetime('15-5-2022', 'dd-MM-yyyy'), parsedatetime('15-5-2022', 'dd-MM-yyyy'), 'Alle', 'K5', 'K7',
+ parsedatetime('01-12-2021', 'dd-MM-yyyy'),parsedatetime('02-12-2021', 'dd-MM-yyyy'),parsedatetime('03-12-2021', 'dd-MM-yyyy'),parsedatetime('04-12-2021', 'dd-MM-yyyy'),parsedatetime('9-12-2021', 'dd-MM-yyyy'));
 
-INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE) VALUES (random_uuid(), true, false, 'Gerätewettkampf', 'Rafz', 'Rafz',
- parsedatetime('10-7-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), parsedatetime('11-7-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), 'Ti', 'K1', 'K7');
+INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
+ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (random_uuid(), true, false, 'Gerätewettkampf', 'Stammertal', '', 'TV Stammertal',
+ parsedatetime('21-5-2022', 'dd-MM-yyyy'), parsedatetime('22-5-2022', 'dd-MM-yyyy'), 'Alle', 'K1', 'K4',
+ parsedatetime('01-12-2021', 'dd-MM-yyyy'),parsedatetime('02-12-2021', 'dd-MM-yyyy'),parsedatetime('03-12-2021', 'dd-MM-yyyy'),parsedatetime('4-12-2021', 'dd-MM-yyyy'),parsedatetime('30-01-2022', 'dd-MM-yyyy'));
 
-INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE) VALUES (random_uuid(), true, false, 'Kant. Geräte%meisterschaften', 'Bonstetten', 'Im Schachen',
- parsedatetime('04-09-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), parsedatetime('05-09-2021 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), 'Alle', 'K1', 'K7');
+INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
+ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (random_uuid(), true, false, 'Geräteturnerinnen%tage', 'Niederhasli', 'Niederhasli', 'DR Niederhasli',
+ parsedatetime('9-7-2022', 'dd-MM-yyyy'), parsedatetime('10-7-2022', 'dd-MM-yyyy'), 'Ti', 'K1', 'K7',
+ parsedatetime('01-12-2021', 'dd-MM-yyyy'),parsedatetime('7-12-2021', 'dd-MM-yyyy'),parsedatetime('8-12-2021', 'dd-MM-yyyy'),parsedatetime('1-7-2022', 'dd-MM-yyyy'),parsedatetime('5-7-2022', 'dd-MM-yyyy'));
+
+INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
+ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (random_uuid(), true, false, 'Kant. Geräte%meisterschaften', 'offen', '', '',
+ parsedatetime('27-08-2022', 'dd-MM-yyyy'), parsedatetime('28-08-2022', 'dd-MM-yyyy'), 'Alle', 'K1', 'K4',
+ parsedatetime('01-12-2021', 'dd-MM-yyyy'),parsedatetime('8-12-2021', 'dd-MM-yyyy'),parsedatetime('1-8-2022', 'dd-MM-yyyy'),parsedatetime('20-08-2022', 'dd-MM-yyyy'),parsedatetime('25-08-2022', 'dd-MM-yyyy'));
+
+ INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
+ ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (random_uuid(), true, false, 'Kant. Geräte%meisterschaften', 'Regensdorf', 'Wisacher', 'TV Regensdorf',
+ parsedatetime('11-09-2022', 'dd-MM-yyyy'), parsedatetime('11-09-2022', 'dd-MM-yyyy'), 'Alle', 'K5', 'K7',
+ parsedatetime('01-12-2021', 'dd-MM-yyyy'),parsedatetime('31-07-2022', 'dd-MM-yyyy'),parsedatetime('24-08-2022', 'dd-MM-yyyy'),parsedatetime('3-09-2022', 'dd-MM-yyyy'),parsedatetime('7-09-2022', 'dd-MM-yyyy'));
 
 create table ORGANISATION_ANLASS_LINK
 (
@@ -227,6 +255,7 @@ create table TEILNEHMER
     NAME	   	  VARCHAR(100),
     VORNAME       VARCHAR(100),
     JAHRGANG      INTEGER,
+    STV_NUMMER	  VARCHAR(6),
     TI_TU	      VARCHAR(4),
     ORGANISATION_ID uuid not null,
     DIRTY		  BOOLEAN,

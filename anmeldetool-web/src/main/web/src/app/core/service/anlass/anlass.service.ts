@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
-import { catchError } from "rxjs/operators";
+import { catchError, map } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
 import { IAnlass } from "../../model/IAnlass";
 import { IAnlassLink } from "../../model/IAnlassLink";
@@ -19,9 +19,14 @@ export class AnlassService {
 
   getAnlaesse(): Observable<IAnlass[]> {
     console.log("getAnlaesse called");
-    return this.http
-      .get<IAnlass[]>(this.url)
-      .pipe(catchError(this.handleError<IAnlass[]>("getAnlaesse", [])));
+    return this.http.get<IAnlass[]>(this.url).pipe(
+      map((anlaesse) => {
+        return anlaesse.map((value) => {
+          return Object.assign(new IAnlass(), value);
+        });
+      }),
+      catchError(this.handleError<IAnlass[]>("getAnlaesse", []))
+    );
   }
   getVerfuegbareWertungsrichter(
     anlass: IAnlass,
