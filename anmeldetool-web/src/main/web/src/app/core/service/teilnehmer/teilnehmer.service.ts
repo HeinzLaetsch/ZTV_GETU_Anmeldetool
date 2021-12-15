@@ -3,13 +3,15 @@ import { Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { catchError } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
+import { environment } from "src/environments/environment";
 import { ITeilnehmer } from "../../model/ITeilnehmer";
 
 @Injectable({
   providedIn: "root",
 })
 export class TeilnehmerService {
-  private url: string = "http://localhost:8088/admin/organisationen/";
+  apiHost = `${environment.apiHost}`;
+  private url: string = this.apiHost + "/admin/organisationen/";
   private _anzahlTeilnehmer = 0;
   teilnehmer: ITeilnehmer[] = [];
   // teilnahmen: IAnlassLink[] = [  {id: '1', anlassId: '1', kategorie: 'k1'}, {id: '2', anlassId: '2', kategorie: ''}, {id: '3', anlassId: '3', kategorie: ''}, {id: '4', anlassId: '4', kategorie: ''}];

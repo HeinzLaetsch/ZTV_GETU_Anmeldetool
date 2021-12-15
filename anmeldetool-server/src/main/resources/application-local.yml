@@ -1,21 +1,17 @@
 spring:
   flyway:
-    locations: ["classpath:/db/migration-h2"]
+    locations: ["classpath:/db/migration"]
     clean-on-validation-error: true
-    username: sa
-    password:
+    username: postgres
+    password: adrian2000
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    show-sql: false
+     database-platform: org.hibernate.dialect.PostgreSQLDialect
+     show-sql: "false"
+     
   datasource:
-    driver-class-name: org.h2.Driver
-    platform: h2
-    url: jdbc:h2:mem:test;MODE=PostgreSQL
-    username: sa
-    password:
-  h2:
-    console:
-      enabled: true
+    url: jdbc:postgresql://localhost:5432/getu-wettkaempfe
+    username: postgres
+    password: adrian2000
 
 logging:
   level:

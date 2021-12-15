@@ -3,6 +3,7 @@ import { EventEmitter, Injectable } from "@angular/core";
 import { Observable, of, throwError } from "rxjs";
 import { IUser } from "src/app/core/model/IUser";
 import { IVerein } from "src/app/verein/verein";
+import { environment } from "src/environments/environment";
 import { ILoginData } from "../../model/ILoginData";
 import { CachingUserService } from "../caching-services/caching.user.service";
 import { CachingVereinService } from "../caching-services/caching.verein.service";
@@ -11,9 +12,10 @@ import { CachingVereinService } from "../caching-services/caching.verein.service
   providedIn: "root",
 })
 export class AuthService {
-  private loginUrl = "http://localhost:8088/admin/login";
-  private VereineUrl = "http://localhost:8088/admin/organisationen";
-  private userUrl = "http://localhost:8088/admin/user";
+  apiHost = `${environment.apiHost}`;
+  private loginUrl = this.apiHost + "/admin/login";
+  private VereineUrl = this.apiHost + "/admin/organisationen";
+  private userUrl = this.apiHost + "/admin/user";
 
   isLoggedIn: boolean = false;
   token: string;

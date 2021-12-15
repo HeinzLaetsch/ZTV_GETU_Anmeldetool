@@ -1,7 +1,8 @@
-import { Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { catchError } from "rxjs/operators";
+import { Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
+import { catchError } from "rxjs/operators";
+import { environment } from "src/environments/environment";
 import { IRolle } from "../../model/IRolle";
 import { IUser } from "../../model/IUser";
 
@@ -9,7 +10,8 @@ import { IUser } from "../../model/IUser";
   providedIn: "root",
 })
 export class RoleService {
-  private url: string = "http://localhost:8088/admin/role";
+  apiHost = `${environment.apiHost}`;
+  private url: string = this.apiHost + "/admin/role";
 
   constructor(private http: HttpClient) {}
 

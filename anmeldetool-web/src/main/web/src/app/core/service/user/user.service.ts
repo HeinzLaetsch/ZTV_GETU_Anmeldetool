@@ -1,16 +1,18 @@
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { HttpClient, HttpParams } from "@angular/common/http";
-import { catchError } from "rxjs/operators";
-import { IUser } from "../../model/IUser";
 import { Observable, of } from "rxjs";
+import { catchError } from "rxjs/operators";
+import { environment } from "src/environments/environment";
 import { IRolle } from "../../model/IRolle";
+import { IUser } from "../../model/IUser";
 import { IWertungsrichter } from "../../model/IWertungsrichter";
 
 @Injectable({
   providedIn: "root",
 })
 export class UserService {
-  private url: string = "http://localhost:8088/admin/user";
+  apiHost = `${environment.apiHost}`;
+  private url: string = this.apiHost + "/admin/user";
 
   constructor(private http: HttpClient) {}
 

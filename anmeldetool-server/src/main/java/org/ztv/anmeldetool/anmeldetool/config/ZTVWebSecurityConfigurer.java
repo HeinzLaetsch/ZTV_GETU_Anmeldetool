@@ -3,8 +3,10 @@ package org.ztv.anmeldetool.anmeldetool.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,10 +19,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
+@Order(SecurityProperties.BASIC_AUTH_ORDER)
 public class ZTVWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
 	@Bean(name = BeanIds.AUTHENTICATION_MANAGER)
@@ -31,13 +33,15 @@ public class ZTVWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers("/", "/admin/login", "/admin/user", "/admin/organisationen",
-				"/favicon.ico", "/h2-console", "/h2-console/**/*.*").permitAll().antMatchers("/admin").authenticated()
-				.and().httpBasic()
+		http.authorizeRequests()
+				.antMatchers("/", "/admin/login", "/admin/user", "/admin/organisationen", "/favicon.ico", "/h2-console",
+						"/h2-console/**/*.*")
+				.permitAll()
+				// .antMatchers("/admin")
+				// .access("@userAuthorizationControl.checkAccessBasedOnRoleBla(authentication)")
+				.anyRequest().authenticated().and().httpBasic().and().cors().and().csrf().disable().logout();
 		// .authenticationEntryPoint(authenticationEntryPoint)
-		;
-		http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-		http.headers().frameOptions().disable();
+		// http.headers().frameOptions().disable();
 		// http.addFilterAfter(new CustomFilter(),
 		// BasicAuthenticationFilter.class);
 	}

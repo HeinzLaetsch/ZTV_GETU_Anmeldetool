@@ -4,7 +4,7 @@ server:
     context-path: /
 spring:
   profiles:
-    active: "s"
+    active: "local"
   jpa:
      database-platform: org.hibernate.dialect.PostgreSQLDialect
      show-sql: "false"

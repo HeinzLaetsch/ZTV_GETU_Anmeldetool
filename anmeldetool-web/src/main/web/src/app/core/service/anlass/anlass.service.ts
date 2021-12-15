@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
+import { environment } from "src/environments/environment";
 import { IAnlass } from "../../model/IAnlass";
 import { IAnlassLink } from "../../model/IAnlassLink";
 import { IPersonAnlassLink } from "../../model/IPersonAnlassLink";
@@ -13,7 +14,8 @@ import { IWertungsrichterEinsatz } from "../../model/IWertungsrichterEinsatz";
   providedIn: "root",
 })
 export class AnlassService {
-  private url: string = "http://localhost:8088/admin/anlaesse";
+  apiHost = `${environment.apiHost}`;
+  private url: string = this.apiHost + "/admin/anlaesse";
 
   constructor(private http: HttpClient) {}
 
