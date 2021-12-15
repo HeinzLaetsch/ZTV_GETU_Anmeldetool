@@ -13,7 +13,7 @@ import { IWertungsrichterEinsatz } from "../../model/IWertungsrichterEinsatz";
   providedIn: "root",
 })
 export class AnlassService {
-  private url: string = "http://localhost:8080/admin/anlaesse";
+  private url: string = "http://localhost:8088/admin/anlaesse";
 
   constructor(private http: HttpClient) {}
 

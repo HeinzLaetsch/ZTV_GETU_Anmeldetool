@@ -5,37 +5,37 @@
   <div class="row">
     <div
       class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatus('noch nicht offen')"
+      [ngClass]="getClassForAnzeigeStatusNochNichtOffen()"
     >
       Anmeldung offen
     </div>
     <div
       class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatus('Erfassen geschlossen')"
+      [ngClass]="getClassForAnzeigeStatusErfassenGeschlossen()"
     >
       Erfassen geschlossen
     </div>
     <div
       class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatus('Cross Kategorie geschlossen')"
+      [ngClass]="getClassForAnzeigeStatusCrossKategorieGeschlossen()"
     >
       Kategorie übergreifende
     </div>
     <div
       class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatus('In Kategorie geschlossen')"
+      [ngClass]="getClassForAnzeigeStatusInKategorieGeschlossen()"
     >
       innerhalb Kategorie
     </div>
     <div
       class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatus('Alle Mutationen geschlossen')"
+      [ngClass]="getClassForAnzeigeStatusAlleMutationenGeschlossen()"
     >
       Mutationen abgeschlossen
     </div>
     <div
       class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatus('geschlossen')"
+      [ngClass]="getClassForAnzeigeStatusGeschlossen()"
     >
       Wettkampf geschlossen
     </div>
@@ -43,37 +43,37 @@
   <div class="row">
     <div
       class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatus('noch nicht offen')"
+      [ngClass]="getClassForAnzeigeStatusNochNichtOffen()"
     >
       {{ anlass.anmeldungBeginn | date: "d-MM-y" }}
     </div>
     <div
       class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatus('Erfassen geschlossen')"
+      [ngClass]="getClassForAnzeigeStatusErfassenGeschlossen()"
     >
       {{ anlass.erfassenGeschlossen | date: "d-MM-y" }}
     </div>
     <div
       class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatus('Cross Kategorie geschlossen')"
+      [ngClass]="getClassForAnzeigeStatusCrossKategorieGeschlossen()"
     >
       {{ anlass.crossKategorieAenderungenGeschlossen | date: "d-MM-y" }}
     </div>
     <div
       class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatus('In Kategorie geschlossen')"
+      [ngClass]="getClassForAnzeigeStatusInKategorieGeschlossen()"
     >
       {{ anlass.aenderungenInKategorieGeschlossen | date: "d-MM-y" }}
     </div>
     <div
       class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatus('Alle Mutationen geschlossen')"
+      [ngClass]="getClassForAnzeigeStatusAlleMutationenGeschlossen()"
     >
       {{ anlass.aenderungenNichtMehrErlaubt | date: "d-MM-y" }}
     </div>
     <div
       class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatus('geschlossen')"
+      [ngClass]="getClassForAnzeigeStatusGeschlossen()"
     >
       {{ anlass.endDatum | date: "d-MM-y" }}
     </div>

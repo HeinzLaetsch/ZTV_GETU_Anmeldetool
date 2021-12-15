@@ -17,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -29,63 +29,50 @@ public class ZTVWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 		return super.authenticationManagerBean();
 	}
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-        .authorizeRequests()
-          .antMatchers(
-        		  "/",
-        		  "/admin/login",
-        		  "/admin/user",
-        		  "/admin/organisationen",
-        		  "/favicon.ico",
-        		  "/h2-console",
-        		  "/h2-console/**/*.*"
-          ).permitAll()
-          .antMatchers("/api").authenticated()
-          .and()
-          .httpBasic()
-          //.authenticationEntryPoint(authenticationEntryPoint)
-          ;
-        http.csrf().disable();
-        http.headers().frameOptions().disable();
-        // http.addFilterAfter(new CustomFilter(),
-        //  BasicAuthenticationFilter.class);
-    }
-    
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-    	String idForEncode = "bcrypt";
-    	 Map<String,PasswordEncoder> encoders = new HashMap<>();
-    	 encoders.put(idForEncode, new BCryptPasswordEncoder());
-    	 encoders.put("noop", NoOpPasswordEncoder.getInstance());
-    	 encoders.put("pbkdf2", new Pbkdf2PasswordEncoder());
-    	 encoders.put("scrypt", new SCryptPasswordEncoder());
-    	 encoders.put("sha256", new StandardPasswordEncoder());
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.authorizeRequests().antMatchers("/", "/admin/login", "/admin/user", "/admin/organisationen",
+				"/favicon.ico", "/h2-console", "/h2-console/**/*.*").permitAll().antMatchers("/admin").authenticated()
+				.and().httpBasic()
+		// .authenticationEntryPoint(authenticationEntryPoint)
+		;
+		http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+		http.headers().frameOptions().disable();
+		// http.addFilterAfter(new CustomFilter(),
+		// BasicAuthenticationFilter.class);
+	}
 
-    	 PasswordEncoder passwordEncoder = new DelegatingPasswordEncoder(idForEncode, encoders);
-    	 return passwordEncoder;
-    }
-    
-    
+//	protected void configure(HttpSecurity http) throws Exception {
+//		http.authorizeRequests().antMatchers("/", "/admin/login", "/admin/user", "/admin/organisationen/**/*.*",
+//				"/favicon.ico", "/h2-console", "/h2-console/**/*.*").permitAll().anyRequest().authenticated().and()
+//				.httpBasic()
+//		;
+//		http.csrf().disable();
+//		http.headers().frameOptions().disable();
+//	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		String idForEncode = "bcrypt";
+		Map<String, PasswordEncoder> encoders = new HashMap<>();
+		encoders.put(idForEncode, new BCryptPasswordEncoder());
+		encoders.put("noop", NoOpPasswordEncoder.getInstance());
+		encoders.put("pbkdf2", new Pbkdf2PasswordEncoder());
+		encoders.put("scrypt", new SCryptPasswordEncoder());
+		encoders.put("sha256", new StandardPasswordEncoder());
+
+		PasswordEncoder passwordEncoder = new DelegatingPasswordEncoder(idForEncode, encoders);
+		return passwordEncoder;
+	}
+
 	/*
-	AuthenticationManager ztvAuthenticationManager() {
-	    return authentication -> {
-	    	authentication.getName()
-	        if (isCustomer(authentication)) {
-	            return new UsernamePasswordAuthenticationToken(credentials);
-	        }
-	        throw new UsernameNotFoundException(principal name);
-	    };
-	}
-
-	AuthenticationManagerResolver<HttpServletRequest> resolver() {
-		return request -> {
-			if (request.getPathInfo().startsWith("/employee")) {
-				return ztvAuthenticationManager();
-			}
-			return ztvAuthenticationManager();
-		};
-	}
-	*/
+	 * AuthenticationManager ztvAuthenticationManager() { return authentication -> {
+	 * authentication.getName() if (isCustomer(authentication)) { return new
+	 * UsernamePasswordAuthenticationToken(credentials); } throw new
+	 * UsernameNotFoundException(principal name); }; }
+	 * 
+	 * AuthenticationManagerResolver<HttpServletRequest> resolver() { return request
+	 * -> { if (request.getPathInfo().startsWith("/employee")) { return
+	 * ztvAuthenticationManager(); } return ztvAuthenticationManager(); }; }
+	 */
 }

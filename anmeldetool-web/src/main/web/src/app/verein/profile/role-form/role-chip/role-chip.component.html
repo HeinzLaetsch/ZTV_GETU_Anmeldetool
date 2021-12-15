@@ -24,7 +24,7 @@
       }"
       [(ngModel)]="role.aktiv"
       [disabled]="!isVereinsVerantwortlicher"
-      (click)="aktivChange(role)"
+      (ngModelChange)="aktivChange(role)"
       >Rolle ist aktiviert</mat-checkbox
     >
   </ng-container>

@@ -26,7 +26,7 @@ export class WertungsrichterSlotComponent implements OnInit {
   @Input()
   wrAnlassLink: IPersonAnlassLink;
   @Input()
-  private einsatz: IWertungsrichterEinsatz;
+  einsatz: IWertungsrichterEinsatz;
   @Input()
   private anlass: IAnlass;
 
