@@ -89,7 +89,7 @@ export class EventThumbnailComponent implements OnInit {
       return { greenNoMargin: true };
     }
   }
-  handleClickMe() {
+  handleClickMe(event: PointerEvent) {
     // this.anlassClick.emit(this.anlass.anlassBezeichnung);
     this.router.navigate(["/anlass/", this.anlass?.id]);
   }

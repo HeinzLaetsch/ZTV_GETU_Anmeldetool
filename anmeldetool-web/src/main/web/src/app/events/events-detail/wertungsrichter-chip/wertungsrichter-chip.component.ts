@@ -35,7 +35,7 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
   @Output()
   wertungsrichterUserChange = new EventEmitter<IUser>();
 
-  private wertungsrichter: IWertungsrichter;
+  wertungsrichter: IWertungsrichter;
 
   constructor(
     private authservice: AuthService,

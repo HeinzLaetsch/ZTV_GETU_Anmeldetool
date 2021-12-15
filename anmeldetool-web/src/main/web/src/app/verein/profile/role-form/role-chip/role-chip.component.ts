@@ -20,4 +20,7 @@ export class RoleChipComponent implements OnInit {
   ngOnInit(): void {
     console.log("Oninit: ", this.role.name);
   }
+  aktivChange(role: IRolle) {
+    console.error("Funktion noch nicht implementiert");
+  }
 }

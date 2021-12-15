@@ -11,8 +11,8 @@
       <div class="col">
         <span
           [ngClass]="{
-            'h2-green': wertungsrichterUser.gueltig,
-            'h2-red': !wertungsrichterUser.gueltig
+            'h2-green': wertungsrichter.gueltig,
+            'h2-red': !wertungsrichter.gueltig
           }"
           >{{
             wertungsrichterUser.vorname + " " + wertungsrichterUser.name
@@ -24,10 +24,10 @@
       <div class="col">
         <mat-checkbox
           [ngClass]="{
-            'label-green': wertungsrichterUser.gueltig,
-            'label-red': !wertungsrichterUser.gueltig
+            'label-green': wertungsrichter.gueltig,
+            'label-red': !wertungsrichter.gueltig
           }"
-          [(ngModel)]="wertungsrichterUser.gueltig"
+          [(ngModel)]="wertungsrichter.gueltig"
           [disabled]="true"
           >Wertungsrichter hat FK</mat-checkbox
         >

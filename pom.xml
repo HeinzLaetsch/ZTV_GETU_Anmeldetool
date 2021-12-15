@@ -25,7 +25,7 @@
 	</dependencyManagement>
 
 	<modules>
-		<!--module>anmeldetool-web</module-->
+		<module>anmeldetool-web</module>
 		<module>anmeldetool-server</module>
 	</modules>
 </project>

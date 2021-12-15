@@ -1,0 +1,30 @@
+spring:
+  flyway:
+    locations: ["classpath:/db/migration-h2"]
+    clean-on-validation-error: true
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: false
+  datasource:
+    driver-class-name: org.h2.Driver
+    platform: h2
+    url: jdbc:h2:mem:test;MODE=PostgreSQL
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+
+logging:
+  level:
+    root: warn
+    org:
+      ztv: debug
+
+management:
+  endpoints:
+    web:
+      cors:
+        allowed-origins: http://localhost:4200

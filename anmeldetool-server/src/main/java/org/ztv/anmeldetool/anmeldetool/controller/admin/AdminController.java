@@ -71,7 +71,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/admin")
 @Slf4j
-@CrossOrigin(origins = { "http://localhost:4200",
+@CrossOrigin(origins = { "http://localhost:4200", "http://localhost:8081",
 		"http://127.0.0.1:4200" }, allowedHeaders = "*", allowCredentials = "true")
 public class AdminController {
 	@Autowired

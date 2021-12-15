@@ -9,7 +9,7 @@ import { ITeilnehmer } from "../../model/ITeilnehmer";
   providedIn: "root",
 })
 export class TeilnehmerService {
-  private url: string = "http://localhost:8080/admin/organisationen/";
+  private url: string = "http://localhost:8088/admin/organisationen/";
   private _anzahlTeilnehmer = 0;
   teilnehmer: ITeilnehmer[] = [];
   // teilnahmen: IAnlassLink[] = [  {id: '1', anlassId: '1', kategorie: 'k1'}, {id: '2', anlassId: '2', kategorie: ''}, {id: '3', anlassId: '3', kategorie: ''}, {id: '4', anlassId: '4', kategorie: ''}];

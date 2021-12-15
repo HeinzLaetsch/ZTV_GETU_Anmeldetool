@@ -11,9 +11,9 @@ import { CachingVereinService } from "../caching-services/caching.verein.service
   providedIn: "root",
 })
 export class AuthService {
-  private loginUrl = "http://localhost:8080/admin/login";
-  private VereineUrl = "http://localhost:8080/admin/organisationen";
-  private userUrl = "http://localhost:8080/admin/user";
+  private loginUrl = "http://localhost:8088/admin/login";
+  private VereineUrl = "http://localhost:8088/admin/organisationen";
+  private userUrl = "http://localhost:8088/admin/user";
 
   isLoggedIn: boolean = false;
   token: string;

@@ -1,3 +1,4 @@
+
 -- create table CONFIG
 --(
 --    ID          int          not null,
@@ -11,7 +12,7 @@
 
 create table ORGANISATION
 (
-    ID            uuid          default random_uuid(),
+    ID            uuid          default  gen_random_uuid(),
     AKTIV         BOOLEAN,
     DELETED       BOOLEAN,
     CHANGE_DATE   TIMESTAMP(6),
@@ -27,7 +28,7 @@ CREATE INDEX idx_ORGANISATION_DELETED ON ORGANISATION (DELETED);
 
 create table PERSON
 (
-    ID            uuid          default random_uuid(),
+    ID            uuid          default  gen_random_uuid(),
     AKTIV         BOOLEAN,
     DELETED       BOOLEAN,
     CHANGE_DATE   TIMESTAMP(6),
@@ -53,7 +54,7 @@ CREATE INDEX idx_PERSON_EMAIL ON PERSON (EMAIL);
 
 create table ORGANISATION_PERSON_LINK
 (
-    ID            	uuid          default random_uuid(),
+    ID            	uuid          default  gen_random_uuid(),
     AKTIV         	BOOLEAN,
     DELETED       	BOOLEAN,
     CHANGE_DATE   	TIMESTAMP(6),
@@ -71,7 +72,7 @@ CREATE INDEX idx_ORGANISATION_PERSON_LINK_PERSON_ID ON ORGANISATION_PERSON_LINK 
 
 CREATE table ROLLE
 (
-    ID            	uuid          default random_uuid(),
+    ID            	uuid          default  gen_random_uuid(),
     AKTIV         	BOOLEAN,
     DELETED       	BOOLEAN,
     CHANGE_DATE   	TIMESTAMP(6),
@@ -89,7 +90,7 @@ CREATE INDEX idx_ROLLE_NAME ON ROLLE (NAME);
 
 CREATE table ROLLEN_LINK
 (
-    ID            	uuid          default random_uuid(),
+    ID            	uuid          default  gen_random_uuid(),
     AKTIV         	BOOLEAN,
     DELETED       	BOOLEAN,
     CHANGE_DATE   	TIMESTAMP(6),
@@ -109,7 +110,7 @@ CREATE INDEX idx_ROLLEN_LINK_LINK_ID ON ROLLEN_LINK (LINK_ID);
 
 CREATE table VERBAND
 (
-    ID            	uuid          default random_uuid(),
+    ID            	uuid          default  gen_random_uuid(),
     AKTIV         	BOOLEAN,
     DELETED       	BOOLEAN,
     CHANGE_DATE   	TIMESTAMP(6),
@@ -127,17 +128,17 @@ CREATE INDEX idx_VERBAND_AKTIV ON VERBAND (AKTIV);
 
 CREATE INDEX idx_VERBAND_VERBAND ON VERBAND (VERBAND);
 
-INSERT INTO VERBAND (ID, AKTIV, DELETED, VERBAND, VERBAND_LONG) VALUES (random_uuid(), '1', '0', 'STV', 'Schweizer Turnverband');
-INSERT INTO VERBAND (ID, AKTIV, DELETED, VERBAND, VERBAND_LONG) VALUES (random_uuid(), '1', '0', 'ZTV', 'Zürcher Turnverband');
-INSERT INTO VERBAND (ID, AKTIV, DELETED, VERBAND, VERBAND_LONG) VALUES (random_uuid(), '1', '0', 'GLZ', 'Region Glatt- Limmattal und Stadt Zürich');
-INSERT INTO VERBAND (ID, AKTIV, DELETED, VERBAND, VERBAND_LONG) VALUES (random_uuid(), '1', '0', 'WTU', 'Region Winterthur und Umgebung');
-INSERT INTO VERBAND (ID, AKTIV, DELETED, VERBAND, VERBAND_LONG) VALUES (random_uuid(), '1', '0', 'AZO', 'Region Albis, Zürichsee und Oberland');
-INSERT INTO VERBAND (ID, AKTIV, DELETED, VERBAND, VERBAND_LONG) VALUES (random_uuid(), '1', '0', 'UTV', 'Urner Turnverband');
-INSERT INTO VERBAND (ID, AKTIV, DELETED, VERBAND, VERBAND_LONG) VALUES (random_uuid(), '1', '0', 'GRTV', 'Graubündner Turnverband');
+INSERT INTO VERBAND (ID, AKTIV, DELETED, VERBAND, VERBAND_LONG) VALUES (gen_random_uuid(), '1', '0', 'STV', 'Schweizer Turnverband');
+INSERT INTO VERBAND (ID, AKTIV, DELETED, VERBAND, VERBAND_LONG) VALUES (gen_random_uuid(), '1', '0', 'ZTV', 'Zürcher Turnverband');
+INSERT INTO VERBAND (ID, AKTIV, DELETED, VERBAND, VERBAND_LONG) VALUES (gen_random_uuid(), '1', '0', 'GLZ', 'Region Glatt- Limmattal und Stadt Zürich');
+INSERT INTO VERBAND (ID, AKTIV, DELETED, VERBAND, VERBAND_LONG) VALUES (gen_random_uuid(), '1', '0', 'WTU', 'Region Winterthur und Umgebung');
+INSERT INTO VERBAND (ID, AKTIV, DELETED, VERBAND, VERBAND_LONG) VALUES (gen_random_uuid(), '1', '0', 'AZO', 'Region Albis, Zürichsee und Oberland');
+INSERT INTO VERBAND (ID, AKTIV, DELETED, VERBAND, VERBAND_LONG) VALUES (gen_random_uuid(), '1', '0', 'UTV', 'Urner Turnverband');
+INSERT INTO VERBAND (ID, AKTIV, DELETED, VERBAND, VERBAND_LONG) VALUES (gen_random_uuid(), '1', '0', 'GRTV', 'Graubündner Turnverband');
 
 CREATE table WERTUNGSRICHTER
 (
-    ID            	uuid          default random_uuid(),
+    ID            	uuid          default  gen_random_uuid(),
     AKTIV         	BOOLEAN,
     DELETED       	BOOLEAN,
     CHANGE_DATE   	TIMESTAMP(6),
@@ -157,7 +158,7 @@ CREATE INDEX idx_WERTUNGSRICHTER_AKTIV ON WERTUNGSRICHTER (AKTIV);
 
 CREATE table ANLASS
 (
-    ID            	uuid          default random_uuid(),
+    ID            	uuid          default  gen_random_uuid(),
     AKTIV         	BOOLEAN,
     DELETED       	BOOLEAN,
     CHANGE_DATE   	TIMESTAMP(6),
@@ -190,43 +191,43 @@ CREATE INDEX idx_ANLASS_AKTIV ON ANLASS (AKTIV);
 CREATE INDEX idx_ANLASS_TI_TU ON ANLASS (TI_TU);
 
 INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
-ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (random_uuid(), true, false, 'Frühlings%wettkampf', 'Kloten', 'im Feld', 'TV Kloten',
- parsedatetime('3-4-2022', 'dd-MM-yyyy'), parsedatetime('3-4-2022', 'dd-MM-yyyy'), 'Tu', 'K1', 'K7',
- parsedatetime('01-12-2021', 'dd-MM-yyyy'),parsedatetime('30-1-2022', 'dd-MM-yyyy'),parsedatetime('28-2-2022', 'dd-MM-yyyy'),parsedatetime('27-3-2022', 'dd-MM-yyyy'),parsedatetime('1-4-2022', 'dd-MM-yyyy'));
+ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (gen_random_uuid(), true, false, 'Frühlings%wettkampf', 'Kloten', 'im Feld', 'TV Kloten',
+ To_TimeStamp('3-4-2022', 'dd-MM-yyyy'), To_TimeStamp('3-4-2022', 'dd-MM-yyyy'), 'Tu', 'K1', 'K7',
+ To_TimeStamp('01-12-2021', 'dd-MM-yyyy'),To_TimeStamp('30-1-2022', 'dd-MM-yyyy'),To_TimeStamp('28-2-2022', 'dd-MM-yyyy'),To_TimeStamp('27-3-2022', 'dd-MM-yyyy'),To_TimeStamp('1-4-2022', 'dd-MM-yyyy'));
 
  INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
- ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT, PUBLISHED) VALUES (random_uuid(), true, false, 'Frühlings%wettkampf', 'offen', '', '',
- parsedatetime('9-4-2022 00:00:00.00', 'dd-MM-yyyy hh:mm:ss.SS'), parsedatetime('10-4-2022', 'dd-MM-yyyy'), 'Ti', 'K1', 'K7',
- parsedatetime('31-12-9999', 'dd-MM-yyyy'),parsedatetime('30-1-2022', 'dd-MM-yyyy'),parsedatetime('28-2-2022', 'dd-MM-yyyy'),parsedatetime('3-4-2022', 'dd-MM-yyyy'),parsedatetime('6-4-2022', 'dd-MM-yyyy'), FALSE);
+ ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT, PUBLISHED) VALUES (gen_random_uuid(), true, false, 'Frühlings%wettkampf', 'offen', '', '',
+ To_TimeStamp('9-4-2022 00:00:00.00', 'dd-MM-yyyy HH24:MI:ss.SS'), To_TimeStamp('10-4-2022', 'dd-MM-yyyy'), 'Ti', 'K1', 'K7',
+ To_TimeStamp('31-12-9999', 'dd-MM-yyyy'),To_TimeStamp('30-1-2022', 'dd-MM-yyyy'),To_TimeStamp('28-2-2022', 'dd-MM-yyyy'),To_TimeStamp('3-4-2022', 'dd-MM-yyyy'),To_TimeStamp('6-4-2022', 'dd-MM-yyyy'), FALSE);
 
 INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
-ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (random_uuid(), true, false, 'Gerätewettkampf', 'Bonstetteten', 'Im Schachen', 'TSV Bonstetten',
- parsedatetime('15-5-2022', 'dd-MM-yyyy'), parsedatetime('15-5-2022', 'dd-MM-yyyy'), 'Alle', 'K5', 'K7',
- parsedatetime('01-12-2021', 'dd-MM-yyyy'),parsedatetime('02-12-2021', 'dd-MM-yyyy'),parsedatetime('03-12-2021', 'dd-MM-yyyy'),parsedatetime('04-12-2021', 'dd-MM-yyyy'),parsedatetime('9-12-2021', 'dd-MM-yyyy'));
+ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (gen_random_uuid(), true, false, 'Gerätewettkampf', 'Bonstetteten', 'Im Schachen', 'TSV Bonstetten',
+ To_TimeStamp('15-5-2022', 'dd-MM-yyyy'), To_TimeStamp('15-5-2022', 'dd-MM-yyyy'), 'Alle', 'K5', 'K7',
+ To_TimeStamp('01-12-2021', 'dd-MM-yyyy'),To_TimeStamp('02-12-2021', 'dd-MM-yyyy'),To_TimeStamp('03-12-2021', 'dd-MM-yyyy'),To_TimeStamp('04-12-2021', 'dd-MM-yyyy'),To_TimeStamp('9-12-2021', 'dd-MM-yyyy'));
 
 INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
-ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (random_uuid(), true, false, 'Gerätewettkampf', 'Stammertal', '', 'TV Stammertal',
- parsedatetime('21-5-2022', 'dd-MM-yyyy'), parsedatetime('22-5-2022', 'dd-MM-yyyy'), 'Alle', 'K1', 'K4',
- parsedatetime('01-12-2021', 'dd-MM-yyyy'),parsedatetime('02-12-2021', 'dd-MM-yyyy'),parsedatetime('03-12-2021', 'dd-MM-yyyy'),parsedatetime('4-12-2021', 'dd-MM-yyyy'),parsedatetime('30-01-2022', 'dd-MM-yyyy'));
+ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (gen_random_uuid(), true, false, 'Gerätewettkampf', 'Stammertal', '', 'TV Stammertal',
+ To_TimeStamp('21-5-2022', 'dd-MM-yyyy'), To_TimeStamp('22-5-2022', 'dd-MM-yyyy'), 'Alle', 'K1', 'K4',
+ To_TimeStamp('01-12-2021', 'dd-MM-yyyy'),To_TimeStamp('02-12-2021', 'dd-MM-yyyy'),To_TimeStamp('03-12-2021', 'dd-MM-yyyy'),To_TimeStamp('4-12-2021', 'dd-MM-yyyy'),To_TimeStamp('30-01-2022', 'dd-MM-yyyy'));
 
 INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
-ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (random_uuid(), true, false, 'Geräteturnerinnen%tage', 'Niederhasli', 'Niederhasli', 'DR Niederhasli',
- parsedatetime('9-7-2022', 'dd-MM-yyyy'), parsedatetime('10-7-2022', 'dd-MM-yyyy'), 'Ti', 'K1', 'K7',
- parsedatetime('01-12-2021', 'dd-MM-yyyy'),parsedatetime('7-12-2021', 'dd-MM-yyyy'),parsedatetime('8-12-2021', 'dd-MM-yyyy'),parsedatetime('1-7-2022', 'dd-MM-yyyy'),parsedatetime('5-7-2022', 'dd-MM-yyyy'));
+ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (gen_random_uuid(), true, false, 'Geräteturnerinnen%tage', 'Niederhasli', 'Niederhasli', 'DR Niederhasli',
+ To_TimeStamp('9-7-2022', 'dd-MM-yyyy'), To_TimeStamp('10-7-2022', 'dd-MM-yyyy'), 'Ti', 'K1', 'K7',
+ To_TimeStamp('01-12-2021', 'dd-MM-yyyy'),To_TimeStamp('7-12-2021', 'dd-MM-yyyy'),To_TimeStamp('8-12-2021', 'dd-MM-yyyy'),To_TimeStamp('1-7-2022', 'dd-MM-yyyy'),To_TimeStamp('5-7-2022', 'dd-MM-yyyy'));
 
 INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
-ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (random_uuid(), true, false, 'Kant. Geräte%meisterschaften', 'offen', '', '',
- parsedatetime('27-08-2022', 'dd-MM-yyyy'), parsedatetime('28-08-2022', 'dd-MM-yyyy'), 'Alle', 'K1', 'K4',
- parsedatetime('01-12-2021', 'dd-MM-yyyy'),parsedatetime('8-12-2021', 'dd-MM-yyyy'),parsedatetime('1-8-2022', 'dd-MM-yyyy'),parsedatetime('20-08-2022', 'dd-MM-yyyy'),parsedatetime('25-08-2022', 'dd-MM-yyyy'));
+ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (gen_random_uuid(), true, false, 'Kant. Geräte%meisterschaften', 'offen', '', '',
+ To_TimeStamp('27-08-2022', 'dd-MM-yyyy'), To_TimeStamp('28-08-2022', 'dd-MM-yyyy'), 'Alle', 'K1', 'K4',
+ To_TimeStamp('01-12-2021', 'dd-MM-yyyy'),To_TimeStamp('8-12-2021', 'dd-MM-yyyy'),To_TimeStamp('1-8-2022', 'dd-MM-yyyy'),To_TimeStamp('20-08-2022', 'dd-MM-yyyy'),To_TimeStamp('25-08-2022', 'dd-MM-yyyy'));
 
  INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
- ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (random_uuid(), true, false, 'Kant. Geräte%meisterschaften', 'Regensdorf', 'Wisacher', 'TV Regensdorf',
- parsedatetime('11-09-2022', 'dd-MM-yyyy'), parsedatetime('11-09-2022', 'dd-MM-yyyy'), 'Alle', 'K5', 'K7',
- parsedatetime('01-12-2021', 'dd-MM-yyyy'),parsedatetime('31-07-2022', 'dd-MM-yyyy'),parsedatetime('24-08-2022', 'dd-MM-yyyy'),parsedatetime('3-09-2022', 'dd-MM-yyyy'),parsedatetime('7-09-2022', 'dd-MM-yyyy'));
+ ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (gen_random_uuid(), true, false, 'Kant. Geräte%meisterschaften', 'Regensdorf', 'Wisacher', 'TV Regensdorf',
+ To_TimeStamp('11-09-2022', 'dd-MM-yyyy'), To_TimeStamp('11-09-2022', 'dd-MM-yyyy'), 'Alle', 'K5', 'K7',
+ To_TimeStamp('01-12-2021', 'dd-MM-yyyy'),To_TimeStamp('31-07-2022', 'dd-MM-yyyy'),To_TimeStamp('24-08-2022', 'dd-MM-yyyy'),To_TimeStamp('3-09-2022', 'dd-MM-yyyy'),To_TimeStamp('7-09-2022', 'dd-MM-yyyy'));
 
 create table ORGANISATION_ANLASS_LINK
 (
-    ID            	uuid          default random_uuid(),
+    ID            	uuid          default  gen_random_uuid(),
     AKTIV         	BOOLEAN,
     DELETED       	BOOLEAN,
     CHANGE_DATE   	TIMESTAMP(6),
@@ -246,7 +247,7 @@ CREATE INDEX idx_ORGANISATION_ANLASS_LINK_PERSON_ID ON ORGANISATION_ANLASS_LINK 
 
 create table TEILNEHMER
 (
-    ID            uuid          default random_uuid(),
+    ID            uuid          default  gen_random_uuid(),
     AKTIV         BOOLEAN,
     DELETED       BOOLEAN,
     CHANGE_DATE   TIMESTAMP(6),
@@ -277,7 +278,7 @@ CREATE INDEX idx_TEILNEHMER_DIRTY ON TEILNEHMER (DIRTY);
 
 create table TEILNEHMER_ANLASS_LINK
 (
-    ID            	uuid          default random_uuid(),
+    ID            	uuid          default  gen_random_uuid(),
     AKTIV         	BOOLEAN,
     DELETED       	BOOLEAN,
     CHANGE_DATE   	TIMESTAMP(6),
@@ -301,7 +302,7 @@ CREATE INDEX idx_TEILNEHMER_ANLASS_LINK_ANLASS_ID ON TEILNEHMER_ANLASS_LINK (ANL
 
 create table PERSON_ANLASS_LINK
 (
-    ID            	uuid          default random_uuid(),
+    ID            	uuid          default  gen_random_uuid(),
     AKTIV         	BOOLEAN,
     DELETED       	BOOLEAN,
     CHANGE_DATE   	TIMESTAMP(6),
@@ -326,7 +327,7 @@ CREATE INDEX idx_PERSON_ANLASS_LINK_ANLASS_ID ON PERSON_ANLASS_LINK (ANLASS_ID);
 
 create table WERTUNGSRICHTER_SLOT
 (
-    ID            	uuid          default random_uuid(),
+    ID            	uuid          default gen_random_uuid(),
     AKTIV         	BOOLEAN,
     DELETED       	BOOLEAN,
     CHANGE_DATE   	TIMESTAMP(6),
@@ -351,7 +352,7 @@ CREATE INDEX idx_WERTUNGSRICHTER_SLOT_ANLASS_ID ON WERTUNGSRICHTER_SLOT (ANLASS_
 
 create table WERTUNGSRICHTER_EINSATZ
 (
-    ID            	uuid          default random_uuid(),
+    ID            	uuid          default gen_random_uuid(),
     AKTIV         	BOOLEAN,
     DELETED       	BOOLEAN,
     CHANGE_DATE   	TIMESTAMP(6),
