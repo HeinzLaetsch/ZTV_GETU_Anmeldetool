@@ -34,6 +34,8 @@
           },
           "configurations": {
             "development": {
+              "baseHref": "/ztv-anmeldetool/",
+              "deployUrl": "/ztv-anmeldetool/",
               "optimization": false,
               "sourceMap": true,
               "namedChunks": true,
@@ -60,6 +62,8 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
+              "baseHref": "/ztv-anmeldetool/",
+              "deployUrl": "/ztv-anmeldetool/",
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,

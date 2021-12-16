@@ -5,12 +5,18 @@ server:
 spring:
   profiles:
     active: "prod"
+  flyway:
+    locations: ["classpath:/db/migration"]
+    clean-on-validation-error: true
+    username: postgres
+    password: getu@ztv
+
   jpa:
      database-platform: org.hibernate.dialect.PostgreSQLDialect
      show-sql: "false"
      
   datasource:
-    url: jdbc:postgresql://db:5432/getu-wettkaempfe
+    url: jdbc:postgresql://db:5432/getuwettkaempfe
     username: postgres
     password: getu@ztv
      
