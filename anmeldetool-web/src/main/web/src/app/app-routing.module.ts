@@ -39,7 +39,13 @@ const routes: Routes = [
 // loadChildren: "./verein/teilnehmer.module#TeilnehmerModule",
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [
+    RouterModule.forRoot(routes, {
+      enableTracing: false,
+      useHash: true,
+      relativeLinkResolution: "legacy",
+    }),
+  ],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}
