@@ -4,13 +4,13 @@ server:
     context-path: /
 spring:
   profiles:
-    active: "prod"
+    active: "local"
   jpa:
      database-platform: org.hibernate.dialect.PostgreSQLDialect
      show-sql: "false"
      
   datasource:
-    url: jdbc:postgresql://db:5432/getu-wettkaempfe
+    url: jdbc:postgresql://localhost:5432/getu-wettkaempfe
     username: postgres
     password: getu@ztv
      

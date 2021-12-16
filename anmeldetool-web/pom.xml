@@ -26,7 +26,7 @@
                             <goal>install-node-and-npm</goal>
                         </goals>
                     </execution>
-                    <execution>
+                    <!-- execution>
                         <id>Popper.js install</id>
                         <goals>
                             <goal>npm</goal>
@@ -34,8 +34,8 @@
                         <configuration>
                             <arguments>install @popperjs/core</arguments>
                         </configuration>
-                    </execution>
-                    <execution>
+                    </execution-->
+                    <!-- execution>
                         <id>jQuery install</id>
                         <goals>
                             <goal>npm</goal>
@@ -50,16 +50,16 @@
                             <goal>npm</goal>
                         </goals>
                         <configuration>
-                            <arguments>install toastr --save</arguments>
+                            <arguments>install toastr -save</arguments>
                         </configuration>
-                    </execution>
-                    <execution>
+                    </execution-->
+                    <!--  execution>
                         <id>NGBootstrap install</id>
                         <goals>
                             <goal>npm</goal>
                         </goals>
                         <configuration>
-                            <arguments>install --save @ng-bootstrap/ng-bootstrap</arguments>
+                            <arguments>install -save @ng-bootstrap/ng-bootstrap</arguments>
                         </configuration>
                     </execution>
                     <execution>
@@ -70,7 +70,7 @@
                         <configuration>
                             <arguments>install bootstrap</arguments>
                         </configuration>
-                    </execution>
+                    </execution-->
                     <execution>
                         <id>npm install</id>
                         <goals>
