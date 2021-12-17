@@ -1,16 +1,13 @@
-import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { IRolle } from '../../model/IRolle';
-import { IUser } from '../../model/IUser';
-import { RoleEnum } from '../auth/role.enum';
-import { RoleService } from '../role/role.service';
+import { Injectable } from "@angular/core";
+import { BehaviorSubject, Observable } from "rxjs";
+import { IRolle } from "../../model/IRolle";
+import { IUser } from "../../model/IUser";
+import { RoleService } from "../role/role.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
-
 export class CachingRoleService {
-
   private rolesLoaded: BehaviorSubject<boolean>;
 
   private _loadRunning = false;
@@ -33,14 +30,14 @@ export class CachingRoleService {
 
   loadRoles(): Observable<boolean> {
     // console.log('Roles loadRoles');
-    if(!this._loadRunning && !this.loaded) {
+    if (!this._loadRunning && !this.loaded) {
       this._loadRunning = true;
-      this.roleService.getRoles().subscribe( roles => {
+      this.roleService.getRoles().subscribe((roles) => {
         this.roles = roles;
         this._loadRunning = false;
-        this.loaded = true
+        this.loaded = true;
         this.rolesLoaded.next(true);
-        console.log('Roles Loaded');
+        // console.log('Roles Loaded');
       });
     } else {
       if (this.loaded) {
@@ -52,9 +49,9 @@ export class CachingRoleService {
 
   getRoles(): IRolle[] {
     if (this.loaded) {
-      return this.roles.filter( role => {
+      return this.roles.filter((role) => {
         // console.log('Rolle: ', role);
-        return (role.name !== 'ADMINISTRATOR' && role.name !== 'BENUTZER')
+        return role.name !== "ADMINISTRATOR" && role.name !== "BENUTZER";
       });
     }
     return undefined;

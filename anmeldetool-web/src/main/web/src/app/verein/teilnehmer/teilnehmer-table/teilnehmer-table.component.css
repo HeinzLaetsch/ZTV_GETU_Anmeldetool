@@ -23,6 +23,13 @@
   overflow: auto;
   max-height: 70vh;
 }
+.opacity_03 {
+  opacity: 0.3;
+}
+.opacity_10 {
+  opacity: 1;
+}
+
 .mat-row {
   min-height: 30px;
 }

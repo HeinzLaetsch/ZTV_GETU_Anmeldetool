@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { FormGroup } from "@angular/forms";
 import { Subscription } from "rxjs";
 import { IRolle } from "src/app/core/model/IRolle";
 import { IUser } from "src/app/core/model/IUser";
@@ -46,7 +45,7 @@ export class UserFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('Current User: ' , this.currentUser);
+    // console.log("Current User: ", this.currentUser);
     if (this.currentUser.id && this.currentUser.id.length > 0) {
       this.reloadRoles(this.currentUser);
       this.userValid = true;
@@ -66,18 +65,18 @@ export class UserFormComponent implements OnInit {
   private reloadRoles(user: IUser) {
     let localSubscription2: Subscription = undefined;
     if (user.id && user.id.length > 0) {
-      console.log('user.id is valid');
+      // console.log("user.id is valid");
       localSubscription2 = this.roleService
-      .getRolesForUser(user)
-      .subscribe((result) => {
-        this._assignedRoles = result;
-        console.log("RoleFormComponent:: ngOnInit: ", this._assignedRoles);
-        if (localSubscription2) {
-          localSubscription2.unsubscribe();
-        }
-      });
+        .getRolesForUser(user)
+        .subscribe((result) => {
+          this._assignedRoles = result;
+          // console.log("RoleFormComponent:: ngOnInit: ", this._assignedRoles);
+          if (localSubscription2) {
+            localSubscription2.unsubscribe();
+          }
+        });
     } else {
-      console.log('user.id not valid');
+      console.log("user.id not valid");
       this._assignedRoles = new Array<IRolle>();
     }
   }
@@ -87,7 +86,10 @@ export class UserFormComponent implements OnInit {
   }
 
   isOwner() {
-    if(this.currentUser.benutzername === this.authService.currentUser.benutzername) {
+    if (
+      this.currentUser.benutzername ===
+      this.authService.currentUser.benutzername
+    ) {
       return true;
     }
     return false;
@@ -125,7 +127,7 @@ export class UserFormComponent implements OnInit {
     return this._assignedRoles;
   }
   set assignedRoles(value: IRolle[]) {
-    console.log("Set assignedRoles: ", value);
+    // console.log("Set assignedRoles: ", value);
     this.rolesChanged = true;
     this._assignedRoles = value;
   }
@@ -135,7 +137,7 @@ export class UserFormComponent implements OnInit {
     return this.currentUser;
   }
   set user(value: IUser) {
-    console.log("Set user: ", value);
+    // console.log("Set user: ", value);
     this.userChanged = true;
     this.currentUser = value;
   }
@@ -154,6 +156,7 @@ export class UserFormComponent implements OnInit {
   }
 
   save(): void {
+    /*
     console.log(
       "this.userChanged: ",
       this.userChanged,
@@ -161,7 +164,7 @@ export class UserFormComponent implements OnInit {
       this.wrChanged,
       " ,this.userValid: ",
       this.userValid
-    );
+    );*/
 
     if (this.currentUser.id) {
       if (this.userChanged && this.userValid) {

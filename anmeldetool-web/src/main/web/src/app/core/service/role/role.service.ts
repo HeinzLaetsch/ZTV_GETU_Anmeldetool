@@ -16,7 +16,7 @@ export class RoleService {
   constructor(private http: HttpClient) {}
 
   getRoles(): Observable<IRolle[]> {
-    console.log("getRoles called");
+    // console.log("getRoles called");
     const params = new HttpParams().set("userId", "");
     return this.http
       .get<IRolle[]>(this.url, { params })
@@ -24,7 +24,7 @@ export class RoleService {
   }
 
   getRolesForUser(user: IUser): Observable<IRolle[]> {
-    console.log("getRolesForUser called");
+    // console.log("getRolesForUser called");
     const params = new HttpParams().set("userId", user.id);
     return this.http
       .get<IRolle[]>(this.url, { params })

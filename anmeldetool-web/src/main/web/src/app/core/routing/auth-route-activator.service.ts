@@ -9,9 +9,9 @@ export class AuthRouteActivatorService {
   constructor(public authService: AuthService, private router: Router) {}
 
   canActivate(route: ActivatedRouteSnapshot) {
-    console.log("check Auth");
+    // console.log("check Auth");
     const isAuthenticated = this.authService.isAuthenticated();
-    console.log("canActivate ", isAuthenticated);
+    // console.log("canActivate ", isAuthenticated);
     if (!isAuthenticated) {
       this.router.navigate(["/"]);
     }

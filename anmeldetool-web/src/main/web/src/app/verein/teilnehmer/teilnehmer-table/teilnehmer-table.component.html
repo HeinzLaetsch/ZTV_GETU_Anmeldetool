@@ -95,7 +95,12 @@
           anlass.anlassBezeichnung + anlass.tiTu + anlass.tiefsteKategorie
         "
       >
-        <mat-header-cell *matHeaderCellDef mat-sort-header class="kategorie">
+        <mat-header-cell
+          *matHeaderCellDef
+          mat-sort-header
+          class="kategorie"
+          [ngClass]="getStatusClass(anlass)"
+        >
           <div class="rotate">
             <span> {{ anlass.anlassBezeichnung.replace("%", "-") }}</span>
           </div>

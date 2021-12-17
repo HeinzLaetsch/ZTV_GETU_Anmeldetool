@@ -1,10 +1,21 @@
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import { IRolle } from 'src/app/core/model/IRolle';
-import { IUser } from 'src/app/core/model/IUser';
-import { CachingRoleService } from 'src/app/core/service/caching-services/caching.role.service';
+import {
+  CdkDragDrop,
+  moveItemInArray,
+  transferArrayItem,
+} from "@angular/cdk/drag-drop";
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from "@angular/core";
+import { Subscription } from "rxjs";
+import { IRolle } from "src/app/core/model/IRolle";
+import { IUser } from "src/app/core/model/IUser";
+import { CachingRoleService } from "src/app/core/service/caching-services/caching.role.service";
 
 @Component({
   selector: "app-role",
@@ -31,12 +42,11 @@ export class RoleFormComponent implements OnInit, OnChanges {
   assignedRolesDirty = false;
   assignedRolesChanged = false;
 
-  constructor(private roleService: CachingRoleService) {
-  }
+  constructor(private roleService: CachingRoleService) {}
 
   ngOnInit(): void {
     let localSubscription: Subscription = undefined;
-    localSubscription =  this.roleService.loadRoles().subscribe( result => {
+    localSubscription = this.roleService.loadRoles().subscribe((result) => {
       this._allRoles = this.roleService.getRoles();
       // console.log('RoleFormComponent:: ngOnInit: ' , this._allRoles);
       if (localSubscription) {
@@ -44,10 +54,8 @@ export class RoleFormComponent implements OnInit, OnChanges {
       }
     });
     // this.reloadRoles(this.currentUser);
-    console.log('RoleFormComponent:: ngOnInit: ' , this.assignedRoles);
+    // console.log('RoleFormComponent:: ngOnInit: ' , this.assignedRoles);
   }
-
-
 
   ngOnChanges(changes: SimpleChanges) {
     for (const propName in changes) {
@@ -66,15 +74,20 @@ export class RoleFormComponent implements OnInit, OnChanges {
 
   get allRoles(): IRolle[] {
     if (this.assignedRoles && this._allRoles) {
-      return this._allRoles.filter( value => {
-        if (!this.isVereinsVerantwortlicher && value.name === 'VEREINSVERANTWORTLICHER') {
+      return this._allRoles.filter((value) => {
+        if (
+          !this.isVereinsVerantwortlicher &&
+          value.name === "VEREINSVERANTWORTLICHER"
+        ) {
           // console.log('this.isVereinsVerantwortlicher: ' , this.isVereinsVerantwortlicher , value, ' , ');
           return false;
         }
-        const notFound =  this.assignedRoles.find(search => search.name === value.name ) === undefined;
+        const notFound =
+          this.assignedRoles.find((search) => search.name === value.name) ===
+          undefined;
         // console.log('this.isVereinsVerantwortlicher: ' , this.isVereinsVerantwortlicher ,'  notFound: ' , notFound , value, ' , ');
         return notFound;
-      })
+      });
     }
     return this._allRoles;
   }
@@ -86,7 +99,10 @@ export class RoleFormComponent implements OnInit, OnChanges {
     if (!this.isVereinsAnmelder) {
       return true;
     }
-    if (role.name === 'VEREINSVERANTWORTLICHER' && !this.isVereinsVerantwortlicher) {
+    if (
+      role.name === "VEREINSVERANTWORTLICHER" &&
+      !this.isVereinsVerantwortlicher
+    ) {
       return true;
     }
     return false;
@@ -101,19 +117,30 @@ export class RoleFormComponent implements OnInit, OnChanges {
   }
 */
   drop(event: CdkDragDrop<string[]>) {
-    console.log('Drop: ' , event);
+    console.log("Drop: ", event);
     if (event.previousContainer === event.container) {
-      console.log('move Drop: ' , event);
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      console.log("move Drop: ", event);
+      moveItemInArray(
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
     } else {
-      console.log('Transfer Drop: ' , event);
+      console.log("Transfer Drop: ", event);
       this.assignedRolesDirty = true;
-      transferArrayItem(event.previousContainer.data,
-                        event.container.data,
-                        event.previousIndex,
-                        event.currentIndex);
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
       this.assignedRoles[event.currentIndex].aktiv = true;
-      console.log('Current Index: ' , event.currentIndex, ' , Data: ' , event.container.data[event.currentIndex])
+      console.log(
+        "Current Index: ",
+        event.currentIndex,
+        " , Data: ",
+        event.container.data[event.currentIndex]
+      );
       this.assignedRolesChange.emit(this.assignedRoles);
     }
   }

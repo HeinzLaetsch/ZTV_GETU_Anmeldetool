@@ -125,6 +125,14 @@ export class TeilnehmerTableComponent implements AfterViewInit {
         this.loadTeilnahmen(true);
       });
   }
+
+  getStatusClass(anlass: IAnlass): string {
+    if (this.isChangesDisabled(anlass)) {
+      return "opacity_03";
+    } else {
+      return "opacity_10";
+    }
+  }
   private loadTeilnahmen(createControl: boolean) {
     this.checked = new Array();
     let currentAnlass = 0;
@@ -143,7 +151,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       this.anlassService
         .getVereinStart(anlass, this.authService.currentVerein)
         .subscribe((result) => {
-          console.log("getVereinStart Result is: ", result);
+          // console.log("getVereinStart Result is: ", result);
           this.checked.push(result);
           const isLast = currentAnlass++ === this.anlaesse.length - 1;
           this.teilnahmenloader(anlass, isLast);
@@ -151,7 +159,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     });
   }
   public resetDataSource() {
-    console.log("resetDataSource");
+    // console.log("resetDataSource");
     this.dataSource.reset(this.authService.currentVerein);
     this.paginator.firstPage();
   }
@@ -389,7 +397,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     });
   }
   loadTeilnehmerPage() {
-    console.log("Load Teilnehmer Page");
+    // console.log("Load Teilnehmer Page");
     this.dataSource.loading$.subscribe((result) => {
       this.populateTeilnehmer(
         this.dataSource.loadTeilnehmer(this.filterValue, this.tiTu)
@@ -400,7 +408,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     let i = 0;
     this.populating = true;
     allTeilnehmer.forEach((teilnehmer) => {
-      console.log("populateTeilnehmer");
+      // console.log("populateTeilnehmer");
       this.teilnehmerControls[i][0].setValue(teilnehmer.name);
       this.teilnehmerControls[i][1].setValue(teilnehmer.vorname);
       this.teilnehmerControls[i][2].setValue(teilnehmer.jahrgang);
