@@ -5,6 +5,7 @@ import { catchError } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
 import { environment } from "src/environments/environment";
 import { ITeilnehmer } from "../../model/ITeilnehmer";
+import { TiTuEnum } from "../../model/TiTuEnum";
 
 @Injectable({
   providedIn: "root",
@@ -55,12 +56,15 @@ export class TeilnehmerService {
       .subscribe((anzahl) => (this._anzahlTeilnehmer = anzahl));
   }
 
-  add(verein: IVerein): Observable<ITeilnehmer> {
+  add(verein: IVerein, titu: TiTuEnum): Observable<ITeilnehmer> {
     console.log("add Verein called");
     this._anzahlTeilnehmer++;
     const combinedUrl = this.url + verein.id + "/teilnehmer";
+    const teilnehmer = {
+      tiTu: titu === TiTuEnum.Ti ? "Ti" : "Tu",
+    };
     return this.http
-      .post<ITeilnehmer>(combinedUrl, {})
+      .post<ITeilnehmer>(combinedUrl, teilnehmer)
       .pipe(catchError(this.handleError<ITeilnehmer>("add")));
   }
 
