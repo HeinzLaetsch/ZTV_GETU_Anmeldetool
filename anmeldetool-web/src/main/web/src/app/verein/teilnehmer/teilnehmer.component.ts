@@ -3,6 +3,7 @@ import { FormBuilder } from "@angular/forms";
 import { MatTabGroup } from "@angular/material/tabs";
 import { Router } from "@angular/router";
 import { Observable } from "rxjs";
+import { tap } from "rxjs/operators";
 import { IUser } from "src/app/core/model/IUser";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
@@ -58,7 +59,11 @@ export class TeilnehmerComponent implements OnInit {
 
   get isTeilnehmerLoaded(): Observable<number> {
     // console.log('TeilnehmerComponent::isTeilnehmerLoaded')
-    return this.teilnehmerService.isTeilnehmerLoaded();
+    return this.teilnehmerService.isTeilnehmerLoaded().pipe(
+      tap((evt) => {
+        console.info("Evt: ", evt);
+      })
+    );
   }
   isVereinsVerantwortlicher(): boolean {
     return true;

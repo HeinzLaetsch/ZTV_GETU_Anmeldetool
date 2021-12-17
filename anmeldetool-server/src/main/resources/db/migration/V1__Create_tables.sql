@@ -1,5 +1,6 @@
 CREATE EXTENSION pgcrypto;
 
+
 -- create table CONFIG
 --(
 --    ID          int          not null,

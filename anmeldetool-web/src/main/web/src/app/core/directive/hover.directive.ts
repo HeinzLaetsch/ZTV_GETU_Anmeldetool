@@ -25,9 +25,9 @@ export class HoverOverDirective implements OnChanges {
   @HostListener("mouseenter") onMouseEnter() {
     if (!this.status.hasStatus(AnzeigeStatusEnum.PUBLISHED)) {
       this.setStyles(
-        "var(--ztv-white)",
-        "var(--ztv-warning)",
-        "1px solid var(--ztv-warning)"
+        "var(---ztv-black)",
+        "var(--ztv-lighter-gray)",
+        "1px solid var(--ztv-light-gray)"
       );
     } else {
       this.setStyles(
@@ -44,7 +44,7 @@ export class HoverOverDirective implements OnChanges {
 
   private noMouse() {
     if (!this.status.hasStatus(AnzeigeStatusEnum.PUBLISHED)) {
-      this.setStyles("var(--ztv-warning)", "var(--ztv-white)", "");
+      this.setStyles("var(--ztv-lighter-gray)", "var(---ztv-black)", "");
     } else {
       this.setStyles("var(--ztv-blue)", "var(--ztv-white)", "");
     }
