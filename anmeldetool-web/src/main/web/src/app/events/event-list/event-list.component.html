@@ -2,7 +2,7 @@
 <h1>ZTV Anlässe</h1>
 <hr />
 <div class="row">
-  <div *ngFor="let anlass of anlaesse" class="col-md-4">
+  <div *ngFor="let anlass of anlaesse" class="col-md-auto">
     <!--(click)="handleThumbnailClick(event.name)"-->
     <!-- (eventClick)="handleEventClicked($event)"für was-->
     <app-event-thumbnail #thumbnail [anlass]="anlass"></app-event-thumbnail>

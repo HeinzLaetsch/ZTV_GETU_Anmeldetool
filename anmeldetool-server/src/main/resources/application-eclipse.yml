@@ -4,7 +4,12 @@ server:
     context-path: /
 spring:
   profiles:
-    active: "local"
+    active: "eclipse"
+  flyway:
+    locations: ["classpath:/db/migration"]
+    clean-on-validation-error: true
+    username: postgres
+    password: adrian2000
   jpa:
      database-platform: org.hibernate.dialect.PostgreSQLDialect
      show-sql: "false"
@@ -12,7 +17,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/getuwettkaempfe
     username: postgres
-    password: getu@ztv
+    password: adrian2000
      
 # this info may be accessed via actuator
 info:

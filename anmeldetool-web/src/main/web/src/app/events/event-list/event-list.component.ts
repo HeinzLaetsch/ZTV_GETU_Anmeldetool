@@ -1,12 +1,10 @@
 import { Component, EventEmitter, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { IEvent } from "../shared";
-import { EventService } from "src/app/core/service/event/event.service";
-import { ToastrService } from "src/app/core/service/toastr/toastr.service";
-import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
-import { BehaviorSubject, Observable, of, Subscription } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
+import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
+import { ToastrService } from "src/app/core/service/toastr/toastr.service";
 
 @Component({
   selector: "app-event-list",
@@ -31,7 +29,7 @@ export class EventListComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log("TeilnehmerTableComponent:: ngOnInit: ", this.anlaesse);
+    // console.log("TeilnehmerTableComponent:: ngOnInit: ", this.anlaesse);
     // this.events = this.router.snapshot.data.events;
     // this.events = this.eventService.getEvents().subscribe(events => {this.events = events; });
     let localSubscription2: Subscription = undefined;
@@ -48,7 +46,7 @@ export class EventListComponent implements OnInit {
       });
     this.anlassService.isAnlaesseLoaded().subscribe((result) => {
       if (result) {
-        console.log("now loaded");
+        // console.log("now loaded");
         this.loaded = true;
         this.localAdresseEmitter.emit(true);
       }

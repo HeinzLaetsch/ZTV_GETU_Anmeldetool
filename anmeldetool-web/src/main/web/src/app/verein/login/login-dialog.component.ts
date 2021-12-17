@@ -45,7 +45,7 @@ export class LoginDialogComponent implements OnInit {
 
   login() {
     this.loginError = false;
-    console.log("Login: ", this.vwUserNameControl.value);
+    // console.log("Login: ", this.vwUserNameControl.value);
     try {
       const self = this;
       this.authService
@@ -56,7 +56,7 @@ export class LoginDialogComponent implements OnInit {
         )
         .subscribe({
           next(data) {
-            console.log("Response: ", data);
+            // console.log("Response: ", data);
             self.dialogRef.close("OK");
             self.loginError = false;
             self.userService.loadUser().subscribe((result) => {

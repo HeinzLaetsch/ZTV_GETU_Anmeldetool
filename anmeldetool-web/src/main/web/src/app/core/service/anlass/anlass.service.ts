@@ -20,7 +20,7 @@ export class AnlassService {
   constructor(private http: HttpClient) {}
 
   getAnlaesse(): Observable<IAnlass[]> {
-    console.log("getAnlaesse called");
+    // console.log("getAnlaesse called");
     return this.http.get<IAnlass[]>(this.url).pipe(
       map((anlaesse) => {
         return anlaesse.map((value) => {

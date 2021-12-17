@@ -28,7 +28,7 @@ export class AuthService {
     private vereinService: CachingVereinService,
     private userService: CachingUserService
   ) {
-    console.info("Service created");
+    // console.info("Service created");
     this.token = "undefined";
   }
 
@@ -40,11 +40,11 @@ export class AuthService {
   }
 
   createVereinAndUser(verein: IVerein, user: IUser): Observable<IUser> {
-    console.log("Verein 1: ", verein);
+    // console.log("Verein 1: ", verein);
     const emitter: EventEmitter<IUser> = new EventEmitter();
     this.http.post<IVerein>(this.VereineUrl, verein).subscribe((verein) => {
       this.currentVerein = verein;
-      console.log("Verein 2: ", verein);
+      // console.log("Verein 2: ", verein);
       user.organisationid = verein.id;
       this.vereinService
         .reset()
@@ -73,7 +73,7 @@ export class AuthService {
     const emitter: EventEmitter<IUser> = new EventEmitter();
     this.http.patch<IUser>(this.userUrl, user).subscribe((user) => {
       this.currentUser = user;
-      console.log("User: ", user);
+      // console.log("User: ", user);
       emitter.emit(user);
     });
     return emitter.asObservable();
@@ -92,13 +92,13 @@ export class AuthService {
     const emitter: EventEmitter<IUser> = new EventEmitter();
     this.http.post<IUser>(this.loginUrl, loginData).subscribe(
       (user) => {
-        console.log("Response: ", user);
+        // console.log("Response: ", user);
         this.currentUser = user;
         this.currentVerein = this.vereinService.getVereinById(
           user.organisationid
         );
         this.userService.loadUser().subscribe((result) => {
-          console.log("Users loaded: ", result);
+          // console.log("Users loaded: ", result);
         });
         emitter.emit(user);
       },

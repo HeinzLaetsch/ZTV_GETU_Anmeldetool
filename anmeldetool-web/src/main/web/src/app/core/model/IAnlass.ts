@@ -86,7 +86,7 @@ export class IAnlass {
   // Anlass nicht anzeigen oder sperren kein Org
   set published(published: boolean) {
     this.published_ = published;
-    console.log("Published gesetzt: ", published);
+    // console.log("Published gesetzt: ", published);
     this.updateAnzeigeStatus();
   }
   get published(): boolean {

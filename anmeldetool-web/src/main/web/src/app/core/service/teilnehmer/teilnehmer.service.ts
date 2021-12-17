@@ -27,7 +27,7 @@ export class TeilnehmerService {
     pageIndex = 0,
     pageSize = 3
   ): Observable<ITeilnehmer[]> {
-    console.log("getTeilnehmer called");
+    // console.log("getTeilnehmer called");
     this.updateCount(verein, filter);
     const combinedUrl =
       this.url +

@@ -40,7 +40,7 @@ export class CachingUserService {
         this._loadRunning = false;
         this.loaded = true;
         this.usersLoaded.next(true);
-        console.log("User Loaded");
+        // console.log("User Loaded");
       });
     } else {
       if (this.loaded) {
@@ -52,11 +52,11 @@ export class CachingUserService {
 
   private copyUsers(users: IUser[]): IUser[] {
     return users.map((user) => {
-      console.log("Orginal 1: ", user);
+      // console.log("Orginal 1: ", user);
       const userCopy: IUser = Object.assign(user);
       userCopy.benutzername = userCopy.benutzername + "_copy";
-      console.log("Clone: ", userCopy);
-      console.log("Orginal 2: ", user);
+      // console.log("Clone: ", userCopy);
+      // console.log("Orginal 2: ", user);
       if (user.rollen) {
         const rolesCopy = user.rollen.map((role) => {
           const roleCopy = Object.assign(role);

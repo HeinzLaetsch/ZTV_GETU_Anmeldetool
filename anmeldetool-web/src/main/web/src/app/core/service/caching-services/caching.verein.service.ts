@@ -31,18 +31,18 @@ export class CachingVereinService {
         this.vereine = vereine;
         this._loadRunning = false;
         this.loaded = true;
-        console.log("Vereine Loaded");
+        // console.log("Vereine Loaded");
         this.vereineLoaded.next(true);
-        console.log("Vereine Loaded 2");
+        // console.log("Vereine Loaded 2");
       });
     } else {
       if (this.loaded) {
-        console.log("Vereine already loaded");
+        // console.log("Vereine already loaded");
         this.vereineLoaded.next(true);
       }
     }
     this.vereineLoaded.asObservable().subscribe((result) => {
-      console.log("loadVereine : ", result);
+      // console.log("loadVereine : ", result);
       this.vereineLoaded.complete();
     });
     return this.vereineLoaded.asObservable();

@@ -43,7 +43,7 @@ export class CachingTeilnehmerService {
   }
 
   loadTeilnehmer(verein: IVerein): Observable<number> {
-    console.log("Teilnehmer Caching loadTeilnehmer: ", verein.name);
+    // console.log("Teilnehmer Caching loadTeilnehmer: ", verein.name);
     if (!this._loadRunning && !this.loaded) {
       this._loadRunning = true;
       // verein: IVerein, filter = '',  sortDirection = 'asc', pageIndex = 0, pageSize = 3
@@ -58,7 +58,7 @@ export class CachingTeilnehmerService {
           this.dirty = false;
           this.valid = true;
           this.teilnehmerLoaded.next(teilnehmer.length);
-          console.log("Teilnehmer Loaded: ", teilnehmer.length);
+          // console.log("Teilnehmer Loaded: ", teilnehmer.length);
         });
     } else {
       if (this.loaded) {

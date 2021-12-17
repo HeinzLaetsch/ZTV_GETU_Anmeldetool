@@ -1,12 +1,11 @@
-import { AfterViewInit, Component, EventEmitter, OnInit } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
-import { LoginDialogComponent } from "./verein/login/login-dialog.component";
+import { AfterViewInit, Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { ActivatedRoute } from "@angular/router";
 import { AuthService } from "./core/service/auth/auth.service";
-import { NewVereinComponent } from "./verein/new-verein/new-verein.component";
-import { NewAnmelderComponent } from "./verein/new-anmelder/new-anmelder.component";
 import { CachingVereinService } from "./core/service/caching-services/caching.verein.service";
-import { Observable } from "rxjs";
+import { LoginDialogComponent } from "./verein/login/login-dialog.component";
+import { NewAnmelderComponent } from "./verein/new-anmelder/new-anmelder.component";
+import { NewVereinComponent } from "./verein/new-verein/new-verein.component";
 
 /** @title Main Component */
 @Component({
@@ -24,15 +23,13 @@ export class AnmeldeToolComponent implements OnInit, AfterViewInit {
     public vereinService: CachingVereinService,
     private router: ActivatedRoute,
     public dialog: MatDialog
-  ) {
-    console.log("Konst");
-  }
+  ) {}
 
   fillerNav = Array.from({ length: 10 }, (_, i) => `Nav Item ${i + 1}`);
 
   ngOnInit() {
     this.vereinService.loadVereine().subscribe((result) => {
-      console.log("AnmeldeToolComponent::ngOnInit 1: ", result);
+      // console.log("AnmeldeToolComponent::ngOnInit 1: ", result);
     });
 
     if (!this.authService.isAuthenticated()) {
@@ -46,7 +43,7 @@ export class AnmeldeToolComponent implements OnInit, AfterViewInit {
   openLoginDialog() {
     this.dialogOpen = true;
 
-    console.log("Dialog open");
+    // console.log("Dialog open");
 
     let dialogRef = this.dialog.open(LoginDialogComponent, {
       height: "500px",
@@ -54,7 +51,7 @@ export class AnmeldeToolComponent implements OnInit, AfterViewInit {
       disableClose: true,
     });
     dialogRef.afterClosed().subscribe((result) => {
-      console.log("Dialog Closed", result);
+      // console.log("Dialog Closed", result);
       if (result === "OK") {
         this.dialogOpen = false;
       }

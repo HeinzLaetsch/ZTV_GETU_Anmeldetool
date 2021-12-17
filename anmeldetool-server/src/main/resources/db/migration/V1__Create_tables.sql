@@ -1,3 +1,4 @@
+CREATE EXTENSION pgcrypto;
 
 -- create table CONFIG
 --(
@@ -201,12 +202,12 @@ ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN,
  To_TimeStamp('31-12-9999', 'dd-MM-yyyy'),To_TimeStamp('30-1-2022', 'dd-MM-yyyy'),To_TimeStamp('28-2-2022', 'dd-MM-yyyy'),To_TimeStamp('3-4-2022', 'dd-MM-yyyy'),To_TimeStamp('6-4-2022', 'dd-MM-yyyy'), FALSE);
 
 INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
-ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (gen_random_uuid(), true, false, 'Gerätewettkampf', 'Bonstetteten', 'Im Schachen', 'TSV Bonstetten',
+ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (gen_random_uuid(), true, false, 'Gerätewettkampf K5-K7', 'Bonstetteten', 'Im Schachen', 'TSV Bonstetten',
  To_TimeStamp('15-5-2022', 'dd-MM-yyyy'), To_TimeStamp('15-5-2022', 'dd-MM-yyyy'), 'Alle', 'K5', 'K7',
  To_TimeStamp('01-12-2021', 'dd-MM-yyyy'),To_TimeStamp('02-12-2021', 'dd-MM-yyyy'),To_TimeStamp('03-12-2021', 'dd-MM-yyyy'),To_TimeStamp('04-12-2021', 'dd-MM-yyyy'),To_TimeStamp('9-12-2021', 'dd-MM-yyyy'));
 
 INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
-ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (gen_random_uuid(), true, false, 'Gerätewettkampf', 'Stammertal', '', 'TV Stammertal',
+ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (gen_random_uuid(), true, false, 'Gerätewettkampf K1-K4', 'Stammertal', '', 'TV Stammertal',
  To_TimeStamp('21-5-2022', 'dd-MM-yyyy'), To_TimeStamp('22-5-2022', 'dd-MM-yyyy'), 'Alle', 'K1', 'K4',
  To_TimeStamp('01-12-2021', 'dd-MM-yyyy'),To_TimeStamp('02-12-2021', 'dd-MM-yyyy'),To_TimeStamp('03-12-2021', 'dd-MM-yyyy'),To_TimeStamp('4-12-2021', 'dd-MM-yyyy'),To_TimeStamp('30-01-2022', 'dd-MM-yyyy'));
 
@@ -216,12 +217,12 @@ ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN,
  To_TimeStamp('01-12-2021', 'dd-MM-yyyy'),To_TimeStamp('7-12-2021', 'dd-MM-yyyy'),To_TimeStamp('8-12-2021', 'dd-MM-yyyy'),To_TimeStamp('1-7-2022', 'dd-MM-yyyy'),To_TimeStamp('5-7-2022', 'dd-MM-yyyy'));
 
 INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
-ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (gen_random_uuid(), true, false, 'Kant. Geräte%meisterschaften', 'offen', '', '',
+ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (gen_random_uuid(), true, false, 'Kant. Geräte%meisterschaften K1-K4', 'offen', '', '',
  To_TimeStamp('27-08-2022', 'dd-MM-yyyy'), To_TimeStamp('28-08-2022', 'dd-MM-yyyy'), 'Alle', 'K1', 'K4',
  To_TimeStamp('01-12-2021', 'dd-MM-yyyy'),To_TimeStamp('8-12-2021', 'dd-MM-yyyy'),To_TimeStamp('1-8-2022', 'dd-MM-yyyy'),To_TimeStamp('20-08-2022', 'dd-MM-yyyy'),To_TimeStamp('25-08-2022', 'dd-MM-yyyy'));
 
  INSERT INTO ANLASS (ID, AKTIV, DELETED, ANLASS_BEZEICHNUNG, ORT, HALLE, ORGANISATOR, START_DATE, END_DATE, TI_TU, TIEFSTE_KATEGORIE, HOECHSTE_KATEGORIE, 
- ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (gen_random_uuid(), true, false, 'Kant. Geräte%meisterschaften', 'Regensdorf', 'Wisacher', 'TV Regensdorf',
+ ANMELDUNG_BEGINN, ERFASSEN_GESCHLOSSEN, CROSS_KATEGORIE_AENDERUNGEN_GESCHLOSSEN, AENDERUNGEN_IN_KATEGORIE_GESCHLOSSEN, AENDERUNGEN_NICHT_MEHR_ERLAUBT) VALUES (gen_random_uuid(), true, false, 'Kant. Geräte%meisterschaften K5-K7', 'Regensdorf', 'Wisacher', 'TV Regensdorf',
  To_TimeStamp('11-09-2022', 'dd-MM-yyyy'), To_TimeStamp('11-09-2022', 'dd-MM-yyyy'), 'Alle', 'K5', 'K7',
  To_TimeStamp('01-12-2021', 'dd-MM-yyyy'),To_TimeStamp('31-07-2022', 'dd-MM-yyyy'),To_TimeStamp('24-08-2022', 'dd-MM-yyyy'),To_TimeStamp('3-09-2022', 'dd-MM-yyyy'),To_TimeStamp('7-09-2022', 'dd-MM-yyyy'));
 

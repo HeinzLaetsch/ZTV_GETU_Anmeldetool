@@ -17,7 +17,7 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   getUser(): Observable<IUser[]> {
-    console.log("getUser called");
+    // console.log("getUser called");
     return this.http
       .get<IUser[]>(this.url)
       .pipe(catchError(this.handleError<IUser[]>("getUser", [])));

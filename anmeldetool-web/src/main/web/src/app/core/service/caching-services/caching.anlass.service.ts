@@ -150,11 +150,11 @@ export class CachingAnlassService {
         this._loadRunning = false;
         this.loaded = true;
         this.anlaesseLoaded.next(true);
-        console.log("Anlaesse Loaded");
+        // console.log("Anlaesse Loaded");
       });
     } else {
       if (this.loaded) {
-        console.log("Anlaesse already loaded");
+        // console.log("Anlaesse already loaded");
         this.anlaesseLoaded.next(true);
       }
     }

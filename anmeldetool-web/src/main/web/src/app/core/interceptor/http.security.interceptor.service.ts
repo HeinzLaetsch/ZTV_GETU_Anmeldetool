@@ -3,11 +3,9 @@ import {
   HttpHandler,
   HttpInterceptor,
   HttpRequest,
-  HttpResponse,
 } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { tap } from "rxjs/operators";
 import { AuthService } from "../service/auth/auth.service";
 @Injectable()
 export class HttpSecurityInterceptorService implements HttpInterceptor {
@@ -17,6 +15,7 @@ export class HttpSecurityInterceptorService implements HttpInterceptor {
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
+    /*
     console.log(
       "Interceptor called: ",
       req.url,
@@ -24,7 +23,7 @@ export class HttpSecurityInterceptorService implements HttpInterceptor {
       req.method,
       " , ",
       req.headers
-    );
+    );*/
     let newHeaders = req.headers;
     if (this.authService.isAuthenticated()) {
       // console.log('Authenticated will add Headers');
@@ -39,7 +38,9 @@ export class HttpSecurityInterceptorService implements HttpInterceptor {
       // console.log("Dont do anything");
     }
     const authReq = req.clone({ withCredentials: true, headers: newHeaders });
-    return next.handle(authReq).pipe(
+    return next.handle(authReq);
+    /*
+    .pipe(
       tap((evt) => {
         console.info("Evt: ", evt);
         if (evt instanceof HttpResponse) {
@@ -49,6 +50,6 @@ export class HttpSecurityInterceptorService implements HttpInterceptor {
             this.authService.setToken(token);
         }
       })
-    );
+    );*/
   }
 }
