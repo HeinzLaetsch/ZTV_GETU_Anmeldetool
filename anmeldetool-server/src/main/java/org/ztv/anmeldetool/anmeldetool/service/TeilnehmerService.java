@@ -16,6 +16,7 @@ import org.ztv.anmeldetool.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.anmeldetool.models.Teilnehmer;
 import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
+import org.ztv.anmeldetool.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.anmeldetool.repositories.TeilnehmerAnlassLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.TeilnehmerRepository;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
@@ -75,9 +76,9 @@ public class TeilnehmerService {
 		return teilnehmerList;
 	}
 
-	public ResponseEntity<TeilnehmerDTO> create(UUID orgId) {
+	public ResponseEntity<TeilnehmerDTO> create(UUID orgId, TiTuEnum tiTu) {
 		TeilnehmerDTO teilnehmerDTO = TeilnehmerDTO.builder().aktiv(false).id(UUID.randomUUID()).organisationid(orgId)
-				.dirty(true).build();
+				.tiTu(tiTu).dirty(true).build();
 		return create(teilnehmerDTO);
 	}
 

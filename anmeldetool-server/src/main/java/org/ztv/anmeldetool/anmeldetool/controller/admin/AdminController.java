@@ -316,8 +316,9 @@ public class AdminController {
 	}
 
 	@PostMapping("/organisationen/{orgId}/teilnehmer")
-	public ResponseEntity<TeilnehmerDTO> addNewTeilnehmer(HttpServletRequest request, @PathVariable UUID orgId) {
-		return teilnehmerSrv.create(orgId);
+	public ResponseEntity<TeilnehmerDTO> addNewTeilnehmer(HttpServletRequest request, @PathVariable UUID orgId,
+			@RequestBody TeilnehmerDTO teilnehmerDTO) {
+		return teilnehmerSrv.create(orgId, teilnehmerDTO.getTiTu());
 	}
 
 	@PatchMapping("/organisationen/{orgId}/teilnehmer")

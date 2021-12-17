@@ -95,7 +95,7 @@ export class TeilnehmerComponent implements OnInit {
 
   addTurnerin(event: any) {
     this.needsCancel = true;
-    this.teilnehmerTable.addNewTeilnehmer();
+    this.teilnehmerTable.addNewTeilnehmer(TiTuEnum.Ti);
   }
 
   saveTeilnehmer(event: any) {
@@ -107,7 +107,7 @@ export class TeilnehmerComponent implements OnInit {
 
   addTurner(event: any) {
     this.needsCancel = true;
-    this.teilnehmerTable.addNewTeilnehmer();
+    this.teilnehmerTable.addNewTeilnehmer(TiTuEnum.Tu);
   }
 
   get disAllowSave(): boolean {

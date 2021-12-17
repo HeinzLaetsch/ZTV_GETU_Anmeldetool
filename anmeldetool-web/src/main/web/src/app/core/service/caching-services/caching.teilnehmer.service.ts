@@ -142,16 +142,8 @@ export class CachingTeilnehmerService {
     return undefined;
   }
 
-  add(verein: IVerein): Observable<ITeilnehmer> {
-    /*
-    const newTeilnehmerObs = new Subject<ITeilnehmer>();
-    this.teilnehmerService.add(verein).subscribe( teilnehmer => {
-      this.teilnehmer.push(teilnehmer);
-      this.dirty = true;
-      newTeilnehmerObs.next(teilnehmer);
-    })
-    */
-    return this.teilnehmerService.add(verein).pipe(
+  add(verein: IVerein, titu: TiTuEnum): Observable<ITeilnehmer> {
+    return this.teilnehmerService.add(verein, titu).pipe(
       tap((teilnehmer) => {
         this.teilnehmer.push(teilnehmer);
         this.dirty = true;
@@ -159,6 +151,12 @@ export class CachingTeilnehmerService {
         // newTeilnehmerObs.next(teilnehmer);
       })
     );
+    /*
+    this.teilnehmerService.add(verein, titu).subscribe((teilnehmer) => {
+      console.log("From Tap:", teilnehmer);
+    });
+    return of({});
+    */
     // return newTeilnehmerObs;
   }
 

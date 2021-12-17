@@ -155,9 +155,9 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     this.teilnehmerService.reset(verein);
   }
 
-  add(verein: IVerein): Observable<ITeilnehmer> {
+  add(verein: IVerein, titu: TiTuEnum): Observable<ITeilnehmer> {
     console.log("Add");
-    return this.teilnehmerService.add(verein);
+    return this.teilnehmerService.add(verein, titu);
   }
   set dirty(dirty: boolean) {
     this.teilnehmerService.dirty = dirty;

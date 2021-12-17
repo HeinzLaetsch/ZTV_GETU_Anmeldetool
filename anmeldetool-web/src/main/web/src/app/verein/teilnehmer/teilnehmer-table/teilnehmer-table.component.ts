@@ -199,10 +199,10 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     return 0;
   }
 
-  public addNewTeilnehmer() {
+  public addNewTeilnehmer(titu: TiTuEnum) {
     console.log("addNewTeilnehmer");
     this.dataSource
-      .add(this.authService.currentVerein)
+      .add(this.authService.currentVerein, titu)
       .subscribe((teilnehmer) => {
         console.log("Teilnehmer added: ", teilnehmer);
         this.paginator.lastPage();
