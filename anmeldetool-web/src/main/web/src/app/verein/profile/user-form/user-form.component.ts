@@ -6,6 +6,7 @@ import { IWertungsrichter } from "src/app/core/model/IWertungsrichter";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingRoleService } from "src/app/core/service/caching-services/caching.role.service";
 import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
+import { IChangeEvent } from "../IChangeEvent";
 
 @Component({
   selector: "app-user-form",
@@ -16,11 +17,13 @@ export class UserFormComponent implements OnInit {
   @Input()
   currentUser: IUser;
 
+  changeEvent: IChangeEvent;
   appearance = "outline";
-  userValid: boolean;
-  userChanged: boolean;
-  rolesChanged: boolean;
-  wrChanged: boolean;
+  //userValid: boolean;
+  //_userHasChanged: boolean;
+  //rolesChanged: boolean;
+  //wrChanged: boolean;
+  //hasWr = false;
 
   _assignedRoles: IRolle[];
   // profileForm: FormGroup;
@@ -39,16 +42,19 @@ export class UserFormComponent implements OnInit {
       letzterFK: new Date(),
       aktiv: false,
     };
-    this.userChanged = false;
-    this.userValid = true;
-    this.wrChanged = false;
+    this.changeEvent = {
+      hasWr: false,
+      rolesChanged: false,
+      userHasChanged: false,
+      userValid: true,
+      wrChanged: false,
+    };
   }
 
   ngOnInit(): void {
     // console.log("Current User: ", this.currentUser);
     if (this.currentUser.id && this.currentUser.id.length > 0) {
       this.reloadRoles(this.currentUser);
-      this.userValid = true;
       this.userService
         .getWertungsrichter(this.currentUser.id)
         .subscribe((value) => {
@@ -57,11 +63,24 @@ export class UserFormComponent implements OnInit {
           }
         });
     } else {
-      this.userValid = false;
+      this.changeEvent.userValid = false;
       this._assignedRoles = new Array<IRolle>();
     }
   }
 
+  isSaveDisabled() {
+    if (!this.changeEvent.userValid) {
+      return true;
+    }
+    if (
+      !this.changeEvent.rolesChanged &&
+      !this.changeEvent.userHasChanged &&
+      !this.changeEvent.wrChanged
+    ) {
+      return true;
+    }
+    return false;
+  }
   private reloadRoles(user: IUser) {
     let localSubscription2: Subscription = undefined;
     if (user.id && user.id.length > 0) {
@@ -70,6 +89,7 @@ export class UserFormComponent implements OnInit {
         .getRolesForUser(user)
         .subscribe((result) => {
           this._assignedRoles = result;
+          this.changeEvent.hasWr = this.isWertungsrichter();
           // console.log("RoleFormComponent:: ngOnInit: ", this._assignedRoles);
           if (localSubscription2) {
             localSubscription2.unsubscribe();
@@ -78,6 +98,7 @@ export class UserFormComponent implements OnInit {
     } else {
       console.log("user.id not valid");
       this._assignedRoles = new Array<IRolle>();
+      this.changeEvent.hasWr = false;
     }
   }
 
@@ -107,12 +128,18 @@ export class UserFormComponent implements OnInit {
     }
     return false;
   }
+  get userHasChanged(): boolean {
+    return this.changeEvent.userHasChanged;
+  }
+  set userHasChanged(value: boolean) {
+    this.changeEvent.userHasChanged = value;
+  }
   get wertungsrichter() {
     return this._wertungsrichter;
   }
 
   set wertungsrichter(value: IWertungsrichter) {
-    this.wrChanged = true;
+    this.changeEvent.wrChanged = true;
     this._wertungsrichter = value;
   }
   get isVereinsAnmelder() {
@@ -128,8 +155,12 @@ export class UserFormComponent implements OnInit {
   }
   set assignedRoles(value: IRolle[]) {
     // console.log("Set assignedRoles: ", value);
-    this.rolesChanged = true;
+    this.changeEvent.rolesChanged = true;
     this._assignedRoles = value;
+    if (this.changeEvent.hasWr !== this.isWertungsrichter()) {
+      this.changeEvent.wrChanged = true;
+    }
+    this.changeEvent.hasWr = this.isWertungsrichter();
   }
 
   get user(): IUser {
@@ -137,76 +168,77 @@ export class UserFormComponent implements OnInit {
     return this.currentUser;
   }
   set user(value: IUser) {
-    // console.log("Set user: ", value);
-    this.userChanged = true;
     this.currentUser = value;
+    this.userHasChanged = true;
   }
 
   updateUserValid(valid: boolean) {
-    this.userValid = valid;
+    this.changeEvent.userValid = valid;
     // console.log("Valid changed: ", this.currentUser , ', ', valid);
   }
 
   cancel() {
     this.currentUser = this.userService.getUserById(this.currentUser.id);
     this.reloadRoles(this.currentUser);
-    this.userChanged = false;
-    this.userValid = true;
-    this.wrChanged = false;
+    this.userHasChanged = false;
+    this.changeEvent.userValid = true;
+    this.changeEvent.wrChanged = false;
   }
 
   save(): void {
-    /*
-    console.log(
-      "this.userChanged: ",
-      this.userChanged,
-      " ,this.wrChanged: ",
-      this.wrChanged,
-      " ,this.userValid: ",
-      this.userValid
-    );*/
-
     if (this.currentUser.id) {
-      if (this.userChanged && this.userValid) {
+      if (this.userHasChanged && this.changeEvent.userValid) {
         this.authService.updateUser(this.currentUser).subscribe((user) => {
           this.currentUser = user;
+          this.userHasChanged = false;
         });
-        this.userChanged = false;
       }
-      if (this.rolesChanged) {
+      if (this.changeEvent.rolesChanged) {
         this.userService
           .updateRoles(this.currentUser, this.assignedRoles)
           .subscribe((user) => {
             this.currentUser = user;
             this.reloadRoles(this.currentUser);
           });
-        this.rolesChanged = false;
+        this.changeEvent.rolesChanged = false;
       }
-      this.wrChanged = true;
-      if (this.wrChanged) {
-        this.userService
-          .updateWertungsrichter(this.currentUser.id, this._wertungsrichter)
-          .subscribe((value) => (this._wertungsrichter = value));
-      }
+      this.checkWrChanged();
     } else {
       this.authService.createUser(this.currentUser).subscribe((user) => {
         this.currentUser = user;
-        if (this.rolesChanged) {
+        if (this.changeEvent.rolesChanged) {
           this.userService
             .updateRoles(this.currentUser, this.assignedRoles)
             .subscribe((user) => {
               this.currentUser = user;
               this.reloadRoles(this.currentUser);
             });
-          this.rolesChanged = false;
+          this.changeEvent.rolesChanged = false;
         }
-        this.wrChanged = true;
-        if (this.wrChanged) {
-          this.userService
-            .updateWertungsrichter(this.currentUser.id, this._wertungsrichter)
-            .subscribe((value) => (this._wertungsrichter = value));
-        }
+        this.checkWrChanged();
+        this.userHasChanged = false;
       });
+    }
+  }
+
+  checkWrChanged(): void {
+    if (this.changeEvent.wrChanged) {
+      if (this.changeEvent.hasWr) {
+        this._wertungsrichter.personId = this.currentUser.id;
+        this.userService
+          .updateWertungsrichter(this.currentUser.id, this._wertungsrichter)
+          .subscribe((value) => {
+            this._wertungsrichter = value;
+            this.changeEvent.wrChanged = false;
+          });
+      } else {
+        this.userService
+          .deleteWertungsrichterForUserId(this.currentUser.id)
+          .subscribe((value) => {
+            this._wertungsrichter = value;
+            this.changeEvent.wrChanged = false;
+          });
+      }
     }
   }
 }

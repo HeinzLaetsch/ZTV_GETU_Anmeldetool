@@ -1,7 +1,6 @@
 package org.ztv.anmeldetool.anmeldetool.repositories;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.repository.CrudRepository;
@@ -12,5 +11,5 @@ import org.ztv.anmeldetool.anmeldetool.models.Wertungsrichter;
 public interface WertungsrichterRepository extends CrudRepository<Wertungsrichter, UUID> {
 	List<Wertungsrichter> findAllByAktiv(boolean aktiv);
 
-	Optional<Wertungsrichter> findByPersonId(UUID id);
+	List<Wertungsrichter> findByPersonId(UUID id);
 }

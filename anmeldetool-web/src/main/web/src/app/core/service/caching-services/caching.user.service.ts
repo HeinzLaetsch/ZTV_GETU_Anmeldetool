@@ -125,10 +125,9 @@ export class CachingUserService {
     return this.userService.getWertungsrichter(id);
   }
   updateWertungsrichter(id: string, wertungsrichter: IWertungsrichter) {
-    if (wertungsrichter.id) {
-      return this.userService.updateWertungsrichter(id, wertungsrichter);
-    } else {
-      return this.userService.updateWertungsrichter(id, wertungsrichter);
-    }
+    return this.userService.updateWertungsrichter(id, wertungsrichter);
+  }
+  deleteWertungsrichterForUserId(id: string) {
+    return this.userService.deleteWertungsrichterForUserId(id);
   }
 }

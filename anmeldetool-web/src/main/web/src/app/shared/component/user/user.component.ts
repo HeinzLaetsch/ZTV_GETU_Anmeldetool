@@ -6,7 +6,6 @@ import {
   OnChanges,
   OnInit,
   Output,
-  SimpleChange,
   SimpleChanges,
 } from "@angular/core";
 import {
@@ -24,6 +23,8 @@ import { ConfirmedValidator } from "../../validators/ConfirmedValidator";
   styleUrls: ["./user.component.css"],
 })
 export class UserComponent implements OnInit, AfterViewInit, OnChanges {
+  @Input()
+  modify: boolean;
   @Input()
   readOnly: boolean;
   @Input()
@@ -63,6 +64,7 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
   });
 
   constructor(private formBuilder: FormBuilder) {
+    this.modify = false;
     this.form.setValidators(
       ConfirmedValidator("passwortControl", "passwort2Control")
     );
@@ -109,8 +111,16 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
     valid = valid && this.form.controls.nachnameControl.valid;
     valid = valid && this.form.controls.vornameControl.valid;
     if (this.showPassword) {
-      valid = valid && this.form.controls.passwortControl.valid;
-      valid = valid && this.form.controls.passwort2Control.valid;
+      if (
+        !(
+          this.modify &&
+          (!this.form.controls.passwortControl.value ||
+            this.form.controls.passwortControl.value === "")
+        )
+      ) {
+        valid = valid && this.form.controls.passwortControl.valid;
+        valid = valid && this.form.controls.passwort2Control.valid;
+      }
     }
     valid = valid && this.form.controls.eMailAdresseControl.valid;
     valid = valid && this.form.controls.mobilNummerControl.valid;
@@ -124,32 +134,46 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
   ngOnInit(): void {
     this.updateUser(this.user);
     this.form.controls.benutzernameControl.valueChanges.subscribe((value) => {
-      this.user.benutzername = value;
-      this.emitChange(true);
+      if (this.user.benutzername !== value) {
+        this.user.benutzername = value;
+        this.emitChange(true);
+      }
     });
     this.form.controls.nachnameControl.valueChanges.subscribe((value) => {
-      this.user.name = value;
-      this.emitChange(true);
+      if (this.user.name !== value) {
+        this.user.name = value;
+        this.emitChange(true);
+      }
     });
     this.form.controls.vornameControl.valueChanges.subscribe((value) => {
-      this.user.vorname = value;
-      this.emitChange(true);
+      if (this.user.vorname !== value) {
+        this.user.vorname = value;
+        this.emitChange(true);
+      }
     });
     this.form.controls.passwortControl.valueChanges.subscribe((value) => {
-      this.user.password = value;
-      this.emitChange(true);
+      if (this.user.password !== value) {
+        this.user.password = value;
+        this.emitChange(true);
+      }
     });
     this.form.controls.passwort2Control.valueChanges.subscribe((value) => {
-      this.user.password = value;
-      this.emitChange(true);
+      if (this.user.password !== value) {
+        this.user.password = value;
+        this.emitChange(true);
+      }
     });
     this.form.controls.eMailAdresseControl.valueChanges.subscribe((value) => {
-      this.user.email = value;
-      this.emitChange(true);
+      if (this.user.email !== value) {
+        this.user.email = value;
+        this.emitChange(true);
+      }
     });
     this.form.controls.mobilNummerControl.valueChanges.subscribe((value) => {
-      this.user.handy = value;
-      this.emitChange(true);
+      if (this.user.handy !== value) {
+        this.user.handy = value;
+        this.emitChange(true);
+      }
     });
   }
 }

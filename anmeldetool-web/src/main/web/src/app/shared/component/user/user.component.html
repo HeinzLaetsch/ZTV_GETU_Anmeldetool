@@ -80,6 +80,9 @@
       <mat-error *ngIf="form.controls.mobilNummerControl.hasError('required')">
         Pflichtfeld
       </mat-error>
+      <mat-error *ngIf="form.controls.mobilNummerControl.hasError('valid')">
+        ungültige Mobile Nummer
+      </mat-error>
       <mat-hint>Gib die Mobilnummer ein</mat-hint>
     </mat-form-field>
   </p>
@@ -93,6 +96,9 @@
       />
       <mat-error *ngIf="form.controls.eMailAdresseControl.hasError('required')">
         Pflichtfeld
+      </mat-error>
+      <mat-error *ngIf="form.controls.eMailAdresseControl.hasError('valid')">
+        ungültige eMail Adresse
       </mat-error>
       <mat-hint>Gib die eMail Adresse ein</mat-hint>
     </mat-form-field>

@@ -80,7 +80,7 @@ export class LoginDialogComponent implements OnInit {
   }
 
   cancel() {
-    this.router.navigate(["events"]);
+    this.router.navigate(["anlass"]);
   }
 
   onNoClick(): void {

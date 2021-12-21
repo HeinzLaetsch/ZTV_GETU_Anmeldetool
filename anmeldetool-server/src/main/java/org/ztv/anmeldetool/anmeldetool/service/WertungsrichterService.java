@@ -1,5 +1,6 @@
 package org.ztv.anmeldetool.anmeldetool.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,8 +31,11 @@ public class WertungsrichterService {
 	}
 
 	public Optional<Wertungsrichter> getWertungsrichterByPersonId(UUID id) {
-		Optional<Wertungsrichter> opt = wertungsrichterRepo.findByPersonId(id);
-		return opt;
+		List<Wertungsrichter> wrList = wertungsrichterRepo.findByPersonId(id);
+		if (wrList != null && wrList.size() > 0)
+			return Optional.of(wrList.get(0));
+		else
+			return Optional.empty();
 	}
 
 	public Optional<Wertungsrichter> getWertungsrichterForUser(Person person) {
@@ -41,6 +45,15 @@ public class WertungsrichterService {
 
 	public Wertungsrichter update(Wertungsrichter wertungsrichter) {
 		wertungsrichter = wertungsrichterRepo.save(wertungsrichter);
+		wertungsrichter.getPerson().setWertungsrichter(wertungsrichter);
+		personSrv.create(wertungsrichter.getPerson(), false);
 		return wertungsrichter;
 	}
+
+	public void delete(Wertungsrichter wertungsrichter) {
+		wertungsrichter.getPerson().setWertungsrichter(null);
+		personSrv.create(wertungsrichter.getPerson(), false);
+		wertungsrichterRepo.delete(wertungsrichter);
+	}
+
 }

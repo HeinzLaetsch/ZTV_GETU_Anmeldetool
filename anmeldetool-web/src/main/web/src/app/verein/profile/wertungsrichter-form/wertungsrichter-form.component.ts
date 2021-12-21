@@ -1,9 +1,16 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import { IRolle } from 'src/app/core/model/IRolle';
-import { IUser } from 'src/app/core/model/IUser';
-import { IWertungsrichter } from 'src/app/core/model/IWertungsrichter';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from "@angular/core";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { IRolle } from "src/app/core/model/IRolle";
+import { IUser } from "src/app/core/model/IUser";
+import { IWertungsrichter } from "src/app/core/model/IWertungsrichter";
 
 @Component({
   selector: "app-wertungsrichter",
@@ -20,7 +27,7 @@ export class WertungsrichterFormComponent implements OnInit, OnChanges {
   @Input()
   isVereinsVerantwortlicher: boolean;
   @Output()
-  wertungsrichterChanged = new EventEmitter<IWertungsrichter>();
+  wertungsrichterChange = new EventEmitter<IWertungsrichter>();
 
   appearance = "outline";
 
@@ -35,21 +42,20 @@ export class WertungsrichterFormComponent implements OnInit, OnChanges {
     brevetControl: this.brevetControl,
     letzterFkControl: this.letzterFkControl,
     gueltigControl: this.gueltigControl,
-    bestaetigtControl: this.bestaetigtControl
+    bestaetigtControl: this.bestaetigtControl,
   });
 
-  constructor() {
-  }
+  constructor() {}
 
   ngOnInit(): void {
     this.setValues();
 
-    this.form.valueChanges.subscribe( (value: any) => {
-        if (this.form.dirty && this.brevetControl.dirty) {
-          this.wertungsrichter.brevet = this.brevetControl.value;
-          this.wertungsrichterChanged.emit(this.wertungsrichter);
-        }
-    })
+    this.form.valueChanges.subscribe((value: any) => {
+      if (this.form.dirty && this.brevetControl.dirty) {
+        this.wertungsrichter.brevet = this.brevetControl.value;
+        this.wertungsrichterChange.emit(this.wertungsrichter);
+      }
+    });
   }
 
   private setValues(): void {
@@ -69,7 +75,10 @@ export class WertungsrichterFormComponent implements OnInit, OnChanges {
   }
 
   disableRole(role: IRolle) {
-    if (role.name === 'VEREINSVERANTWORTLICHER' && !this.isVereinsVerantwortlicher) {
+    if (
+      role.name === "VEREINSVERANTWORTLICHER" &&
+      !this.isVereinsVerantwortlicher
+    ) {
       return true;
     }
     return false;

@@ -74,6 +74,9 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 	@Autowired
 	WertungsrichterSlotRepository wertungsrichterSlotRepo;
 
+	@Autowired
+	OrganisationPersonLinkRepository orgPersLinkRepo;
+
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		log.info("Anmeldetool is starting");
@@ -94,6 +97,7 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 			person.setAktiv(true);
 			person.setChangeDate(Calendar.getInstance());
 			person.addToOrganisationenLink(opLink);
+			opLink = orgPersLinkRepo.save(opLink);
 			RollenLink rollenLink = new RollenLink();
 			rollenLink.setLink(opLink);
 			rollenLink.setRolle(getRolle(RollenEnum.ADMINISTRATOR));
@@ -191,21 +195,31 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 
 	private void createVerein1() {
 		log.info("Create Verein1");
+		String password = "pw";
 		Iterable<Verband> verbaende = verbandRepo.findByVerband(VerbandEnum.GLZ.name());
 		Verband verband = verbaende.iterator().next();
+
+		// Verein erstellen
 		Organisation verein1 = Organisation.builder().name("TV Verein1").verband(verband).build();
-		OrganisationPersonLink opLink = new OrganisationPersonLink();
-		opLink.setAktiv(true);
-		opLink.setChangeDate(Calendar.getInstance());
-		verein1.addToPersonenLink(opLink);
-		String password = "pw";
+		verein1 = this.orgRepo.save(verein1);
 
 		// Trainer 1
 		Person person = Person.builder().benutzername("trainer1@verein1.com").name("Trainer1").vorname("Best")
 				.handy("076 12 345 67").email("verein1@verein1.com").password(password).build();
 		person.setAktiv(true);
 		person.setChangeDate(Calendar.getInstance());
-		person.addToOrganisationenLink(opLink);
+
+		person = personSrv.create(person, true);
+
+		OrganisationPersonLink opLink = new OrganisationPersonLink();
+		opLink.setAktiv(true);
+		opLink.setChangeDate(Calendar.getInstance());
+		opLink.setPerson(person);
+		opLink.setOrganisation(verein1);
+		opLink = orgPersLinkRepo.save(opLink);
+
+		// person.addToOrganisationenLink(opLink);
+		// verein1.addToPersonenLink(opLink);
 
 		RollenLink rollenLink = new RollenLink();
 		rollenLink.setLink(opLink);
@@ -213,12 +227,6 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 		rollenLink.setAktiv(false);
 		rollenLinkRepo.save(rollenLink);
 
-		opLink = new OrganisationPersonLink();
-		opLink.setAktiv(true);
-		opLink.setChangeDate(Calendar.getInstance());
-		verein1.addToPersonenLink(opLink);
-
-		person = personSrv.create(person, true);
 		log.info("User created: " + person.getBenutzername());
 
 		// Trainer 2
@@ -226,7 +234,16 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 				.handy("078 11 111 11").email("trainer2@tvverein1.ch").password(password).build();
 		person.setAktiv(true);
 		person.setChangeDate(Calendar.getInstance());
-		person.addToOrganisationenLink(opLink);
+		// person.addToOrganisationenLink(opLink);
+		person = personSrv.create(person, true);
+
+		opLink = new OrganisationPersonLink();
+		opLink.setAktiv(true);
+		opLink.setChangeDate(Calendar.getInstance());
+		// verein1.addToPersonenLink(opLink);
+		opLink.setPerson(person);
+		opLink.setOrganisation(verein1);
+		opLink = orgPersLinkRepo.save(opLink);
 
 		rollenLink = new RollenLink();
 		rollenLink.setLink(opLink);
@@ -240,12 +257,6 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 		rollenLink.setAktiv(true);
 		rollenLinkRepo.save(rollenLink);
 
-		opLink = new OrganisationPersonLink();
-		opLink.setAktiv(true);
-		opLink.setChangeDate(Calendar.getInstance());
-		verein1.addToPersonenLink(opLink);
-
-		person = personSrv.create(person, true);
 		log.info("User created: " + person.getBenutzername());
 
 		// WR Brevet 1
@@ -253,7 +264,16 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 				.handy("078 11 111 11").email("WR.Brevet_1@tvverein1.ch").password(password).build();
 		person.setAktiv(true);
 		person.setChangeDate(Calendar.getInstance());
-		person.addToOrganisationenLink(opLink);
+		// person.addToOrganisationenLink(opLink);
+		person = personSrv.create(person, true);
+
+		opLink = new OrganisationPersonLink();
+		opLink.setAktiv(true);
+		opLink.setChangeDate(Calendar.getInstance());
+		opLink.setPerson(person);
+		opLink.setOrganisation(verein1);
+		// verein1.addToPersonenLink(opLink);
+		opLink = orgPersLinkRepo.save(opLink);
 
 		rollenLink = new RollenLink();
 		rollenLink.setLink(opLink);
@@ -261,16 +281,10 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 		rollenLink.setAktiv(true);
 		rollenLinkRepo.save(rollenLink);
 
-		opLink = new OrganisationPersonLink();
-		opLink.setAktiv(true);
-		opLink.setChangeDate(Calendar.getInstance());
-		verein1.addToPersonenLink(opLink);
-
 		Wertungsrichter wertungsrichter = Wertungsrichter.builder().person(person)
 				.brevet(WertungsrichterBrevetEnum.Brevet_1).letzterFk(null).build();
 		// wertungsrichter = wertungsrichterRepo.save(wertungsrichter);
 		person.setWertungsrichter(wertungsrichter);
-
 		person = personSrv.create(person, true);
 
 		log.info("User created: " + person.getBenutzername());
@@ -280,7 +294,16 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 				.handy("078 11 111 11").email("WR.Brevet_2@tvverein1.ch").password(password).build();
 		person.setAktiv(true);
 		person.setChangeDate(Calendar.getInstance());
-		person.addToOrganisationenLink(opLink);
+		// person.addToOrganisationenLink(opLink);
+		person = personSrv.create(person, true);
+
+		opLink = new OrganisationPersonLink();
+		opLink.setAktiv(true);
+		opLink.setChangeDate(Calendar.getInstance());
+		opLink.setPerson(person);
+		opLink.setOrganisation(verein1);
+		// verein1.addToPersonenLink(opLink);
+		opLink = orgPersLinkRepo.save(opLink);
 
 		rollenLink = new RollenLink();
 		rollenLink.setLink(opLink);
@@ -292,12 +315,11 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 				.letzterFk(null).build();
 		// wertungsrichter = wertungsrichterRepo.save(wertungsrichter);
 		person.setWertungsrichter(wertungsrichter);
-
 		person = personSrv.create(person, true);
 
 		log.info("User created: " + person.getBenutzername());
 
-		verein1 = orgRepo.save(verein1);
+		// verein1 = orgRepo.save(verein1);
 
 		createListOfTeilnehmer(verein1, 33);
 	}

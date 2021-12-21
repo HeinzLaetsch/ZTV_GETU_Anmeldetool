@@ -72,6 +72,14 @@ export class UserService {
       );
   }
 
+  deleteWertungsrichterForUserId(id: string): Observable<IWertungsrichter> {
+    return this.http
+      .delete<IWertungsrichter>(this.url + "/" + id + "/wertungsrichter")
+      .pipe(
+        catchError(this.handleError<IWertungsrichter>("deleteWertungsrichter"))
+      );
+  }
+
   private handleError<T>(operation = "operation", result?: T) {
     return (error: any): Observable<T> => {
       console.error(error);

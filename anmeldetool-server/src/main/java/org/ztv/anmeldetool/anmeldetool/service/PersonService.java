@@ -3,10 +3,12 @@ package org.ztv.anmeldetool.anmeldetool.service;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,9 @@ import org.ztv.anmeldetool.anmeldetool.models.Person;
 import org.ztv.anmeldetool.anmeldetool.models.Rolle;
 import org.ztv.anmeldetool.anmeldetool.models.RollenEnum;
 import org.ztv.anmeldetool.anmeldetool.models.RollenLink;
+import org.ztv.anmeldetool.anmeldetool.repositories.OrganisationPersonLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.PersonenRepository;
+import org.ztv.anmeldetool.anmeldetool.repositories.RollenLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.RolleDTO;
 import org.ztv.anmeldetool.anmeldetool.util.PersonHelper;
@@ -40,6 +44,12 @@ public class PersonService {
 
 	@Autowired
 	PersonenRepository persRepo;
+
+	@Autowired
+	RollenLinkRepository rollenLinkRep;
+
+	@Autowired
+	OrganisationPersonLinkRepository orgPersLinkRep;
 
 	public Collection<PersonDTO> findPersonsByOrganisation(UUID orgId) {
 		Collection<Person> persons = persRepo.findByOrganisationId(orgId);
@@ -105,22 +115,23 @@ public class PersonService {
 			return ResponseEntity.notFound().build();
 		}
 		OrganisationPersonLink orgPersLink = new OrganisationPersonLink();
-		Set<RolleDTO> rollenDTO = personDTO.getRollen();
-		populateLinkRollen(orgPersLink, rollenDTO);
-		/*
-		 * for(RolleDTO rolleDTO : rollenDTO) { Rolle rolle =
-		 * roleSrv.findByName(rolleDTO.getName()); RollenLink rollenLink = new
-		 * RollenLink(); rollenLink.setAktiv(true); rollenLink.setLink(orgPersLink);
-		 * rollenLink.setRolle(rolle); orgPersLink.getRollenLink().add(rollenLink); }
-		 */
+
 		Person person = PersonHelper.createPerson(personDTO);
+		person = create(person, true);
 
 		orgPersLink.setAktiv(true);
 		orgPersLink.setOrganisation(organisation);
 		orgPersLink.setPerson(person);
+		orgPersLinkRep.save(orgPersLink);
+
+		Set<RolleDTO> rollenDTO = personDTO.getRollen();
+		populateLinkRollen(orgPersLink, rollenDTO);
+		// Persist
+		orgPersLink.getRollenLink().stream().forEach(rollenLink -> {
+			rollenLinkRep.save(rollenLink);
+		});
 
 		person.getOrganisationenLinks().add(orgPersLink);
-		person = create(person, true);
 		personDTO = PersonHelper.createPersonDTO(person, organisation);
 		return ResponseEntity.ok(personDTO);
 	}
@@ -139,30 +150,44 @@ public class PersonService {
 		if (person.getOrganisationenLinks() == null) {
 			return ResponseEntity.notFound().build();
 		}
-		for (OrganisationPersonLink opl : person.getOrganisationenLinks()) {
-			if (opl.getOrganisation().equals(organisation)) {
-				for (RolleDTO rolleDTO : rollenDTO) {
-					boolean found = false;
-					for (RollenLink rl : opl.getRollenLink()) {
-						if (rl.getId().toString().equals(rolleDTO.getId())) {
-							found = true;
-							rl.setChangeDate(Calendar.getInstance());
-							rl.setAktiv(rolleDTO.isAktiv());
-
-						}
-					}
-					if (!found) {
-						RollenLink rl = new RollenLink();
-						rl.setChangeDate(Calendar.getInstance());
-						rl.setAktiv(rolleDTO.isAktiv());
-						rl.setDeleted(false);
-						rl.setId(UUID.randomUUID());
-						rl.setLink(opl);
-						Rolle rolle = roleSrv.findByName(rolleDTO.getName());
-						rl.setRolle(rolle);
-						opl.getRollenLink().add(rl);
-					}
-				}
+		List<OrganisationPersonLink> filteredOpl = person.getOrganisationenLinks().stream().filter(opl -> {
+			return opl.getOrganisation().equals(organisation);
+		}).collect(Collectors.toList());
+		if (filteredOpl.size() != 1) {
+			// error
+		}
+		Set<RollenLink> rollenSet = filteredOpl.get(0).getRollenLink();
+		// check Delete
+		Set<RollenLink> deletedRollen = new HashSet();
+		for (RollenLink rl : rollenSet) {
+			List<RolleDTO> filtered = rollenDTO.stream().filter(rolleDTO -> {
+				return rl.getId().toString().equals(rolleDTO.getId());
+			}).collect(Collectors.toList());
+			if (filtered.size() == 0) {
+				rollenLinkRep.delete(rl);
+				deletedRollen.add(rl);
+			}
+		}
+		// Clean up Set
+		deletedRollen.stream().forEach(deleteLink -> {
+			rollenSet.remove(deleteLink);
+		});
+		// Check Create
+		for (RolleDTO rolleDTO : rollenDTO) {
+			List<RollenLink> filtered = rollenSet.stream().filter(rolleLink -> {
+				return rolleDTO.getId().equals(rolleLink.getId().toString());
+			}).collect(Collectors.toList());
+			if (filtered.size() == 0) {
+				RollenLink rl = new RollenLink();
+				rl.setChangeDate(Calendar.getInstance());
+				rl.setAktiv(rolleDTO.isAktiv());
+				rl.setDeleted(false);
+				rl.setId(UUID.randomUUID());
+				rl.setLink(filteredOpl.get(0));
+				Rolle rolle = roleSrv.findByName(rolleDTO.getName());
+				rl.setRolle(rolle);
+				rollenLinkRep.save(rl);
+				filteredOpl.get(0).getRollenLink().add(rl);
 			}
 		}
 		person = create(person, false);

@@ -3,7 +3,6 @@ package org.ztv.anmeldetool.anmeldetool.models;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -21,24 +20,23 @@ import lombok.ToString;
 @Setter
 public class OrganisationPersonLink extends Base {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="ORGANISATION_ID", nullable=false, insertable=true, updatable=true)
-    @ToString.Exclude
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "ORGANISATION_ID", nullable = false, insertable = true, updatable = true)
+	@ToString.Exclude
 	private Organisation organisation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="PERSON_ID", nullable=false, insertable=true, updatable=true)
-    @ToString.Exclude
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "PERSON_ID", nullable = false, insertable = true, updatable = true)
+	@ToString.Exclude
 	private Person person;
 
-    // Rolle über Enum
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "link", cascade = { CascadeType.PERSIST , CascadeType.MERGE })
-    @ToString.Exclude
+	// Rolle über Enum
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "link")
+	@ToString.Exclude
 	private Set<RollenLink> rollenLink;
-    //private Set<RollenEnum> rollen;
-    
-    public OrganisationPersonLink() {
-    	this.rollenLink = new HashSet<RollenLink>();
-    }
-}
+	// private Set<RollenEnum> rollen;
 
+	public OrganisationPersonLink() {
+		this.rollenLink = new HashSet<RollenLink>();
+	}
+}

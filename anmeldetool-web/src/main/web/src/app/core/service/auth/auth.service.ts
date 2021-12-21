@@ -62,7 +62,7 @@ export class AuthService {
   createUser(user: IUser): Observable<IUser> {
     const emitter: EventEmitter<IUser> = new EventEmitter();
     this.http.post<IUser>(this.userUrl, user).subscribe((user) => {
-      this.currentUser = user;
+      // this.currentUser = user;
       console.log("User: ", user);
       emitter.emit(user);
     });
@@ -72,7 +72,7 @@ export class AuthService {
   updateUser(user: IUser): Observable<IUser> {
     const emitter: EventEmitter<IUser> = new EventEmitter();
     this.http.patch<IUser>(this.userUrl, user).subscribe((user) => {
-      this.currentUser = user;
+      // this.currentUser = user;
       // console.log("User: ", user);
       emitter.emit(user);
     });

@@ -400,8 +400,23 @@ public class AdminController {
 
 	@PutMapping("/user/{id}/wertungsrichter")
 	public @ResponseBody ResponseEntity<WertungsrichterDTO> updateWertungsrichter(HttpServletRequest request,
-			@PathVariable String id, @RequestBody WertungsrichterDTO wertungsrichterDTO) {
+			@PathVariable UUID id, @RequestBody WertungsrichterDTO wertungsrichterDTO) {
 		Wertungsrichter wertungsrichter = wrMapper.WertungsrichterDTOToWertungsrichter(wertungsrichterDTO);
+		if (wertungsrichterDTO.getId() != null) {
+			wertungsrichter.setId(wertungsrichterDTO.getId());
+		}
+		wertungsrichter = wertungsrichterSrv.update(wertungsrichter);
+		URI requestURI = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+		return ResponseEntity.created(requestURI).build();
+	}
+
+	@DeleteMapping("/user/{id}/wertungsrichter")
+	public @ResponseBody ResponseEntity<WertungsrichterDTO> deletWertungsrichter(HttpServletRequest request,
+			@PathVariable UUID id) {
+		Optional<Wertungsrichter> wertungsrichterOpt = wertungsrichterSrv.getWertungsrichterByPersonId(id);
+		if (wertungsrichterOpt.isPresent()) {
+			wertungsrichterSrv.delete(wertungsrichterOpt.get());
+		}
 		URI requestURI = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
 		return ResponseEntity.created(requestURI).build();
 	}
