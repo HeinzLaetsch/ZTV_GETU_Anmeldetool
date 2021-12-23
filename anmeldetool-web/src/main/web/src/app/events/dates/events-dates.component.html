@@ -45,37 +45,43 @@
       class="col-2 border small black"
       [ngClass]="getClassForAnzeigeStatusNochNichtOffen()"
     >
-      {{ anlass.anmeldungBeginn | date: "d-MM-y" }}
+      {{ anlass.anmeldungBeginn | date: "d-MM-y":"GMT+1":"DE-CH" }}
     </div>
     <div
       class="col-2 border small black"
       [ngClass]="getClassForAnzeigeStatusErfassenGeschlossen()"
     >
-      {{ anlass.erfassenGeschlossen | date: "d-MM-y" }}
+      {{ anlass.erfassenGeschlossen | date: "d-MM-y":"GMT+1":"DE-CH" }}
     </div>
     <div
       class="col-2 border small black"
       [ngClass]="getClassForAnzeigeStatusCrossKategorieGeschlossen()"
     >
-      {{ anlass.crossKategorieAenderungenGeschlossen | date: "d-MM-y" }}
+      {{
+        anlass.crossKategorieAenderungenGeschlossen
+          | date: "d-MM-y":"GMT+1":"DE-CH"
+      }}
     </div>
     <div
       class="col-2 border small black"
       [ngClass]="getClassForAnzeigeStatusInKategorieGeschlossen()"
     >
-      {{ anlass.aenderungenInKategorieGeschlossen | date: "d-MM-y" }}
+      {{
+        anlass.aenderungenInKategorieGeschlossen
+          | date: "d-MM-y":"GMT+1":"DE-CH"
+      }}
     </div>
     <div
       class="col-2 border small black"
       [ngClass]="getClassForAnzeigeStatusAlleMutationenGeschlossen()"
     >
-      {{ anlass.aenderungenNichtMehrErlaubt | date: "d-MM-y" }}
+      {{ anlass.aenderungenNichtMehrErlaubt | date: "d-MM-y":"GMT+1":"DE-CH" }}
     </div>
     <div
       class="col-2 border small black"
       [ngClass]="getClassForAnzeigeStatusGeschlossen()"
     >
-      {{ anlass.endDatum | date: "d-MM-y" }}
+      {{ anlass.endDatum | date: "d-MM-y":"GMT+1":"DE-CH" }}
     </div>
   </div>
 </div>

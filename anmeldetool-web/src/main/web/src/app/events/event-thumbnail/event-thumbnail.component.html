@@ -37,10 +37,10 @@
     <div class="col-sm-4">
       <span *ngIf="anlass.startDatum === anlass.endDatum">am</span>
       <span *ngIf="anlass.startDatum !== anlass.endDatum">von</span>:
-      {{ anlass.startDatum | date: "EEE, d MMMM , y" }}
+      {{ anlass.startDatum | date: "EEE, d MMMM , y":"GMT+1":"DE-CH" }}
     </div>
     <div class="col-sm-4" *ngIf="anlass.startDatum !== anlass.endDatum">
-      bis: {{ anlass.endDatum | date: "EEE, d MMMM , y" }}
+      bis: {{ anlass.endDatum | date: "EEE, d MMMM , y":"GMT+1":"DE-CH" }}
     </div>
   </div>
   <div class="row">

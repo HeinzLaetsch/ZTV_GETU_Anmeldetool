@@ -1,6 +1,7 @@
-import { DatePipe } from "@angular/common";
+import { DatePipe, registerLocaleData } from "@angular/common";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
-import { APP_INITIALIZER, NgModule } from "@angular/core";
+import localeDeCH from "@angular/common/locales/de-CH";
+import { APP_INITIALIZER, LOCALE_ID, NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from "@angular/material/form-field";
 import { BrowserModule } from "@angular/platform-browser";
@@ -29,6 +30,7 @@ import { SharedComponentsModule } from "./shared/component/shared.components.mod
 import { LoginDialogComponent } from "./verein/login/login-dialog.component";
 import { NewAnmelderComponent } from "./verein/new-anmelder/new-anmelder.component";
 import { NewVereinComponent } from "./verein/new-verein/new-verein.component";
+registerLocaleData(localeDeCH, "de-ch");
 
 export function initVereinservice(
   vereinService: CachingVereinService
@@ -84,6 +86,10 @@ export function initVereinservice(
       provide: HTTP_INTERCEPTORS,
       useClass: HttpSecurityInterceptorService,
       multi: true,
+    },
+    {
+      provide: LOCALE_ID,
+      useValue: "de",
     },
   ],
   bootstrap: [AnmeldeToolComponent],
