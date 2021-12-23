@@ -55,6 +55,16 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     return this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator);
   }
 
+  delete(filter: string, tiTu: TiTuEnum, row: number): Observable<boolean> {
+    return this.teilnehmerService.delete(
+      this.verein,
+      filter,
+      tiTu,
+      this.paginator,
+      row
+    );
+  }
+
   // pageEvent: PageEvent,
   update(filter: string, tiTu: TiTuEnum, row: number, col: number, value: any) {
     // const effRow = pageEvent.previousPageIndex * this.paginator.pageSize + row;
@@ -150,9 +160,9 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     }
   }
 
-  reset(verein: IVerein) {
+  reset(verein: IVerein): Observable<any> {
     console.log("Reset");
-    this.teilnehmerService.reset(verein);
+    return this.teilnehmerService.reset(verein);
   }
 
   add(verein: IVerein, titu: TiTuEnum): Observable<ITeilnehmer> {

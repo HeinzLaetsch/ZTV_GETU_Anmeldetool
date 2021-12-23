@@ -327,6 +327,12 @@ public class AdminController {
 		return teilnehmerSrv.update(orgId, teilnehmerDTO);
 	}
 
+	@DeleteMapping("/organisationen/{orgId}/teilnehmer/{teilnehmerId}")
+	public ResponseEntity<Boolean> deleteTeilnehmer(HttpServletRequest request, @PathVariable UUID orgId,
+			@PathVariable UUID teilnehmerId) {
+		return teilnehmerSrv.delete(orgId, teilnehmerId);
+	}
+
 	@GetMapping("/verbaende")
 	// @ResponseBody
 	public ResponseEntity<Collection<VerbandDTO>> getVerbaende() {

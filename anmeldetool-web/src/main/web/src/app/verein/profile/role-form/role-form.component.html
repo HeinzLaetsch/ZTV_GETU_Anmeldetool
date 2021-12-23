@@ -41,7 +41,13 @@
           cdkDrag
           [cdkDragDisabled]="disableRole(role)"
         >
-          <app-role-chip [role]="role" [isAllRolesList]="false"></app-role-chip>
+          <app-role-chip
+            [role]="role"
+            [isAllRolesList]="false"
+            [isVereinsVerantwortlicher]="isVereinsAnmelder"
+            [isVereinsAnmelder]="isVereinsAnmelder"
+            (roleChange)="aktivChange($event)"
+          ></app-role-chip>
         </div>
       </div>
     </div>

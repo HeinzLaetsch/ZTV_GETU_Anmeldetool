@@ -31,6 +31,8 @@ public class Anlass extends Base {
 
 	private String organisator;
 
+	private String iban;
+
 	private LocalDateTime startDate;
 
 	private LocalDateTime endDate;

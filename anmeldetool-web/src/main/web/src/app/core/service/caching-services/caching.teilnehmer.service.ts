@@ -31,11 +31,18 @@ export class CachingTeilnehmerService {
   ) {
     this.teilnehmerLoaded = new BehaviorSubject<number>(undefined);
   }
-  reset(verein: IVerein): Observable<number> {
+  reset(verein: IVerein): Observable<any[]> {
     this.loaded = false;
     this.dirty = false;
     this.valid = true;
-    return this.loadTeilnehmer(verein);
+    const observables = new Array<Observable<any>>();
+    this.teilnehmer.forEach((teilnehmer) => {
+      if (teilnehmer.onlyCreated) {
+        observables.push(this.teilnehmerService.delete(verein, teilnehmer));
+      }
+    });
+    return forkJoin(observables);
+    // return this.loadTeilnehmer(verein);
   }
 
   isTeilnehmerLoaded(): Observable<number> {
@@ -92,6 +99,23 @@ export class CachingTeilnehmerService {
     return tituFiltered;
   }
 
+  delete(
+    verein: IVerein,
+    filter: string,
+    tiTu: TiTuEnum,
+    paginator: MatPaginator,
+    row: number
+  ): Observable<boolean> {
+    const teilnehmer = this.getTeilnehmer(filter, tiTu, paginator)[row];
+    this.removeTeilnehmer(teilnehmer);
+    return this.teilnehmerService.delete(verein, teilnehmer);
+  }
+
+  removeTeilnehmer(searchTeilnehmer: ITeilnehmer) {
+    const index = this.teilnehmer.indexOf(searchTeilnehmer);
+    const removed = this.teilnehmer.splice(index, 1);
+    // console.log("Finished: ", index, " , ", removed);
+  }
   getTeilnehmer(
     filter: string,
     tiTu: TiTuEnum,
@@ -145,19 +169,12 @@ export class CachingTeilnehmerService {
   add(verein: IVerein, titu: TiTuEnum): Observable<ITeilnehmer> {
     return this.teilnehmerService.add(verein, titu).pipe(
       tap((teilnehmer) => {
+        teilnehmer.onlyCreated = true;
         this.teilnehmer.push(teilnehmer);
         this.dirty = true;
         console.log("From Tap:", teilnehmer);
-        // newTeilnehmerObs.next(teilnehmer);
       })
     );
-    /*
-    this.teilnehmerService.add(verein, titu).subscribe((teilnehmer) => {
-      console.log("From Tap:", teilnehmer);
-    });
-    return of({});
-    */
-    // return newTeilnehmerObs;
   }
 
   saveAll(verein: IVerein): Observable<any[]> {

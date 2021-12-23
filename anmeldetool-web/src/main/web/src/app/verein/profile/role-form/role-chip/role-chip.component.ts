@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { IRolle } from "src/app/core/model/IRolle";
 
 @Component({
@@ -13,6 +13,12 @@ export class RoleChipComponent implements OnInit {
   isVereinsVerantwortlicher: boolean;
   @Input()
   role: IRolle;
+  @Output()
+  roleChange: EventEmitter<IRolle>;
+
+  constructor() {
+    this.roleChange = new EventEmitter();
+  }
 
   @Input()
   isAllRolesList: boolean;
@@ -21,6 +27,6 @@ export class RoleChipComponent implements OnInit {
     // console.log("Oninit: ", this.role.name);
   }
   aktivChange(role: IRolle) {
-    console.error("Funktion noch nicht implementiert");
+    this.roleChange.emit(role);
   }
 }

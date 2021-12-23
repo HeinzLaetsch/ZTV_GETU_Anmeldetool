@@ -160,8 +160,11 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   }
   public resetDataSource() {
     // console.log("resetDataSource");
-    this.dataSource.reset(this.authService.currentVerein);
-    this.paginator.firstPage();
+    this.dataSource
+      .reset(this.authService.currentVerein)
+      .subscribe((results) => {
+        this.initAll();
+      });
   }
 
   get isTeilnahmenLoaded(): Observable<boolean> {
@@ -232,7 +235,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   getControl(row: number, col: number): FormControl {
     let control: FormControl = undefined;
     // TODO pattern für STV Nummer
-    if (col !== 2) {
+    if (col === 0 || col === 1) {
       control = new FormControl(row + ":", [
         Validators.minLength(2),
         Validators.required,
@@ -240,11 +243,21 @@ export class TeilnehmerTableComponent implements AfterViewInit {
           "[a-zA-Z -_.\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]*"
         ),
       ]);
-    } else {
+    }
+    if (col === 2) {
       control = new FormControl(row + ":", [
         Validators.minLength(4),
+        Validators.maxLength(4),
         Validators.required,
         Validators.pattern("[1,2][0-9]*"),
+      ]);
+    }
+    if (col === 3) {
+      control = new FormControl(row + ":", [
+        Validators.minLength(5),
+        Validators.maxLength(6),
+        Validators.required,
+        Validators.pattern("[0-9]*"),
       ]);
     }
     return control;
@@ -418,8 +431,10 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     this.populating = false;
   }
   applyFilter(filterValue: string) {
-    filterValue = filterValue.trim(); // Remove whitespace
-    this.filterValue = filterValue.toLowerCase(); // Datasource defaults to lowercase matches
+    if (filterValue) {
+      filterValue = filterValue.trim(); // Remove whitespace
+      this.filterValue = filterValue.toLowerCase(); // Datasource defaults to lowercase matches
+    }
     this.dataSource.filter = filterValue;
     // this.checkIfDirty(pageEvent);
     // console.log("PageEvent: ", pageEvent);
@@ -514,7 +529,12 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   }
 
   delete(event: any, row: any, rowIndex: any) {
-    console.log("click fired: ", event, " row: ", row, " rowIndex: ", rowIndex);
+    // console.log("click fired: ", event, " row: ", row, " rowIndex: ", rowIndex);
+    this.dataSource
+      .delete(this.filterValue, this.tiTu, rowIndex)
+      .subscribe((results) => {
+        this.applyFilter(this.filterValue);
+      });
   }
 
   // Wenn Name oder Jahrgang geändert wird Wettkaämpfe anzeigen, bei welchem das keine Rolle mehr spielt.

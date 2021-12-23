@@ -7,7 +7,7 @@
 
   <mat-tab-group mat-align-tabs="start" #tabs>
     <mat-tab label="Turnerinnen">
-      <app-teilnehmer-table [tiTu]="ti"></app-teilnehmer-table>
+      <app-teilnehmer-table [tiTu]="ti" #tableTi></app-teilnehmer-table>
       <div>
         <button
           mat-fab
@@ -30,7 +30,7 @@
           matTooltip="Änderungen speichern"
           matTooltipPosition="below"
           matTooltipHideDelay="500"
-          (click)="saveTeilnehmer($event)"
+          (click)="saveTeilnehmerTi($event)"
         >
           Speichern
         </button>
@@ -43,14 +43,14 @@
           matTooltip="Änderungen verwerfen"
           matTooltipPosition="below"
           matTooltipHideDelay="500"
-          (click)="cancel()"
+          (click)="cancelTi()"
         >
           Verwerfen
         </button>
       </div>
     </mat-tab>
     <mat-tab label="Turner">
-      <app-teilnehmer-table [tiTu]="tu"></app-teilnehmer-table>
+      <app-teilnehmer-table [tiTu]="tu" #tableTu></app-teilnehmer-table>
       <div>
         <button
           mat-fab
@@ -73,7 +73,7 @@
           matTooltip="Änderungen speichern"
           matTooltipPosition="below"
           matTooltipHideDelay="500"
-          (click)="saveTeilnehmer($event)"
+          (click)="saveTeilnehmerTu($event)"
         >
           Speichern
         </button>
@@ -86,7 +86,7 @@
           matTooltip="Änderungen verwerfen"
           matTooltipPosition="below"
           matTooltipHideDelay="500"
-          (click)="cancel()"
+          (click)="cancelTu()"
         >
           Verwerfen
         </button>

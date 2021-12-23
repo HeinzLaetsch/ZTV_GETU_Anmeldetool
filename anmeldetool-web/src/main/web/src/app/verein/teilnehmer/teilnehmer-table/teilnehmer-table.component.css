@@ -118,6 +118,6 @@ div.rotate > span {
 
 .ng-invalid:not(form) {
   border: 1px solid #a94442; /* red */
-  color: white;
-  background-image: linear-gradient(to right, #a94442 0%, white 100%);
+  color: rgb(253, 4, 4);
+  background-image: linear-gradient(to right, white 0%, #f0b5b4 100%);
 }

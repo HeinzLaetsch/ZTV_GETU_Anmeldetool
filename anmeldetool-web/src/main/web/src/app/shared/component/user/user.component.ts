@@ -42,6 +42,8 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
   //floatLabel = 'Always';
   appearance = "outline";
 
+  enteredPassword = "";
+
   form: FormGroup = new FormGroup({
     benutzernameControl: new FormControl("", [
       Validators.required,
@@ -87,8 +89,14 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
     this.form.controls.benutzernameControl.setValue(user.benutzername);
     this.form.controls.nachnameControl.setValue(user.name);
     this.form.controls.vornameControl.setValue(user.vorname);
-    this.form.controls.passwortControl.setValue(user.password);
-    this.form.controls.passwort2Control.setValue(user.password);
+    // Password is not returned by the server
+    if (this.enteredPassword && this.enteredPassword.length > 0) {
+      this.form.controls.passwortControl.setValue(this.enteredPassword);
+      this.form.controls.passwort2Control.setValue(this.enteredPassword);
+    } else {
+      this.form.controls.passwortControl.setValue(user.password);
+      this.form.controls.passwort2Control.setValue(user.password);
+    }
     this.form.controls.eMailAdresseControl.setValue(user.email);
     this.form.controls.mobilNummerControl.setValue(user.handy);
   }
@@ -154,6 +162,7 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
     this.form.controls.passwortControl.valueChanges.subscribe((value) => {
       if (this.user.password !== value) {
         this.user.password = value;
+        this.enteredPassword = value;
         this.emitChange(true);
       }
     });

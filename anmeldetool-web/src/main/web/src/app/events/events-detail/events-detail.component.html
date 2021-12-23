@@ -9,31 +9,33 @@
   </div>
 
   <div class="row">
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       <span *ngIf="anlass.startDatum === anlass.endDatum">am</span>
       <span *ngIf="anlass.startDatum !== anlass.endDatum">von</span>:
       {{ anlass.startDatum | date: "EEEE, d MMMM , yyyy" }}
     </div>
-    <div class="col-sm-4" *ngIf="anlass.startDatum !== anlass.endDatum">
+    <div class="col-sm-3" *ngIf="anlass.startDatum !== anlass.endDatum">
       bis: {{ anlass.endDatum | date: "EEEE, d MMMM , yyyy" }}
     </div>
   </div>
 
   <div class="row">
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       Geschlecht: <span style="font-weight: 550"> {{ anlass.tiTu }}</span>
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       Startberechtigt: {{ anlass.tiefsteKategorie }} bis
       {{ anlass.hoechsteKategorie }}
     </div>
   </div>
 
   <div class="row">
-    <div class="col-sm-4">Ort: {{ anlass.ort }}</div>
-    <div class="col-sm-4">Halle: {{ anlass.halle }}</div>
-    <div class="col-sm-4">Organisator: {{ anlass.organisator }}</div>
+    <div class="col-sm-3">Ort: {{ anlass.ort }}</div>
+    <div class="col-sm-3">Halle: {{ anlass.halle }}</div>
+    <div class="col-sm-3">Organisator: {{ anlass.organisator }}</div>
+    <div class="col-sm-3">IBAN: {{ anlass.iban }}</div>
   </div>
+  <hr />
   <!--  (click)="vereinStartedClicked($event)"        -->
   <div class="row">
     <div class="col-12">
@@ -46,7 +48,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-3">Teilnehmer: {{ anzahlTeilnehmer }}</div>
+    <div class="col-3">Teilnehmer Total: {{ anzahlTeilnehmer }}</div>
     <div class="col-3">Teilnehmer K1-K4: {{ anzahlTeilnehmerBrevet1 }}</div>
     <div class="col-3">Teilnehmer K5-K7: {{ anzahlTeilnehmerBrevet2 }}</div>
   </div>

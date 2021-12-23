@@ -102,6 +102,8 @@ public class PersonService {
 		boolean createPW = true;
 		if (personDTO.getPassword() == null || personDTO.getPassword().length() == 0) {
 			createPW = false;
+		} else {
+			person.setPassword(personDTO.getPassword());
 		}
 
 		person = create(person, createPW);
@@ -188,6 +190,12 @@ public class PersonService {
 				rl.setRolle(rolle);
 				rollenLinkRep.save(rl);
 				filteredOpl.get(0).getRollenLink().add(rl);
+			} else {
+				RollenLink rl = filtered.get(0);
+				if (rl.isAktiv() != rolleDTO.isAktiv()) {
+					rl.setAktiv(rolleDTO.isAktiv());
+					rollenLinkRep.save(rl);
+				}
 			}
 		}
 		person = create(person, false);

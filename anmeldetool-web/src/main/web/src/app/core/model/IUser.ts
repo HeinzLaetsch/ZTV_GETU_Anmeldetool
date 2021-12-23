@@ -3,7 +3,7 @@ import { IRolle } from "./IRolle";
 import { IWertungsrichter } from "./IWertungsrichter";
 
 export interface IUser {
-  id: string;
+  id?: string;
   organisationid: string;
   benutzername: string;
   name: string;

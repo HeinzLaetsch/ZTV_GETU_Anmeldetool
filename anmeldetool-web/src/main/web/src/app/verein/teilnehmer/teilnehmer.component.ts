@@ -29,8 +29,11 @@ export class TeilnehmerComponent implements OnInit {
 
   @ViewChild("tabs") tabGroup: MatTabGroup;
 
-  @ViewChild(TeilnehmerTableComponent, { static: false })
-  teilnehmerTable: TeilnehmerTableComponent;
+  @ViewChild("tableTi", { static: false })
+  teilnehmerTableTi: TeilnehmerTableComponent;
+
+  @ViewChild("tableTu", { static: false })
+  teilnehmerTableTu: TeilnehmerTableComponent;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -81,9 +84,14 @@ export class TeilnehmerComponent implements OnInit {
   set user(value: IUser) {
     this.currentUser = value;
   }
-
-  cancel() {
-    this.teilnehmerTable.resetDataSource();
+  cancelTi() {
+    this.cancel(this.teilnehmerTableTi);
+  }
+  cancelTu() {
+    this.cancel(this.teilnehmerTableTu);
+  }
+  cancel(ttc: TeilnehmerTableComponent) {
+    ttc.resetDataSource();
     this.needsCancel = false;
     this.needsSave = false;
     // this.router.navigate(["events"]);
@@ -95,19 +103,24 @@ export class TeilnehmerComponent implements OnInit {
 
   addTurnerin(event: any) {
     this.needsCancel = true;
-    this.teilnehmerTable.addNewTeilnehmer(TiTuEnum.Ti);
+    this.teilnehmerTableTi.addNewTeilnehmer(TiTuEnum.Ti);
   }
-
-  saveTeilnehmer(event: any) {
+  saveTeilnehmerTi(event: any) {
+    this.saveTeilnehmer(this.teilnehmerTableTi);
+  }
+  saveTeilnehmerTu(event: any) {
+    this.saveTeilnehmer(this.teilnehmerTableTu);
+  }
+  saveTeilnehmer(ttc: TeilnehmerTableComponent) {
     this.needsCancel = false;
     this.needsSave = false;
-    this.teilnehmerTable.saveTeilnehmer();
+    ttc.saveTeilnehmer();
     this.teilnehmerService.dirty = false;
   }
 
   addTurner(event: any) {
     this.needsCancel = true;
-    this.teilnehmerTable.addNewTeilnehmer(TiTuEnum.Tu);
+    this.teilnehmerTableTu.addNewTeilnehmer(TiTuEnum.Tu);
   }
 
   get disAllowSave(): boolean {

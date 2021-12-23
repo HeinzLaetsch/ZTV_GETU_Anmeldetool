@@ -68,6 +68,14 @@ export class TeilnehmerService {
       .pipe(catchError(this.handleError<ITeilnehmer>("add")));
   }
 
+  delete(verein: IVerein, teilnehmer: ITeilnehmer): Observable<boolean> {
+    // console.log("Service delete: ", teilnehmer);
+    const combinedUrl = this.url + verein.id + "/teilnehmer/" + teilnehmer.id;
+    return this.http
+      .delete<boolean>(combinedUrl)
+      .pipe(catchError(this.handleError<boolean>("delete")));
+  }
+
   save(verein: IVerein, teilnehmer: ITeilnehmer): Observable<ITeilnehmer> {
     console.log("Service save: ", teilnehmer);
     const combinedUrl = this.url + verein.id + "/teilnehmer";

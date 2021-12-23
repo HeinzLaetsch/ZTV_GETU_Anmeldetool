@@ -10,6 +10,7 @@ export class IAnlass {
   ort: string;
   halle: string;
   organisator: string;
+  iban: string;
 
   set startDatum(startDatum: Date) {
     this.startDatum_ = startDatum;

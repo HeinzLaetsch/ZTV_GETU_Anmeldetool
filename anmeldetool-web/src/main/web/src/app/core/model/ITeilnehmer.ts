@@ -10,4 +10,5 @@ export interface ITeilnehmer {
   tiTu?: TiTuEnum;
   dirty?: boolean;
   teilnahmen?: IAnlassLinks;
+  onlyCreated?: boolean;
 }

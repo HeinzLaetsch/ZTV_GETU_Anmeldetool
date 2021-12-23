@@ -101,6 +101,19 @@ public class TeilnehmerService {
 		return teilnehmerRepository.save(teilnehmer);
 	}
 
+	public ResponseEntity<Boolean> delete(UUID orgId, UUID teilnehmerId) {
+		Organisation organisation = organisationSrv.findOrganisationById(orgId);
+		if (organisation == null) {
+			return ResponseEntity.notFound().build();
+		}
+		Optional<Teilnehmer> teilnehmerOptional = teilnehmerRepository.findById(teilnehmerId);
+		if (teilnehmerOptional.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		teilnehmerRepository.delete(teilnehmerOptional.get());
+		return ResponseEntity.ok(true);
+	}
+
 	public ResponseEntity<TeilnehmerDTO> update(UUID orgId, TeilnehmerDTO teilnehmerDTO) {
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		if (organisation == null) {
