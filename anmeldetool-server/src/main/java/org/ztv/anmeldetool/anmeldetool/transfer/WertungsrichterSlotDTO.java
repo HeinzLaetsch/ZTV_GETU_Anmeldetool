@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
-import org.ztv.anmeldetool.anmeldetool.models.WertungsrichterBrevetEnum;
-
 import lombok.Builder;
 import lombok.Value;
 
@@ -16,7 +14,7 @@ public class WertungsrichterSlotDTO {
 
 	int reihenfolge;
 
-	WertungsrichterBrevetEnum brevet;
+	int brevet;
 
 	LocalDate tag;
 

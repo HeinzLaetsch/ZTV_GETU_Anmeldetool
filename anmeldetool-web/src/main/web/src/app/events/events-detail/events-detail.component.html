@@ -96,7 +96,7 @@
                   aria-label="Wertungsrichter"
                   class="drag-drop-list col"
                   cdkDropList
-                  [cdkDropListDisabled]="true"
+                  [cdkDropListDisabled]="isStartedCheckboxDisabled()"
                   #allWr1sList="cdkDropList"
                   [cdkDropListData]="availableWertungsrichter1"
                   [cdkDropListConnectedTo]="[assignedWr1List]"
@@ -114,7 +114,7 @@
               <div class="col">
                 <div
                   cdkDropList
-                  [cdkDropListDisabled]="true"
+                  [cdkDropListDisabled]="isStartedCheckboxDisabled()"
                   #assignedWr1List="cdkDropList"
                   [cdkDropListData]="assignedWr1s"
                   [cdkDropListConnectedTo]="[allWr1sList]"

@@ -38,6 +38,7 @@ import org.ztv.anmeldetool.anmeldetool.models.PersonAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.models.Wertungsrichter;
 import org.ztv.anmeldetool.anmeldetool.models.WertungsrichterBrevetEnum;
 import org.ztv.anmeldetool.anmeldetool.models.WertungsrichterEinsatz;
+import org.ztv.anmeldetool.anmeldetool.models.WertungsrichterSlot;
 import org.ztv.anmeldetool.anmeldetool.service.AnlassService;
 import org.ztv.anmeldetool.anmeldetool.service.LoginService;
 import org.ztv.anmeldetool.anmeldetool.service.OrganisationService;
@@ -239,11 +240,16 @@ public class AdminController {
 		}
 		if (pal.getEinsaetze() == null || pal.getEinsaetze().isEmpty()) {
 			if (pal.getAnlass().getWertungsrichterSlots() != null) {
-				List<WertungsrichterEinsatz> wrEs = pal.getAnlass().getWertungsrichterSlots().stream().map(slot -> {
+				List<WertungsrichterSlot> slots = pal.getAnlass().getWertungsrichterSlots().stream().filter(slot -> {
+					return pal.getPerson().getWertungsrichter().getBrevet() == slot.getBrevet();
+				}).collect(Collectors.toList());
+
+				List<WertungsrichterEinsatz> wrEs = slots.stream().map(slot -> {
 					WertungsrichterEinsatz wrE = WertungsrichterEinsatz.builder().personAnlassLink(pal)
 							.eingesetzt(false).wertungsrichterSlot(slot).build();
 					wrE.setId(UUID.randomUUID());
 					wrE.setAktiv(true);
+					wrE = this.wertungsrichterEinsatzSrv.update(wrE);
 					return wrE;
 				}).collect(Collectors.toList());
 				pal.setEinsaetze(wrEs);
