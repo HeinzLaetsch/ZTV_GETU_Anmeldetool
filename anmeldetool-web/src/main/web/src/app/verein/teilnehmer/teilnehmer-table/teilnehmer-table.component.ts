@@ -173,8 +173,8 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   }
 
   getKategorien(anlass: IAnlass): String[] {
-    let kd = Object.keys(KategorieEnum).findIndex(
-      (key) => key === KategorieEnum.KD
+    let k5 = Object.keys(KategorieEnum).findIndex(
+      (key) => key === KategorieEnum.K5
     );
     const start = Object.keys(KategorieEnum).findIndex(
       (key) => key === anlass.tiefsteKategorie
@@ -182,12 +182,18 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     let end = Object.keys(KategorieEnum).findIndex(
       (key) => key === anlass.hoechsteKategorie
     );
+    // Keine Teilnahme
     let filtered = Object.values(KategorieEnum).slice(0, 1);
-    if (end > kd) {
-      filtered = filtered.concat(Object.values(KategorieEnum).slice(start, kd));
+    if (end > k5) {
+      filtered = filtered.concat(Object.values(KategorieEnum).slice(start, k5));
       if (this.tiTu === TiTuEnum.Ti) {
+        filtered.push(KategorieEnum.K5A);
+        filtered.push(KategorieEnum.K5B);
+        filtered.push(KategorieEnum.K6);
         filtered.push(KategorieEnum.KD);
       } else {
+        filtered.push(KategorieEnum.K5);
+        filtered.push(KategorieEnum.K6);
         filtered.push(KategorieEnum.KH);
       }
       filtered.push(KategorieEnum.K7);

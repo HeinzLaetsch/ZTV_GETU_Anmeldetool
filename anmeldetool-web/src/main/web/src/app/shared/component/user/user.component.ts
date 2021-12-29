@@ -54,7 +54,7 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
     vornameControl: new FormControl("", Validators.required),
     passwortControl: new FormControl("", Validators.required),
     passwort2Control: new FormControl("", Validators.required),
-    eMailAdresseControl: new FormControl("", [
+    eMailAdresseControl: new FormControl({ value: "", disabled: false }, [
       Validators.required,
       Validators.email,
       Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"),
@@ -74,6 +74,9 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
   ngAfterViewInit(): void {
     if (this.readOnly) {
       this.form.disable();
+    }
+    if (this.showBenutzername) {
+      this.form.controls.eMailAdresseControl.disable();
     }
     this.emitChange(false);
   }
@@ -105,6 +108,7 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
     if (this.showBenutzername) {
       const benutzerNameValid = this.form.controls.benutzernameControl.valid;
       valid = valid && benutzerNameValid;
+      /*
       if (
         benutzerNameValid &&
         (this.form.controls.eMailAdresseControl.value === undefined ||
@@ -114,6 +118,12 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
           this.form.controls.benutzernameControl.value
         );
         this.user.email = this.form.controls.benutzernameControl.value;
+      }*/
+      if (benutzerNameValid) {
+        this.user.email = this.form.controls.benutzernameControl.value;
+        this.form.controls.eMailAdresseControl.setValue(
+          this.form.controls.benutzernameControl.value
+        );
       }
     }
     valid = valid && this.form.controls.nachnameControl.valid;
@@ -130,7 +140,9 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
         valid = valid && this.form.controls.passwort2Control.valid;
       }
     }
-    valid = valid && this.form.controls.eMailAdresseControl.valid;
+    if (!this.showBenutzername) {
+      valid = valid && this.form.controls.eMailAdresseControl.valid;
+    }
     valid = valid && this.form.controls.mobilNummerControl.valid;
 
     this.valid.next(valid);
