@@ -77,6 +77,14 @@
               <div class="col">Status Brevet 1: {{ statusBr1 }}</div>
             </div>
             <div class="row doubleRow">
+              <div class="col-4 label-red" *ngIf="isBrevet1Anlass()">
+                <mat-checkbox
+                  [(ngModel)]="useBrevet2"
+                  (ngModelChange)="useBrevet2Clicked($event)"
+                  >Brevet 2 als Brevet 1 einsetzen</mat-checkbox
+                >
+              </div>
+
               <div class="col">
                 Benötigte Wertungsrichter Brevet 1:
                 {{ wertungsrichterPflichtBrevet1 }}
@@ -96,7 +104,9 @@
                   aria-label="Wertungsrichter"
                   class="drag-drop-list col"
                   cdkDropList
-                  [cdkDropListDisabled]="isStartedCheckboxDisabled()"
+                  [cdkDropListDisabled]="
+                    isStartedCheckboxDisabled() || !isBrevet1Anlass()
+                  "
                   #allWr1sList="cdkDropList"
                   [cdkDropListData]="availableWertungsrichter1"
                   [cdkDropListConnectedTo]="[assignedWr1List]"
@@ -114,7 +124,9 @@
               <div class="col">
                 <div
                   cdkDropList
-                  [cdkDropListDisabled]="isStartedCheckboxDisabled()"
+                  [cdkDropListDisabled]="
+                    isStartedCheckboxDisabled() || !isBrevet1Anlass()
+                  "
                   #assignedWr1List="cdkDropList"
                   [cdkDropListData]="assignedWr1s"
                   [cdkDropListConnectedTo]="[allWr1sList]"
@@ -177,7 +189,9 @@
                 [cdkDropListConnectedTo]="[assignedWr2List]"
                 cdkDropListOrientation="vertical"
                 (cdkDropListDropped)="drop($event, '1')"
-                [cdkDropListDisabled]="isStartedCheckboxDisabled()"
+                [cdkDropListDisabled]="
+                  isStartedCheckboxDisabled() || !isBrevet2Anlass()
+                "
               >
                 <app-wertungsrichter-chip
                   *ngFor="let wr of availableWertungsrichter2"
@@ -196,7 +210,9 @@
                 [cdkDropListConnectedTo]="[allWr2sList]"
                 class="drag-drop-list col"
                 (cdkDropListDropped)="drop($event, '2')"
-                [cdkDropListDisabled]="isStartedCheckboxDisabled()"
+                [cdkDropListDisabled]="
+                  isStartedCheckboxDisabled() || !isBrevet2Anlass()
+                "
               >
                 <app-wertungsrichter-chip
                   *ngFor="let wr of assignedWr2s"

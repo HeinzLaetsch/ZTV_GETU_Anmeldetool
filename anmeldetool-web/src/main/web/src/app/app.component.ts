@@ -1,4 +1,9 @@
-import { AfterViewInit, Component, OnInit } from "@angular/core";
+import {
+  AfterContentChecked,
+  AfterViewInit,
+  Component,
+  OnInit,
+} from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute } from "@angular/router";
 import { AuthService } from "./core/service/auth/auth.service";
@@ -13,7 +18,9 @@ import { NewVereinComponent } from "./verein/new-verein/new-verein.component";
   templateUrl: "app.component.html",
   styleUrls: ["app.component.css"],
 })
-export class AnmeldeToolComponent implements OnInit, AfterViewInit {
+export class AnmeldeToolComponent
+  implements OnInit, AfterViewInit, AfterContentChecked
+{
   private showPage = 0;
   dialogOpen = false;
   _authenticated: boolean;
@@ -24,6 +31,13 @@ export class AnmeldeToolComponent implements OnInit, AfterViewInit {
     private router: ActivatedRoute,
     public dialog: MatDialog
   ) {}
+  ngAfterContentChecked(): void {
+    if (!this.authService.isAuthenticated() && this._authenticated) {
+      this._authenticated = false;
+      console.log("AnmeldeToolComponent::ngAfterContentChecked");
+      this.openLoginDialog();
+    }
+  }
 
   fillerNav = Array.from({ length: 10 }, (_, i) => `Nav Item ${i + 1}`);
 
@@ -31,14 +45,14 @@ export class AnmeldeToolComponent implements OnInit, AfterViewInit {
     this.vereinService.loadVereine().subscribe((result) => {
       // console.log("AnmeldeToolComponent::ngOnInit 1: ", result);
     });
+  }
 
+  ngAfterViewInit(): void {
     if (!this.authService.isAuthenticated()) {
       // console.log('AnmeldeToolComponent::ngOnInit 2: ');
       this.openLoginDialog();
     }
   }
-
-  ngAfterViewInit(): void {}
 
   openLoginDialog() {
     this.dialogOpen = true;
@@ -54,6 +68,7 @@ export class AnmeldeToolComponent implements OnInit, AfterViewInit {
       // console.log("Dialog Closed", result);
       if (result === "OK") {
         this.dialogOpen = false;
+        this._authenticated = true;
       }
       if (result === 1) {
         this.openNewVereinDialog();
@@ -89,7 +104,7 @@ export class AnmeldeToolComponent implements OnInit, AfterViewInit {
       this.openLoginDialog();
     });
   }
-  /* 
+  /*
   get vereineLoaded(): Observable<boolean> {
     return this.vereinService.isVereineLoaded();
   }*/

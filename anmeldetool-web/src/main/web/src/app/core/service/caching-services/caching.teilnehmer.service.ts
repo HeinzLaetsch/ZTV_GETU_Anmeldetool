@@ -1,12 +1,15 @@
 import { Injectable } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
+import { Sort } from "@angular/material/sort";
 import { BehaviorSubject, forkJoin, Observable } from "rxjs";
 import { tap } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
 import { ITeilnehmer } from "../../model/ITeilnehmer";
+import { KategorieEnum } from "../../model/KategorieEnum";
 import { TiTuEnum } from "../../model/TiTuEnum";
 import { AnlassService } from "../anlass/anlass.service";
 import { TeilnehmerService } from "../teilnehmer/teilnehmer.service";
+import { CachingAnlassService } from "./caching.anlass.service";
 
 @Injectable({
   providedIn: "root",
@@ -25,9 +28,15 @@ export class CachingTeilnehmerService {
   private teilnehmer: ITeilnehmer[];
   // private orgUsers: IUser[];
 
+  private oldSort: Sort;
+  private sortedTeilnehmer: ITeilnehmer[];
+
+  private oldFilter: string;
+  private filteredTeilnehmer: ITeilnehmer[];
+
   constructor(
     private teilnehmerService: TeilnehmerService,
-    private anlassService: AnlassService
+    private anlassService: CachingAnlassService
   ) {
     this.teilnehmerLoaded = new BehaviorSubject<number>(undefined);
   }
@@ -102,11 +111,12 @@ export class CachingTeilnehmerService {
   delete(
     verein: IVerein,
     filter: string,
+    sort: Sort,
     tiTu: TiTuEnum,
     paginator: MatPaginator,
     row: number
   ): Observable<boolean> {
-    const teilnehmer = this.getTeilnehmer(filter, tiTu, paginator)[row];
+    const teilnehmer = this.getTeilnehmer(filter, sort, tiTu, paginator)[row];
     this.removeTeilnehmer(teilnehmer);
     return this.teilnehmerService.delete(verein, teilnehmer);
   }
@@ -118,6 +128,7 @@ export class CachingTeilnehmerService {
   }
   getTeilnehmer(
     filter: string,
+    sort: Sort,
     tiTu: TiTuEnum,
     paginator: MatPaginator
   ): ITeilnehmer[] {
@@ -130,10 +141,64 @@ export class CachingTeilnehmerService {
       }
       let tituFiltered = this.getTiTuTeilnehmer(tiTu);
       tituFiltered = this.filterByName(filter, tituFiltered);
+      tituFiltered = this.sortBySort(tituFiltered, sort);
       const paged = tituFiltered.slice(start, end);
       return paged;
     }
     return undefined;
+  }
+
+  private sortBySort(tituFiltered: ITeilnehmer[], sort: Sort): ITeilnehmer[] {
+    if (!sort) {
+      this.oldSort = sort;
+      return tituFiltered;
+    }
+    if (this.oldSort === sort) {
+      return this.sortedTeilnehmer;
+    }
+    this.oldSort = sort;
+    console.log("Sort: ", sort.active);
+    const isAsc = sort.direction === "asc";
+    const anlass = this.anlassService.getAnlassById(sort.active);
+
+    this.sortedTeilnehmer = tituFiltered.sort((a, b) => {
+      switch (sort.active) {
+        case "name":
+          return this.compare(a.name, b.name, isAsc);
+        case "vorname":
+          return this.compare(a.vorname, b.vorname, isAsc);
+        case "jahrgang":
+          return this.compare(a.jahrgang, b.jahrgang, isAsc);
+        case "stvnummer":
+          return this.compare(a.stvNummer, b.stvNummer, isAsc);
+        default:
+          const aLink = this.anlassService.getTeilnehmer(anlass, a);
+          const bLink = this.anlassService.getTeilnehmer(anlass, b);
+          if (!aLink) {
+            if (bLink) {
+              return 1;
+            }
+            return 0;
+          }
+          if (!bLink) {
+            if (aLink) {
+              return -1;
+            }
+            return 0;
+          }
+          const kategories = Object.keys(KategorieEnum);
+          return this.compare(
+            kategories.indexOf(aLink.kategorie),
+            kategories.indexOf(bLink.kategorie),
+            isAsc
+          );
+      }
+    });
+    return this.sortedTeilnehmer;
+  }
+
+  compare(a: number | string, b: number | string, isAsc: boolean) {
+    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
   }
 
   private filterByName(
@@ -141,9 +206,14 @@ export class CachingTeilnehmerService {
     teilnehmer: ITeilnehmer[]
   ): ITeilnehmer[] {
     if (!filter || filter.length === 0) {
+      this.oldFilter = filter;
       return teilnehmer;
     }
-    return teilnehmer.filter((teilnehmer) => {
+    if (this.oldFilter === filter) {
+      return this.filteredTeilnehmer;
+    }
+    this.oldFilter = filter;
+    this.filteredTeilnehmer = teilnehmer.filter((teilnehmer) => {
       if (teilnehmer.name.toLowerCase().indexOf(filter) > -1) {
         return true;
       }
@@ -152,7 +222,9 @@ export class CachingTeilnehmerService {
       }
       return false;
     });
+    return this.filteredTeilnehmer;
   }
+
   getTeilnehmerById(id: string) {
     if (this.loaded) {
       const newTeilnehmer = this.teilnehmer.find(

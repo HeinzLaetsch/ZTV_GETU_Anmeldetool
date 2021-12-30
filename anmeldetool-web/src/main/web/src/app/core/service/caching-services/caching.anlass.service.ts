@@ -186,6 +186,15 @@ export class CachingAnlassService {
     }
     return undefined;
   }
+  getAnlassByAnlassBezeichnung(anlassBezeichnung: string) {
+    if (this.loaded) {
+      return this.anlaesse.find(
+        (anlass) => anlass.anlassBezeichnung === anlassBezeichnung
+      );
+    }
+    return undefined;
+  }
+
   loadTeilnahmen(
     anlass: IAnlass,
     verein: IVerein,
@@ -236,5 +245,8 @@ export class CachingAnlassService {
     } else {
       return new Array();
     }
+  }
+  saveTeilnahme(verein: IVerein, anlassLink: IAnlassLink): Observable<boolean> {
+    return this.anlassService.saveTeilnahme(verein, anlassLink);
   }
 }

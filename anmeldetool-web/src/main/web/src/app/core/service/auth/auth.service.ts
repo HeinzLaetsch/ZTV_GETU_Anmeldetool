@@ -17,7 +17,7 @@ export class AuthService {
   private VereineUrl = this.apiHost + "/admin/organisationen";
   private userUrl = this.apiHost + "/admin/user";
 
-  isLoggedIn: boolean = false;
+  // isLoggedIn: boolean = false;
   token: string;
 
   currentUser: IUser;

@@ -8,7 +8,7 @@
     matTooltipHideDelay="100"
   >
     <div class="row">
-      <div class="col">
+      <div class="col-10">
         <span
           [ngClass]="{
             'h2-green': wertungsrichter.gueltig,
@@ -19,6 +19,7 @@
           }}</span
         >
       </div>
+      <div class="col-2">Brevet {{ wertungsrichter.brevet }}</div>
     </div>
     <div class="row">
       <div class="col">

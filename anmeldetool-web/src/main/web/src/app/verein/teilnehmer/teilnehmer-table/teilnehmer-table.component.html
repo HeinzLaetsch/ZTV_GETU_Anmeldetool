@@ -10,7 +10,11 @@
   </div>
 
   <div class="example-container mat-elevation-z8">
-    <mat-table [dataSource]="dataSource" matSort>
+    <mat-table
+      [dataSource]="dataSource"
+      matSort
+      (matSortChange)="sortData($event)"
+    >
       <!-- Name Column -->
       <ng-container matColumnDef="name">
         <mat-header-cell *matHeaderCellDef mat-sort-header class="w_15">
@@ -92,7 +96,10 @@
       <ng-container
         *ngFor="let anlass of anlaesse; let colIndex = index; let last = last"
         [matColumnDef]="
-          anlass.anlassBezeichnung + anlass.tiTu + anlass.tiefsteKategorie
+          anlass.anlassBezeichnung +
+          '///' +
+          anlass.tiTu +
+          anlass.tiefsteKategorie
         "
       >
         <mat-header-cell
@@ -142,6 +149,7 @@
           *ngIf="!last"
           [matColumnDef]="
             anlass.anlassBezeichnung +
+            '///' +
             anlass.tiTu +
             anlass.tiefsteKategorie +
             'Btn'

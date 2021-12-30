@@ -1,15 +1,18 @@
 import {
+  HttpErrorResponse,
   HttpEvent,
   HttpHandler,
   HttpInterceptor,
   HttpRequest,
 } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { Router } from "@angular/router";
 import { Observable } from "rxjs";
+import { tap } from "rxjs/operators";
 import { AuthService } from "../service/auth/auth.service";
 @Injectable()
 export class HttpSecurityInterceptorService implements HttpInterceptor {
-  constructor(private authService: AuthService) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   intercept(
     req: HttpRequest<any>,
@@ -32,13 +35,29 @@ export class HttpSecurityInterceptorService implements HttpInterceptor {
         newHeaders = newHeaders
           .append("authtoken", this.authService.getToken())
           .append("userid", this.authService.currentUser.id)
-          .append("vereinsid", this.authService.currentVerein.id);
+          .append("vereinsid", this.authService.currentVerein.id)
+          .append("X-Requested-With", "XMLHttpRequest");
       }
     } else {
       // console.log("Dont do anything");
     }
     const authReq = req.clone({ withCredentials: true, headers: newHeaders });
-    return next.handle(authReq);
+    return next.handle(authReq).pipe(
+      tap(
+        (evt) => {
+          // console.info("Evt: ", evt);
+        },
+        (err: any) => {
+          if (err instanceof HttpErrorResponse) {
+            if (err.status !== 401) {
+              return;
+            }
+            this.authService.currentUser = undefined;
+            this.router.navigate(["/"]);
+          }
+        }
+      )
+    );
     /*
     .pipe(
       tap((evt) => {

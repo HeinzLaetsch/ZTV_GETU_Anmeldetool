@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, Input, ViewChild } from "@angular/core";
 import { FormControl, Validators } from "@angular/forms";
 import { MatPaginator, PageEvent } from "@angular/material/paginator";
-import { MatSort } from "@angular/material/sort";
+import { MatSort, Sort } from "@angular/material/sort";
 import { Observable, Subscription } from "rxjs";
 import { TeilnehmerDataSource } from "src/app/core/datasource/TeilnehmerDataSource";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
@@ -34,6 +34,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   tiTu: TiTuEnum;
 
   filterValue: string;
+  sortValue: string;
 
   populating = true;
   checked: Array<boolean>;
@@ -97,10 +98,14 @@ export class TeilnehmerTableComponent implements AfterViewInit {
         this.allDisplayedColumns = this.displayedColumns.map((col) => col);
         this.anlaesse.forEach((anlass) => {
           this.allDisplayedColumns.push(
-            anlass.anlassBezeichnung + anlass.tiTu + anlass.tiefsteKategorie
+            anlass.anlassBezeichnung +
+              "///" +
+              anlass.tiTu +
+              anlass.tiefsteKategorie
           );
           this.allDisplayedColumns.push(
             anlass.anlassBezeichnung +
+              "///" +
               anlass.tiTu +
               anlass.tiefsteKategorie +
               "Btn"
@@ -325,6 +330,19 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     return undefined;
   }
 
+  sortData(sort: Sort) {
+    if (sort.active.indexOf("///") > -1) {
+      // Anlass
+      const end = sort.active.indexOf("///");
+      const anlassBezeichnung = sort.active.slice(0, end);
+      const anlass =
+        this.anlassService.getAnlassByAnlassBezeichnung(anlassBezeichnung);
+      sort.active = anlass.id;
+    }
+    this.dataSource.sort(sort);
+    this.loadTeilnahmen(false);
+    this.loadTeilnehmerPage();
+  }
   mustEnableAnlass(colIndex: number) {
     const mustEnable =
       this.checked[colIndex] &&
@@ -380,7 +398,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     // console.log('Init Table: ', this.tiTu);
     if (this.paginator) {
       this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
+      // this.dataSource.sort = this.sort;
       this.paginator.page.subscribe((pageEvent) => {
         this.checkIfDirty(pageEvent);
         console.log("PageEvent: ", pageEvent);

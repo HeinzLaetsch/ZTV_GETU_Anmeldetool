@@ -9,6 +9,7 @@ import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IAnlassLink } from "src/app/core/model/IAnlassLink";
 import { IUser } from "src/app/core/model/IUser";
+import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterStatusEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
@@ -32,6 +33,7 @@ export class EventsDetailComponent implements OnInit {
   teilnahmenBrevet2: IAnlassLink[];
   statusBr1: WertungsrichterStatusEnum;
   statusBr2: WertungsrichterStatusEnum;
+  useBrevet2: boolean;
 
   constructor(
     public authService: AuthService,
@@ -71,7 +73,7 @@ export class EventsDetailComponent implements OnInit {
     this.getVerfuegbareWertungsrichter(this.wr2s, 2);
   }
 
-  isStartedCheckboxDisabled() {
+  isStartedCheckboxDisabled(): boolean {
     if (
       !this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)
     ) {
@@ -84,6 +86,14 @@ export class EventsDetailComponent implements OnInit {
     return true;
   }
 
+  isBrevet1Anlass(): boolean {
+    console.log("Brevet 1: ", this.anlass.tiefsteKategorie <= KategorieEnum.K4);
+    return this.anlass.tiefsteKategorie <= KategorieEnum.K4;
+  }
+  isBrevet2Anlass(): boolean {
+    console.log("Brevet 2: ", this.anlass.hoechsteKategorie > KategorieEnum.K4);
+    return this.anlass.hoechsteKategorie > KategorieEnum.K4;
+  }
   private getVerfuegbareWertungsrichter(wrs: IUser[], brevet: number) {
     this.anlassService
       .getVerfuegbareWertungsrichter(
@@ -142,6 +152,9 @@ export class EventsDetailComponent implements OnInit {
     return 0;
   }
   get availableWertungsrichter1(): IUser[] {
+    if (this.useBrevet2) {
+      return this.wr1s.concat(this.wr2s);
+    }
     return this.wr1s;
   }
   get availableWertungsrichter2(): IUser[] {
@@ -222,7 +235,9 @@ export class EventsDetailComponent implements OnInit {
         wertungsrichterUser.pal = pal;
       });
   }
-
+  useBrevet2Clicked(check: boolean) {
+    console.log("Use Brevet 2: ", this.useBrevet2);
+  }
   vereinStartedClicked(check: boolean) {
     this.anlassService
       .updateVereinsStart(

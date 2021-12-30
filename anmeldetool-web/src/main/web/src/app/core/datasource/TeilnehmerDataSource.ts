@@ -1,7 +1,7 @@
 import { CollectionViewer } from "@angular/cdk/collections";
 import { DataSource } from "@angular/cdk/table";
 import { MatPaginator } from "@angular/material/paginator";
-import { MatSort } from "@angular/material/sort";
+import { MatSort, Sort } from "@angular/material/sort";
 import { BehaviorSubject, Observable } from "rxjs";
 import { IVerein } from "src/app/verein/verein";
 import { IAnlass } from "../model/IAnlass";
@@ -16,7 +16,8 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
   private loadingSubject = new BehaviorSubject<boolean>(false);
 
   public paginator: MatPaginator;
-  public sort: MatSort;
+  // public sort: MatSort;
+  sortValue: Sort;
   public filter: string;
 
   public loading$ = this.loadingSubject.asObservable();
@@ -36,15 +37,19 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
   }
 
   getTeilnehmer(filter: string, tiTu: TiTuEnum, row: number): ITeilnehmer {
-    return this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[
-      row
-    ];
+    return this.teilnehmerService.getTeilnehmer(
+      filter,
+      this.sortValue,
+      tiTu,
+      this.paginator
+    )[row];
   }
 
   loadTeilnehmer(filter: string, tiTu: TiTuEnum): ITeilnehmer[] {
     this.teilnehmerService.loadTeilnehmer(this.verein).subscribe((result) => {
       const loadedTeilnehmer = this.teilnehmerService.getTeilnehmer(
         filter,
+        this.sortValue,
         tiTu,
         this.paginator
       );
@@ -52,13 +57,19 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
       this.paginator.length =
         this.teilnehmerService.getTiTuTeilnehmer(tiTu).length;
     });
-    return this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator);
+    return this.teilnehmerService.getTeilnehmer(
+      filter,
+      this.sortValue,
+      tiTu,
+      this.paginator
+    );
   }
 
   delete(filter: string, tiTu: TiTuEnum, row: number): Observable<boolean> {
     return this.teilnehmerService.delete(
       this.verein,
       filter,
+      this.sortValue,
       tiTu,
       this.paginator,
       row
@@ -68,46 +79,60 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
   // pageEvent: PageEvent,
   update(filter: string, tiTu: TiTuEnum, row: number, col: number, value: any) {
     // const effRow = pageEvent.previousPageIndex * this.paginator.pageSize + row;
-    if (!this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)) {
+    if (
+      !this.teilnehmerService.getTeilnehmer(
+        filter,
+        this.sortValue,
+        tiTu,
+        this.paginator
+      )
+    ) {
       console.log("Empty");
     }
-    console.log(
-      "Update row: ",
-      row,
-      ", old: ",
-      this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row],
-      ", new: ",
-      value
-    );
     switch (col) {
       case 0: {
-        this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[
-          row
-        ].name = value;
+        this.teilnehmerService.getTeilnehmer(
+          filter,
+          this.sortValue,
+          tiTu,
+          this.paginator
+        )[row].name = value;
         break;
       }
       case 1: {
-        this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[
-          row
-        ].vorname = value;
+        this.teilnehmerService.getTeilnehmer(
+          filter,
+          this.sortValue,
+          tiTu,
+          this.paginator
+        )[row].vorname = value;
         break;
       }
       case 2: {
-        this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[
-          row
-        ].jahrgang = value;
+        this.teilnehmerService.getTeilnehmer(
+          filter,
+          this.sortValue,
+          tiTu,
+          this.paginator
+        )[row].jahrgang = value;
         break;
       }
       case 3: {
-        this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[
-          row
-        ].stvNummer = value;
+        this.teilnehmerService.getTeilnehmer(
+          filter,
+          this.sortValue,
+          tiTu,
+          this.paginator
+        )[row].stvNummer = value;
         break;
       }
     }
-    this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[
-      row
-    ].dirty = true;
+    this.teilnehmerService.getTeilnehmer(
+      filter,
+      this.sortValue,
+      tiTu,
+      this.paginator
+    )[row].dirty = true;
   }
   updateTeilnahme(
     filter: string,
@@ -118,19 +143,32 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     anlass: IAnlass
   ) {
     // const effRow = pageEvent.previousPageIndex * this.paginator.pageSize + row;
-    if (!this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)) {
+    if (
+      !this.teilnehmerService.getTeilnehmer(
+        filter,
+        this.sortValue,
+        tiTu,
+        this.paginator
+      )
+    ) {
       console.log("Empty");
     }
     console.log(
       "Update Teilnahmen row: ",
       row,
       ", old: ",
-      this.teilnehmerService.getTeilnehmer(filter, tiTu, this.paginator)[row],
+      this.teilnehmerService.getTeilnehmer(
+        filter,
+        this.sortValue,
+        tiTu,
+        this.paginator
+      )[row],
       ", new: ",
       value
     );
     const teilnehmer = this.teilnehmerService.getTeilnehmer(
       filter,
+      this.sortValue,
       tiTu,
       this.paginator
     )[row];
@@ -185,5 +223,9 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
   }
   saveAll(verein: IVerein): Observable<ITeilnehmer[]> {
     return this.teilnehmerService.saveAll(verein);
+  }
+  sort(sort: Sort) {
+    this.sortValue = sort;
+    console.log("Sort: ", sort.active);
   }
 }
