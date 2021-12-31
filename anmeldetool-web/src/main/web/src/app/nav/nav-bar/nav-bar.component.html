@@ -18,35 +18,6 @@
           class="nav-link"
           >Anlass erstellen</a
         >
-      </li>
-      <li class="nav-item dropdown">
-        <a
-          class="nav-link dropdown-toggle"
-          href="#"
-          id="navbarDropdownMenuLink"
-          data-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded="false"
-        >
-          Anlässe
-        </a>
-
-        <div
-          *ngFor="let event of events | async"
-          class="dropdown-menu"
-          aria-labelledby="navbarDropdownMenuLink"
-        >
-          <a class="dropdown-item" href="#">{{ event.name }}</a>
-        </div>
-
-        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a
-            *ngFor="let anlass of anlaesse | async"
-            class="dropdown-item"
-            href="#"
-            >{{ anlass.anlassBezeichnung }}</a
-          >
-        </div>
       </li-->
     </ul>
     <!--form class="nav navbar-nav form-inline" id="searchForm">
@@ -65,7 +36,10 @@
         <li>
           <!--a *ngIf="!authService.isAuthenticated()" [routerLink]="['user/login']">Login</a-->
           <a
-            *ngIf="authService.isAuthenticated()"
+            *ngIf="
+              authService.isAuthenticated() ||
+              (authService.isAdministrator() && authService.currentVerein)
+            "
             [routerLink]="['teilnehmer']"
             class="nav-link"
             >Teilnehmer</a
@@ -73,15 +47,52 @@
         </li>
         <li>
           <a
-            *ngIf="authService.isAuthenticated()"
+            *ngIf="
+              authService.isAuthenticated() ||
+              (authService.isAdministrator() && authService.currentVerein)
+            "
             [routerLink]="['user/user']"
             class="nav-link"
             >Benutzerdaten</a
           >
         </li>
+        <li class="nav-item dropdown" *ngIf="authService.isAdministrator()">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            id="navbarDropdownMenuLink"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            Verein auswählen
+          </a>
+
+          <div
+            *ngFor="let verein of getVereine()"
+            class="dropdown-menu"
+            aria-labelledby="navbarDropdownMenuLink"
+          >
+            <a class="dropdown-item" (click)="setVerein(verein)">{{
+              verein.name
+            }}</a>
+          </div>
+        </li>
       </ul>
     </div>
   </div>
+  <a
+    *ngIf="authService.currentVerein && authService.isAdministrator()"
+    class="navbar-brand"
+  >
+    selektierter Verein <span>{{ authService.currentVerein.name }}</span>
+  </a>
+  <a
+    *ngIf="!authService.currentVerein && authService.isAdministrator()"
+    class="navbar-brand"
+  >
+    Kein Verein selektiert
+  </a>
   <a class="navbar-brand">
     Ressort GETU
     <img brand src="assets/images/ZTV_Logo_CMYK_freigestellt.png" height="36" />

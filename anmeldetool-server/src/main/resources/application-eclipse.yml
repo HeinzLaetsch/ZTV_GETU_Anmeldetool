@@ -13,12 +13,19 @@ spring:
   jpa:
      database-platform: org.hibernate.dialect.PostgreSQLDialect
      show-sql: "false"
+     properties:
+        hibernate:
+           jdbc:
+              time_zone: "UTC"
      
   datasource:
     url: jdbc:postgresql://localhost:5432/getuwettkaempfe
     username: postgres
     password: getu@ztv
-     
+  jackson:
+     deserialization:
+        adjust-dates-to-context-time-zone: true
+     time-zone: "Europe/Zurich"
 # this info may be accessed via actuator
 info:
   app:

@@ -112,7 +112,7 @@ export class AnlassService {
       "/" +
       "wertungsrichter" +
       "/" +
-      wertungsrichter.id +
+      wertungsrichter?.id +
       "/" +
       "einsaetze";
 

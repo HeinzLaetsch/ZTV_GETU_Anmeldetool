@@ -107,6 +107,9 @@ export class UserFormComponent implements OnInit {
   }
 
   isOwner() {
+    if (this.authService.isAdministrator()) {
+      return true;
+    }
     if (
       this.currentUser.benutzername ===
       this.authService.currentUser.benutzername
@@ -143,10 +146,16 @@ export class UserFormComponent implements OnInit {
     this._wertungsrichter = value;
   }
   get isVereinsAnmelder() {
+    if (this.authService.isAdministrator()) {
+      return true;
+    }
     return this.authService.isVereinsAnmmelder();
   }
 
   get isVereinsVerantwortlicher() {
+    if (this.authService.isAdministrator()) {
+      return true;
+    }
     return this.authService.isVereinsVerantwortlicher();
   }
   get assignedRoles(): IRolle[] {

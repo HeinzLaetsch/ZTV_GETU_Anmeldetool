@@ -77,7 +77,10 @@
               <div class="col">Status Brevet 1: {{ statusBr1 }}</div>
             </div>
             <div class="row doubleRow">
-              <div class="col-4 label-red" *ngIf="isBrevet1Anlass()">
+              <div
+                class="col-4 label-red"
+                *ngIf="isBrevet1Anlass() && !isBrevet2Anlass()"
+              >
                 <mat-checkbox
                   [(ngModel)]="useBrevet2"
                   (ngModelChange)="useBrevet2Clicked($event)"

@@ -18,3 +18,7 @@
 li > a.active {
   color: #f97924;
 }
+
+nav > a > span {
+  font-weight: 500;
+}

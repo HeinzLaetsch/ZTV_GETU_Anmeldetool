@@ -1,13 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { IEvent } from '../shared';
-import { EventService } from 'src/app/core/service/event/event.service';
+import { Component, OnInit } from "@angular/core";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
+import { IEvent } from "../shared";
 
 @Component({
-  selector: 'app-create-event',
-  templateUrl: './create-event.component.html',
-  styleUrls: ['./create-event.component.css']
+  selector: "app-create-event",
+  templateUrl: "./create-event.component.html",
+  styleUrls: ["./create-event.component.css"],
 })
 export class CreateEventComponent implements OnInit {
   newEvent: IEvent;
@@ -18,30 +17,29 @@ export class CreateEventComponent implements OnInit {
   startDate: FormControl;
   endDate: FormControl;
 
-  constructor(private router: Router, private eventService: EventService) { }
+  constructor(private router: Router) {}
 
   ngOnInit() {
-    this.name = new FormControl('', Validators.required);
-    this.startDate = new FormControl('', Validators.required);
-    this.endDate = new FormControl('', Validators.required);
+    this.name = new FormControl("", Validators.required);
+    this.startDate = new FormControl("", Validators.required);
+    this.endDate = new FormControl("", Validators.required);
 
-    this.newEventForm = new FormGroup ( {
+    this.newEventForm = new FormGroup({
       name: this.name,
       start_date: this.startDate,
-      end_date: this.endDate
-
-    })
+      end_date: this.endDate,
+    });
   }
 
   cancel() {
-    console.log('Cancel called');
-    this.router.navigate(['/events/']);
+    console.log("Cancel called");
+    this.router.navigate(["/events/"]);
   }
 
   saveEvent(formValues) {
-    this.eventService.saveEvent(formValues);
+    // this.eventService.saveEvent(formValues);
     this.isDirty = false;
-    this.router.navigate(['/events/']);
+    this.router.navigate(["/events/"]);
   }
 
   getCurrentDate(): string {

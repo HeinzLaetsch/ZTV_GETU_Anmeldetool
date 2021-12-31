@@ -32,10 +32,11 @@ export class HttpSecurityInterceptorService implements HttpInterceptor {
       // console.log('Authenticated will add Headers');
 
       if (this.authService.currentUser !== null) {
+        console.log("Current User: ", this.authService.currentVerein);
         newHeaders = newHeaders
           .append("authtoken", this.authService.getToken())
           .append("userid", this.authService.currentUser.id)
-          .append("vereinsid", this.authService.currentVerein.id)
+          .append("vereinsid", this.authService.currentVerein?.id)
           .append("X-Requested-With", "XMLHttpRequest");
       }
     } else {

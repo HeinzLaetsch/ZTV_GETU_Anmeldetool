@@ -21,7 +21,8 @@ export class AuthService {
   token: string;
 
   currentUser: IUser;
-  currentVerein: IVerein;
+  private _currentVerein: IVerein;
+  private _selectedVerein: IVerein;
 
   constructor(
     private http: HttpClient,
@@ -31,6 +32,19 @@ export class AuthService {
     // console.info("Service created");
     this.token = "undefined";
   }
+  set currentVerein(verein: IVerein) {
+    this._currentVerein = verein;
+  }
+  get currentVerein(): IVerein {
+    if (!this.isAdministrator()) {
+      return this._currentVerein;
+    } else {
+      if (this._selectedVerein) {
+        return this._selectedVerein;
+      }
+      return undefined;
+    }
+  }
 
   setToken(token: string) {
     this.token = token;
@@ -39,6 +53,11 @@ export class AuthService {
     return this.token;
   }
 
+  selectVerein(verein: IVerein): void {
+    if (this.isAdministrator()) {
+      this._selectedVerein = verein;
+    }
+  }
   createVereinAndUser(verein: IVerein, user: IUser): Observable<IUser> {
     // console.log("Verein 1: ", verein);
     const emitter: EventEmitter<IUser> = new EventEmitter();
@@ -133,16 +152,33 @@ export class AuthService {
     return false;
   }
 
-  isVereinsAnmmelder() {
-    return this.hasRole("ANMELDER");
+  isVereinsAnmmelder(): boolean {
+    if (this.isAdministrator) {
+      return true;
+    }
+    if (this.isAuthenticated()) return this.hasRole("ANMELDER");
+    else return false;
   }
 
-  isVereinsVerantwortlicher() {
-    return this.hasRole("VEREINSVERANTWORTLICHER");
+  isVereinsVerantwortlicher(): boolean {
+    if (this.isAdministrator) {
+      return true;
+    }
+    if (this.isAuthenticated()) return this.hasRole("VEREINSVERANTWORTLICHER");
+    else return false;
   }
 
-  isWertungsrichter() {
-    return this.hasRole("WERTUNGSRICHTER");
+  isWertungsrichter(): boolean {
+    if (this.isAdministrator) {
+      return true;
+    }
+    if (this.isAuthenticated()) return this.hasRole("WERTUNGSRICHTER");
+    else return false;
+  }
+
+  isAdministrator(): boolean {
+    if (this.isAuthenticated()) return this.hasRole("ADMINISTRATOR");
+    else return false;
   }
 
   private handleError<T>(operation = "operation", result?: T) {
