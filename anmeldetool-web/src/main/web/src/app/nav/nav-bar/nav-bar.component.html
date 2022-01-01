@@ -68,14 +68,13 @@
             Verein auswählen
           </a>
 
-          <div
-            *ngFor="let verein of getVereine()"
-            class="dropdown-menu"
-            aria-labelledby="navbarDropdownMenuLink"
-          >
-            <a class="dropdown-item" (click)="setVerein(verein)">{{
-              verein.name
-            }}</a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a
+              *ngFor="let verein of getVereine()"
+              class="dropdown-item"
+              (click)="setVerein(verein)"
+              >{{ verein.name }}</a
+            >
           </div>
         </li>
       </ul>
