@@ -53,38 +53,51 @@
     <div class="col-3">Teilnehmer K5-K7: {{ anzahlTeilnehmerBrevet2 }}</div>
   </div>
   <div class="row">
+    <div *ngIf="isBrevet1Anlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet1Anlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet1Anlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet1Anlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet2Anlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet2Anlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet2Anlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet2Anlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet2Anlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet2Anlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet2Anlass()" class="col-1">Anzahl</div>
+  </div>
+  <div class="row">
     <div *ngIf="isBrevet1Anlass()" class="col-1">
-      Anzahl K1: {{ getTeilnahmenForKategorieK1().length }}
+      K1: {{ getTeilnahmenForKategorieK1().length }}
     </div>
     <div *ngIf="isBrevet1Anlass()" class="col-1">
-      Anzahl K2: {{ getTeilnahmenForKategorieK2().length }}
+      K2: {{ getTeilnahmenForKategorieK2().length }}
     </div>
     <div *ngIf="isBrevet1Anlass()" class="col-1">
-      Anzahl K3: {{ getTeilnahmenForKategorieK3().length }}
+      K3: {{ getTeilnahmenForKategorieK3().length }}
     </div>
     <div *ngIf="isBrevet1Anlass()" class="col-1">
-      Anzahl K4: {{ getTeilnahmenForKategorieK4().length }}
+      K4: {{ getTeilnahmenForKategorieK4().length }}
     </div>
     <div *ngIf="isBrevet2Anlass()" class="col-1">
-      Anzahl K5: {{ getTeilnahmenForKategorieK5().length }}
+      K5: {{ getTeilnahmenForKategorieK5().length }}
     </div>
     <div *ngIf="isBrevet2Anlass()" class="col-1">
-      Anzahl K5A: {{ getTeilnahmenForKategorieK5A().length }}
+      K5A: {{ getTeilnahmenForKategorieK5A().length }}
     </div>
     <div *ngIf="isBrevet2Anlass()" class="col-1">
-      Anzahl K5B: {{ getTeilnahmenForKategorieK5B().length }}
+      K5B: {{ getTeilnahmenForKategorieK5B().length }}
     </div>
     <div *ngIf="isBrevet2Anlass()" class="col-1">
-      Anzahl K6: {{ getTeilnahmenForKategorieK6().length }}
+      K6: {{ getTeilnahmenForKategorieK6().length }}
     </div>
     <div *ngIf="isBrevet2Anlass()" class="col-1">
-      Anzahl KH: {{ getTeilnahmenForKategorieKH().length }}
+      KH: {{ getTeilnahmenForKategorieKH().length }}
     </div>
     <div *ngIf="isBrevet2Anlass()" class="col-1">
-      Anzahl KD: {{ getTeilnahmenForKategorieKD().length }}
+      KD: {{ getTeilnahmenForKategorieKD().length }}
     </div>
     <div *ngIf="isBrevet2Anlass()" class="col-1">
-      Anzahl K7: {{ getTeilnahmenForKategorieK7().length }}
+      K7: {{ getTeilnahmenForKategorieK7().length }}
     </div>
   </div>
 

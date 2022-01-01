@@ -5,7 +5,7 @@
       'label-red': !einsatz.eingesetzt
     }"
     [(ngModel)]="einsatz.eingesetzt"
-    [disabled]="canEdit()"
+    [disabled]="!canEdit()"
     (ngModelChange)="userEingesetztgmodelchange($event)"
     >{{ getSlotText() }}</mat-checkbox
   >

@@ -153,7 +153,7 @@ export class AuthService {
   }
 
   isVereinsAnmmelder(): boolean {
-    if (this.isAdministrator) {
+    if (this.isAdministrator()) {
       return true;
     }
     if (this.isAuthenticated()) return this.hasRole("ANMELDER");
@@ -161,7 +161,7 @@ export class AuthService {
   }
 
   isVereinsVerantwortlicher(): boolean {
-    if (this.isAdministrator) {
+    if (this.isAdministrator()) {
       return true;
     }
     if (this.isAuthenticated()) return this.hasRole("VEREINSVERANTWORTLICHER");
@@ -169,7 +169,7 @@ export class AuthService {
   }
 
   isWertungsrichter(): boolean {
-    if (this.isAdministrator) {
+    if (this.isAdministrator()) {
       return true;
     }
     if (this.isAuthenticated()) return this.hasRole("WERTUNGSRICHTER");
