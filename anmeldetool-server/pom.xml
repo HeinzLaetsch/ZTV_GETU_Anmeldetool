@@ -20,6 +20,7 @@
 		<org.mapstruct.version>1.5.0.Beta1</org.mapstruct.version>
 		<lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
 		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
+		<com.innoventsolutions.birt.version>4.8.0</com.innoventsolutions.birt.version>
 	</properties>
 
 	<dependencies>
@@ -91,7 +92,12 @@
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
 			<version>${org.mapstruct.version}</version>
-		</dependency>
+		</dependency>		
+		<!-- dependency>
+    		<groupId>com.innoventsolutions.birt.runtime</groupId>
+    		<artifactId>org.eclipse.birt.runtime_4.8.0-20180626</artifactId>
+    		<version>${com.innoventsolutions.birt.version}</version>
+		</dependency-->
 	</dependencies>
 	<build>
 		<plugins>

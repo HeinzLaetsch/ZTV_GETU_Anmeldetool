@@ -59,14 +59,14 @@ export class EventsDetailComponent implements OnInit {
       .getEingeteilteWertungsrichter(this.anlass, 1)
       .subscribe((assignedWrs) => {
         this.assignedWr1s = assignedWrs;
-        console.log("has assigned Wrs 1 : ", assignedWrs);
+        // console.log("has assigned Wrs 1 : ", assignedWrs);
         this.statusBr1 = this.getStatusBr1();
       });
     this.wertungsrichterService
       .getEingeteilteWertungsrichter(this.anlass, 2)
       .subscribe((assignedWrs) => {
         this.assignedWr2s = assignedWrs;
-        console.log("has assigned Wrs 2 : ", assignedWrs);
+        // console.log("has assigned Wrs 2 : ", assignedWrs);
         this.statusBr2 = this.getStatusBr2();
       });
     this.getVerfuegbareWertungsrichter(this.wr1s, 1);
@@ -87,11 +87,11 @@ export class EventsDetailComponent implements OnInit {
   }
 
   isBrevet1Anlass(): boolean {
-    console.log("Brevet 1: ", this.anlass.tiefsteKategorie <= KategorieEnum.K4);
+    // console.log("Brevet 1: ", this.anlass.tiefsteKategorie <= KategorieEnum.K4);
     return this.anlass.tiefsteKategorie <= KategorieEnum.K4;
   }
   isBrevet2Anlass(): boolean {
-    console.log("Brevet 2: ", this.anlass.hoechsteKategorie > KategorieEnum.K4);
+    // console.log("Brevet 2: ", this.anlass.hoechsteKategorie > KategorieEnum.K4);
     return this.anlass.hoechsteKategorie > KategorieEnum.K4;
   }
   private getVerfuegbareWertungsrichter(wrs: IUser[], brevet: number) {
@@ -118,6 +118,47 @@ export class EventsDetailComponent implements OnInit {
   }
   getCleaned(): string {
     return this.anlass.anlassBezeichnung.replace("%", "");
+  }
+  getTeilnahmenForKategorieK1(): IAnlassLink[] {
+    return this.getTeilnahmenForKategorie(KategorieEnum.K1);
+  }
+  getTeilnahmenForKategorieK2(): IAnlassLink[] {
+    return this.getTeilnahmenForKategorie(KategorieEnum.K2);
+  }
+  getTeilnahmenForKategorieK3(): IAnlassLink[] {
+    return this.getTeilnahmenForKategorie(KategorieEnum.K3);
+  }
+  getTeilnahmenForKategorieK4(): IAnlassLink[] {
+    return this.getTeilnahmenForKategorie(KategorieEnum.K4);
+  }
+  getTeilnahmenForKategorieK5(): IAnlassLink[] {
+    return this.getTeilnahmenForKategorie(KategorieEnum.K5);
+  }
+  getTeilnahmenForKategorieK5A(): IAnlassLink[] {
+    return this.getTeilnahmenForKategorie(KategorieEnum.K5A);
+  }
+  getTeilnahmenForKategorieK5B(): IAnlassLink[] {
+    return this.getTeilnahmenForKategorie(KategorieEnum.K5B);
+  }
+  getTeilnahmenForKategorieK6(): IAnlassLink[] {
+    return this.getTeilnahmenForKategorie(KategorieEnum.K6);
+  }
+  getTeilnahmenForKategorieKD(): IAnlassLink[] {
+    return this.getTeilnahmenForKategorie(KategorieEnum.KD);
+  }
+  getTeilnahmenForKategorieKH(): IAnlassLink[] {
+    return this.getTeilnahmenForKategorie(KategorieEnum.KH);
+  }
+  getTeilnahmenForKategorieK7(): IAnlassLink[] {
+    return this.getTeilnahmenForKategorie(KategorieEnum.K7);
+  }
+
+  getTeilnahmenForKategorie(katgorie: KategorieEnum): IAnlassLink[] {
+    const teilnahmen = this.anlassService.getTeilnehmerForAnlass(this.anlass);
+    const filteredLinks = teilnahmen.anlassLinks.filter((link) => {
+      return link.kategorie === katgorie;
+    });
+    return filteredLinks;
   }
 
   get anzahlTeilnehmerBrevet1(): number {
