@@ -88,14 +88,14 @@ export class NewVereinComponent implements OnInit {
 
   updateUserValid(valid: boolean) {
     this.userValid = valid;
-    console.log("Valid changed", valid);
+    // console.log("Valid changed", valid);
   }
 
   get verantwortlicher() {
     return this._verantwortlicher;
   }
   set verantwortlicher(verantwortlicher: IUser) {
-    console.log("Verantwortlicher changed", verantwortlicher);
+    // console.log("Verantwortlicher changed", verantwortlicher);
     this._verantwortlicher = verantwortlicher;
   }
   save(): void {
@@ -129,7 +129,7 @@ export class NewVereinComponent implements OnInit {
             next(data) {
               self.router.navigate(["anlass"]);
 
-              self.userService.loadUser().subscribe((result) => {
+              self.userService.reset().subscribe((result) => {
                 // console.log("Login UserService loaded");
               });
               self.teilnehmerService

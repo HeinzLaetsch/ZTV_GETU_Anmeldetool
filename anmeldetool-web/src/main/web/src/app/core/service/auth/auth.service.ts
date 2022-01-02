@@ -70,9 +70,11 @@ export class AuthService {
         .subscribe((result) => console.log("Vereins Cache reloaded: ", result));
       this.createUser(user).subscribe((user) => {
         emitter.emit(user);
+        /*
         this.userService
           .reset()
           .subscribe((result) => console.log("User Cache reloaded: ", result));
+          */
       });
     });
     return emitter.asObservable();
