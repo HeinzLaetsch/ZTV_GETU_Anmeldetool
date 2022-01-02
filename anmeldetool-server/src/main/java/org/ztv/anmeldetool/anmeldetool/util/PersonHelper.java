@@ -2,8 +2,10 @@ package org.ztv.anmeldetool.anmeldetool.util;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.ztv.anmeldetool.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.anmeldetool.models.OrganisationPersonLink;
@@ -31,6 +33,8 @@ public class PersonHelper {
 	}
 
 	public static PersonDTO createPersonDTO(Person person, Organisation organisation) {
+		List<UUID> organisationids = person.getOrganisationenLinks().stream().map(opl -> opl.getOrganisation().getId())
+				.collect(Collectors.toList());
 		Set<RolleDTO> rollenDto = new HashSet<RolleDTO>();
 		Collection<Rolle> rollen = OrganisationLinkHelper.getRollenForOrganisation(person.getOrganisationenLinks(),
 				organisation);
@@ -41,13 +45,15 @@ public class PersonHelper {
 		}
 		return PersonDTO.builder().id(person.getId()).benutzername(person.getBenutzername()).name(person.getName())
 				.email(person.getEmail()).handy(person.getHandy()).vorname(person.getVorname())
-				.organisationid(organisation.getId()).rollen(rollenDto).aktiv(person.isAktiv()).build();
+				.organisationids(organisationids).rollen(rollenDto).aktiv(person.isAktiv()).build();
 	}
 
-	public static PersonDTO createPersonDTO(Person person, UUID orgId) {
+	public static PersonDTO createPersonDTO(Person person) {
+		List<UUID> organisationids = person.getOrganisationenLinks().stream().map(opl -> opl.getOrganisation().getId())
+				.collect(Collectors.toList());
 		return PersonDTO.builder().id(person.getId()).benutzername(person.getBenutzername()).name(person.getName())
-				.email(person.getEmail()).handy(person.getHandy()).vorname(person.getVorname()).organisationid(orgId)
-				.aktiv(person.isAktiv()).build();
+				.email(person.getEmail()).handy(person.getHandy()).vorname(person.getVorname())
+				.organisationids(organisationids).aktiv(person.isAktiv()).build();
 	}
 
 	public static Person createPerson(PersonDTO personDTO) {

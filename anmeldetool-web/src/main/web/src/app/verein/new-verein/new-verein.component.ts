@@ -29,7 +29,7 @@ export class NewVereinComponent implements OnInit {
 
   _verantwortlicher: IUser = {
     id: "",
-    organisationid: "",
+    organisationids: [""],
     name: "",
     vorname: "",
     password: "",
@@ -116,7 +116,8 @@ export class NewVereinComponent implements OnInit {
       .createVereinAndUser(this.verein, this._verantwortlicher)
       .subscribe((user) => {
         console.log("Neuer Verein inklusive User kreiert ", user.benutzername);
-        this.verein.id = user.organisationid;
+        // Immer erster !!
+        this.verein.id = user.organisationids[0];
         const self = this;
         this.authService
           .login(

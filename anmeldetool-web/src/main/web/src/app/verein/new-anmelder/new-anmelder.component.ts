@@ -25,7 +25,7 @@ export class NewAnmelderComponent implements OnInit {
   };
 
   _anmelder: IUser = {
-    organisationid: "-1",
+    organisationids: ["-1"],
     name: "",
     vorname: "",
     password: "",
@@ -86,7 +86,12 @@ export class NewAnmelderComponent implements OnInit {
   save(): void {
     const rollen: IRolle[] = [{ id: "", name: "ANMELDER", aktiv: false }];
     console.log("Verein: ", this.form.controls.vereinFormControl.value);
-    this.anmelder.organisationid = this.form.controls.vereinFormControl.value;
+    if (!this.anmelder.organisationids) {
+      this.anmelder.organisationids = new Array();
+    }
+    this.anmelder.organisationids.push(
+      this.form.controls.vereinFormControl.value
+    );
 
     this._anmelder.aktiv = true;
     this._anmelder.rollen = rollen;

@@ -4,7 +4,7 @@ import { IWertungsrichter } from "./IWertungsrichter";
 
 export interface IUser {
   id?: string;
-  organisationid: string;
+  organisationids: string[];
   benutzername: string;
   name: string;
   vorname: string;

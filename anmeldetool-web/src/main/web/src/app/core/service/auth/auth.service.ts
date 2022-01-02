@@ -64,7 +64,7 @@ export class AuthService {
     this.http.post<IVerein>(this.VereineUrl, verein).subscribe((verein) => {
       this.currentVerein = verein;
       // console.log("Verein 2: ", verein);
-      user.organisationid = verein.id;
+      user.organisationids = [verein.id];
       this.vereinService
         .reset()
         .subscribe((result) => console.log("Vereins Cache reloaded: ", result));
@@ -113,9 +113,7 @@ export class AuthService {
       (user) => {
         // console.log("Response: ", user);
         this.currentUser = user;
-        this.currentVerein = this.vereinService.getVereinById(
-          user.organisationid
-        );
+        this.currentVerein = verein;
         this.userService.loadUser().subscribe((result) => {
           // console.log("Users loaded: ", result);
         });

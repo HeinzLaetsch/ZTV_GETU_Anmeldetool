@@ -204,7 +204,11 @@ export class UserFormComponent implements OnInit {
       }
       if (this.changeEvent.rolesChanged) {
         this.userService
-          .updateRoles(this.currentUser, this.assignedRoles)
+          .updateRoles(
+            this.currentUser,
+            this.authService.currentVerein,
+            this.assignedRoles
+          )
           .subscribe((user) => {
             this.currentUser = user;
             this.reloadRoles(this.currentUser);
@@ -217,7 +221,11 @@ export class UserFormComponent implements OnInit {
         this.currentUser = user;
         if (this.changeEvent.rolesChanged) {
           this.userService
-            .updateRoles(this.currentUser, this.assignedRoles)
+            .updateRoles(
+              this.currentUser,
+              this.authService.currentVerein,
+              this.assignedRoles
+            )
             .subscribe((user) => {
               this.currentUser = user;
               this.reloadRoles(this.currentUser);

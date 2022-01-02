@@ -357,19 +357,22 @@ public class AdminController {
 	}
 
 	@PatchMapping("/user")
-	public @ResponseBody ResponseEntity<PersonDTO> patch(HttpServletRequest request, @RequestBody PersonDTO personDTO) {
-		return personSrv.update(personDTO);
+	public @ResponseBody ResponseEntity<PersonDTO> patch(HttpServletRequest request,
+			@RequestHeader("userid") String userId, @RequestHeader("vereinsid") UUID vereinsId,
+			@RequestBody PersonDTO personDTO) {
+		return personSrv.update(personDTO, vereinsId);
 	}
 
 	@PostMapping("/user")
 	public @ResponseBody ResponseEntity<PersonDTO> post(HttpServletRequest request, @RequestBody PersonDTO personDTO) {
-		return personSrv.create(personDTO);
+		return personSrv.create(personDTO, null);
 	}
 
 	@PostMapping("/user/{id}")
-	public @ResponseBody ResponseEntity<PersonDTO> postUser(HttpServletRequest request, @PathVariable String id,
+	public @ResponseBody ResponseEntity<PersonDTO> postUser(HttpServletRequest request,
+			@RequestHeader("userid") String userId, @RequestHeader("vereinsid") UUID vereinsId, @PathVariable String id,
 			@RequestBody PersonDTO personDTO) {
-		return personSrv.create(personDTO);
+		return personSrv.create(personDTO, vereinsId);
 	}
 
 	@PatchMapping("/user/{userId}/organisationen/{organisationsId}/rollen")
@@ -384,6 +387,15 @@ public class AdminController {
 		log.debug("Headers= authToken: {}, userId: {}, vereinsId: {}", userId, vereinsId);
 		Collection<PersonDTO> persons = personSrv.findPersonsByOrganisation(vereinsId);
 		return ResponseEntity.ok(persons);
+	}
+
+	@GetMapping("/user/benutzernamen/{benutzername}")
+	public @ResponseBody ResponseEntity<PersonDTO> getPersonByBenutzername(HttpServletRequest request,
+			@PathVariable("benutzername") String benutzername, @RequestHeader("userid") String userId,
+			@RequestHeader("vereinsid") UUID vereinsId) {
+		log.debug("Headers= authToken: {}, userId: {}, vereinsId: {}", userId, vereinsId);
+		PersonDTO person = PersonHelper.createPersonDTO(personSrv.findPersonByBenutzername(benutzername));
+		return ResponseEntity.ok(person);
 	}
 
 	@GetMapping("/role")

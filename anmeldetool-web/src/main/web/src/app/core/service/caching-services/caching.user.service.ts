@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, forkJoin, Observable } from "rxjs";
+import { IVerein } from "src/app/verein/verein";
 import { IRolle } from "../../model/IRolle";
 import { IUser } from "../../model/IUser";
 import { IWertungsrichter } from "../../model/IWertungsrichter";
@@ -106,8 +107,12 @@ export class CachingUserService {
     return undefined;
   }
 
-  updateRoles(user: IUser, roles: IRolle[]): Observable<IUser> {
-    return this.userService.updateRoles(user, roles);
+  updateRoles(
+    user: IUser,
+    verein: IVerein,
+    roles: IRolle[]
+  ): Observable<IUser> {
+    return this.userService.updateRoles(user, verein, roles);
   }
 
   getUserById(id: string) {

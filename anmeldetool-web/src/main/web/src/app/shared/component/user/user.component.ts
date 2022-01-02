@@ -14,8 +14,11 @@ import {
   FormGroup,
   Validators,
 } from "@angular/forms";
+import { MatDialog } from "@angular/material/dialog";
 import { IUser } from "src/app/core/model/IUser";
+import { UserService } from "src/app/core/service/user/user.service";
 import { ConfirmedValidator } from "../../validators/ConfirmedValidator";
+import { UserExists } from "./user-exists/user-exists.component";
 
 @Component({
   selector: "app-user",
@@ -44,11 +47,13 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
 
   enteredPassword = "";
 
+  userAlreadyExists = false;
+
   form: FormGroup = new FormGroup({
     benutzernameControl: new FormControl("", [
       Validators.required,
       Validators.email,
-      Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"),
+      Validators.pattern("^[A-Za-z0-9._%+-]+@[a-z0-9.-]+\\.[A-Za-z]{2,4}$"),
     ]),
     nachnameControl: new FormControl("", Validators.required),
     vornameControl: new FormControl("", Validators.required),
@@ -57,7 +62,7 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
     eMailAdresseControl: new FormControl({ value: "", disabled: false }, [
       Validators.required,
       Validators.email,
-      Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"),
+      Validators.pattern("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$"),
     ]),
     mobilNummerControl: new FormControl("", [
       Validators.required,
@@ -65,7 +70,11 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
     ]),
   });
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(
+    public dialog: MatDialog,
+    private formBuilder: FormBuilder,
+    private userService: UserService
+  ) {
     this.modify = false;
     this.form.setValidators(
       ConfirmedValidator("passwortControl", "passwort2Control")
@@ -88,6 +97,16 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
       }
     }
   }
+  private openDialog(existingUser: IUser) {
+    const dialogRef = this.dialog.open(UserExists, {
+      data: existingUser,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log(`Dialog result: ${result}`);
+    });
+  }
+
   private updateUser(user: IUser) {
     this.form.controls.benutzernameControl.setValue(user.benutzername);
     this.form.controls.nachnameControl.setValue(user.name);
@@ -107,7 +126,7 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
     let valid = true;
     if (this.showBenutzername) {
       const benutzerNameValid = this.form.controls.benutzernameControl.valid;
-      valid = valid && benutzerNameValid;
+      valid = valid && benutzerNameValid && !this.userAlreadyExists;
       /*
       if (
         benutzerNameValid &&
@@ -141,7 +160,10 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
       }
     }
     if (!this.showBenutzername) {
-      valid = valid && this.form.controls.eMailAdresseControl.valid;
+      valid =
+        valid &&
+        this.form.controls.eMailAdresseControl.valid &&
+        !this.userAlreadyExists;
     }
     valid = valid && this.form.controls.mobilNummerControl.valid;
 
@@ -154,6 +176,19 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
   ngOnInit(): void {
     this.updateUser(this.user);
     this.form.controls.benutzernameControl.valueChanges.subscribe((value) => {
+      if (this.form.controls.benutzernameControl.valid) {
+        this.userService
+          .getUserByBenutzername(value)
+          .subscribe((existingUser) => {
+            console.log("User: ", this.user, " returned: ", existingUser);
+            if (existingUser && this.user?.id !== existingUser.id) {
+              this.userAlreadyExists = true;
+              this.openDialog(existingUser);
+            } else {
+              this.userAlreadyExists = false;
+            }
+          });
+      }
       if (this.user.benutzername !== value) {
         this.user.benutzername = value;
         this.emitChange(true);

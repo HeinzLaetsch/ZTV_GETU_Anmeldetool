@@ -64,7 +64,7 @@ export class ProfileComponent implements OnInit {
   addUser(event: any) {
     this._vereinsUser.push({
       id: undefined,
-      organisationid: this.authService.currentVerein.id,
+      organisationids: [this.authService.currentVerein.id],
       benutzername: "",
       name: "",
       vorname: "",

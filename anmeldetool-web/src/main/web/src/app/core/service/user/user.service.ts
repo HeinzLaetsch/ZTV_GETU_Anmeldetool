@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { catchError } from "rxjs/operators";
+import { IVerein } from "src/app/verein/verein";
 import { environment } from "src/environments/environment";
 import { IRolle } from "../../model/IRolle";
 import { IUser } from "../../model/IUser";
@@ -22,6 +23,13 @@ export class UserService {
       .get<IUser[]>(this.url)
       .pipe(catchError(this.handleError<IUser[]>("getUser", [])));
   }
+  getUserByBenutzername(benutzername: string): Observable<IUser> {
+    // console.log("getUser called");
+    return this.http
+      .get<IUser>(this.url + "/benutzernamen/" + benutzername)
+      .pipe(catchError(this.handleError<IUser>("getUserByBenutzername")));
+  }
+
   /*
   updateUser(user: IUser): Observable<IUser> {
     const emitter: EventEmitter<IUser> = new EventEmitter();
@@ -34,7 +42,11 @@ export class UserService {
       return emitter.asObservable();
   }
   */
-  updateRoles(user: IUser, roles: IRolle[]): Observable<IUser> {
+  updateRoles(
+    user: IUser,
+    verein: IVerein,
+    roles: IRolle[]
+  ): Observable<IUser> {
     const url =
       this.url +
       "/" +
@@ -42,7 +54,7 @@ export class UserService {
       "/" +
       "organisationen" +
       "/" +
-      user.organisationid +
+      verein.id +
       "/rollen";
     console.log("updateRoles called: ", url, " , data: ", roles);
     return this.http

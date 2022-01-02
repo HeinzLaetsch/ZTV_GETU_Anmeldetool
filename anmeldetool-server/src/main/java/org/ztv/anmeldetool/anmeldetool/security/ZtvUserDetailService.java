@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.ztv.anmeldetool.anmeldetool.models.LoginData;
 import org.ztv.anmeldetool.anmeldetool.models.Organisation;
-import org.ztv.anmeldetool.anmeldetool.models.OrganisationPersonLink;
 import org.ztv.anmeldetool.anmeldetool.models.Person;
 import org.ztv.anmeldetool.anmeldetool.models.Rolle;
 import org.ztv.anmeldetool.anmeldetool.models.RollenEnum;
@@ -34,7 +33,7 @@ public class ZtvUserDetailService implements UserDetailsService {
 
 	@Autowired
 	private OrganisationService organisationSrv;
-	
+
 	@Autowired
 	private PersonenRepository personenRepository;
 
@@ -45,8 +44,8 @@ public class ZtvUserDetailService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String benutzername) throws UsernameNotFoundException {
 		String[] parts = LoginData.splitCombinedUsername(benutzername);
 		log.debug("CombinedUsername is: " + benutzername + " , parts: " + parts.length);
-		
-		Person person = personenRepository.findByBenutzername(parts[0]);
+
+		Person person = personenRepository.findByBenutzernameIgnoreCase(parts[0]);
 		if (person == null) {
 			return new org.springframework.security.core.userdetails.User(" ", " ", true, true, true, true,
 					getAuthorities(Arrays.asList(roleRepository.findByName(RollenEnum.BENUTZER.name()))));
@@ -57,8 +56,9 @@ public class ZtvUserDetailService implements UserDetailsService {
 		} else {
 			organisation = organisationSrv.findOrganisationByName("ZTV");
 		}
-		
-		Collection<Rolle> roles = OrganisationLinkHelper.getRollenForOrganisation(person.getOrganisationenLinks(), organisation);
+
+		Collection<Rolle> roles = OrganisationLinkHelper.getRollenForOrganisation(person.getOrganisationenLinks(),
+				organisation);
 
 		return new org.springframework.security.core.userdetails.User(person.getBenutzername(), person.getPassword(),
 				person.isAktiv(), true, true, true, getAuthorities(roles));
@@ -72,10 +72,10 @@ public class ZtvUserDetailService implements UserDetailsService {
 	private List<String> getPrivileges(Collection<Rolle> roles) {
 
 		List<String> privileges = new ArrayList<>();
-		if(roles != null) {
-		for (Rolle role : roles) {
-			privileges.add(role.getName());
-		}
+		if (roles != null) {
+			for (Rolle role : roles) {
+				privileges.add(role.getName());
+			}
 		}
 		return privileges;
 	}

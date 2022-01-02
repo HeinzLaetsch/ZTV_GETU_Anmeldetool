@@ -11,7 +11,7 @@ import org.ztv.anmeldetool.anmeldetool.models.Person;
 @Repository
 public interface PersonenRepository extends CrudRepository<Person, UUID> {
 
-	Person findByBenutzername(String benutzername);
+	Person findByBenutzernameIgnoreCase(String benutzername);
 
 	@Query(value = "SELECT p.* from PERSON p, organisation_person_link opl, ORGANISATION org where opl.PERSON_ID=p.id AND opl.ORGANISATION_ID=org.id AND org.id=?1", nativeQuery = true)
 	List<Person> findByOrganisationId(UUID orgId);

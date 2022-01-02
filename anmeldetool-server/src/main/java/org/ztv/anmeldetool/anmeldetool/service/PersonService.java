@@ -55,7 +55,7 @@ public class PersonService {
 		Collection<Person> persons = persRepo.findByOrganisationId(orgId);
 		List<PersonDTO> personDTOs = new ArrayList<PersonDTO>();
 		for (Person person : persons) {
-			personDTOs.add(PersonHelper.createPersonDTO(person, orgId));
+			personDTOs.add(PersonHelper.createPersonDTO(person));
 		}
 		return personDTOs;
 	}
@@ -69,7 +69,7 @@ public class PersonService {
 	}
 
 	public Person findPersonByBenutzername(String username) {
-		Person person = persRepo.findByBenutzername(username.toLowerCase());
+		Person person = persRepo.findByBenutzernameIgnoreCase(username.toLowerCase());
 		return person;
 	}
 
@@ -80,8 +80,8 @@ public class PersonService {
 		return persRepo.save(person);
 	}
 
-	public ResponseEntity<PersonDTO> update(PersonDTO personDTO) {
-		Organisation organisation = organisationSrv.findOrganisationById(personDTO.getOrganisationid());
+	public ResponseEntity<PersonDTO> update(PersonDTO personDTO, UUID organisationsId) {
+		Organisation organisation = organisationSrv.findOrganisationById(organisationsId);
 		if (organisation == null) {
 			return ResponseEntity.notFound().build();
 		}
@@ -111,8 +111,13 @@ public class PersonService {
 		return ResponseEntity.ok(personDTO);
 	}
 
-	public ResponseEntity<PersonDTO> create(PersonDTO personDTO) {
-		Organisation organisation = organisationSrv.findOrganisationById(personDTO.getOrganisationid());
+	public ResponseEntity<PersonDTO> create(PersonDTO personDTO, UUID organisationsId) {
+		Organisation organisation = null;
+		if (organisationsId == null && personDTO.getOrganisationids().size() > 0) {
+			organisation = organisationSrv.findOrganisationById(personDTO.getOrganisationids().get(0));
+		} else {
+			organisation = organisationSrv.findOrganisationById(organisationsId);
+		}
 		if (organisation == null) {
 			return ResponseEntity.notFound().build();
 		}

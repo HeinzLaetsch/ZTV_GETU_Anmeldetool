@@ -1,10 +1,12 @@
 package org.ztv.anmeldetool.anmeldetool.transfer;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import lombok.Builder;
 import lombok.Value;
+
 /*
  *  id: '-1',
     verein_id: '-1',
@@ -25,24 +27,24 @@ import lombok.Value;
 @Value
 @Builder
 public class PersonDTO {
-	
+
 	private UUID id;
-	
-	private UUID organisationid;
-	
+
+	private List<UUID> organisationids;
+
 	private String benutzername;
-	
+
 	private String name;
-	
+
 	private String vorname;
-	
+
 	private String handy;
-	
+
 	private String email;
-	
+
 	private String password;
-	
+
 	private boolean aktiv;
-	
+
 	private Set<RolleDTO> rollen;
 }
