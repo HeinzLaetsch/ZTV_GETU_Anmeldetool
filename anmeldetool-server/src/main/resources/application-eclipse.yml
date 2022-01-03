@@ -16,7 +16,9 @@ spring:
      properties:
         hibernate:
            jdbc:
-              time_zone: "UTC"
+              # time_zone: "Europe/Zurich"
+              time_zone: "GMT+1"
+              
      
   datasource:
     url: jdbc:postgresql://localhost:5432/getuwettkaempfe
@@ -25,7 +27,8 @@ spring:
   jackson:
      deserialization:
         adjust-dates-to-context-time-zone: true
-     time-zone: "Europe/Zurich"
+     # time-zone: "Europe/Zurich"
+     time-zone: "UTC"
 # this info may be accessed via actuator
 info:
   app:

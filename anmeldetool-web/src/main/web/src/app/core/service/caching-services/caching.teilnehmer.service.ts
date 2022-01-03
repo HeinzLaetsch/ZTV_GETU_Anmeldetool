@@ -116,7 +116,13 @@ export class CachingTeilnehmerService {
     paginator: MatPaginator,
     row: number
   ): Observable<boolean> {
-    const teilnehmer = this.getTeilnehmer(filter, sort, tiTu, paginator)[row];
+    const teilnehmer = this.getTeilnehmer(
+      filter,
+      sort,
+      tiTu,
+      paginator,
+      undefined
+    )[row];
     this.removeTeilnehmer(teilnehmer);
     return this.teilnehmerService.delete(verein, teilnehmer);
   }
@@ -130,12 +136,17 @@ export class CachingTeilnehmerService {
     filter: string,
     sort: Sort,
     tiTu: TiTuEnum,
-    paginator: MatPaginator
+    paginator: MatPaginator,
+    previousIndex: number
   ): ITeilnehmer[] {
     if (this.loaded) {
       // console.log('Vereins User: ' , this.users);
-      const start = paginator.pageSize * paginator.pageIndex;
-      let end = paginator.pageSize * (paginator.pageIndex + 1);
+      let index = paginator.pageIndex;
+      if (previousIndex !== undefined) {
+        index = previousIndex;
+      }
+      const start = paginator.pageSize * index;
+      let end = paginator.pageSize * (index + 1);
       if (paginator.length > 0 && end > paginator.length) {
         end = paginator.length;
       }

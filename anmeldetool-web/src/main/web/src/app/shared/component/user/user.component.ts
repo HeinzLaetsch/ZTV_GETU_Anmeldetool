@@ -53,7 +53,7 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
     benutzernameControl: new FormControl("", [
       Validators.required,
       Validators.email,
-      Validators.pattern("^[A-Za-z0-9._%+-]+@[a-z0-9.-]+\\.[A-Za-z]{2,4}$"),
+      Validators.pattern("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$"),
     ]),
     nachnameControl: new FormControl("", Validators.required),
     vornameControl: new FormControl("", Validators.required),

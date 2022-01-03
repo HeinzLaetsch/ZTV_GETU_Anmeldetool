@@ -215,10 +215,13 @@ export class TeilnehmerTableComponent implements AfterViewInit {
 
   public addNewTeilnehmer(titu: TiTuEnum) {
     console.log("addNewTeilnehmer");
+    this.dataSource.sort(undefined);
     this.dataSource
       .add(this.authService.currentVerein, titu)
       .subscribe((teilnehmer) => {
         console.log("Teilnehmer added: ", teilnehmer);
+        this.paginator.length =
+          this.teilnehmerService.getTiTuTeilnehmer(titu).length + 1;
         this.paginator.lastPage();
         this.loadTeilnehmerPage();
       });
@@ -266,7 +269,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     if (col === 3) {
       control = new FormControl(row + ":", [
         Validators.minLength(5),
-        Validators.maxLength(6),
+        Validators.maxLength(7),
         Validators.required,
         Validators.pattern("[0-9]*"),
       ]);
@@ -415,15 +418,31 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       let col = 0;
       teilnehmerLine.forEach((control) => {
         if (control.dirty) {
-          console.log("Control dirty: ", row, ", ", col);
+          console.log(
+            "Control dirty: ",
+            row,
+            ", ",
+            col,
+            " ,pageEvent: ",
+            pageEvent
+          );
           this.dataSource.update(
             this.filterValue,
             this.tiTu,
+            pageEvent.previousPageIndex,
             row,
             col,
             control.value
           );
-          //control.reset();
+          control.reset();
+          console.log(
+            "Control dirty: ",
+            row,
+            ", ",
+            col,
+            ", control.dirty: ",
+            control.dirty
+          );
         }
         if (control.touched) {
           console.log("Control touched: ", row, ", ", col);
@@ -517,6 +536,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     this.dataSource.update(
       this.filterValue,
       this.tiTu,
+      undefined,
       rowIndex,
       colIndex,
       this.teilnehmerControls[rowIndex][colIndex].value

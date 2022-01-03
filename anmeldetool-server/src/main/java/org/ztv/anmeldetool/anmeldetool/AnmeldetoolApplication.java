@@ -10,4 +10,12 @@ public class AnmeldetoolApplication {
 		SpringApplication.run(AnmeldetoolApplication.class, args);
 	}
 
+	/*
+	 * @Bean public Jackson2ObjectMapperBuilderCustomizer init() { return new
+	 * Jackson2ObjectMapperBuilderCustomizer() {
+	 * 
+	 * @Override public void customize(Jackson2ObjectMapperBuilder builder) {
+	 * builder.timeZone(TimeZone.getTimeZone("Europe/London")); } }; }
+	 */
+
 }

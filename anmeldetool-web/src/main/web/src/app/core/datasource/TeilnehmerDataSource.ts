@@ -41,7 +41,8 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
       filter,
       this.sortValue,
       tiTu,
-      this.paginator
+      this.paginator,
+      undefined
     )[row];
   }
 
@@ -51,7 +52,8 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
         filter,
         this.sortValue,
         tiTu,
-        this.paginator
+        this.paginator,
+        undefined
       );
       this.teilnehmerSubject.next(loadedTeilnehmer);
       this.paginator.length =
@@ -61,7 +63,8 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
       filter,
       this.sortValue,
       tiTu,
-      this.paginator
+      this.paginator,
+      undefined
     );
   }
 
@@ -77,14 +80,22 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
   }
 
   // pageEvent: PageEvent,
-  update(filter: string, tiTu: TiTuEnum, row: number, col: number, value: any) {
+  update(
+    filter: string,
+    tiTu: TiTuEnum,
+    previousIndex: number,
+    row: number,
+    col: number,
+    value: any
+  ) {
     // const effRow = pageEvent.previousPageIndex * this.paginator.pageSize + row;
     if (
       !this.teilnehmerService.getTeilnehmer(
         filter,
         this.sortValue,
         tiTu,
-        this.paginator
+        this.paginator,
+        previousIndex
       )
     ) {
       console.log("Empty");
@@ -95,7 +106,8 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
           filter,
           this.sortValue,
           tiTu,
-          this.paginator
+          this.paginator,
+          previousIndex
         )[row].name = value;
         break;
       }
@@ -104,7 +116,8 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
           filter,
           this.sortValue,
           tiTu,
-          this.paginator
+          this.paginator,
+          previousIndex
         )[row].vorname = value;
         break;
       }
@@ -113,7 +126,8 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
           filter,
           this.sortValue,
           tiTu,
-          this.paginator
+          this.paginator,
+          previousIndex
         )[row].jahrgang = value;
         break;
       }
@@ -122,7 +136,8 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
           filter,
           this.sortValue,
           tiTu,
-          this.paginator
+          this.paginator,
+          previousIndex
         )[row].stvNummer = value;
         break;
       }
@@ -131,7 +146,8 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
       filter,
       this.sortValue,
       tiTu,
-      this.paginator
+      this.paginator,
+      previousIndex
     )[row].dirty = true;
   }
   updateTeilnahme(
@@ -148,7 +164,8 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
         filter,
         this.sortValue,
         tiTu,
-        this.paginator
+        this.paginator,
+        undefined
       )
     ) {
       console.log("Empty");
@@ -161,7 +178,8 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
         filter,
         this.sortValue,
         tiTu,
-        this.paginator
+        this.paginator,
+        undefined
       )[row],
       ", new: ",
       value
@@ -170,7 +188,8 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
       filter,
       this.sortValue,
       tiTu,
-      this.paginator
+      this.paginator,
+      undefined
     )[row];
     if (!teilnehmer.teilnahmen) {
       const teilnahmen: IAnlassLinks = {
@@ -226,6 +245,5 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
   }
   sort(sort: Sort) {
     this.sortValue = sort;
-    console.log("Sort: ", sort.active);
   }
 }
