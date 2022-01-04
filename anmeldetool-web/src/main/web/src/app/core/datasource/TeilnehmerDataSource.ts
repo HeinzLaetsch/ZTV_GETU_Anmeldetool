@@ -3,7 +3,7 @@ import { DataSource } from "@angular/cdk/table";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, Sort } from "@angular/material/sort";
 import { BehaviorSubject, Observable } from "rxjs";
-import { first } from "rxjs/operators";
+import { first, take } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
 import { IAnlass } from "../model/IAnlass";
 import { IAnlassLink } from "../model/IAnlassLink";
@@ -50,7 +50,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
   loadTeilnehmer(filter: string, tiTu: TiTuEnum): Observable<ITeilnehmer[]> {
     const subs = this.teilnehmerService
       .loadTeilnehmer(this.verein)
-      .pipe(first())
+      .pipe(take(1))
       .subscribe((result) => {
         console.log("Load Teilnehmer: ", result);
         const loadedTeilnehmer = this.teilnehmerService.getTeilnehmer(

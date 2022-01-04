@@ -3,7 +3,7 @@ import { FormControl, Validators } from "@angular/forms";
 import { MatPaginator, PageEvent } from "@angular/material/paginator";
 import { MatSort, Sort } from "@angular/material/sort";
 import { Observable, Subscription } from "rxjs";
-import { first } from "rxjs/operators";
+import { first, take } from "rxjs/operators";
 import { TeilnehmerDataSource } from "src/app/core/datasource/TeilnehmerDataSource";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
@@ -440,7 +440,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   loadTeilnehmerPage() {
     const subs = this.dataSource
       .loadTeilnehmer(this.filterValue, this.tiTu)
-      .pipe(first())
+      .pipe(take(1))
       .subscribe((result) => {
         this.populateTeilnehmer(result);
       });
