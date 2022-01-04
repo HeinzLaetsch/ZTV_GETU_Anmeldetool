@@ -3,6 +3,7 @@ import { FormControl, Validators } from "@angular/forms";
 import { MatPaginator, PageEvent } from "@angular/material/paginator";
 import { MatSort, Sort } from "@angular/material/sort";
 import { Observable, Subscription } from "rxjs";
+import { first } from "rxjs/operators";
 import { TeilnehmerDataSource } from "src/app/core/datasource/TeilnehmerDataSource";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
@@ -418,14 +419,6 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       let col = 0;
       teilnehmerLine.forEach((control) => {
         if (control.dirty) {
-          console.log(
-            "Control dirty: ",
-            row,
-            ", ",
-            col,
-            " ,pageEvent: ",
-            pageEvent
-          );
           this.dataSource.update(
             this.filterValue,
             this.tiTu,
@@ -435,14 +428,6 @@ export class TeilnehmerTableComponent implements AfterViewInit {
             control.value
           );
           control.reset();
-          console.log(
-            "Control dirty: ",
-            row,
-            ", ",
-            col,
-            ", control.dirty: ",
-            control.dirty
-          );
         }
         if (control.touched) {
           console.log("Control touched: ", row, ", ", col);
@@ -453,12 +438,19 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     });
   }
   loadTeilnehmerPage() {
+    const subs = this.dataSource
+      .loadTeilnehmer(this.filterValue, this.tiTu)
+      .pipe(first())
+      .subscribe((result) => {
+        this.populateTeilnehmer(result);
+      });
     // console.log("Load Teilnehmer Page");
-    this.dataSource.loading$.subscribe((result) => {
-      this.populateTeilnehmer(
+    // this.dataSource.loading$.subscribe((result) => {
+    // TODO Async
+    /* this.populateTeilnehmer(
         this.dataSource.loadTeilnehmer(this.filterValue, this.tiTu)
       );
-    });
+    });*/
   }
   populateTeilnehmer(allTeilnehmer: ITeilnehmer[]) {
     let i = 0;
@@ -477,8 +469,10 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     if (filterValue) {
       filterValue = filterValue.trim(); // Remove whitespace
       this.filterValue = filterValue.toLowerCase(); // Datasource defaults to lowercase matches
+    } else {
+      this.filterValue = filterValue;
     }
-    this.dataSource.filter = filterValue;
+    this.dataSource.filter = this.filterValue;
     // this.checkIfDirty(pageEvent);
     // console.log("PageEvent: ", pageEvent);
     this.loadTeilnahmen(false);

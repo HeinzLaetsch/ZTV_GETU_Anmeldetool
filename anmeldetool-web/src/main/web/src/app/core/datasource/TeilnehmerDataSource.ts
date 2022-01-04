@@ -3,6 +3,7 @@ import { DataSource } from "@angular/cdk/table";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, Sort } from "@angular/material/sort";
 import { BehaviorSubject, Observable } from "rxjs";
+import { first } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
 import { IAnlass } from "../model/IAnlass";
 import { IAnlassLink } from "../model/IAnlassLink";
@@ -13,14 +14,14 @@ import { CachingTeilnehmerService } from "../service/caching-services/caching.te
 
 export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
   private teilnehmerSubject = new BehaviorSubject<ITeilnehmer[]>([]);
-  private loadingSubject = new BehaviorSubject<boolean>(false);
+  // private loadingSubject = new BehaviorSubject<boolean>(false);
 
   public paginator: MatPaginator;
   // public sort: MatSort;
   sortValue: Sort;
   public filter: string;
 
-  public loading$ = this.loadingSubject.asObservable();
+  // public loading$ = this.loadingSubject.asObservable();
 
   constructor(
     private teilnehmerService: CachingTeilnehmerService,
@@ -33,7 +34,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
 
   disconnect(collectionViewer: CollectionViewer): void {
     this.teilnehmerSubject.complete();
-    this.loadingSubject.complete();
+    // this.loadingSubject.complete();
   }
 
   getTeilnehmer(filter: string, tiTu: TiTuEnum, row: number): ITeilnehmer {
@@ -46,19 +47,25 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     )[row];
   }
 
-  loadTeilnehmer(filter: string, tiTu: TiTuEnum): ITeilnehmer[] {
-    this.teilnehmerService.loadTeilnehmer(this.verein).subscribe((result) => {
-      const loadedTeilnehmer = this.teilnehmerService.getTeilnehmer(
-        filter,
-        this.sortValue,
-        tiTu,
-        this.paginator,
-        undefined
-      );
-      this.teilnehmerSubject.next(loadedTeilnehmer);
-      this.paginator.length =
-        this.teilnehmerService.getTiTuTeilnehmer(tiTu).length;
-    });
+  loadTeilnehmer(filter: string, tiTu: TiTuEnum): Observable<ITeilnehmer[]> {
+    const subs = this.teilnehmerService
+      .loadTeilnehmer(this.verein)
+      .pipe(first())
+      .subscribe((result) => {
+        console.log("Load Teilnehmer: ", result);
+        const loadedTeilnehmer = this.teilnehmerService.getTeilnehmer(
+          filter,
+          this.sortValue,
+          tiTu,
+          this.paginator,
+          undefined
+        );
+        this.teilnehmerSubject.next(loadedTeilnehmer);
+        this.paginator.length =
+          this.teilnehmerService.getTiTuTeilnehmer(tiTu).length;
+      });
+    return this.teilnehmerSubject.asObservable();
+    /*
     return this.teilnehmerService.getTeilnehmer(
       filter,
       this.sortValue,
@@ -66,6 +73,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
       this.paginator,
       undefined
     );
+    */
   }
 
   delete(filter: string, tiTu: TiTuEnum, row: number): Observable<boolean> {
