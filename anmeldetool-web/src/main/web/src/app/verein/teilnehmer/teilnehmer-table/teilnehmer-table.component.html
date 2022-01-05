@@ -114,6 +114,7 @@
           <div class="below">
             <!--               [disabled]="isChangesDisabled(anlass)" -->
             <mat-checkbox
+              (click)="clicked($event, colIndex)"
               (ngModelChange)="checkedClicked($event, colIndex)"
               [ngModel]="checked[colIndex]"
               [disabled]="isChangesDisabled(anlass)"

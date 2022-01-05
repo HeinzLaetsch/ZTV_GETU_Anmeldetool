@@ -222,13 +222,14 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       .subscribe((teilnehmer) => {
         console.log("Teilnehmer added: ", teilnehmer);
         this.paginator.length =
-          this.teilnehmerService.getTiTuTeilnehmer(titu).length + 1;
+          this.teilnehmerService.getTiTuTeilnehmer(titu).length;
         this.paginator.lastPage();
         this.loadTeilnehmerPage();
       });
   }
   public saveTeilnehmer() {
     console.log("saveTeilnehmer");
+    /*
     this._startsChanges.forEach((start) => {
       this.anlassService
         .updateVereinsStart(
@@ -240,6 +241,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
           console.log("updateVereinsStart");
         });
     });
+    */
     this.dataSource
       .saveAll(this.authService.currentVerein)
       .subscribe((results) => {
@@ -364,6 +366,10 @@ export class TeilnehmerTableComponent implements AfterViewInit {
         this.teilnahmenControls[i][colIndex].disable();
       }
     }
+  }
+  clicked(event: any, colIndex: any) {
+    console.log(event);
+    event.stopPropagation();
   }
 
   checkedClicked(check: boolean, colIndex: any) {
