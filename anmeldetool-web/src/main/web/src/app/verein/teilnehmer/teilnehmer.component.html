@@ -6,7 +6,7 @@
   <h3 class="label">Teilnehmer {{ verein.name }}</h3>
 
   <mat-tab-group mat-align-tabs="start" #tabs>
-    <mat-tab label="Turnerinnen">
+    <mat-tab label="Turnerinnen" [disabled]="disAllowTab()">
       <app-teilnehmer-table [tiTu]="ti" #tableTi></app-teilnehmer-table>
       <div>
         <button
@@ -49,7 +49,7 @@
         </button>
       </div>
     </mat-tab>
-    <mat-tab label="Turner">
+    <mat-tab label="Turner" [disabled]="disAllowTab()">
       <app-teilnehmer-table [tiTu]="tu" #tableTu></app-teilnehmer-table>
       <div>
         <button

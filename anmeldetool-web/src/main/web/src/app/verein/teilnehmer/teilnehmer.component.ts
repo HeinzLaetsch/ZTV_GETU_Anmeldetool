@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, HostListener, OnInit, ViewChild } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
 import { MatTabGroup } from "@angular/material/tabs";
 import { Router } from "@angular/router";
@@ -54,6 +54,23 @@ export class TeilnehmerComponent implements OnInit {
       console.log('TeilnehmerComponent::ngOnInit 1: ', result);
     });;
     */
+  }
+  @HostListener("window:beforeunload", ["$event"])
+  unloadNotification($event: any) {
+    if (!this.disAllowTab()) {
+      $event.returnValue = true;
+    }
+  }
+
+  disAllowTab() {
+    if (!this.teilnehmerTableTi && !this.teilnehmerTableTu) {
+      return true;
+    }
+    if (this.teilnehmerTableTi.isDirty() || this.teilnehmerTableTu.isDirty()) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   get vereinsUsers(): IUser[] {

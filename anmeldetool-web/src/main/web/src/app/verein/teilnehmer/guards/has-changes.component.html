@@ -1,0 +1,10 @@
+<h2 mat-dialog-title>nicht gespeicherte Teilnehmerdaten</h2>
+<mat-dialog-content class="mat-typography">
+  Teilnehmerdaten wurden noch nicht gespeichert oder verworfen.
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <!--button mat-button mat-dialog-close (click)="cancel()">OK</button-->
+  <button mat-button [mat-dialog-close]="true" cdkFocusInitial (click)="save()">
+    OK
+  </button>
+</mat-dialog-actions>

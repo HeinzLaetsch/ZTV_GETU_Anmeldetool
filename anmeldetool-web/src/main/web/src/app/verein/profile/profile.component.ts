@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { MatTabGroup } from "@angular/material/tabs";
-import { Router } from "@angular/router";
 import { IRolle } from "src/app/core/model/IRolle";
 import { IUser } from "src/app/core/model/IUser";
 import { AuthService } from "src/app/core/service/auth/auth.service";
@@ -21,8 +20,7 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private userService: CachingUserService,
-    private router: Router
+    private userService: CachingUserService
   ) {}
 
   ngOnInit() {
