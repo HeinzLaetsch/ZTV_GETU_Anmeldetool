@@ -7,7 +7,6 @@ import { IVerein } from "src/app/verein/verein";
 import { ITeilnehmer } from "../../model/ITeilnehmer";
 import { KategorieEnum } from "../../model/KategorieEnum";
 import { TiTuEnum } from "../../model/TiTuEnum";
-import { AnlassService } from "../anlass/anlass.service";
 import { TeilnehmerService } from "../teilnehmer/teilnehmer.service";
 import { CachingAnlassService } from "./caching.anlass.service";
 
@@ -16,6 +15,7 @@ import { CachingAnlassService } from "./caching.anlass.service";
 })
 export class CachingTeilnehmerService {
   private teilnehmerLoaded: BehaviorSubject<number>;
+  // private teilnehmerLoaded: Subject<number>;
 
   private _loadRunning = false;
 
@@ -39,6 +39,7 @@ export class CachingTeilnehmerService {
     private anlassService: CachingAnlassService
   ) {
     this.teilnehmerLoaded = new BehaviorSubject<number>(undefined);
+    // this.teilnehmerLoaded = new Subject<number>();
   }
   reset(verein: IVerein): Observable<any[]> {
     this.loaded = false;

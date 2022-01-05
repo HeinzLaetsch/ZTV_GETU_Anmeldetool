@@ -1,9 +1,8 @@
 import { CollectionViewer } from "@angular/cdk/collections";
 import { DataSource } from "@angular/cdk/table";
 import { MatPaginator } from "@angular/material/paginator";
-import { MatSort, Sort } from "@angular/material/sort";
-import { BehaviorSubject, Observable } from "rxjs";
-import { first, take } from "rxjs/operators";
+import { Sort } from "@angular/material/sort";
+import { BehaviorSubject, Observable, Subscription } from "rxjs";
 import { IVerein } from "src/app/verein/verein";
 import { IAnlass } from "../model/IAnlass";
 import { IAnlassLink } from "../model/IAnlassLink";
@@ -14,12 +13,14 @@ import { CachingTeilnehmerService } from "../service/caching-services/caching.te
 
 export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
   private teilnehmerSubject = new BehaviorSubject<ITeilnehmer[]>([]);
+  // private teilnehmerSubject = new Subject<ITeilnehmer[]>();
   // private loadingSubject = new BehaviorSubject<boolean>(false);
 
   public paginator: MatPaginator;
   // public sort: MatSort;
   sortValue: Sort;
   public filter: string;
+  private loadTeilnehmerSub: Subscription;
 
   // public loading$ = this.loadingSubject.asObservable();
 
@@ -48,11 +49,13 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
   }
 
   loadTeilnehmer(filter: string, tiTu: TiTuEnum): Observable<ITeilnehmer[]> {
-    const subs = this.teilnehmerService
+    if (this.loadTeilnehmerSub) {
+      this.loadTeilnehmerSub.unsubscribe();
+    }
+    this.loadTeilnehmerSub = this.teilnehmerService
       .loadTeilnehmer(this.verein)
-      .pipe(take(1))
       .subscribe((result) => {
-        console.log("Load Teilnehmer: ", result);
+        // console.log("Load Teilnehmer: ", result);
         const loadedTeilnehmer = this.teilnehmerService.getTeilnehmer(
           filter,
           this.sortValue,
@@ -178,20 +181,6 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     ) {
       console.log("Empty");
     }
-    console.log(
-      "Update Teilnahmen row: ",
-      row,
-      ", old: ",
-      this.teilnehmerService.getTeilnehmer(
-        filter,
-        this.sortValue,
-        tiTu,
-        this.paginator,
-        undefined
-      )[row],
-      ", new: ",
-      value
-    );
     const teilnehmer = this.teilnehmerService.getTeilnehmer(
       filter,
       this.sortValue,
@@ -226,7 +215,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
   }
 
   reset(verein: IVerein): Observable<any> {
-    console.log("Reset");
+    // console.log("Reset");
     return this.teilnehmerService.reset(verein);
   }
 

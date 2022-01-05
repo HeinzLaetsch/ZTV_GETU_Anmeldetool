@@ -1,10 +1,8 @@
 import { Component, EventEmitter, OnInit } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
 import { Observable, Subscription } from "rxjs";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
-import { ToastrService } from "src/app/core/service/toastr/toastr.service";
 
 @Component({
   selector: "app-event-list",
@@ -18,11 +16,7 @@ export class EventListComponent implements OnInit {
   localObs: Observable<boolean>;
   // localObs: BehaviorSubject<boolean>;
 
-  constructor(
-    private anlassService: CachingAnlassService,
-    private toastrService: ToastrService,
-    private router: ActivatedRoute
-  ) {
+  constructor(private anlassService: CachingAnlassService) {
     this.localAdresseEmitter = new EventEmitter();
     this.localObs = this.localAdresseEmitter.asObservable();
     // this.localObs = new BehaviorSubject(false);
@@ -63,9 +57,5 @@ export class EventListComponent implements OnInit {
 
   handleEventClicked(data) {
     console.log("received :", data);
-  }
-
-  handleThumbnailClick(eventName) {
-    this.toastrService.success(eventName);
   }
 }

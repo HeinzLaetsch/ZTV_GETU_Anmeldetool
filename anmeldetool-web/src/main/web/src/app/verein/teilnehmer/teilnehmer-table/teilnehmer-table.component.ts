@@ -2,8 +2,8 @@ import { AfterViewInit, Component, Input, ViewChild } from "@angular/core";
 import { FormControl, Validators } from "@angular/forms";
 import { MatPaginator, PageEvent } from "@angular/material/paginator";
 import { MatSort, Sort } from "@angular/material/sort";
+import { ToastrService } from "ngx-toastr";
 import { Observable, Subscription } from "rxjs";
-import { first, take } from "rxjs/operators";
 import { TeilnehmerDataSource } from "src/app/core/datasource/TeilnehmerDataSource";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
@@ -55,11 +55,14 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
+  loadTeilnehmerPageSub: Subscription;
+
   constructor(
     public authService: AuthService,
     private teilnehmerService: CachingTeilnehmerService,
     private vereinService: CachingVereinService,
-    private anlassService: CachingAnlassService
+    private anlassService: CachingAnlassService,
+    private toastr: ToastrService
   ) {
     // Assign the data to the data source for the table to render
     this.dataSource = new TeilnehmerDataSource(
@@ -114,6 +117,9 @@ export class TeilnehmerTableComponent implements AfterViewInit {
         });
         this.allDisplayedColumns.pop();
         this.allDisplayedColumns.push("aktion");
+
+        // this.teilnahmenControls = new Array<Array<FormControl>>();
+        // this.teilnehmerControls = new Array<Array<FormControl>>();
 
         let anzahlControls = this.pageSize;
         for (let i = 0; i <= anzahlControls; i++) {
@@ -171,6 +177,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       .subscribe((results) => {
         this.initAll();
       });
+    this.paginator.firstPage();
   }
 
   get isTeilnahmenLoaded(): Observable<boolean> {
@@ -214,18 +221,39 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     return 0;
   }
 
+  private toasterWarningSpeichern() {
+    if (this.teilnehmerService.dirty) {
+      const options = this.toastr.toastrConfig;
+      options.closeButton = true;
+      this.toastr.warning(
+        "Änderungen zuerst speichern oder verwerfen",
+        "Speichern/Verwerfen",
+        options
+      );
+      return true;
+    }
+    return false;
+  }
+
   public addNewTeilnehmer(titu: TiTuEnum) {
-    console.log("addNewTeilnehmer");
-    this.dataSource.sort(undefined);
-    this.dataSource
-      .add(this.authService.currentVerein, titu)
-      .subscribe((teilnehmer) => {
-        console.log("Teilnehmer added: ", teilnehmer);
-        this.paginator.length =
-          this.teilnehmerService.getTiTuTeilnehmer(titu).length;
-        this.paginator.lastPage();
-        this.loadTeilnehmerPage();
-      });
+    if (
+      this.paginator.length % this.paginator.pageSize === 0 &&
+      this.toasterWarningSpeichern()
+    ) {
+      return;
+    } else {
+      console.log("addNewTeilnehmer");
+      this.dataSource.sort(undefined);
+      this.dataSource
+        .add(this.authService.currentVerein, titu)
+        .subscribe((teilnehmer) => {
+          console.log("Teilnehmer added: ", teilnehmer);
+          this.paginator.length =
+            this.teilnehmerService.getTiTuTeilnehmer(titu).length;
+          this.paginator.lastPage();
+          this.loadTeilnehmerPage();
+        });
+    }
   }
   public saveTeilnehmer() {
     console.log("saveTeilnehmer");
@@ -337,6 +365,9 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   }
 
   sortData(sort: Sort) {
+    if (this.toasterWarningSpeichern()) {
+      return;
+    }
     if (sort.active.indexOf("///") > -1) {
       // Anlass
       const end = sort.active.indexOf("///");
@@ -419,6 +450,9 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     }
   }
 
+  public isDirty(): boolean {
+    return this.teilnehmerService.dirty;
+  }
   checkIfDirty(pageEvent: PageEvent) {
     let row = 0;
     this.teilnehmerControls.forEach((teilnehmerLine) => {
@@ -444,10 +478,13 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     });
   }
   loadTeilnehmerPage() {
-    const subs = this.dataSource
+    if (this.loadTeilnehmerPageSub) {
+      this.loadTeilnehmerPageSub.unsubscribe();
+    }
+    this.loadTeilnehmerPageSub = this.dataSource
       .loadTeilnehmer(this.filterValue, this.tiTu)
-      .pipe(take(1))
       .subscribe((result) => {
+        // console.error("Load Teilnehmer Page");
         this.populateTeilnehmer(result);
       });
     // console.log("Load Teilnehmer Page");

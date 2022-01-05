@@ -7,6 +7,7 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from "@angular/material/form-field";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
+import { ToastrModule } from "ngx-toastr";
 import { tap } from "rxjs/operators";
 import { AppRoutingModule } from "./app-routing.module";
 import { AnmeldeToolComponent } from "./app.component";
@@ -69,6 +70,11 @@ export function initVereinservice(
     MaterialModule,
     ServiceModule,
     SharedComponentsModule,
+    ToastrModule.forRoot({
+      timeOut: 10000,
+      positionClass: "toast-center-center",
+      preventDuplicates: true,
+    }), // ToastrModule added
   ],
   providers: [
     DatePipe,

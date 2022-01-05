@@ -117,6 +117,7 @@ export class CachingAnlassService {
   }
 
   getTeilnehmer(anlass: IAnlass, teilnehmer: ITeilnehmer): IAnlassLink {
+    // TODO Lade hier
     if (this.teilnamen) {
       const anlassTeilnahmen = this.getTeilnehmerForAnlass(anlass);
       if (anlassTeilnahmen && anlassTeilnahmen.anlassLinks) {
