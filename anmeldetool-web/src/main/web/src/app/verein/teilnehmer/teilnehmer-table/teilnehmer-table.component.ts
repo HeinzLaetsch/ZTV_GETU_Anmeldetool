@@ -50,7 +50,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   dataSource: TeilnehmerDataSource;
   vereine: IVerein[];
   anlaesse: IAnlass[];
-  _startsChanges: IStart[];
+  // _startsChanges: IStart[];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -69,7 +69,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       this.teilnehmerService,
       this.authService.currentVerein
     );
-    this._startsChanges = new Array<IStart>();
+    // this._startsChanges = new Array<IStart>();
 
     let localSubscription1: Subscription = undefined;
     localSubscription1 = this.vereinService
@@ -408,6 +408,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     this.checked[colIndex] = check;
 
     this.checkForIndex(colIndex, check);
+    /*
     const newStart: IStart = {
       anlass: this.anlaesse[colIndex],
       start: check,
@@ -421,11 +422,12 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       this._startsChanges.push(newStart);
       start = newStart;
     }
+    */
     this.anlassService
       .updateVereinsStart(
-        start.anlass,
+        this.anlaesse[colIndex],
         this.authService.currentVerein,
-        start.start
+        check
       )
       .subscribe((response) => {
         console.log("VereinsStart updated");
