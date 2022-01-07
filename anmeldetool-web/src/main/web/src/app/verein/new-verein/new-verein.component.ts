@@ -111,6 +111,16 @@ export class NewVereinComponent implements OnInit {
     this.verein.verbandId = this.form.controls.verbandFormControl.value;
     console.log("Verband: ", this.verein.verbandId);
 
+    const existing = this.vereine.filter((verein) => {
+      return verein.name.toUpperCase() === this.verein.name.toUpperCase();
+    });
+    if (existing.length > 0) {
+      this.error = true;
+      this.errorMessage =
+        "Es existiert bereits ein Verein mit dem Namen: " + this.verein.name;
+      return;
+    }
+
     this.verantwortlicher.benutzername = this.verantwortlicher.email;
     this._verantwortlicher.aktiv = true;
     this._verantwortlicher.rollen = rollen;
