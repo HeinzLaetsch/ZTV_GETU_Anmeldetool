@@ -57,14 +57,14 @@ export class TeilnehmerComponent implements OnInit {
   }
   @HostListener("window:beforeunload", ["$event"])
   unloadNotification($event: any) {
-    if (!this.disAllowTab()) {
+    if (this.disAllowTab()) {
       $event.returnValue = true;
     }
   }
 
   disAllowTab() {
     if (!this.teilnehmerTableTi && !this.teilnehmerTableTu) {
-      return true;
+      return false;
     }
     if (this.teilnehmerTableTi.isDirty() || this.teilnehmerTableTu.isDirty()) {
       return true;
