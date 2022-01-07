@@ -391,9 +391,10 @@ public class AdminController {
 
 	@GetMapping("/user/benutzernamen/{benutzername}")
 	public @ResponseBody ResponseEntity<PersonDTO> getPersonByBenutzername(HttpServletRequest request,
-			@PathVariable("benutzername") String benutzername, @RequestHeader("userid") String userId,
-			@RequestHeader("vereinsid") UUID vereinsId) {
-		log.debug("Headers= authToken: {}, userId: {}, vereinsId: {}", userId, vereinsId);
+			@PathVariable("benutzername") String benutzername, @RequestHeader("userid") Optional<String> userId,
+			@RequestHeader("vereinsid") Optional<UUID> vereinsId) {
+		// log.debug("Headers= authToken: {}, userId: {}, vereinsId: {}", userId,
+		// vereinsId);
 		PersonDTO person = PersonHelper.createPersonDTO(personSrv.findPersonByBenutzername(benutzername));
 		return ResponseEntity.ok(person);
 	}

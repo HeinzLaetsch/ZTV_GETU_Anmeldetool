@@ -2,6 +2,7 @@ import { Component, EventEmitter, OnInit, Output } from "@angular/core";
 import { FormControl, Validators } from "@angular/forms";
 import { MatDialogRef } from "@angular/material/dialog";
 import { Router } from "@angular/router";
+import { Observable, of } from "rxjs";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingTeilnehmerService } from "src/app/core/service/caching-services/caching.teilnehmer.service";
 import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
@@ -19,6 +20,7 @@ export class LoginDialogComponent implements OnInit {
 
   appearance = "outline";
   loginError: boolean;
+  errorMessage = undefined;
 
   vereine: IVerein[];
   username: string;
@@ -42,7 +44,6 @@ export class LoginDialogComponent implements OnInit {
   ngOnInit() {
     this.vereine = this.vereinService.getVereine();
   }
-
   login() {
     this.loginError = false;
     // console.log("Login: ", this.vwUserNameControl.value);
@@ -54,31 +55,38 @@ export class LoginDialogComponent implements OnInit {
           this.vwUserNameControl.value,
           this.vwPasswordControl.value
         )
-        .subscribe({
-          next(data) {
-            // console.log("Response: ", data);
+        // .pipe(catchError(this.handleError<boolean>("login")))
+        .subscribe(
+          (result) => {
             self.dialogRef.close("OK");
             self.loginError = false;
             self.userService.loadUser().subscribe((result) => {
-              // console.log("Login UserService loaded");
+              // TODO register Error
             });
             self.teilnehmerService
               .loadTeilnehmer(self.vwVereinControl.value)
               .subscribe((result) => {
-                // console.log("Login teilnehmerService loaded");
+                // TODO register Error
               });
           },
-          error(msg) {
-            console.log("Error: ", msg);
-            self.loginError = true;
-          },
-        });
+          (error) => {
+            this.loginError = true;
+            this.errorMessage =
+              "Fehler beim Login, Verein, Name oder Passwort falsch";
+          }
+        );
     } catch (error) {
       console.error("Error logging in: " + error);
       this.loginError = true;
     }
   }
 
+  private handleError<T>(operation = "operation", result?: T) {
+    return (error: any): Observable<T> => {
+      console.error(error);
+      return of(result as T);
+    };
+  }
   cancel() {
     this.router.navigate(["anlass"]);
   }

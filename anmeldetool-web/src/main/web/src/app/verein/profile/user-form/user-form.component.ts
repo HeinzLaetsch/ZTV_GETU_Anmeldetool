@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Subscription } from "rxjs";
 import { IRolle } from "src/app/core/model/IRolle";
 import { IUser } from "src/app/core/model/IUser";
@@ -16,6 +16,10 @@ import { IChangeEvent } from "../IChangeEvent";
 export class UserFormComponent implements OnInit {
   @Input()
   currentUser: IUser;
+  @Input()
+  tabIndex: number;
+  @Output()
+  userChange: EventEmitter<IChangeEvent>;
 
   changeEvent: IChangeEvent;
   appearance = "outline";
@@ -35,6 +39,7 @@ export class UserFormComponent implements OnInit {
     private userService: CachingUserService,
     private roleService: CachingRoleService
   ) {
+    this.userChange = new EventEmitter<IChangeEvent>();
     this._wertungsrichter = {
       id: "",
       brevet: 1,
@@ -43,16 +48,20 @@ export class UserFormComponent implements OnInit {
       aktiv: false,
     };
     this.changeEvent = {
+      tabIndex: -1,
       hasWr: false,
       rolesChanged: false,
       userHasChanged: false,
       userValid: true,
       wrChanged: false,
+      canceled: false,
+      saved: false,
     };
   }
 
   ngOnInit(): void {
     // console.log("Current User: ", this.currentUser);
+    this.changeEvent.tabIndex = this.tabIndex;
     if (this.currentUser.id && this.currentUser.id.length > 0) {
       this.reloadRoles(this.currentUser);
       this.userService
@@ -131,11 +140,17 @@ export class UserFormComponent implements OnInit {
     }
     return false;
   }
+  private updateChangeEvent() {
+    this.changeEvent.canceled = false;
+    this.changeEvent.saved = false;
+    this.userChange.next(this.changeEvent);
+  }
   get userHasChanged(): boolean {
     return this.changeEvent.userHasChanged;
   }
   set userHasChanged(value: boolean) {
     this.changeEvent.userHasChanged = value;
+    // this.updateChangeEvent();
   }
   get wertungsrichter() {
     return this._wertungsrichter;
@@ -144,6 +159,7 @@ export class UserFormComponent implements OnInit {
   set wertungsrichter(value: IWertungsrichter) {
     this.changeEvent.wrChanged = true;
     this._wertungsrichter = value;
+    this.updateChangeEvent();
   }
   get isVereinsAnmelder() {
     if (this.authService.isAdministrator()) {
@@ -170,6 +186,7 @@ export class UserFormComponent implements OnInit {
       this.changeEvent.wrChanged = true;
     }
     this.changeEvent.hasWr = this.isWertungsrichter();
+    this.updateChangeEvent();
   }
 
   get user(): IUser {
@@ -179,6 +196,7 @@ export class UserFormComponent implements OnInit {
   set user(value: IUser) {
     this.currentUser = value;
     this.userHasChanged = true;
+    this.updateChangeEvent();
   }
 
   updateUserValid(valid: boolean) {
@@ -187,14 +205,21 @@ export class UserFormComponent implements OnInit {
   }
 
   cancel() {
-    this.currentUser = this.userService.getUserById(this.currentUser.id);
-    this.reloadRoles(this.currentUser);
+    this.currentUser = this.userService.getUserById(this.currentUser?.id);
+    if (this.currentUser) {
+      this.reloadRoles(this.currentUser);
+    }
     this.userHasChanged = false;
     this.changeEvent.userValid = true;
     this.changeEvent.wrChanged = false;
+    this.changeEvent.canceled = true;
+    this.changeEvent.saved = false;
+    this.userChange.next(this.changeEvent);
   }
 
   save(): void {
+    this.changeEvent.canceled = false;
+    this.changeEvent.saved = true;
     if (this.currentUser.id) {
       if (this.userHasChanged && this.changeEvent.userValid) {
         this.authService.updateUser(this.currentUser).subscribe((user) => {
@@ -235,6 +260,7 @@ export class UserFormComponent implements OnInit {
         this.checkWrChanged();
         this.userHasChanged = false;
       });
+      this.userChange.next(this.changeEvent);
     }
   }
 

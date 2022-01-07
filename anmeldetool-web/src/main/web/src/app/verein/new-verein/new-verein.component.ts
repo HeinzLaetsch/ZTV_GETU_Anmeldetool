@@ -56,6 +56,9 @@ export class NewVereinComponent implements OnInit {
   vereine: IVerein[];
   verbaende: IVerband[];
 
+  error: boolean;
+  errorMessage = undefined;
+
   constructor(
     private formBuilder: FormBuilder,
     public dialogRef: MatDialogRef<NewVereinComponent>,
@@ -111,40 +114,65 @@ export class NewVereinComponent implements OnInit {
     this.verantwortlicher.benutzername = this.verantwortlicher.email;
     this._verantwortlicher.aktiv = true;
     this._verantwortlicher.rollen = rollen;
+    this.userService
+      .getUserByBenutzername(this.verantwortlicher.benutzername)
+      .subscribe(
+        (user) => {
+          if (user) {
+            this.error = true;
+            this.errorMessage =
+              "Es existiert bereits ein Benutzer mit dem Benutzernamen: " +
+              this.verantwortlicher.benutzername;
+          } else {
+            this.authService
+              .createVereinAndUser(this.verein, this._verantwortlicher)
+              .subscribe(
+                (user) => {
+                  console.log(
+                    "Neuer Verein inklusive User kreiert ",
+                    user.benutzername
+                  );
+                  // Immer erster !!
+                  this.verein.id = user.organisationids[0];
+                  const self = this;
+                  this.authService
+                    .login(
+                      this.verein,
+                      user.benutzername,
+                      this._verantwortlicher.password
+                    )
+                    .subscribe({
+                      next(data) {
+                        self.router.navigate(["anlass"]);
 
-    this.authService
-      .createVereinAndUser(this.verein, this._verantwortlicher)
-      .subscribe((user) => {
-        console.log("Neuer Verein inklusive User kreiert ", user.benutzername);
-        // Immer erster !!
-        this.verein.id = user.organisationids[0];
-        const self = this;
-        this.authService
-          .login(
-            this.verein,
-            user.benutzername,
-            this._verantwortlicher.password
-          )
-          .subscribe({
-            next(data) {
-              self.router.navigate(["anlass"]);
+                        self.userService.reset().subscribe((result) => {
+                          // console.log("Login UserService loaded");
+                        });
+                        self.teilnehmerService
+                          .loadTeilnehmer(self.verein)
+                          .subscribe((result) => {
+                            // console.log("Login teilnehmerService loaded");
+                          });
+                      },
+                      error(msg) {
+                        console.log("Error: ", msg);
+                      },
+                    });
 
-              self.userService.reset().subscribe((result) => {
-                // console.log("Login UserService loaded");
-              });
-              self.teilnehmerService
-                .loadTeilnehmer(self.verein)
-                .subscribe((result) => {
-                  // console.log("Login teilnehmerService loaded");
-                });
-            },
-            error(msg) {
-              console.log("Error: ", msg);
-            },
-          });
+                  self.dialogRef.close("OK");
+                },
+                (error) => {
+                  this.error = true;
+                  this.errorMessage = error;
+                }
+              );
+          }
+        },
+        (error) => {
+          console.error("Error", error);
+        }
+      );
 
-        self.dialogRef.close("OK");
-      });
     console.log("Save");
   }
 

@@ -1,5 +1,5 @@
 <!--div class="container" [formGroup]="form"-->
-<div [formGroup]="form">
+<div [formGroup]="form" *ngIf="user">
   <!--form [formGroup]="form" (submit)="save()"-->
   <p *ngIf="showBenutzername">
     <mat-form-field [appearance]="appearance">
@@ -8,6 +8,7 @@
         matInput
         placeholder="Benutzername"
         formControlName="benutzernameControl"
+        required
       />
       <mat-error *ngIf="form.controls.benutzernameControl.hasError('required')">
         Pflichtfeld
@@ -26,6 +27,7 @@
         matInput
         placeholder="Nachname"
         formControlName="nachnameControl"
+        required
       />
       <mat-error *ngIf="form.controls.nachnameControl.hasError('required')">
         Pflichtfeld
@@ -36,7 +38,12 @@
   <p>
     <mat-form-field [appearance]="appearance">
       <mat-label>Vorname</mat-label>
-      <input matInput placeholder="Vorname" formControlName="vornameControl" />
+      <input
+        matInput
+        placeholder="Vorname"
+        formControlName="vornameControl"
+        required
+      />
       <mat-error *ngIf="form.controls.vornameControl.hasError('required')">
         Pflichtfeld
       </mat-error>
@@ -74,6 +81,23 @@
     </mat-form-field>
   </p>
   <p>
+    <mat-form-field appearance="fill">
+      <mat-label>Mobiltelefon</mat-label>
+      <app-phone-input
+        formControlName="mobilNummerControl"
+        required
+      ></app-phone-input>
+      <mat-icon matSuffix>phone</mat-icon>
+      <mat-hint>Gib die Mobilnummer ein Beispiel: 076 111 11 11</mat-hint>
+      <mat-error *ngIf="form.controls.mobilNummerControl.hasError('required')">
+        Pflichtfeld
+      </mat-error>
+      <mat-error *ngIf="form.controls.mobilNummerControl.invalid">
+        ungültige Mobile Nummer Beispiel: 076 111 11 11
+      </mat-error>
+    </mat-form-field>
+  </p>
+  <!--p>
     <mat-form-field [appearance]="appearance">
       <mat-label>Mobiltelefon</mat-label>
       <input
@@ -89,7 +113,7 @@
       </mat-error>
       <mat-hint>Gib die Mobilnummer ein Beispiel: 076 111 11 11</mat-hint>
     </mat-form-field>
-  </p>
+  </p-->
   <p>
     <mat-form-field [appearance]="appearance">
       <mat-label>Kontakt eMail Adresse</mat-label>

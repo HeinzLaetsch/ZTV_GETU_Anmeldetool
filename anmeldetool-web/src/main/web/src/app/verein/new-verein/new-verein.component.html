@@ -26,7 +26,11 @@
         <mat-label>Turnverband</mat-label>
         <mat-select [formControl]="form.controls['verbandFormControl']">
           <mat-option value=""></mat-option>
-          <mat-option *ngFor="let verband of verbaende" [value]="verband.id" title="{{verband.verband_long}}">
+          <mat-option
+            *ngFor="let verband of verbaende"
+            [value]="verband.id"
+            title="{{ verband.verband_long }}"
+          >
             {{ verband.verband }}
           </mat-option>
         </mat-select>
@@ -41,105 +45,22 @@
     <p>
       <span class="label">Vereinsverantwortliche/r</span>
     </p>
-    <app-user [(user)]="verantwortlicher" (valid)="updateUserValid($event)" [showPassword]="true" [showBenutzername]="false"></app-user>
-    <!--p>
-      <mat-form-field [appearance]="appearance">
-        <mat-label>Nachname</mat-label>
-        <input
-          matInput
-          placeholder="Nachname"
-          [formControl]="form.controls['nachnameControl']"
-        />
-        <mat-error
-          *ngIf="form.controls['nachnameControl'].hasError('required')"
-        >
-          Pflichtfeld
-        </mat-error>
-        <mat-hint>Gib den Nachnamen ein</mat-hint>
-      </mat-form-field>
-    </p>
-    <p>
-      <mat-form-field [appearance]="appearance">
-        <mat-label>Vorname</mat-label>
-        <input
-          matInput
-          placeholder="Vorname"
-          [formControl]="form.controls['vornameControl']"
-        />
-        <mat-error *ngIf="form.controls['vornameControl'].hasError('required')">
-          Pflichtfeld
-        </mat-error>
-        <mat-hint>Gib den Vornamen ein</mat-hint>
-      </mat-form-field>
-    </p>
-    <p>
-      <mat-form-field [appearance]="appearance">
-        <mat-label>Passwort</mat-label>
-        <input
-          type="password"
-          matInput
-          placeholder="Passwort"
-          [formControl]="form.controls['passwortControl']"
-        />
-        <mat-error
-          *ngIf="form.controls['passwortControl'].hasError('required')"
-        >
-          Pflichtfeld
-        </mat-error>
-        <mat-hint>Gib das Passwort ein</mat-hint>
-      </mat-form-field>
-    </p>
-    <p>
-      <mat-form-field [appearance]="appearance">
-        <mat-label>Passwort bestätigen</mat-label>
-        <input
-          type="password"
-          matInput
-          placeholder="Passwort"
-          [formControl]="form.controls['passwort2Control']"
-        />
-        <mat-error
-          *ngIf="form.controls['passwort2Control'].hasError('required')"
-        >
-          Pflichtfeld
-        </mat-error>
-        <mat-hint>Gib das gleiche Passwort nochmals ein</mat-hint>
-      </mat-form-field>
-    </p>
-    <p>
-      <mat-form-field [appearance]="appearance">
-        <mat-label>Mobiltelefon</mat-label>
-        <input
-          matInput
-          placeholder="Mobil Nummer"
-          [formControl]="form.controls['mobilNummerControl']"
-        />
-        <mat-error
-          *ngIf="form.controls['mobilNummerControl'].hasError('required')"
-        >
-          Pflichtfeld
-        </mat-error>
-        <mat-hint>Gib die Mobilnummer in der Form 076 111 11 11 ein</mat-hint>
-      </mat-form-field>
-    </p>
-    <p>
-      <mat-form-field [appearance]="appearance">
-        <mat-label>Kontakt eMail Adresse</mat-label>
-        <input
-          matInput
-          placeholder="eMail Adresse"
-          [formControl]="form.controls['eMailAdresseControl']"
-        />
-        <mat-error
-          *ngIf="form.controls['eMailAdresseControl'].hasError('required')"
-        >
-          Pflichtfeld
-        </mat-error>
-        <mat-hint>Gib die eMail Adresse ein</mat-hint>
-      </mat-form-field>
-    </p-->
+    <app-user
+      [(user)]="verantwortlicher"
+      (valid)="updateUserValid($event)"
+      [showPassword]="true"
+      [showBenutzername]="false"
+    ></app-user>
+    <mat-error *ngIf="error" class="error"> {{ errorMessage }}</mat-error>
     <button mat-button (click)="cancel()">Abbrechen</button>
-    <button mat-button type="submit" [disabled]="(!form.valid || !userValid)" (click)="save()">Speichern</button>
+    <button
+      mat-button
+      type="submit"
+      [disabled]="!form.valid || !userValid"
+      (click)="save()"
+    >
+      Speichern
+    </button>
     <!--button mat-button
     (click)="save()"
     >Speichern</button-->

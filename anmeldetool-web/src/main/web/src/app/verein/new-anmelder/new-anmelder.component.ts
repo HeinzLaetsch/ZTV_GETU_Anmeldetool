@@ -5,6 +5,7 @@ import { Router } from "@angular/router";
 import { IRolle } from "src/app/core/model/IRolle";
 import { IUser } from "src/app/core/model/IUser";
 import { AuthService } from "src/app/core/service/auth/auth.service";
+import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
 import { VereinService } from "src/app/core/service/verein/verein.service";
 import { IVerein } from "../verein";
 
@@ -47,11 +48,15 @@ export class NewAnmelderComponent implements OnInit {
 
   userValid: boolean;
 
+  error: boolean;
+  errorMessage = undefined;
+
   constructor(
     private formBuilder: FormBuilder,
     public dialogRef: MatDialogRef<NewAnmelderComponent>,
     private authService: AuthService,
     private vereinService: VereinService,
+    private userService: CachingUserService,
     private router: Router
   ) {
     this.form = this.formBuilder.group({
@@ -89,6 +94,7 @@ export class NewAnmelderComponent implements OnInit {
     if (!this.anmelder.organisationids) {
       this.anmelder.organisationids = new Array();
     }
+    this.anmelder.organisationids = this.anmelder.organisationids.slice(0, 0);
     this.anmelder.organisationids.push(
       this.form.controls.vereinFormControl.value
     );
@@ -97,12 +103,22 @@ export class NewAnmelderComponent implements OnInit {
     this._anmelder.rollen = rollen;
 
     this.anmelder.benutzername = this.anmelder.email;
-
-    this.authService.createUser(this.anmelder).subscribe((user) => {
-      console.log("User kreiert ", user.benutzername);
-      this.dialogRef.close("OK");
-      this.router.navigate(["profile"]);
-    });
+    this.userService
+      .getUserByBenutzername(this.anmelder.benutzername)
+      .subscribe((user) => {
+        if (user) {
+          this.error = true;
+          this.errorMessage =
+            "Es existiert bereits ein Benutzer mit dem Benutzernamen: " +
+            this.anmelder.benutzername;
+        } else {
+          this.authService.createUser(this.anmelder).subscribe((user) => {
+            console.log("User kreiert ", user.benutzername);
+            this.dialogRef.close("OK");
+            this.router.navigate(["profile"]);
+          });
+        }
+      });
   }
 
   cancel(): void {

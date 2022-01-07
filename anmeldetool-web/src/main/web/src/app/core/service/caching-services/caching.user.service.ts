@@ -95,6 +95,9 @@ export class CachingUserService {
     return undefined;
   }
 
+  getUserByBenutzername(benutzername: string): Observable<IUser> {
+    return this.userService.getUserByBenutzername(benutzername);
+  }
   getAllWertungsrichter(brevet: number): Observable<IWertungsrichter[]> {
     const observables = new Array<Observable<IWertungsrichter>>();
     if (this.loaded) {

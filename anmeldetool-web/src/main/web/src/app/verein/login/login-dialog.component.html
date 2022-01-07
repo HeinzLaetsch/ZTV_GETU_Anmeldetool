@@ -1,7 +1,6 @@
 <div class="container">
   <h1>Login</h1>
   <hr />
-
   <mat-dialog-content>
     <p>
       <mat-form-field [appearance]="appearance">
@@ -64,9 +63,7 @@
     >
       Login
     </button>
-    <mat-error *ngIf="loginError" class="error">
-      Benutzername oder Passwort falsch</mat-error
-    >
+    <mat-error *ngIf="loginError" class="error"> {{ errorMessage }}</mat-error>
     <!--button mat-button mat-dialog-close>Abbrechen</button-->
   </div>
   <div>

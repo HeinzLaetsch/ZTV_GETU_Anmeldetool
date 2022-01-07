@@ -18,6 +18,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { IUser } from "src/app/core/model/IUser";
 import { UserService } from "src/app/core/service/user/user.service";
 import { ConfirmedValidator } from "../../validators/ConfirmedValidator";
+import { MyTel } from "../phonenumber/phone-input-component";
 import { UserExists } from "./user-exists/user-exists.component";
 
 @Component({
@@ -64,12 +65,18 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
       Validators.email,
       Validators.pattern("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$"),
     ]),
-    mobilNummerControl: new FormControl("", [
+    mobilNummerControl: new FormControl(new MyTel("", "", "", ""), [
       Validators.required,
-      Validators.pattern("[0-9]{3} [0-9]{3} [0-9]{2} [0-9]{2}"),
     ]),
   });
 
+  /*
+    mobilNummerControl: new FormControl(new MyTel("", "", "", ""), [
+      Validators.required,
+      Validators.pattern("[0-9]{3} [0-9]{3} [0-9]{2} [0-9]{2}"),
+    ]),
+
+  */
   constructor(
     public dialog: MatDialog,
     private formBuilder: FormBuilder,
@@ -107,6 +114,12 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
     });
   }
 
+  private splitHandy(handy: string): MyTel {
+    const parts = handy.split(" ");
+    const myTel = new MyTel(parts[0], parts[1], parts[2], parts[3]);
+    return myTel;
+  }
+
   private updateUser(user: IUser) {
     this.form.controls.benutzernameControl.setValue(user.benutzername);
     this.form.controls.nachnameControl.setValue(user.name);
@@ -120,7 +133,7 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
       this.form.controls.passwort2Control.setValue(user.password);
     }
     this.form.controls.eMailAdresseControl.setValue(user.email);
-    this.form.controls.mobilNummerControl.setValue(user.handy);
+    this.form.controls.mobilNummerControl.setValue(this.splitHandy(user.handy));
   }
   private emitChange(includeUser: boolean) {
     let valid = true;
@@ -226,10 +239,17 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
       }
     });
     this.form.controls.mobilNummerControl.valueChanges.subscribe((value) => {
-      if (this.user.handy !== value) {
-        this.user.handy = value;
+      console.log(this.form.controls.mobilNummerControl.value);
+      if (value && this.user.handy !== this.concatHandy(value)) {
+        this.user.handy = this.concatHandy(value);
         this.emitChange(true);
       }
     });
+  }
+
+  private concatHandy(mytel: MyTel): string {
+    const handy =
+      mytel.part1 + " " + mytel.part2 + " " + mytel.part3 + " " + mytel.part4;
+    return handy;
   }
 }

@@ -1,0 +1,51 @@
+<div
+  role="group"
+  class="phone-input-container"
+  [formGroup]="parts"
+  [attr.aria-labelledby]="_formField?.getLabelId()"
+  (focusin)="onFocusIn($event)"
+  (focusout)="onFocusOut($event)"
+>
+  <input
+    class="phone-input-element"
+    formControlName="part1"
+    size="3"
+    maxlength="3"
+    aria-label="076"
+    (input)="_handleInput(parts.controls.part1, part2)"
+    #part1
+  />
+  <span class="phone-input-spacer">&ndash;</span>
+  <input
+    class="phone-input-element"
+    formControlName="part2"
+    maxlength="3"
+    size="3"
+    aria-label="111"
+    (input)="_handleInput(parts.controls.part2, part3)"
+    (keyup.backspace)="autoFocusPrev(parts.controls.part2, part1)"
+    #part2
+  />
+  <span class="phone-input-spacer">&ndash;</span>
+  <input
+    class="phone-input-element"
+    formControlName="part3"
+    maxlength="2"
+    size="2"
+    aria-label="11"
+    (input)="_handleInput(parts.controls.part3, part4)"
+    (keyup.backspace)="autoFocusPrev(parts.controls.part3, part2)"
+    #part3
+  />
+  <span class="phone-input-spacer">&ndash;</span>
+  <input
+    class="phone-input-element"
+    formControlName="part4"
+    maxlength="2"
+    size="2"
+    aria-label="11"
+    (input)="_handleInput(parts.controls.part4)"
+    (keyup.backspace)="autoFocusPrev(parts.controls.part4, part3)"
+    #part4
+  />
+</div>

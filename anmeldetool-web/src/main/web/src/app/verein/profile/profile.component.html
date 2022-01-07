@@ -7,11 +7,17 @@
   <div class="row">
     <div class="col-12">
       <mat-tab-group mat-align-tabs="start" #tabs>
-        <mat-tab
-          *ngFor="let user of vereinsUsers"
-          label="{{ user.benutzername }}"
-        >
-          <app-user-form [currentUser]="user"></app-user-form>
+        <mat-tab *ngFor="let user of vereinsUsers; index as i">
+          <ng-template mat-tab-label>
+            <span [ngClass]="{ unsafed: hasUnsafedWork(i) }">{{
+              getTabName(user.benutzername, i)
+            }}</span>
+          </ng-template>
+          <app-user-form
+            [currentUser]="user"
+            [tabIndex]="i"
+            (userChange)="userChange($event)"
+          ></app-user-form>
         </mat-tab>
       </mat-tab-group>
     </div>

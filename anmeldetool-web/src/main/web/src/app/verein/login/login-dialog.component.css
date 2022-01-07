@@ -2,11 +2,14 @@
   width: 100%;
 }
 .label {
-  color: rgba(0,0,0,.54);
+  color: rgba(0, 0, 0, 0.54);
 }
 button {
   margin-right: 10px;
 }
 .error {
+  padding-top: 5px;
   margin-left: 15px;
+  font-weight: 700;
+  font-size: 1rem;
 }
