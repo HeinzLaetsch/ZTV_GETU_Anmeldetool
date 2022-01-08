@@ -23,14 +23,8 @@ export class UserFormComponent implements OnInit {
 
   changeEvent: IChangeEvent;
   appearance = "outline";
-  //userValid: boolean;
-  //_userHasChanged: boolean;
-  //rolesChanged: boolean;
-  //wrChanged: boolean;
-  //hasWr = false;
 
   _assignedRoles: IRolle[];
-  // profileForm: FormGroup;
 
   _wertungsrichter: IWertungsrichter;
 
@@ -40,13 +34,7 @@ export class UserFormComponent implements OnInit {
     private roleService: CachingRoleService
   ) {
     this.userChange = new EventEmitter<IChangeEvent>();
-    this._wertungsrichter = {
-      id: "",
-      brevet: 1,
-      gueltig: false,
-      letzterFK: new Date(),
-      aktiv: false,
-    };
+    this._wertungsrichter = this.getEmptyWertungsrichter();
     this.changeEvent = {
       tabIndex: -1,
       hasWr: false,
@@ -59,6 +47,15 @@ export class UserFormComponent implements OnInit {
     };
   }
 
+  getEmptyWertungsrichter(): IWertungsrichter {
+    return {
+      id: "",
+      brevet: 1,
+      gueltig: false,
+      letzterFK: new Date(),
+      aktiv: false,
+    };
+  }
   ngOnInit(): void {
     // console.log("Current User: ", this.currentUser);
     this.changeEvent.tabIndex = this.tabIndex;
@@ -150,7 +147,6 @@ export class UserFormComponent implements OnInit {
   }
   set userHasChanged(value: boolean) {
     this.changeEvent.userHasChanged = value;
-    // this.updateChangeEvent();
   }
   get wertungsrichter() {
     return this._wertungsrichter;
@@ -282,7 +278,7 @@ export class UserFormComponent implements OnInit {
         this.userService
           .deleteWertungsrichterForUserId(this.currentUser.id)
           .subscribe((value) => {
-            this._wertungsrichter = value;
+            this._wertungsrichter = this.getEmptyWertungsrichter();
             this.changeEvent.wrChanged = false;
             this.userChange.next(this.changeEvent);
           });

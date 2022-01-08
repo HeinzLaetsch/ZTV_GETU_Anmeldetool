@@ -24,7 +24,7 @@ export class RoleChipComponent implements OnInit {
   isAllRolesList: boolean;
 
   ngOnInit(): void {
-    // console.log("Oninit: ", this.role.name);
+    // console.log("Oninit: ", this.role?.name);
   }
   aktivChange(role: IRolle) {
     this.roleChange.emit(role);

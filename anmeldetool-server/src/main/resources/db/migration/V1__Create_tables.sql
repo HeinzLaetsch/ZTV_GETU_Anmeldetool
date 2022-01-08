@@ -1,5 +1,6 @@
-CREATE EXTENSION pgcrypto;
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
+ALTER DATABASE getuwettkaempfe SET timezone TO 'Europe/Zurich';
 
 -- create table CONFIG
 --(
