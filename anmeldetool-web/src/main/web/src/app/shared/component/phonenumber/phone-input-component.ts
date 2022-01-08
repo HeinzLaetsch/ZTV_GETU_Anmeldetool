@@ -16,6 +16,7 @@ import {
   FormBuilder,
   FormGroup,
   NgControl,
+  ValidationErrors,
   Validators,
 } from "@angular/forms";
 import {
@@ -137,8 +138,22 @@ export class PhoneInput
     this.stateChanges.next();
   }
 
+  get valid(): boolean {
+    return this.parts.valid;
+  }
   get errorState(): boolean {
-    return this.parts.invalid && this.touched;
+    // Shows error only after its touched
+    // return this.parts.invalid && this.touched;
+    const errors: ValidationErrors = {
+      required: this.parts.hasError("required"),
+      minLength: this.parts.hasError("minLength"),
+      maxLength: this.parts.hasError("maxLength"),
+      pattern: this.parts.hasError("pattern"),
+    };
+
+    this.ngControl.control.updateValueAndValidity();
+
+    return this.parts.invalid;
   }
 
   constructor(

@@ -65,9 +65,7 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
       Validators.email,
       Validators.pattern("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$"),
     ]),
-    mobilNummerControl: new FormControl(new MyTel("", "", "", ""), [
-      Validators.required,
-    ]),
+    mobilNummerControl: new FormControl(new MyTel("", "", "", "")),
   });
 
   /*
@@ -116,6 +114,9 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
 
   private splitHandy(handy: string): MyTel {
     const parts = handy.split(" ");
+    if (parts.length < 4) {
+      return new MyTel("", "", "", "");
+    }
     const myTel = new MyTel(parts[0], parts[1], parts[2], parts[3]);
     return myTel;
   }
@@ -178,6 +179,8 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
         this.form.controls.eMailAdresseControl.valid &&
         !this.userAlreadyExists;
     }
+    valid = valid && this.form.controls.mobilNummerControl.parent.valid;
+
     valid = valid && this.form.controls.mobilNummerControl.valid;
 
     this.valid.next(valid);
