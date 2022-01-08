@@ -187,16 +187,31 @@ export class UserFormComponent implements OnInit {
 
   get user(): IUser {
     // console.log('Get user: ', this.currentUser);
+    // return this.deepCopy(this.currentUser);
     return this.currentUser;
   }
   set user(value: IUser) {
-    if (value !== this.currentUser) {
-      this.currentUser = value;
-      this.userHasChanged = true;
-      this.updateChangeEvent();
-    }
+    this.currentUser = value;
+    this.userHasChanged = true;
+    this.updateChangeEvent();
   }
-
+  private deepCopy<T>(source: T): T {
+    return Array.isArray(source)
+      ? source.map((item) => this.deepCopy(item))
+      : source instanceof Date
+      ? new Date(source.getTime())
+      : source && typeof source === "object"
+      ? Object.getOwnPropertyNames(source).reduce((o, prop) => {
+          Object.defineProperty(
+            o,
+            prop,
+            Object.getOwnPropertyDescriptor(source, prop)
+          );
+          o[prop] = this.deepCopy(source[prop]);
+          return o;
+        }, Object.create(Object.getPrototypeOf(source)))
+      : (source as T);
+  }
   updateUserValid(valid: boolean) {
     this.changeEvent.userValid = valid;
     // console.log("Valid changed: ", this.currentUser , ', ', valid);

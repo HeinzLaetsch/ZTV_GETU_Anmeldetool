@@ -179,8 +179,6 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
         this.form.controls.eMailAdresseControl.valid &&
         !this.userAlreadyExists;
     }
-    valid = valid && this.form.controls.mobilNummerControl.parent.valid;
-
     valid = valid && this.form.controls.mobilNummerControl.valid;
 
     this.valid.next(valid);
@@ -253,6 +251,9 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
   private concatHandy(mytel: MyTel): string {
     const handy =
       mytel.part1 + " " + mytel.part2 + " " + mytel.part3 + " " + mytel.part4;
+    if (handy.trim().length === 0) {
+      return "";
+    }
     return handy;
   }
 }
