@@ -194,9 +194,11 @@ export class UserFormComponent implements OnInit {
     return this.currentUser;
   }
   set user(value: IUser) {
-    this.currentUser = value;
-    this.userHasChanged = true;
-    this.updateChangeEvent();
+    if (value !== this.currentUser) {
+      this.currentUser = value;
+      this.userHasChanged = true;
+      this.updateChangeEvent();
+    }
   }
 
   updateUserValid(valid: boolean) {
@@ -259,6 +261,7 @@ export class UserFormComponent implements OnInit {
         }
         this.checkWrChanged();
         this.userHasChanged = false;
+        this.userChange.next(this.changeEvent);
       });
       this.userChange.next(this.changeEvent);
     }
@@ -273,6 +276,7 @@ export class UserFormComponent implements OnInit {
           .subscribe((value) => {
             this._wertungsrichter = value;
             this.changeEvent.wrChanged = false;
+            this.userChange.next(this.changeEvent);
           });
       } else {
         this.userService
@@ -280,6 +284,7 @@ export class UserFormComponent implements OnInit {
           .subscribe((value) => {
             this._wertungsrichter = value;
             this.changeEvent.wrChanged = false;
+            this.userChange.next(this.changeEvent);
           });
       }
     }

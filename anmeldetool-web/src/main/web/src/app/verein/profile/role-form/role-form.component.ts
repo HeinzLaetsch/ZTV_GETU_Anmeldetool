@@ -134,7 +134,9 @@ export class RoleFormComponent implements OnInit, OnChanges {
         event.previousIndex,
         event.currentIndex
       );
-      this.assignedRoles[event.currentIndex].aktiv = true;
+      if (this.assignedRoles[event.currentIndex]) {
+        this.assignedRoles[event.currentIndex].aktiv = true;
+      }
       console.log(
         "Current Index: ",
         event.currentIndex,
