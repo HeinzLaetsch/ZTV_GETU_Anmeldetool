@@ -56,7 +56,7 @@ export class UserService {
       "/" +
       verein.id +
       "/rollen";
-    console.log("updateRoles called: ", url, " , data: ", roles);
+    // console.log("updateRoles called: ", url, " , data: ", roles);
     return this.http
       .patch<IUser>(url, roles)
       .pipe(catchError(this.handleError<IUser>("updateRoles")));
@@ -94,7 +94,7 @@ export class UserService {
 
   private handleError<T>(operation = "operation", result?: T) {
     return (error: any): Observable<T> => {
-      console.error(error);
+      console.error("operation", operation, " , ", error);
       return of(result as T);
     };
   }

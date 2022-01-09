@@ -27,17 +27,7 @@ import {
 import { Subject } from "rxjs";
 
 /** @title Form field with custom telephone number input control. */
-/*
-@Component({
-  selector: "form-field-custom-phone-input-control",
-  templateUrl: "form-field-custom-phone-input-control.html",
-})
-export class FormFieldCustomPhoneInputControl {
-  form: FormGroup = new FormGroup({
-    tel: new FormControl(new MyTel("", "", "", "")),
-  });
-}
-*/
+
 /** Data structure for holding telephone number. */
 export class MyTel {
   constructor(

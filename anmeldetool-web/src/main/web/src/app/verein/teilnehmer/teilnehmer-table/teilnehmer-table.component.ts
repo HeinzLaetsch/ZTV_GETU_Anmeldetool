@@ -3,7 +3,8 @@ import { FormControl, Validators } from "@angular/forms";
 import { MatPaginator, PageEvent } from "@angular/material/paginator";
 import { MatSort, Sort } from "@angular/material/sort";
 import { ToastrService } from "ngx-toastr";
-import { Observable, Subscription } from "rxjs";
+import { Observable, Subject, Subscription } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 import { TeilnehmerDataSource } from "src/app/core/datasource/TeilnehmerDataSource";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
@@ -56,6 +57,10 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   @ViewChild(MatSort) sort: MatSort;
 
   loadTeilnehmerPageSub: Subscription;
+  private readonly unsubscribeLoadAnlaesse$: Subject<void> = new Subject();
+  private readonly unsubscribeLoadTeilnehmerPage$: Subject<void> =
+    new Subject();
+  private readonly unsubscribeLoadVereine$: Subject<void> = new Subject();
 
   constructor(
     public authService: AuthService,
@@ -71,34 +76,30 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     );
     // this._startsChanges = new Array<IStart>();
 
-    let localSubscription1: Subscription = undefined;
-    localSubscription1 = this.vereinService
+    this.vereinService
       .loadVereine()
+      .pipe(takeUntil(this.unsubscribeLoadVereine$))
       .subscribe((result) => {
+        this.unsubscribeLoadVereine$.next();
         this.vereine = this.vereinService.getVereine();
         console.log(
           "TeilnehmerTableComponent:: constructor Vereine: ",
           this.vereine
         );
-        if (localSubscription1) {
-          localSubscription1.unsubscribe();
-        }
       });
   }
 
   private initAll() {
-    let localSubscription2: Subscription = undefined;
-    localSubscription2 = this.anlassService
+    this.anlassService
       .loadAnlaesse()
+      .pipe(takeUntil(this.unsubscribeLoadAnlaesse$))
       .subscribe((result) => {
+        this.unsubscribeLoadAnlaesse$.next();
         if (!result) {
           return;
         }
         this.anlaesse = this.anlassService.getAnlaesse(this.tiTu);
         // console.log("TeilnehmerTableComponent:: ngOnInit: ", this.anlaesse);
-        if (localSubscription2) {
-          localSubscription2.unsubscribe();
-        }
         this.allDisplayedColumns = this.displayedColumns.map((col) => col);
         this.anlaesse.forEach((anlass) => {
           this.allDisplayedColumns.push(
@@ -163,6 +164,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       this.anlassService
         .getVereinStart(anlass, this.authService.currentVerein)
         .subscribe((result) => {
+          /*
           console.log(
             "getVereinStart ",
             anlass.anlassBezeichnung,
@@ -174,7 +176,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
             this.checked.length,
             " , Anlässe: ",
             this.anlaesse.length
-          );
+          );*/
           this.checked.push(result);
           const isLast = currentAnlass++ === this.anlaesse.length - 1;
           this.teilnahmenloader(anlass, isLast);
@@ -455,7 +457,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       // this.dataSource.sort = this.sort;
       this.paginator.page.subscribe((pageEvent) => {
         this.checkIfDirty(pageEvent);
-        console.log("PageEvent: ", pageEvent);
+        // console.log("PageEvent: ", pageEvent);
         this.loadTeilnahmen(false);
         this.loadTeilnehmerPage();
       });
@@ -491,12 +493,11 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     });
   }
   loadTeilnehmerPage() {
-    if (this.loadTeilnehmerPageSub) {
-      this.loadTeilnehmerPageSub.unsubscribe();
-    }
-    this.loadTeilnehmerPageSub = this.dataSource
+    this.dataSource
       .loadTeilnehmer(this.filterValue, this.tiTu)
+      .pipe(takeUntil(this.unsubscribeLoadTeilnehmerPage$))
       .subscribe((result) => {
+        this.unsubscribeLoadTeilnehmerPage$.next();
         // console.error("Load Teilnehmer Page");
         this.populateTeilnehmer(result);
       });
