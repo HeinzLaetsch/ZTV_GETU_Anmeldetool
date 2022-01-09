@@ -170,8 +170,8 @@ public class AdminController {
 	}
 
 	@PatchMapping("/anlaesse/{anlassId}/organisationen/{orgId}")
-	public @ResponseBody ResponseEntity patchAnlassVereine(HttpServletRequest request, @PathVariable UUID anlassId,
-			@PathVariable UUID orgId, @RequestBody OrganisationAnlassLinkDTO oal) {
+	public @ResponseBody ResponseEntity<Boolean> patchAnlassVereine(HttpServletRequest request,
+			@PathVariable UUID anlassId, @PathVariable UUID orgId, @RequestBody OrganisationAnlassLinkDTO oal) {
 		return anlassSrv.updateTeilnehmendeVereine(anlassId, orgId, oal);
 	}
 

@@ -163,7 +163,18 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       this.anlassService
         .getVereinStart(anlass, this.authService.currentVerein)
         .subscribe((result) => {
-          // console.log("getVereinStart Result is: ", result);
+          console.log(
+            "getVereinStart ",
+            anlass.anlassBezeichnung,
+            " , Ti/Tu ",
+            this.tiTu,
+            ", started Result is: ",
+            result,
+            " , checked: ",
+            this.checked.length,
+            " , Anlässe: ",
+            this.anlaesse.length
+          );
           this.checked.push(result);
           const isLast = currentAnlass++ === this.anlaesse.length - 1;
           this.teilnahmenloader(anlass, isLast);
@@ -623,11 +634,22 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   // Wenn Name oder Jahrgang geändert wird Wettkaämpfe anzeigen, bei welchem das keine Rolle mehr spielt.
   // überprüfen, dass nur einzelne Buchstaben geändert werden, keine komplett neuen Namen.
   isChangesDisabled(anlass: IAnlass) {
-    if (!anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)) {
-      if (!anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED)) {
+    // return false;
+    /* TODO uncomment */
+    const nicht_offen = anlass.anzeigeStatus.hasStatus(
+      AnzeigeStatusEnum.NOCH_NICHT_OFFEN
+    );
+    const closed = anlass.anzeigeStatus.hasStatus(
+      AnzeigeStatusEnum.ERFASSEN_CLOSED
+    );
+    // console.log(anlass.anlassBezeichnung + " ,Nicht Offen: ", nicht_offen);
+    // console.log(anlass.anlassBezeichnung + " ,Nicht Closed: ", closed);
+    if (!nicht_offen) {
+      if (!closed) {
         return false;
       }
     }
     return true;
+    /* */
   }
 }

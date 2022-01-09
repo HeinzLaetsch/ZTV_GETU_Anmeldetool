@@ -172,10 +172,12 @@ public class AnlassService {
 			return ResponseEntity.notFound().build();
 		}
 
-		OrganisationAnlassLink teilnahme = orgAnlassRepo.findFirstByOrganisationAndAnlass(organisation, anlass);
-		if (teilnahme != null && teilnahme.isAktiv()) {
-			return ResponseEntity.ok(true);
-
+		List<OrganisationAnlassLink> teilnahmen = orgAnlassRepo.findByOrganisationAndAnlass(organisation, anlass);
+		if (teilnahmen != null && teilnahmen.size() == 1) {
+			if (teilnahmen.get(0).isAktiv()) {
+				return ResponseEntity.ok(true);
+			}
+			return ResponseEntity.notFound().build();
 		}
 		return ResponseEntity.notFound().build();
 	}
@@ -197,7 +199,7 @@ public class AnlassService {
 		return optAnlass.get();
 	}
 
-	public ResponseEntity updateTeilnehmendeVereine(UUID anlassId, UUID orgId, OrganisationAnlassLinkDTO oal) {
+	public ResponseEntity<Boolean> updateTeilnehmendeVereine(UUID anlassId, UUID orgId, OrganisationAnlassLinkDTO oal) {
 
 		Anlass anlass = findAnlassById(anlassId);
 
@@ -206,10 +208,10 @@ public class AnlassService {
 			return ResponseEntity.notFound().build();
 		}
 
-		OrganisationAnlassLink teilnahme = orgAnlassRepo.findFirstByOrganisationAndAnlass(organisation, anlass);
+		List<OrganisationAnlassLink> teilnahmen = orgAnlassRepo.findByOrganisationAndAnlass(organisation, anlass);
 		OrganisationAnlassLink organisationAnlassLink;
-		if (teilnahme != null) {
-			organisationAnlassLink = teilnahme;
+		if (teilnahmen.size() != 0) {
+			organisationAnlassLink = teilnahmen.get(0);
 			organisationAnlassLink.setAktiv(oal.isStarted());
 			organisationAnlassLink.setAnlass(anlass);
 			organisationAnlassLink.setOrganisation(organisation);
@@ -219,9 +221,9 @@ public class AnlassService {
 			organisationAnlassLink.setAnlass(anlass);
 			organisationAnlassLink.setOrganisation(organisation);
 		}
-		orgAnlassRepo.save(organisationAnlassLink);
+		organisationAnlassLink = orgAnlassRepo.save(organisationAnlassLink);
 
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(organisationAnlassLink.isAktiv());
 	}
 
 }

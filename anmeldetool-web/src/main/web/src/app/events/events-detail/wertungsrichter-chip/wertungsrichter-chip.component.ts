@@ -78,16 +78,20 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
       });
   }
   getSlotsForBrevet(): IWertungsrichterSlot[] {
-    return this.anlass.wertungsrichterSlots.filter(
+    const slots = this.anlass.wertungsrichterSlots.filter(
       (slot) => slot.brevet === this.wertungsrichter.brevet
     );
+    return slots;
   }
 
   getEinsatzForSlot(slot: IWertungsrichterSlot): IWertungsrichterEinsatz {
     // console.log("getEinsatzForSlot: ", slot, this.wertungsrichterUser);
-    return this.wertungsrichterUser?.pal?.einsaetze?.filter((einsatz) => {
-      return einsatz.wertungsrichterSlotId === slot.id;
-    })?.[0];
+    const einsatz = this.wertungsrichterUser?.pal?.einsaetze?.filter(
+      (einsatz) => {
+        return einsatz.wertungsrichterSlotId === slot.id;
+      }
+    )?.[0];
+    return einsatz;
   }
 
   get wrAnlassLink() {

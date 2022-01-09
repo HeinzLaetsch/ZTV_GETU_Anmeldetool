@@ -111,10 +111,10 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 			createSlots();
 
 			createVerein1();
+			createTeilnahme();
 		} else {
 			log.info("Anmeldetool is ready to use");
 		}
-		createTeilnahme();
 	}
 
 	private void createSlots() {

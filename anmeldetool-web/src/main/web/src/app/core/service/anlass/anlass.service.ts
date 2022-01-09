@@ -244,7 +244,6 @@ export class AnlassService {
   getVereinStart(anlass: IAnlass, verein: IVerein): Observable<boolean> {
     const combinedUrl =
       this.url + "/" + anlass?.id + "/" + "organisationen" + "/" + verein?.id;
-    // console.log("getVereinStart called: ", combinedUrl);
     if (!anlass) {
       return of(false);
     }
@@ -327,7 +326,7 @@ export class AnlassService {
 
   private handleError<T>(operation = "operation", result?: T) {
     return (error: any): Observable<T> => {
-      console.error("HandleError: ", error);
+      console.error("HandleError: ", operation, " , Error: ", error);
       return of(result as T);
     };
   }
