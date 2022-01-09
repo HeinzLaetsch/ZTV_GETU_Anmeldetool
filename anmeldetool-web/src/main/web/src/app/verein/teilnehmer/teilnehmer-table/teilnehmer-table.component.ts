@@ -39,7 +39,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   sortValue: string;
 
   populating = true;
-  checked: Array<boolean>;
+  checked = new Array<boolean>();
 
   teilnahmenControls = new Array<Array<FormControl>>();
   teilnehmerControls = new Array<Array<FormControl>>();
@@ -147,7 +147,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     }
   }
   private loadTeilnahmen(createControl: boolean) {
-    this.checked = new Array();
+    let i = 0;
     let currentAnlass = 0;
     this.anlaesse.forEach((anlass) => {
       // console.log("Prepare Anlass: ", anlass);
@@ -164,6 +164,13 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       this.anlassService
         .getVereinStart(anlass, this.authService.currentVerein)
         .subscribe((result) => {
+          if (this.checked.length === 0) {
+            this.anlaesse.forEach((anlass) => {
+              this.checked.push(false);
+              anlass.position = i++;
+            });
+          }
+
           /*
           console.log(
             "getVereinStart ",
@@ -177,7 +184,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
             " , Anlässe: ",
             this.anlaesse.length
           );*/
-          this.checked.push(result);
+          this.checked[anlass.position] = result;
           const isLast = currentAnlass++ === this.anlaesse.length - 1;
           this.teilnahmenloader(anlass, isLast);
         });

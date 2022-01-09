@@ -259,7 +259,7 @@ create table TEILNEHMER
     NAME	   	  VARCHAR(100),
     VORNAME       VARCHAR(100),
     JAHRGANG      INTEGER,
-    STV_NUMMER	  VARCHAR(6),
+    STV_NUMMER	  VARCHAR(7),
     TI_TU	      VARCHAR(4),
     ORGANISATION_ID uuid not null,
     DIRTY		  BOOLEAN,
