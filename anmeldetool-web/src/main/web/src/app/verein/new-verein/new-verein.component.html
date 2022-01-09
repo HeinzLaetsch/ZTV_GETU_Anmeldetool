@@ -50,6 +50,7 @@
       (valid)="updateUserValid($event)"
       [showPassword]="true"
       [showBenutzername]="false"
+      [mustShowPassword]="true"
     ></app-user>
     <mat-error *ngIf="error" class="error"> {{ errorMessage }}</mat-error>
     <button mat-button (click)="cancel()">Abbrechen</button>

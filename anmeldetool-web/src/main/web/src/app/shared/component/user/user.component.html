@@ -50,7 +50,14 @@
       <mat-hint>Gib den Vornamen ein</mat-hint>
     </mat-form-field>
   </p>
-  <p *ngIf="showPassword">
+  <p *ngIf="showPassword && !mustShowPassword">
+    <mat-checkbox
+      formControlName="passwortAendernControl"
+      [(ngModel)]="showPasswordAendern"
+      >Passwort ändern
+    </mat-checkbox>
+  </p>
+  <p *ngIf="showPasswordAendern || mustShowPassword">
     <mat-form-field [appearance]="appearance">
       <mat-label>Passwort</mat-label>
       <input
@@ -65,7 +72,7 @@
       <mat-hint>Gib das gleiche Passwort nochmals ein</mat-hint>
     </mat-form-field>
   </p>
-  <p *ngIf="showPassword">
+  <p *ngIf="showPasswordAendern || mustShowPassword">
     <mat-form-field [appearance]="appearance">
       <mat-label>Passwort bestätigen</mat-label>
       <input

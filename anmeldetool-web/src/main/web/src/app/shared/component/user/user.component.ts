@@ -34,6 +34,8 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
   @Input()
   showPassword: boolean;
   @Input()
+  mustShowPassword: boolean;
+  @Input()
   showBenutzername: boolean;
   @Input()
   user: IUser;
@@ -49,6 +51,7 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
   enteredPassword = "";
 
   userAlreadyExists = false;
+  showPasswordAendern = false;
 
   form: FormGroup = new FormGroup({
     benutzernameControl: new FormControl("", [
@@ -58,6 +61,7 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
     ]),
     nachnameControl: new FormControl("", Validators.required),
     vornameControl: new FormControl("", Validators.required),
+    passwortAendernControl: new FormControl(false),
     passwortControl: new FormControl("", Validators.required),
     passwort2Control: new FormControl("", Validators.required),
     eMailAdresseControl: new FormControl({ value: "", disabled: false }, [

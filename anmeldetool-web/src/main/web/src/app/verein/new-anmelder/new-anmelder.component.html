@@ -25,6 +25,7 @@
         (valid)="updateUserValid($event)"
         [showPassword]="true"
         [showBenutzername]="false"
+        [mustShowPassword]="true"
       ></app-user>
     </mat-dialog-content>
     <mat-error *ngIf="error" class="error"> {{ errorMessage }}</mat-error>
