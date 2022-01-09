@@ -39,6 +39,7 @@ import org.ztv.anmeldetool.anmeldetool.models.Wertungsrichter;
 import org.ztv.anmeldetool.anmeldetool.models.WertungsrichterBrevetEnum;
 import org.ztv.anmeldetool.anmeldetool.models.WertungsrichterEinsatz;
 import org.ztv.anmeldetool.anmeldetool.models.WertungsrichterSlot;
+import org.ztv.anmeldetool.anmeldetool.repositories.PersonAnlassLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.service.AnlassService;
 import org.ztv.anmeldetool.anmeldetool.service.LoginService;
 import org.ztv.anmeldetool.anmeldetool.service.OrganisationService;
@@ -124,6 +125,9 @@ public class AdminController {
 
 	@Autowired
 	PasswordEncoder passwordEncoder;
+
+	@Autowired
+	PersonAnlassLinkRepository personAnlassLinkRepository;
 
 	// curl -d @login.json -H "Content-Type: application/json"
 	// http://localhost:8080/admin/login
@@ -267,10 +271,12 @@ public class AdminController {
 			PersonAnlassLink pal = anlassSrv.getAnlassLink(anlassId, orgId, personId);
 			if (pal != null) {
 				pal.setKommentar(personAnlassLinkDTO.getKommentar());
+				pal = personAnlassLinkRepository.save(pal);
 				PersonAnlassLinkDTO palDTO = this.palMapper.PersonAnlassLinkToPersonAnlassLinkDTO(pal);
 				return ResponseEntity.ok(palDTO);
 			} else {
-				return anlassSrv.updateEingeteilteWertungsrichter(anlassId, orgId, personId, true);
+				return anlassSrv.updateEingeteilteWertungsrichter(anlassId, orgId, personId,
+						personAnlassLinkDTO.getKommentar(), true);
 			}
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().build();
@@ -281,7 +287,7 @@ public class AdminController {
 	public ResponseEntity<PersonAnlassLinkDTO> deleteEingeteilteWertungsrichter(HttpServletRequest request,
 			@PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable UUID personId) {
 		try {
-			return anlassSrv.updateEingeteilteWertungsrichter(anlassId, orgId, personId, false);
+			return anlassSrv.updateEingeteilteWertungsrichter(anlassId, orgId, personId, "", false);
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().build();
 		}

@@ -93,7 +93,7 @@ public class AnlassService {
 	}
 
 	public ResponseEntity<PersonAnlassLinkDTO> updateEingeteilteWertungsrichter(UUID anlassId, UUID orgId,
-			UUID personId, boolean add) throws Exception {
+			UUID personId, String kommentar, boolean add) throws Exception {
 
 		PersonAnlassLink pal = getAnlassLink(anlassId, orgId, personId);
 		if (add) {
@@ -108,6 +108,7 @@ public class AnlassService {
 			pal.setAnlass(anlass);
 			pal.setOrganisation(organisation);
 			pal.setPerson(person);
+			pal.setKommentar(kommentar);
 			pal = personAnlassLinkRepository.save(pal);
 			PersonAnlassLinkDTO palDTO = PersonAnlassLinkDTO.builder().anlassId(pal.getAnlass().getId())
 					.organisationId(pal.getOrganisation().getId()).personId(pal.getPerson().getId()).build();

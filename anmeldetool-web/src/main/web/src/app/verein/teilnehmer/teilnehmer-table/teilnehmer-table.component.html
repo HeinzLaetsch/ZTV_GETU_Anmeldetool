@@ -7,6 +7,15 @@
         placeholder="Filter"
       />
     </mat-form-field>
+    <button
+      *ngIf="filterValue"
+      matSuffix
+      mat-icon-button
+      aria-label="leeren"
+      (click)="applyFilter('')"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
   </div>
 
   <div class="example-container mat-elevation-z8">
