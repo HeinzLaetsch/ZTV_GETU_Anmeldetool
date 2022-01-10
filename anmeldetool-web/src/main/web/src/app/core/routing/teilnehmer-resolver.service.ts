@@ -6,8 +6,7 @@ import { Observable, of } from "rxjs";
   providedIn: "root",
 })
 export class TeilnehmerResolverService implements Resolve<number> {
-  constructor() // private authService: AuthService,
-  // private teilnehmerService: CachingTeilnehmerService
+  constructor() // private teilnehmerService: CachingTeilnehmerService // private authService: AuthService,
   {}
 
   resolve(): Observable<number> {

@@ -17,7 +17,6 @@ import { CachingAnlassService } from "src/app/core/service/caching-services/cach
 import { CachingTeilnehmerService } from "src/app/core/service/caching-services/caching.teilnehmer.service";
 import { CachingVereinService } from "src/app/core/service/caching-services/caching.verein.service";
 import { IVerein } from "../../verein";
-import { IStart } from "../starts";
 
 interface TeilnahmeControl {
   formControl: FormControl;
@@ -519,14 +518,16 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   populateTeilnehmer(allTeilnehmer: ITeilnehmer[]) {
     let i = 0;
     this.populating = true;
-    allTeilnehmer.forEach((teilnehmer) => {
-      // console.log("populateTeilnehmer");
-      this.teilnehmerControls[i][0].setValue(teilnehmer.name);
-      this.teilnehmerControls[i][1].setValue(teilnehmer.vorname);
-      this.teilnehmerControls[i][2].setValue(teilnehmer.jahrgang);
-      this.teilnehmerControls[i][3].setValue(teilnehmer.stvNummer);
-      i++;
-    });
+    if (allTeilnehmer) {
+      allTeilnehmer.forEach((teilnehmer) => {
+        // console.log("populateTeilnehmer");
+        this.teilnehmerControls[i][0].setValue(teilnehmer.name);
+        this.teilnehmerControls[i][1].setValue(teilnehmer.vorname);
+        this.teilnehmerControls[i][2].setValue(teilnehmer.jahrgang);
+        this.teilnehmerControls[i][3].setValue(teilnehmer.stvNummer);
+        i++;
+      });
+    }
     this.populating = false;
   }
   applyFilter(filterValue: string) {

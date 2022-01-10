@@ -28,6 +28,8 @@ export class UserFormComponent implements OnInit {
 
   _wertungsrichter: IWertungsrichter;
 
+  _localPassword = "";
+
   constructor(
     private authService: AuthService,
     private userService: CachingUserService,
@@ -191,9 +193,15 @@ export class UserFormComponent implements OnInit {
     return this.currentUser;
   }
   set user(value: IUser) {
-    this.currentUser = value;
-    this.userHasChanged = true;
-    this.updateChangeEvent();
+    if (this._localPassword) {
+      this.currentUser = value;
+      this._localPassword = undefined;
+    } else {
+      this._localPassword = undefined;
+      this.currentUser = value;
+      this.userHasChanged = true;
+      this.updateChangeEvent();
+    }
   }
   private deepCopy<T>(source: T): T {
     return Array.isArray(source)
@@ -236,8 +244,10 @@ export class UserFormComponent implements OnInit {
     if (this.currentUser.id) {
       if (this.userHasChanged && this.changeEvent.userValid) {
         this.authService.updateUser(this.currentUser).subscribe((user) => {
+          this._localPassword = this.currentUser.password;
           this.currentUser = user;
           this.userHasChanged = false;
+          this.userChange.next(this.changeEvent);
         });
       }
       if (this.changeEvent.rolesChanged) {
