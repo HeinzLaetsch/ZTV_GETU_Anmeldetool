@@ -86,35 +86,68 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 			log.info("Anmeldetool needs initialising");
 			Iterable<Verband> verbaende = verbandRepo.findByVerband(VerbandEnum.STV.name());
 			Verband verband = verbaende.iterator().next();
+
 			ztv = Organisation.builder().name("ZTV").verband(verband).build();
-			OrganisationPersonLink opLink = new OrganisationPersonLink();
-			opLink.setAktiv(true);
-			opLink.setChangeDate(Calendar.getInstance());
-			ztv.addToPersonenLink(opLink);
-			String password = "test";
-			Person person = Person.builder().benutzername("admin").name("Administrator").vorname("").handy("").email("")
-					.password(password).build();
-			person.setAktiv(true);
-			person.setChangeDate(Calendar.getInstance());
-			person.addToOrganisationenLink(opLink);
-			opLink = orgPersLinkRepo.save(opLink);
-			RollenLink rollenLink = new RollenLink();
-			rollenLink.setLink(opLink);
-			rollenLink.setRolle(getRolle(RollenEnum.ADMINISTRATOR));
-			rollenLink.setAktiv(true);
-			orgRepo.save(ztv);
-			// persRepo.save(person);
-			personSrv.create(person, true);
-			// orgPersRepo.save(opLink); Cascade
-			rollenLinkRepo.save(rollenLink);
-			log.info("User created: " + password);
+			ztv = orgRepo.save(ztv);
+
+			createWLTi(ztv);
+			createWLTu(ztv);
+
 			createSlots();
 
-			createVerein1();
-			createTeilnahme();
+			// createVerein1();
+			// createTeilnahme();
 		} else {
 			log.info("Anmeldetool is ready to use");
 		}
+	}
+
+	private void createWLTu(Organisation ztv) {
+		OrganisationPersonLink opLink = new OrganisationPersonLink();
+		opLink.setAktiv(true);
+		opLink.setChangeDate(Calendar.getInstance());
+		ztv.addToPersonenLink(opLink);
+		String password = "wl@ztv";
+
+		Person person = Person.builder().benutzername("getu-wettkaempfe-tu@ztv.ch").name("Lätsch").vorname("Heinz")
+				.handy("076 336 30 31").email("getu-wettkaempfe-tu@ztv.ch").password(password).build();
+		person.setAktiv(true);
+		person.setChangeDate(Calendar.getInstance());
+		person.addToOrganisationenLink(opLink);
+		opLink = orgPersLinkRepo.save(opLink);
+
+		RollenLink rollenLink = new RollenLink();
+		rollenLink.setLink(opLink);
+		rollenLink.setRolle(getRolle(RollenEnum.ADMINISTRATOR));
+		rollenLink.setAktiv(true);
+		// persRepo.save(person);
+		personSrv.create(person, true);
+		// orgPersRepo.save(opLink); Cascade
+		rollenLinkRepo.save(rollenLink);
+	}
+
+	private void createWLTi(Organisation ztv) {
+		OrganisationPersonLink opLink = new OrganisationPersonLink();
+		opLink.setAktiv(true);
+		opLink.setChangeDate(Calendar.getInstance());
+		ztv.addToPersonenLink(opLink);
+		String password = "wl@ztv";
+
+		Person person = Person.builder().benutzername("getu-wettkaempfe-ti@ztv.ch").name("Spitznagel/Althaus")
+				.vorname("Karin/Sandy").handy("").email("getu-wettkaempfe-ti@ztv.ch").password(password).build();
+		person.setAktiv(true);
+		person.setChangeDate(Calendar.getInstance());
+		person.addToOrganisationenLink(opLink);
+		opLink = orgPersLinkRepo.save(opLink);
+
+		RollenLink rollenLink = new RollenLink();
+		rollenLink.setLink(opLink);
+		rollenLink.setRolle(getRolle(RollenEnum.ADMINISTRATOR));
+		rollenLink.setAktiv(true);
+		// persRepo.save(person);
+		personSrv.create(person, true);
+		// orgPersRepo.save(opLink); Cascade
+		rollenLinkRepo.save(rollenLink);
 	}
 
 	private void createSlots() {
@@ -125,7 +158,7 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 			WertungsrichterSlot slot = new WertungsrichterSlot();
 			slot.setAktiv(true);
 			slot.setAnlass(a);
-			slot.setBeschreibung("SA Morgen");
+			slot.setBeschreibung("SO Morgen");
 			slot.setBrevet(WertungsrichterBrevetEnum.Brevet_1);
 			slot.setReihenfolge(0);
 			slots.add(slot);
@@ -133,50 +166,9 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 			slot = new WertungsrichterSlot();
 			slot.setAktiv(true);
 			slot.setAnlass(a);
-			slot.setBeschreibung("SA Mittag");
-			slot.setBrevet(WertungsrichterBrevetEnum.Brevet_1);
-			slot.setReihenfolge(1);
-			slots.add(slot);
-			wertungsrichterSlotRepo.save(slot);
-			slot = new WertungsrichterSlot();
-			slot.setAktiv(true);
-			slot.setAnlass(a);
-			slot.setBeschreibung("SO Morgen");
-			slot.setBrevet(WertungsrichterBrevetEnum.Brevet_1);
-			slot.setReihenfolge(2);
-			slots.add(slot);
-			wertungsrichterSlotRepo.save(slot);
-			slot = new WertungsrichterSlot();
-			slot.setAktiv(true);
-			slot.setAnlass(a);
-			slot.setBeschreibung("SO Mittag");
-			slot.setBrevet(WertungsrichterBrevetEnum.Brevet_1);
-			slot.setReihenfolge(3);
-			slots.add(slot);
-			wertungsrichterSlotRepo.save(slot);
-
-			slot = new WertungsrichterSlot();
-			slot.setAktiv(true);
-			slot.setAnlass(a);
-			slot.setBeschreibung("SA Mittag");
-			slot.setBrevet(WertungsrichterBrevetEnum.Brevet_2);
-			slot.setReihenfolge(0);
-			slots.add(slot);
-			wertungsrichterSlotRepo.save(slot);
-			slot = new WertungsrichterSlot();
-			slot.setAktiv(true);
-			slot.setAnlass(a);
-			slot.setBeschreibung("SO Morgen");
-			slot.setBrevet(WertungsrichterBrevetEnum.Brevet_2);
-			slot.setReihenfolge(1);
-			slots.add(slot);
-			wertungsrichterSlotRepo.save(slot);
-			slot = new WertungsrichterSlot();
-			slot.setAktiv(true);
-			slot.setAnlass(a);
 			slot.setBeschreibung("SO Mittag");
 			slot.setBrevet(WertungsrichterBrevetEnum.Brevet_2);
-			slot.setReihenfolge(2);
+			slot.setReihenfolge(1);
 			slots.add(slot);
 			wertungsrichterSlotRepo.save(slot);
 		}
