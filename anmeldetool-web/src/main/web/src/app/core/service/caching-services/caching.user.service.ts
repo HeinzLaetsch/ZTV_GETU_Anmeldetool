@@ -38,6 +38,15 @@ export class CachingUserService {
       this.userService.getUser().subscribe((users) => {
         this.orgUsers = users;
         this.users = this.deepCopy(users);
+        this.users.sort((a, b) => {
+          if (a.benutzername < b.benutzername) {
+            return -1;
+          }
+          if (a.benutzername > b.benutzername) {
+            return 1;
+          }
+          return 0;
+        });
         this._loadRunning = false;
         this.loaded = true;
         this.usersLoaded.next(true);

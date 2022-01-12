@@ -163,24 +163,22 @@ public class AnlassService {
 				.ok(TeilnehmerAnlassLinkHelper.getTeilnehmerAnlassLinkDTOForTeilnehmerAnlassLink(teilnahmen));
 	}
 
-	public ResponseEntity<Boolean> getVereinStarts(UUID anlassId, UUID orgId) {
+	public OrganisationAnlassLink getVereinStarts(UUID anlassId, UUID orgId) {
 		Anlass anlass = findAnlassById(anlassId);
 		if (anlass == null) {
-			return ResponseEntity.notFound().build();
+			return null;
 		}
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		if (organisation == null) {
-			return ResponseEntity.notFound().build();
+			return null;
 		}
 
 		List<OrganisationAnlassLink> teilnahmen = orgAnlassRepo.findByOrganisationAndAnlass(organisation, anlass);
 		if (teilnahmen != null && teilnahmen.size() == 1) {
-			if (teilnahmen.get(0).isAktiv()) {
-				return ResponseEntity.ok(true);
-			}
-			return ResponseEntity.notFound().build();
+			// TODO Check if Date stays
+			return teilnahmen.get(0);
 		}
-		return ResponseEntity.notFound().build();
+		return null;
 	}
 
 	public List<Organisation> getVereinsStarts(UUID anlassId) {
@@ -200,31 +198,33 @@ public class AnlassService {
 		return optAnlass.get();
 	}
 
-	public ResponseEntity<Boolean> updateTeilnehmendeVereine(UUID anlassId, UUID orgId, OrganisationAnlassLinkDTO oal) {
+	public OrganisationAnlassLink updateTeilnehmendeVereine(UUID anlassId, UUID orgId, OrganisationAnlassLinkDTO oal) {
 
 		Anlass anlass = findAnlassById(anlassId);
 
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		if (organisation == null) {
-			return ResponseEntity.notFound().build();
+			return null;
 		}
 
 		List<OrganisationAnlassLink> teilnahmen = orgAnlassRepo.findByOrganisationAndAnlass(organisation, anlass);
 		OrganisationAnlassLink organisationAnlassLink;
 		if (teilnahmen.size() != 0) {
 			organisationAnlassLink = teilnahmen.get(0);
-			organisationAnlassLink.setAktiv(oal.isStarted());
+			organisationAnlassLink.setAktiv(oal.isStartet());
 			organisationAnlassLink.setAnlass(anlass);
 			organisationAnlassLink.setOrganisation(organisation);
+			organisationAnlassLink.setVerlaengerungsDate(oal.getVerlaengerungsDate());
 		} else {
 			organisationAnlassLink = new OrganisationAnlassLink();
-			organisationAnlassLink.setAktiv(oal.isStarted());
+			organisationAnlassLink.setAktiv(oal.isStartet());
 			organisationAnlassLink.setAnlass(anlass);
 			organisationAnlassLink.setOrganisation(organisation);
+			organisationAnlassLink.setVerlaengerungsDate(oal.getVerlaengerungsDate());
 		}
 		organisationAnlassLink = orgAnlassRepo.save(organisationAnlassLink);
 
-		return ResponseEntity.ok(organisationAnlassLink.isAktiv());
+		return organisationAnlassLink;
 	}
 
 }

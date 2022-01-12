@@ -6,6 +6,7 @@ import { IVerein } from "src/app/verein/verein";
 import { environment } from "src/environments/environment";
 import { IAnlass } from "../../model/IAnlass";
 import { IAnlassLink } from "../../model/IAnlassLink";
+import { IOrganisationAnlassLink } from "../../model/IOrganisationAnlassLink";
 import { IPersonAnlassLink } from "../../model/IPersonAnlassLink";
 import { IUser } from "../../model/IUser";
 import { IWertungsrichterEinsatz } from "../../model/IWertungsrichterEinsatz";
@@ -241,18 +242,27 @@ export class AnlassService {
     );
   }
 
-  getVereinStart(anlass: IAnlass, verein: IVerein): Observable<boolean> {
+  getVereinStart(
+    anlass: IAnlass,
+    verein: IVerein
+  ): Observable<IOrganisationAnlassLink> {
+    const empty = {
+      anlassId: anlass?.id,
+      organisationsId: verein?.id,
+      startet: false,
+      verlaengerungsDate: undefined,
+    };
     const combinedUrl =
       this.url + "/" + anlass?.id + "/" + "organisationen" + "/" + verein?.id;
     if (!anlass) {
-      return of(false);
+      return of(empty);
     }
-    return this.http.get<boolean>(combinedUrl).pipe(
+    return this.http.get<IOrganisationAnlassLink>(combinedUrl).pipe(
       catchError((error) => {
         if (error.status === 404) {
-          return of(false);
+          return of(empty);
         }
-        this.handleError<boolean>("getVereinStart");
+        this.handleError<IOrganisationAnlassLink>("getVereinStart");
       })
     );
   }
@@ -266,28 +276,29 @@ export class AnlassService {
   }
 
   updateVereinsStart(
-    anlass: IAnlass,
-    verein: IVerein,
-    started: boolean
-  ): Observable<boolean> {
+    orgAnlassLink: IOrganisationAnlassLink
+  ): Observable<IOrganisationAnlassLink> {
     const combinedUrl =
-      this.url + "/" + anlass.id + "/" + "organisationen" + "/" + verein.id;
-    const body = {
-      anlassId: anlass.id,
-      organisationsId: verein.id,
-      started: started,
-    };
+      this.url +
+      "/" +
+      orgAnlassLink.anlassId +
+      "/" +
+      "organisationen" +
+      "/" +
+      orgAnlassLink.organisationsId;
     console.log(
       "updateVereinsStart called: ",
       combinedUrl,
-      " , data: ",
-      started,
       ", Body: ",
-      body
+      orgAnlassLink
     );
     return this.http
-      .patch<boolean>(combinedUrl, body)
-      .pipe(catchError(this.handleError<boolean>("updateVereinsStart")));
+      .patch<IOrganisationAnlassLink>(combinedUrl, orgAnlassLink)
+      .pipe(
+        catchError(
+          this.handleError<IOrganisationAnlassLink>("updateVereinsStart")
+        )
+      );
   }
 
   saveTeilnahme(verein: IVerein, anlassLink: IAnlassLink): Observable<boolean> {

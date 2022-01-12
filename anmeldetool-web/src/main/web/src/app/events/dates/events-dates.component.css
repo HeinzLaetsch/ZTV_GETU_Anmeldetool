@@ -7,7 +7,10 @@
   color: var(--ztv-black);
   background-color: var(--ztv-light-gray);
 }
-
+.div-orange {
+  color: var(--ztv-black);
+  background-color: var(--ztv-warning);
+}
 .div-red {
   color: var(--ztv-black);
   background-color: var(--ztv-light-red);

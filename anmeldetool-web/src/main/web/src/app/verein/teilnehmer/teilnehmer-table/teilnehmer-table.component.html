@@ -125,7 +125,7 @@
             <mat-checkbox
               (click)="clicked($event, colIndex)"
               (ngModelChange)="checkedClicked($event, colIndex)"
-              [ngModel]="checked[colIndex]"
+              [ngModel]="checked[colIndex].startet"
               [disabled]="isChangesDisabled(anlass)"
               >Verein startet
             </mat-checkbox>

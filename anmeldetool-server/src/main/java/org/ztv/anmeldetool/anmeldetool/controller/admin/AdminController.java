@@ -33,6 +33,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.ztv.anmeldetool.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.anmeldetool.models.LoginData;
 import org.ztv.anmeldetool.anmeldetool.models.Organisation;
+import org.ztv.anmeldetool.anmeldetool.models.OrganisationAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.models.Person;
 import org.ztv.anmeldetool.anmeldetool.models.PersonAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.models.Wertungsrichter;
@@ -61,6 +62,7 @@ import org.ztv.anmeldetool.anmeldetool.transfer.VerbandDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterEinsatzDTO;
 import org.ztv.anmeldetool.anmeldetool.util.AnlassMapper;
+import org.ztv.anmeldetool.anmeldetool.util.OrganisationAnlassLinkMapper;
 import org.ztv.anmeldetool.anmeldetool.util.OrganisationMapper;
 import org.ztv.anmeldetool.anmeldetool.util.PersonAnlassLinkMapper;
 import org.ztv.anmeldetool.anmeldetool.util.PersonHelper;
@@ -112,6 +114,9 @@ public class AdminController {
 	PersonAnlassLinkMapper palMapper;
 
 	@Autowired
+	OrganisationAnlassLinkMapper oalMapper;
+
+	@Autowired
 	PersonMapper personMapper;
 
 	@Autowired
@@ -152,9 +157,13 @@ public class AdminController {
 
 	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}")
 	// @ResponseBody
-	public ResponseEntity<Boolean> getVereinStarts(HttpServletRequest request, @PathVariable UUID anlassId,
-			@PathVariable UUID orgId) {
-		return anlassSrv.getVereinStarts(anlassId, orgId);
+	public ResponseEntity<OrganisationAnlassLinkDTO> getVereinStarts(HttpServletRequest request,
+			@PathVariable UUID anlassId, @PathVariable UUID orgId) {
+		OrganisationAnlassLink oalResult = anlassSrv.getVereinStarts(anlassId, orgId);
+		if (oalResult == null) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(this.oalMapper.toDto(oalResult));
 	}
 
 	@GetMapping("/anlaesse/{anlassId}/organisationen/")
@@ -174,9 +183,13 @@ public class AdminController {
 	}
 
 	@PatchMapping("/anlaesse/{anlassId}/organisationen/{orgId}")
-	public @ResponseBody ResponseEntity<Boolean> patchAnlassVereine(HttpServletRequest request,
+	public @ResponseBody ResponseEntity<OrganisationAnlassLinkDTO> patchAnlassVereine(HttpServletRequest request,
 			@PathVariable UUID anlassId, @PathVariable UUID orgId, @RequestBody OrganisationAnlassLinkDTO oal) {
-		return anlassSrv.updateTeilnehmendeVereine(anlassId, orgId, oal);
+		OrganisationAnlassLink oalResult = anlassSrv.updateTeilnehmendeVereine(anlassId, orgId, oal);
+		if (oalResult == null) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(this.oalMapper.toDto(oalResult));
 	}
 
 	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}/teilnehmer/")

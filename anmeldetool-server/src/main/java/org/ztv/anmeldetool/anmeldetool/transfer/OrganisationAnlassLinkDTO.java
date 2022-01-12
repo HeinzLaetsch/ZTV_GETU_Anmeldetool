@@ -1,5 +1,6 @@
 package org.ztv.anmeldetool.anmeldetool.transfer;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import lombok.Builder;
@@ -10,8 +11,10 @@ import lombok.Value;
 public class OrganisationAnlassLinkDTO {
 
 	UUID anlassId;
-	
+
 	UUID organisationsId;
-	
-	boolean started;
+
+	boolean startet;
+
+	private LocalDateTime verlaengerungsDate;
 }

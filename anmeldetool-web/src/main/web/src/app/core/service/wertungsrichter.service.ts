@@ -40,6 +40,15 @@ export class WertungsrichterService {
               assignedWrs.push(user);
             });
           }
+          assignedWrs.sort((a, b) => {
+            if (a.benutzername < b.benutzername) {
+              return -1;
+            }
+            if (a.benutzername > b.benutzername) {
+              return 1;
+            }
+            return 0;
+          });
           eingteilteWrSubject.next(assignedWrs);
         },
         (error) => {

@@ -4,6 +4,7 @@ import { IVerein } from "src/app/verein/verein";
 import { IAnlass } from "../../model/IAnlass";
 import { IAnlassLink } from "../../model/IAnlassLink";
 import { IAnlassLinks } from "../../model/IAnlassLinks";
+import { IOrganisationAnlassLink } from "../../model/IOrganisationAnlassLink";
 import { IPersonAnlassLink } from "../../model/IPersonAnlassLink";
 import { ITeilnehmer } from "../../model/ITeilnehmer";
 import { IUser } from "../../model/IUser";
@@ -105,7 +106,10 @@ export class CachingAnlassService {
     );
   }
 
-  getVereinStart(anlass: IAnlass, verein: IVerein): Observable<boolean> {
+  getVereinStart(
+    anlass: IAnlass,
+    verein: IVerein
+  ): Observable<IOrganisationAnlassLink> {
     return this.anlassService.getVereinStart(anlass, verein);
   }
 
@@ -134,11 +138,9 @@ export class CachingAnlassService {
   }
 
   updateVereinsStart(
-    anlass: IAnlass,
-    verein: IVerein,
-    started: boolean
-  ): Observable<boolean> {
-    return this.anlassService.updateVereinsStart(anlass, verein, started);
+    orgAnlassLink: IOrganisationAnlassLink
+  ): Observable<IOrganisationAnlassLink> {
+    return this.anlassService.updateVereinsStart(orgAnlassLink);
   }
   isAnlaesseLoaded(): Observable<boolean> {
     return this.anlaesseLoaded.asObservable();

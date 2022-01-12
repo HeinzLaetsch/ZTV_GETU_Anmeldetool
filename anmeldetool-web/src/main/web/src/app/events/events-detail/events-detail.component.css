@@ -7,9 +7,10 @@
   border: solid 1px #ccc;
   background: white;
   border-radius: 4px;
-  overflow: hidden;
+  overflow: auto;
   display: block;
-  min-height: 100px;
+  min-height: 100%;
+  max-height: 400px;
 }
 
 .col {
@@ -26,4 +27,9 @@
 h3 {
   font-weight: 500;
   margin-bottom: 0px;
+}
+.scrollable {
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 440px;
 }

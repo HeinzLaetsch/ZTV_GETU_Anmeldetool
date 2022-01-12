@@ -9,6 +9,7 @@ import { TeilnehmerDataSource } from "src/app/core/datasource/TeilnehmerDataSour
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IAnlassLink } from "src/app/core/model/IAnlassLink";
+import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
 import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
@@ -38,7 +39,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   sortValue: string;
 
   populating = true;
-  checked = new Array<boolean>();
+  checked = new Array<IOrganisationAnlassLink>();
 
   teilnahmenControls = new Array<Array<FormControl>>();
   teilnehmerControls = new Array<Array<FormControl>>();
@@ -159,13 +160,18 @@ export class TeilnehmerTableComponent implements AfterViewInit {
           line.push(cntr);
         });
       }
-
+      const empty = {
+        anlassId: anlass?.id,
+        organisationsId: this.authService.currentVerein?.id,
+        startet: false,
+        verlaengerungsDate: undefined,
+      };
       this.anlassService
         .getVereinStart(anlass, this.authService.currentVerein)
         .subscribe((result) => {
           if (this.checked.length === 0) {
             this.anlaesse.forEach((anlass) => {
-              this.checked.push(false);
+              this.checked.push(empty);
               anlass.position = i++;
             });
           }
@@ -401,7 +407,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   }
   mustEnableAnlass(colIndex: number) {
     const mustEnable =
-      this.checked[colIndex] &&
+      this.checked[colIndex].startet &&
       !this.isChangesDisabled(this.anlaesse[colIndex]);
     return mustEnable;
   }
@@ -424,31 +430,14 @@ export class TeilnehmerTableComponent implements AfterViewInit {
 
   checkedClicked(check: boolean, colIndex: any) {
     console.log("Clicked: ", colIndex, ", ", check);
-    this.checked[colIndex] = check;
+    this.checked[colIndex].startet = check;
 
     this.checkForIndex(colIndex, check);
-    /*
-    const newStart: IStart = {
-      anlass: this.anlaesse[colIndex],
-      start: check,
-    };
-    let start = this._startsChanges.find(
-      (start) => start.anlass.id === newStart.anlass.id
-    );
-    if (start) {
-      start.start = newStart.start;
-    } else {
-      this._startsChanges.push(newStart);
-      start = newStart;
-    }
-    */
+
     this.anlassService
-      .updateVereinsStart(
-        this.anlaesse[colIndex],
-        this.authService.currentVerein,
-        check
-      )
+      .updateVereinsStart(this.checked[colIndex])
       .subscribe((response) => {
+        this.checked[colIndex] = response;
         console.log("VereinsStart updated");
       });
   }
@@ -640,25 +629,26 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       });
   }
 
-  // Wenn Name oder Jahrgang geändert wird Wettkaämpfe anzeigen, bei welchem das keine Rolle mehr spielt.
+  // Wenn Name oder Jahrgang geändert wird Wettkämpfe anzeigen, bei welchem das keine Rolle mehr spielt.
   // überprüfen, dass nur einzelne Buchstaben geändert werden, keine komplett neuen Namen.
   isChangesDisabled(anlass: IAnlass) {
-    // return false;
-    /* TODO uncomment */
+    if (this.authService.isAdministrator()) {
+      return false;
+    }
     const nicht_offen = anlass.anzeigeStatus.hasStatus(
       AnzeigeStatusEnum.NOCH_NICHT_OFFEN
     );
     const closed = anlass.anzeigeStatus.hasStatus(
       AnzeigeStatusEnum.ERFASSEN_CLOSED
     );
-    // console.log(anlass.anlassBezeichnung + " ,Nicht Offen: ", nicht_offen);
-    // console.log(anlass.anlassBezeichnung + " ,Nicht Closed: ", closed);
+    const verlaengert = anlass.anzeigeStatus.hasStatus(
+      AnzeigeStatusEnum.VERLAENGERT
+    );
     if (!nicht_offen) {
-      if (!closed) {
+      if (!closed || verlaengert) {
         return false;
       }
     }
     return true;
-    /* */
   }
 }

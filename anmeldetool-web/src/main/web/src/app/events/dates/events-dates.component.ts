@@ -1,4 +1,6 @@
-import { Component, Input } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { FormControl, FormGroup } from "@angular/forms";
+import { MatDatepickerInputEvent } from "@angular/material/datepicker";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 
@@ -7,8 +9,36 @@ import { IAnlass } from "src/app/core/model/IAnlass";
   templateUrl: "./events-dates.component.html",
   styleUrls: ["./events-dates.component.css"],
 })
-export class EventsDatesComponent {
+export class EventsDatesComponent implements OnInit {
   @Input() anlass: IAnlass;
+  @Input() viewOnly: boolean;
+
+  @Output()
+  verlaengertChange: EventEmitter<Date>;
+
+  verlaengerungGroup: FormGroup;
+  verlaengerungControl: FormControl;
+
+  constructor() {
+    // this.verlaengerungGroup = new FormGroup({
+    this.verlaengerungControl = new FormControl();
+    // });
+    this.verlaengertChange = new EventEmitter<Date>();
+  }
+
+  ngOnInit() {
+    console.log("Anlass verlaengert: ", this.anlass.erfassenVerlaengert);
+    this.verlaengerungControl.setValue(this.anlass.erfassenVerlaengert);
+  }
+  /*
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.anlass) {
+      console.error("anlass: ", this.anlass);
+      this.verlaengerungGroup.controls.verlaengerungControl.setValue(
+        this.anlass.erfassenVerlaengert
+      );
+    }
+  }*/
 
   getClassForAnzeigeStatus(anzeigeStatus: AnzeigeStatusEnum): string {
     if (this.anlass.anzeigeStatus.hasStatus(anzeigeStatus)) {
@@ -42,5 +72,16 @@ export class EventsDatesComponent {
 
   getClassForAnzeigeStatusGeschlossen(): string {
     return this.getClassForAnzeigeStatus(AnzeigeStatusEnum.CLOSED);
+  }
+
+  getClassForAnzeigeStatusVerlaengert(): string {
+    return this.getClassForAnzeigeStatus(AnzeigeStatusEnum.VERLAENGERT);
+  }
+  hasStatusVerlaengert(): boolean {
+    return this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.VERLAENGERT);
+  }
+
+  addVerlaengerung(type: string, event: MatDatepickerInputEvent<Date>): void {
+    this.verlaengertChange.next(event.value);
   }
 }

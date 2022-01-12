@@ -5,9 +5,11 @@ import {
 } from "@angular/cdk/drag-drop";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
+import * as moment from "moment";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IAnlassLink } from "src/app/core/model/IAnlassLink";
+import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
 import { IUser } from "src/app/core/model/IUser";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterStatusEnum";
@@ -23,7 +25,7 @@ import { WertungsrichterService } from "src/app/core/service/wertungsrichter.ser
 })
 export class EventsDetailComponent implements OnInit {
   anlass: IAnlass;
-  vereinStarted: boolean;
+  orgAnlassLink: IOrganisationAnlassLink;
   assignedWr1s = new Array<IUser>();
   assignedWr2s = new Array<IUser>();
   wr1s = new Array<IUser>();
@@ -50,7 +52,8 @@ export class EventsDetailComponent implements OnInit {
     this.anlassService
       .getVereinStart(this.anlass, this.authService.currentVerein)
       .subscribe((result) => {
-        this.vereinStarted = result;
+        this.orgAnlassLink = result;
+        this.anlass.erfassenVerlaengert = result.verlaengerungsDate;
       });
     this.teilnahmenBrevet1 = this.anlassService.getTeilnahmen(this.anlass, 1);
     this.teilnahmenBrevet2 = this.anlassService.getTeilnahmen(this.anlass, 2);
@@ -71,6 +74,21 @@ export class EventsDetailComponent implements OnInit {
       });
     this.getVerfuegbareWertungsrichter(this.wr1s, 1);
     this.getVerfuegbareWertungsrichter(this.wr2s, 2);
+  }
+
+  isViewOnly(): boolean {
+    return !this.authService.isAdministrator();
+  }
+
+  verlaengertChange(event: Date): void {
+    const asMoment = moment(event);
+    this.orgAnlassLink.verlaengerungsDate = asMoment.add(1, "h").toDate();
+    this.anlassService
+      .updateVereinsStart(this.orgAnlassLink)
+      .subscribe((result) => {
+        this.anlass.erfassenVerlaengert = result.verlaengerungsDate;
+        console.log("verlaengertChange: ", event);
+      });
   }
 
   isStartedCheckboxDisabled(): boolean {
@@ -103,6 +121,15 @@ export class EventsDetailComponent implements OnInit {
       )
       .subscribe((allUser) => {
         allUser.forEach((user) => wrs.push(user));
+        wrs.sort((a, b) => {
+          if (a.benutzername < b.benutzername) {
+            return -1;
+          }
+          if (a.benutzername > b.benutzername) {
+            return 1;
+          }
+          return 0;
+        });
       });
   }
 
@@ -281,11 +308,7 @@ export class EventsDetailComponent implements OnInit {
   }
   vereinStartedClicked(check: boolean) {
     this.anlassService
-      .updateVereinsStart(
-        this.anlass,
-        this.authService.currentVerein,
-        this.vereinStarted
-      )
+      .updateVereinsStart(this.orgAnlassLink)
       .subscribe((result) => {
         console.log("Clicked: ", result);
       });

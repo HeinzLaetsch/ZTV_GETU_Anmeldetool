@@ -6,6 +6,7 @@ export enum AnzeigeStatusEnum {
   ALLE_MUTATIONEN_CLOSED = "Alle Mutationen geschlossen",
   CLOSED = "geschlossen",
   PUBLISHED = "publiziert",
+  VERLAENGERT = "verlängert",
 }
 
 export class Anzeigestatus {
@@ -38,6 +39,9 @@ export class Anzeigestatus {
       case AnzeigeStatusEnum.PUBLISHED:
         this.status_ = this.status_ | (1 << 6);
         break;
+      case AnzeigeStatusEnum.VERLAENGERT:
+        this.status_ = this.status_ | (1 << 7);
+        break;
       default:
         break;
     }
@@ -66,6 +70,9 @@ export class Anzeigestatus {
       case AnzeigeStatusEnum.PUBLISHED:
         this.status_ = this.status_ & ~(1 << 6);
         break;
+      case AnzeigeStatusEnum.VERLAENGERT:
+        this.status_ = this.status_ & ~(1 << 7);
+        break;
       default:
         break;
     }
@@ -88,6 +95,8 @@ export class Anzeigestatus {
         return (this.status_ & (1 << 5)) > 0;
       case AnzeigeStatusEnum.PUBLISHED:
         return (this.status_ & (1 << 6)) > 0;
+      case AnzeigeStatusEnum.VERLAENGERT:
+        return (this.status_ & (1 << 7)) > 0;
       default:
         return false;
     }

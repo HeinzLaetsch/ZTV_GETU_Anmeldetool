@@ -50,6 +50,16 @@ export class IAnlass {
   }
   erfassenGeschlossen_: Date;
 
+  // Neu Erfassen verlängert
+  set erfassenVerlaengert(erfassenVerlaengert: Date) {
+    this.erfassenVerlaengert_ = erfassenVerlaengert;
+    this.updateAnzeigeStatus();
+  }
+  get erfassenVerlaengert(): Date {
+    return this.erfassenVerlaengert_;
+  }
+  erfassenVerlaengert_: Date;
+
   // Cross Kategorie Aenderungen nicht mehr erlaubt
   set crossKategorieAenderungenGeschlossen(
     crossKategorieAenderungenGeschlossen: Date
@@ -115,14 +125,26 @@ export class IAnlass {
       } else {
         this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN);
       }
+    } else {
+      this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN);
     }
+    this.erfassenVerlaengert_;
     if (this.erfassenGeschlossen) {
       const asMoment = moment(this.erfassenGeschlossen);
       if (asMoment.isBefore()) {
-        this.anzeigeStatus.setStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED);
+        if (this.erfassenVerlaengert) {
+          const asMoment2 = moment(this.erfassenVerlaengert);
+          if (asMoment2.isBefore()) {
+            this.anzeigeStatus.setStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED);
+          }
+        } else {
+          this.anzeigeStatus.setStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED);
+        }
       } else {
         this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED);
       }
+    } else {
+      this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED);
     }
 
     if (this.crossKategorieAenderungenGeschlossen) {
@@ -134,6 +156,8 @@ export class IAnlass {
           AnzeigeStatusEnum.CROSS_KATEGORIE_CLOSED
         );
       }
+    } else {
+      this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.CROSS_KATEGORIE_CLOSED);
     }
     if (this.aenderungenInKategorieGeschlossen) {
       const asMoment = moment(this.aenderungenInKategorieGeschlossen);
@@ -142,6 +166,8 @@ export class IAnlass {
       } else {
         this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.IN_KATEGORIE_CLOSED);
       }
+    } else {
+      this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.IN_KATEGORIE_CLOSED);
     }
 
     if (this.aenderungenNichtMehrErlaubt) {
@@ -153,6 +179,8 @@ export class IAnlass {
           AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED
         );
       }
+    } else {
+      this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED);
     }
 
     if (this.endDatum) {
@@ -162,12 +190,25 @@ export class IAnlass {
       } else {
         this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.CLOSED);
       }
+    } else {
+      this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.CLOSED);
     }
 
     if (this.published) {
       this.anzeigeStatus.setStatus(AnzeigeStatusEnum.PUBLISHED);
     } else {
       this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.PUBLISHED);
+    }
+
+    if (this.erfassenVerlaengert) {
+      const asMoment = moment(this.erfassenVerlaengert);
+      if (!asMoment.isBefore()) {
+        this.anzeigeStatus.setStatus(AnzeigeStatusEnum.VERLAENGERT);
+      } else {
+        this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.VERLAENGERT);
+      }
+    } else {
+      this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.VERLAENGERT);
     }
   }
 }

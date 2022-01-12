@@ -1,6 +1,4 @@
-<!--div class="container" [formGroup]="form"-->
 <div [formGroup]="form" *ngIf="user">
-  <!--form [formGroup]="form" (submit)="save()"-->
   <p *ngIf="showBenutzername">
     <mat-form-field [appearance]="appearance">
       <mat-label>Benutzername</mat-label>
@@ -104,23 +102,6 @@
       </mat-error>
     </mat-form-field>
   </p>
-  <!--p>
-    <mat-form-field [appearance]="appearance">
-      <mat-label>Mobiltelefon</mat-label>
-      <input
-        matInput
-        placeholder="Mobil Nummer 076 111 11 11"
-        formControlName="mobilNummerControl"
-      />
-      <mat-error *ngIf="form.controls.mobilNummerControl.hasError('required')">
-        Pflichtfeld
-      </mat-error>
-      <mat-error *ngIf="form.controls.mobilNummerControl.invalid">
-        ungültige Mobile Nummer Beispiel: 076 111 11 11
-      </mat-error>
-      <mat-hint>Gib die Mobilnummer ein Beispiel: 076 111 11 11</mat-hint>
-    </mat-form-field>
-  </p-->
   <p>
     <mat-form-field [appearance]="appearance">
       <mat-label>Kontakt eMail Adresse</mat-label>
@@ -138,7 +119,4 @@
       <mat-hint>Gib die eMail Adresse ein</mat-hint>
     </mat-form-field>
   </p>
-  <!--button mat-button (click)="cancel()">Abbrechen</button>
-  <button mat-button type="submit" [disabled]="!form.valid">Speichern</button>
-  </form-->
 </div>

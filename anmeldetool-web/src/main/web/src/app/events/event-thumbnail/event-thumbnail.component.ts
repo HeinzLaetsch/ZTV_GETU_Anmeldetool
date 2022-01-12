@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Router } from "@angular/router";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
+import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
 import { IUser } from "src/app/core/model/IUser";
 import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterStatusEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
@@ -18,7 +19,7 @@ export class EventThumbnailComponent implements OnInit {
   @Output() anlassClick = new EventEmitter();
 
   someProperty: any = "some Text";
-  vereinStarted: boolean;
+  organisationAnlassLink: IOrganisationAnlassLink;
   anzahlTeilnehmer: number;
   assignedWr1s = new Array<IUser>();
   assignedWr2s = new Array<IUser>();
@@ -34,7 +35,8 @@ export class EventThumbnailComponent implements OnInit {
     this.anlassService
       .getVereinStart(this.anlass, this.authService.currentVerein)
       .subscribe((result) => {
-        this.vereinStarted = result;
+        this.organisationAnlassLink = result;
+        this.anlass.erfassenVerlaengert = result.verlaengerungsDate;
       });
     this.anzahlTeilnehmer = 0;
     this.anlassService
@@ -51,6 +53,9 @@ export class EventThumbnailComponent implements OnInit {
     this.fillassignedWrs();
   }
 
+  get vereinStarted(): boolean {
+    return this.organisationAnlassLink?.startet;
+  }
   isEnabled(): boolean {
     return true;
   }
@@ -63,7 +68,7 @@ export class EventThumbnailComponent implements OnInit {
   }
 
   getStartedClass() {
-    if (!this.vereinStarted) {
+    if (!this.organisationAnlassLink?.startet) {
       return { redNoMargin: true };
     } else {
       return { greenNoMargin: true };
@@ -98,11 +103,7 @@ export class EventThumbnailComponent implements OnInit {
     console.log(event);
     event.cancelBubble = true;
     this.anlassService
-      .updateVereinsStart(
-        this.anlass,
-        this.authService.currentVerein,
-        !this.vereinStarted
-      )
+      .updateVereinsStart(this.organisationAnlassLink)
       .subscribe((result) => {
         console.log("Clicked: ", result);
       });

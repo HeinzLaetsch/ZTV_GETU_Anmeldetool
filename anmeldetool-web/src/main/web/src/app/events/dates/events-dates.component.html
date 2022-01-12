@@ -1,87 +1,116 @@
-<div class="pad-left-right">
-  <div class="row">
-    <div class="col-12"><h3>wichtige Daten</h3></div>
-  </div>
-  <div class="row">
-    <div
-      class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatusNochNichtOffen()"
-    >
-      Anmeldung offen
+<div class="container">
+  <div class="pad-left-right">
+    <div class="row">
+      <div class="col-12"><h3>wichtige Daten</h3></div>
     </div>
-    <div
-      class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatusErfassenGeschlossen()"
-    >
-      Erfassen geschlossen
+    <div class="row">
+      <div
+        class="col-2 border small black"
+        [ngClass]="getClassForAnzeigeStatusNochNichtOffen()"
+      >
+        Anmeldung offen
+      </div>
+      <div
+        class="col-2 border small black"
+        [ngClass]="getClassForAnzeigeStatusErfassenGeschlossen()"
+      >
+        Erfassen geschlossen
+      </div>
+      <div
+        class="col-2 border small black"
+        [ngClass]="getClassForAnzeigeStatusCrossKategorieGeschlossen()"
+      >
+        Kategorie übergreifende
+      </div>
+      <div
+        class="col-2 border small black"
+        [ngClass]="getClassForAnzeigeStatusInKategorieGeschlossen()"
+      >
+        innerhalb Kategorie
+      </div>
+      <div
+        class="col-2 border small black"
+        [ngClass]="getClassForAnzeigeStatusAlleMutationenGeschlossen()"
+      >
+        Mutationen abgeschlossen
+      </div>
+      <div
+        class="col-2 border small black"
+        [ngClass]="getClassForAnzeigeStatusGeschlossen()"
+      >
+        Wettkampf geschlossen
+      </div>
     </div>
-    <div
-      class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatusCrossKategorieGeschlossen()"
-    >
-      Kategorie übergreifende
+    <div class="row">
+      <div
+        class="col-2 border small black"
+        [ngClass]="getClassForAnzeigeStatusNochNichtOffen()"
+      >
+        {{ anlass.anmeldungBeginn | date: "d-MM-y":"GMT+1":"DE-CH" }}
+      </div>
+      <div
+        class="col-2 border small black"
+        [ngClass]="getClassForAnzeigeStatusErfassenGeschlossen()"
+      >
+        {{ anlass.erfassenGeschlossen | date: "d-MM-y":"GMT+1":"DE-CH" }}
+      </div>
+      <div
+        class="col-2 border small black"
+        [ngClass]="getClassForAnzeigeStatusCrossKategorieGeschlossen()"
+      >
+        {{
+          anlass.crossKategorieAenderungenGeschlossen
+            | date: "d-MM-y":"GMT+1":"DE-CH"
+        }}
+      </div>
+      <div
+        class="col-2 border small black"
+        [ngClass]="getClassForAnzeigeStatusInKategorieGeschlossen()"
+      >
+        {{
+          anlass.aenderungenInKategorieGeschlossen
+            | date: "d-MM-y":"GMT+1":"DE-CH"
+        }}
+      </div>
+      <div
+        class="col-2 border small black"
+        [ngClass]="getClassForAnzeigeStatusAlleMutationenGeschlossen()"
+      >
+        {{
+          anlass.aenderungenNichtMehrErlaubt | date: "d-MM-y":"GMT+1":"DE-CH"
+        }}
+      </div>
+      <div
+        class="col-2 border small black"
+        [ngClass]="getClassForAnzeigeStatusGeschlossen()"
+      >
+        {{ anlass.endDatum | date: "d-MM-y":"GMT+1":"DE-CH" }}
+      </div>
     </div>
-    <div
-      class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatusInKategorieGeschlossen()"
-    >
-      innerhalb Kategorie
+    <div *ngIf="viewOnly && hasStatusVerlaengert()" class="row">
+      <div class="col border small div-orange">
+        Erfassen wurde verlängert bis
+        {{ anlass.erfassenVerlaengert | date: "d-MM-y":"GMT+1":"DE-CH" }}
+      </div>
     </div>
-    <div
-      class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatusAlleMutationenGeschlossen()"
-    >
-      Mutationen abgeschlossen
-    </div>
-    <div
-      class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatusGeschlossen()"
-    >
-      Wettkampf geschlossen
-    </div>
-  </div>
-  <div class="row">
-    <div
-      class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatusNochNichtOffen()"
-    >
-      {{ anlass.anmeldungBeginn | date: "d-MM-y":"GMT+1":"DE-CH" }}
-    </div>
-    <div
-      class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatusErfassenGeschlossen()"
-    >
-      {{ anlass.erfassenGeschlossen | date: "d-MM-y":"GMT+1":"DE-CH" }}
-    </div>
-    <div
-      class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatusCrossKategorieGeschlossen()"
-    >
-      {{
-        anlass.crossKategorieAenderungenGeschlossen
-          | date: "d-MM-y":"GMT+1":"DE-CH"
-      }}
-    </div>
-    <div
-      class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatusInKategorieGeschlossen()"
-    >
-      {{
-        anlass.aenderungenInKategorieGeschlossen
-          | date: "d-MM-y":"GMT+1":"DE-CH"
-      }}
-    </div>
-    <div
-      class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatusAlleMutationenGeschlossen()"
-    >
-      {{ anlass.aenderungenNichtMehrErlaubt | date: "d-MM-y":"GMT+1":"DE-CH" }}
-    </div>
-    <div
-      class="col-2 border small black"
-      [ngClass]="getClassForAnzeigeStatusGeschlossen()"
-    >
-      {{ anlass.endDatum | date: "d-MM-y":"GMT+1":"DE-CH" }}
+    <div *ngIf="!viewOnly" class="row">
+      <div class="col border small div-orange">
+        <mat-form-field appearance="fill">
+          <mat-label>Verlängerung eingeben</mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            (dateInput)="addVerlaengerung('input', $event)"
+            (dateChange)="addVerlaengerung('change', $event)"
+            [formControl]="verlaengerungControl"
+          />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="picker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
     </div>
   </div>
 </div>

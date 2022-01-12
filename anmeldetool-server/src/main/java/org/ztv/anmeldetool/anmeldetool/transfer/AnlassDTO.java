@@ -24,6 +24,8 @@ public class AnlassDTO {
 
 	String organisator;
 
+	private String iban;
+
 	LocalDateTime startDatum;
 
 	LocalDateTime endDatum;

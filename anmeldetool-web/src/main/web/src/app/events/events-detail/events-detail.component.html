@@ -1,4 +1,4 @@
-<div class="container-lg">
+<div class="container">
   <div class="row">
     <div class="col-11">
       <h2>{{ getCleaned() }}</h2>
@@ -38,9 +38,9 @@
   <hr />
   <!--  (click)="vereinStartedClicked($event)"        -->
   <div class="row">
-    <div class="col-12">
+    <div class="col-12" *ngIf="orgAnlassLink">
       <mat-checkbox
-        [(ngModel)]="vereinStarted"
+        [(ngModel)]="orgAnlassLink.startet"
         [disabled]="isStartedCheckboxDisabled()"
         (ngModelChange)="vereinStartedClicked($event)"
         >Verein startet</mat-checkbox
@@ -230,7 +230,7 @@
               <h3>Ausgewählte Wertungsrichter Brevet 2</h3>
             </div>
           </div>
-          <div class="row doubleRow">
+          <div class="row doubleRow scrollable">
             <div class="col">
               <div
                 aria-label="Wertungsrichter"
@@ -290,5 +290,9 @@
       </div>
     </div>
   </div>
-  <app-events-dates [anlass]="anlass"></app-events-dates>
 </div>
+<app-events-dates
+  [anlass]="anlass"
+  [viewOnly]="isViewOnly()"
+  (verlaengertChange)="verlaengertChange($event)"
+></app-events-dates>
