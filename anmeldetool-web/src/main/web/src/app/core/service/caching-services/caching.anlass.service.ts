@@ -210,6 +210,17 @@ export class CachingAnlassService {
           dirty: false,
           anlassLinks: anlassLinkArray,
         };
+        if (anlassLinks) {
+          anlassLinks.anlassLinks.forEach((al) => {
+            if (
+              al.kategorie === "KEIN_START" ||
+              al.kategorie === undefined ||
+              al.kategorie === null
+            ) {
+              al.kategorie = KategorieEnum.KEINE_TEILNAHME;
+            }
+          });
+        }
         this.teilnamen[anlass.id] = anlassLinks;
         // Fuer jeden Anlass ein Observable
         // console.log("Teilnahme loaded: ", anlass.anlassBezeichnung, ' Verein: ', verein.name, ' isLast: ', isLast);
@@ -241,7 +252,8 @@ export class CachingAnlassService {
             einzel.kategorie !== KategorieEnum.K1 &&
             einzel.kategorie !== KategorieEnum.K2 &&
             einzel.kategorie !== KategorieEnum.K3 &&
-            einzel.kategorie !== KategorieEnum.K4
+            einzel.kategorie !== KategorieEnum.K4 &&
+            einzel.kategorie !== KategorieEnum.KEINE_TEILNAHME
           );
         });
       }
