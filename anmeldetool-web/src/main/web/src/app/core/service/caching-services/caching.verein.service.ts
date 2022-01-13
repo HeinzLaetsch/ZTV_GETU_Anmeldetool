@@ -29,6 +29,15 @@ export class CachingVereinService {
       this._loadRunning = true;
       this.vereinService.getVereine().subscribe((vereine) => {
         this.vereine = vereine;
+        this.vereine.sort((a, b) => {
+          if (a.name < b.name) {
+            return -1;
+          }
+          if (a.name > b.name) {
+            return 1;
+          }
+          return 0;
+        });
         this._loadRunning = false;
         this.loaded = true;
         // console.log("Vereine Loaded");

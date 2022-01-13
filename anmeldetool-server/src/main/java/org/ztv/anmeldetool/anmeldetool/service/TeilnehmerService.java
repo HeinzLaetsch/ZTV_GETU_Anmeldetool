@@ -174,8 +174,9 @@ public class TeilnehmerService {
 		if (KategorieEnum.KEIN_START.toString().equals(tal.getKategorie())) {
 			teilnehmerAnlassLink.setAktiv(false);
 		} else {
-			teilnehmerAnlassLink.setKategorie(KategorieEnum.valueOf(tal.getKategorie()));
+			teilnehmerAnlassLink.setAktiv(true);
 		}
+		teilnehmerAnlassLink.setKategorie(KategorieEnum.valueOf(tal.getKategorie()));
 		teilnehmerAnlassLinkRepository.save(teilnehmerAnlassLink);
 
 		return ResponseEntity.ok().build();

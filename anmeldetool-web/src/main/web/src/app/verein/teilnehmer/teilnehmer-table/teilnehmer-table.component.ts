@@ -361,7 +361,15 @@ export class TeilnehmerTableComponent implements AfterViewInit {
           const link = this.getTeilnahme(teilnehmerPos, anlass);
           // console.log("Old Line :", teilnehmerPos, "/", pos, " Pos: ", line[pos].value);
           const mustEnable = this.mustEnableAnlass(pos);
-          line[pos].setValue(link?.kategorie);
+          if (link) {
+            if (link.kategorie === "KEIN_START") {
+              line[pos].setValue(KategorieEnum.KEINE_TEILNAHME);
+            } else {
+              line[pos].setValue(link?.kategorie);
+            }
+          } else {
+            line[pos].setValue(KategorieEnum.KEINE_TEILNAHME);
+          }
           if (mustEnable) {
             line[pos].enable();
           } else {

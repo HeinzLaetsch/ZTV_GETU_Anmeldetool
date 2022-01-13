@@ -8,6 +8,7 @@ import { IAnlass } from "../model/IAnlass";
 import { IAnlassLink } from "../model/IAnlassLink";
 import { IAnlassLinks } from "../model/IAnlassLinks";
 import { ITeilnehmer } from "../model/ITeilnehmer";
+import { KategorieEnum } from "../model/KategorieEnum";
 import { TiTuEnum } from "../model/TiTuEnum";
 import { CachingTeilnehmerService } from "../service/caching-services/caching.teilnehmer.service";
 
@@ -200,14 +201,18 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
       return link.anlassId === anlass.id;
     });
     links.dirty = true;
+    let corrected = value;
+    if (value === KategorieEnum.KEINE_TEILNAHME) {
+      corrected = "KEIN_START";
+    }
     if (filtered.length > 0) {
-      filtered[0].kategorie = value;
+      filtered[0].kategorie = corrected;
       filtered[0].dirty = true;
     } else {
       const newLink: IAnlassLink = {
         anlassId: anlass.id,
         teilnehmerId: teilnehmer.id,
-        kategorie: value,
+        kategorie: corrected,
         dirty: true,
       };
       links.anlassLinks.push(newLink);
