@@ -1,5 +1,6 @@
 <div class="container">
-  <form [formGroup]="form" (submit)="save()">
+  <!--form [formGroup]="form" (submit)="save()"-->
+  <form [formGroup]="form">
     <h1>Neuen Vereinsanmelder beantragen</h1>
     <hr />
     <mat-dialog-content>
@@ -29,7 +30,7 @@
       ></app-user>
     </mat-dialog-content>
     <mat-error *ngIf="error" class="error"> {{ errorMessage }}</mat-error>
-    <button mat-button (click)="cancel()">Abbrechen</button>
+    <button mat-button type="button" (click)="cancel()">Abbrechen</button>
     <button mat-button type="submit" [disabled]="!form.valid || !userValid">
       Speichern
     </button>
