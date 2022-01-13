@@ -118,7 +118,6 @@ export class TeilnehmerTableComponent implements AfterViewInit {
         });
         this.allDisplayedColumns.pop();
         this.allDisplayedColumns.push("aktion");
-
         // this.teilnahmenControls = new Array<Array<FormControl>>();
         // this.teilnehmerControls = new Array<Array<FormControl>>();
 
@@ -423,6 +422,11 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       }
     }
   }
+
+  getStartet(colIndex: number): boolean {
+    return this.checked[colIndex]?.startet;
+  }
+
   clicked(event: any, colIndex: any) {
     console.log(event);
     event.stopPropagation();
@@ -496,13 +500,6 @@ export class TeilnehmerTableComponent implements AfterViewInit {
         // console.error("Load Teilnehmer Page");
         this.populateTeilnehmer(result);
       });
-    // console.log("Load Teilnehmer Page");
-    // this.dataSource.loading$.subscribe((result) => {
-    // TODO Async
-    /* this.populateTeilnehmer(
-        this.dataSource.loadTeilnehmer(this.filterValue, this.tiTu)
-      );
-    });*/
   }
   populateTeilnehmer(allTeilnehmer: ITeilnehmer[]) {
     let i = 0;

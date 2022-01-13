@@ -113,6 +113,17 @@ export class CachingAnlassService {
     return this.anlassService.getVereinStart(anlass, verein);
   }
 
+  getTeilnahmenForKategorie(
+    anlass: IAnlass,
+    katgorie: KategorieEnum
+  ): IAnlassLink[] {
+    const teilnahmen = this.getTeilnehmerForAnlass(anlass);
+    const filteredLinks = teilnahmen.anlassLinks.filter((link) => {
+      return link.kategorie === katgorie;
+    });
+    return filteredLinks;
+  }
+
   getTeilnehmerForAnlass(anlass: IAnlass): IAnlassLinks {
     if (this.teilnamen) {
       return this.teilnamen[anlass.id];

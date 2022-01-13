@@ -1,10 +1,10 @@
-.example-container {
+.teilnahmen-container {
   display: flex;
   flex-direction: column;
   min-width: 300px;
 }
 
-.example-header {
+.teilnahmen-header {
   min-height: 64px;
   padding: 8px 24px 0;
 }

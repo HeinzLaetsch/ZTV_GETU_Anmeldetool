@@ -1,24 +1,25 @@
 <div *ngIf="isTeilnahmenLoaded | async; else loading">
-  <div class="example-header">
+  <div class="teilnahmen-header">
     <mat-form-field>
       <input
         matInput
+        [ngModel]="filterValue"
         (keyup)="applyFilter($event.target.value)"
         placeholder="Filter"
       />
+      <button
+        *ngIf="filterValue"
+        matSuffix
+        mat-icon-button
+        aria-label="leeren"
+        (click)="applyFilter('')"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
     </mat-form-field>
-    <button
-      *ngIf="filterValue"
-      matSuffix
-      mat-icon-button
-      aria-label="leeren"
-      (click)="applyFilter('')"
-    >
-      <mat-icon>close</mat-icon>
-    </button>
   </div>
 
-  <div class="example-container mat-elevation-z8">
+  <div class="teilnahmen-container mat-elevation-z8">
     <mat-table
       [dataSource]="dataSource"
       matSort
@@ -125,7 +126,7 @@
             <mat-checkbox
               (click)="clicked($event, colIndex)"
               (ngModelChange)="checkedClicked($event, colIndex)"
-              [ngModel]="checked[colIndex].startet"
+              [ngModel]="getStartet(colIndex)"
               [disabled]="isChangesDisabled(anlass)"
               >Verein startet
             </mat-checkbox>
