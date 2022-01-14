@@ -1,0 +1,222 @@
+<div *ngIf="vereinStarted; else nostart">
+  <div id="printArea" class="container-sm">
+    <div class="row">
+      <div class="col-sm-7">
+        <h1>Anmeldung</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-10">
+        <h1>{{ titel }}</h1>
+      </div>
+      <div class="col-sm">
+        <h1>{{ anlass.tiTu }}</h1>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-2">
+        <span *ngIf="anlass.startDatum === anlass.endDatum">am</span>
+        <span *ngIf="anlass.startDatum !== anlass.endDatum">von</span>:
+      </div>
+      <div class="col-sm-2 text-bold">
+        {{ anlass.startDatum | date: "EEE, d MMMM , y":"GMT+1":"DE-CH" }}
+      </div>
+      <div class="col-sm-2" *ngIf="anlass.startDatum !== anlass.endDatum">
+        bis:
+      </div>
+      <div
+        class="col-sm text-bold"
+        *ngIf="anlass.startDatum !== anlass.endDatum"
+      >
+        {{ anlass.endDatum | date: "EEE, d MMMM , y":"GMT+1":"DE-CH" }}
+        >
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">Geschlecht:</div>
+      <div class="col-sm-2 text-bold">
+        {{ anlass.tiTu }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">Startberechtigt:</div>
+      <div class="col-sm-2 text-bold">
+        {{ anlass.tiefsteKategorie }}
+      </div>
+      <div class="col-sm-2">bis</div>
+      <div class="col-sm-2 text-bold">
+        {{ anlass.hoechsteKategorie }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">Ort:</div>
+      <div class="col-sm-2 text-bold">{{ anlass.ort }}</div>
+      <div class="col-sm-2">Halle:</div>
+      <div class="col-sm-2 text-bold">{{ anlass.halle }}</div>
+      <div class="col-sm-2">Organisator:</div>
+      <div class="col-sm-2 text-bold">{{ anlass.organisator }}</div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">Wertungsrichter:</div>
+      <div class="col-sm red" *ngIf="!isWertungsrichterOk">
+        {{ statusWertungsrichter }}
+      </div>
+      <div class="col-sm green" *ngIf="isWertungsrichterOk">
+        {{ statusWertungsrichter }}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-2"><h2>Teilnehmer</h2></div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2 header">Kategorie</div>
+      <div class="col-sm-10 header">Anzahl</div>
+    </div>
+    <div *ngIf="brevet1Anlass" class="row">
+      <div class="col-sm-2">Teilnehmer K1:</div>
+      <div class="col-sm-10 text-bold">
+        {{ getTeilnahmenForKategorieK1() }}
+      </div>
+    </div>
+    <div *ngIf="brevet1Anlass" class="row">
+      <div class="col-sm-2">Teilnehmer K2:</div>
+      <div class="col-sm-10 text-bold">
+        {{ getTeilnahmenForKategorieK2() }}
+      </div>
+    </div>
+    <div *ngIf="brevet1Anlass" class="row">
+      <div class="col-sm-2">Teilnehmer K3:</div>
+      <div class="col-sm-10 text-bold">
+        {{ getTeilnahmenForKategorieK3() }}
+      </div>
+    </div>
+    <div *ngIf="brevet1Anlass" class="row">
+      <div class="col-sm-2">Teilnehmer K4:</div>
+      <div class="col-sm-10 text-bold">
+        {{ getTeilnahmenForKategorieK4() }}
+      </div>
+    </div>
+    <div *ngIf="breve2tAnlass" class="row">
+      <div class="col-sm-2">Teilnehmer K5:</div>
+      <div class="col-sm-10 text-bold">
+        {{ getTeilnahmenForKategorieK5() }}
+      </div>
+    </div>
+    <div *ngIf="breve2tAnlass && tuAnlass" class="row">
+      <div class="col-sm-2">Teilnehmer K5:</div>
+      <div class="col-sm-10 text-bold">
+        {{ getTeilnahmenForKategorieK5() }}
+      </div>
+    </div>
+    <div *ngIf="breve2tAnlass && tiAnlass" class="row">
+      <div class="col-sm-2">Teilnehmer K5A:</div>
+      <div class="col-sm text-bold">
+        {{ getTeilnahmenForKategorieK5A() }}
+      </div>
+    </div>
+    <div *ngIf="breve2tAnlass && tiAnlass" class="row">
+      <div class="col-sm-2">Teilnehmer K5B:</div>
+      <div class="col-sm text-bold">
+        {{ getTeilnahmenForKategorieK5B() }}
+      </div>
+    </div>
+    <div *ngIf="breve2tAnlass" class="row">
+      <div class="col-sm-2">Teilnehmer K6:</div>
+      <div class="col-sm text-bold">
+        {{ getTeilnahmenForKategorieK6() }}
+      </div>
+    </div>
+    <div *ngIf="breve2tAnlass && tiAnlass" class="row">
+      <div class="col-sm-2">Teilnehmer KD:</div>
+      <div class="col-sm text-bold">
+        {{ getTeilnahmenForKategorieKD() }}
+      </div>
+    </div>
+    <div *ngIf="breve2tAnlass && tuAnlass" class="row">
+      <div class="col-sm-2">Teilnehmer KH:</div>
+      <div class="col-sm text-bold">
+        {{ getTeilnahmenForKategorieKH() }}
+      </div>
+    </div>
+    <div *ngIf="breve2tAnlass" class="row">
+      <div class="col-sm-2">Teilnehmer K7:</div>
+      <div class="col-sm text-bold">
+        {{ getTeilnahmenForKategorieK7() }}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-2 total">Total Teilnehmer:</div>
+      <div class="col-sm-10 total">
+        {{ anzahlTeilnehmer }}
+      </div>
+    </div>
+
+    <div class="row border-bottom divider"></div>
+    <div class="row divider"></div>
+
+    <div class="row">
+      <div class="col-sm-3 total"><h3>Startgeld:</h3></div>
+      <div class="col-sm-1 total">
+        <h3>{{ anzahlTeilnehmer }}</h3>
+      </div>
+      <div class="col-sm-2 total"><h3>x 22.-- sFr.</h3></div>
+      <div class="col-sm total">
+        <h3>{{ anzahlTeilnehmer * 22 }}.00 sFr.</h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-3 total"><h3>Termin Anmeldung und Zahlung:</h3></div>
+      <div class="col-sm total">
+        <h3>
+          {{ anlass.erfassenGeschlossen | date: "d. MMMM y":"GMT+1":"DE-CH" }}
+        </h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-3 total"><h2>Zahlungsinformationen:</h2></div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">zu Gunsten:</div>
+      <div class="col-sm text-bold">
+        {{ anlass.zuGunsten }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">IBAN:</div>
+      <div class="col-sm text-bold">
+        {{ anlass.iban }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">Bank:</div>
+      <div class="col-sm text-bold">
+        {{ anlass.bank }}
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-9"></div>
+      <div class="col-sm-2 well hoverwell button" (click)="print()">
+        Ausdrucken
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #nostart>
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h2>{{ titel }}</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col warnung">
+        <h3>Dein Verein ist nicht angemeldet</h3>
+      </div>
+    </div>
+  </div>
+</ng-template>

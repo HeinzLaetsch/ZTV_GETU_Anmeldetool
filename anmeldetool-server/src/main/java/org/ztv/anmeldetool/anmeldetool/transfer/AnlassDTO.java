@@ -26,6 +26,10 @@ public class AnlassDTO {
 
 	private String iban;
 
+	private String zuGunsten;
+
+	private String bank;
+
 	LocalDateTime startDatum;
 
 	LocalDateTime endDatum;

@@ -63,6 +63,7 @@ export class AnmeldeToolComponent
       height: "500px",
       width: "500px",
       disableClose: true,
+      autoFocus: true,
     });
     dialogRef.afterClosed().subscribe((result) => {
       // console.log("Dialog Closed", result);

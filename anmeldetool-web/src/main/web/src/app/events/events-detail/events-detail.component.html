@@ -1,10 +1,15 @@
 <div class="container">
   <div class="row">
-    <div class="col-11">
+    <div class="col-9">
       <h2>{{ getCleaned() }}</h2>
     </div>
     <div class="col-sm-1">
       <h2>{{ anlass.tiTu }}</h2>
+    </div>
+    <div class="col-sm-2">
+      <div [routerLink]="['anmeldung']" class="well hoverwell button">
+        Anmeldungs Übersicht
+      </div>
     </div>
   </div>
 
@@ -285,14 +290,14 @@
   </div>
   <div class="row">
     <div class="col">
-      <div [routerLink]="['/user/user']" class="well hoverwell thumbnail">
+      <div [routerLink]="['/user/user']" class="well hoverwell">
         Wertungsrichter bearbeiten
       </div>
     </div>
   </div>
+  <app-events-dates
+    [anlass]="anlass"
+    [viewOnly]="isViewOnly()"
+    (verlaengertChange)="verlaengertChange($event)"
+  ></app-events-dates>
 </div>
-<app-events-dates
-  [anlass]="anlass"
-  [viewOnly]="isViewOnly()"
-  (verlaengertChange)="verlaengertChange($event)"
-></app-events-dates>

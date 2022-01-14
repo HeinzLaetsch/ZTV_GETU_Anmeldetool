@@ -11,6 +11,8 @@ export class IAnlass {
   halle: string;
   organisator: string;
   iban: string;
+  zuGunsten: string;
+  bank: string;
   position?: number;
 
   set startDatum(startDatum: Date) {

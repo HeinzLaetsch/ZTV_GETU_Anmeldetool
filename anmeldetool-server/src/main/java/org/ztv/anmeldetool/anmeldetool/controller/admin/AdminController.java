@@ -415,6 +415,10 @@ public class AdminController {
 		// log.debug("Headers= authToken: {}, userId: {}, vereinsId: {}", userId,
 		// vereinsId);
 		PersonDTO person = PersonHelper.createPersonDTO(personSrv.findPersonByBenutzername(benutzername));
+		if (person == null) {
+			URI requestURI = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+			return ResponseEntity.notFound().location(requestURI).build();
+		}
 		return ResponseEntity.ok(person);
 	}
 

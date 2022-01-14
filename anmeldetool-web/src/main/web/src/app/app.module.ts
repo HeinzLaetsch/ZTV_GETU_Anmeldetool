@@ -19,6 +19,7 @@ import { Page404Component } from "./error/page404/page404.component";
 import {
   CreateEventComponent,
   EventListComponent,
+  EventRegisterSummaryComponent,
   EventsDatesComponent,
   EventsDetailComponent,
   EventThumbnailComponent,
@@ -53,6 +54,7 @@ export function initVereinservice(
     NavBarComponent,
     EventsDetailComponent,
     CreateEventComponent,
+    EventRegisterSummaryComponent,
     Page404Component,
     NewAnmelderComponent,
     NewVereinComponent,
@@ -96,6 +98,10 @@ export function initVereinservice(
     {
       provide: LOCALE_ID,
       useValue: "de",
+    },
+    {
+      provide: Window,
+      useValue: window,
     },
   ],
   bootstrap: [AnmeldeToolComponent],

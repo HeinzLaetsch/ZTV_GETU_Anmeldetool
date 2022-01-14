@@ -49,8 +49,14 @@ public class PersonHelper {
 	}
 
 	public static PersonDTO createPersonDTO(Person person) {
-		List<UUID> organisationids = person.getOrganisationenLinks().stream().map(opl -> opl.getOrganisation().getId())
-				.collect(Collectors.toList());
+		if (person == null) {
+			return null;
+		}
+		List<UUID> organisationids = null;
+		if (person.getOrganisationenLinks() != null) {
+			organisationids = person.getOrganisationenLinks().stream().map(opl -> opl.getOrganisation().getId())
+					.collect(Collectors.toList());
+		}
 		return PersonDTO.builder().id(person.getId()).benutzername(person.getBenutzername()).name(person.getName())
 				.email(person.getEmail()).handy(person.getHandy()).vorname(person.getVorname())
 				.organisationids(organisationids).aktiv(person.isAktiv()).build();

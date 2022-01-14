@@ -4,7 +4,7 @@ import {
   transferArrayItem,
 } from "@angular/cdk/drag-drop";
 import { Component, OnInit } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import * as moment from "moment";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
@@ -42,7 +42,8 @@ export class EventsDetailComponent implements OnInit {
     private anlassService: CachingAnlassService,
     private userService: CachingUserService,
     private wertungsrichterService: WertungsrichterService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -147,45 +148,70 @@ export class EventsDetailComponent implements OnInit {
     return this.anlass.anlassBezeichnung.replace("%", "");
   }
   getTeilnahmenForKategorieK1(): IAnlassLink[] {
-    return this.getTeilnahmenForKategorie(KategorieEnum.K1);
+    return this.anlassService.getTeilnahmenForKategorie(
+      this.anlass,
+      KategorieEnum.K1
+    );
   }
   getTeilnahmenForKategorieK2(): IAnlassLink[] {
-    return this.getTeilnahmenForKategorie(KategorieEnum.K2);
+    return this.anlassService.getTeilnahmenForKategorie(
+      this.anlass,
+      KategorieEnum.K2
+    );
   }
   getTeilnahmenForKategorieK3(): IAnlassLink[] {
-    return this.getTeilnahmenForKategorie(KategorieEnum.K3);
+    return this.anlassService.getTeilnahmenForKategorie(
+      this.anlass,
+      KategorieEnum.K3
+    );
   }
   getTeilnahmenForKategorieK4(): IAnlassLink[] {
-    return this.getTeilnahmenForKategorie(KategorieEnum.K4);
+    return this.anlassService.getTeilnahmenForKategorie(
+      this.anlass,
+      KategorieEnum.K4
+    );
   }
   getTeilnahmenForKategorieK5(): IAnlassLink[] {
-    return this.getTeilnahmenForKategorie(KategorieEnum.K5);
+    return this.anlassService.getTeilnahmenForKategorie(
+      this.anlass,
+      KategorieEnum.K5
+    );
   }
   getTeilnahmenForKategorieK5A(): IAnlassLink[] {
-    return this.getTeilnahmenForKategorie(KategorieEnum.K5A);
+    return this.anlassService.getTeilnahmenForKategorie(
+      this.anlass,
+      KategorieEnum.K5A
+    );
   }
   getTeilnahmenForKategorieK5B(): IAnlassLink[] {
-    return this.getTeilnahmenForKategorie(KategorieEnum.K5B);
+    return this.anlassService.getTeilnahmenForKategorie(
+      this.anlass,
+      KategorieEnum.K5B
+    );
   }
   getTeilnahmenForKategorieK6(): IAnlassLink[] {
-    return this.getTeilnahmenForKategorie(KategorieEnum.K6);
+    return this.anlassService.getTeilnahmenForKategorie(
+      this.anlass,
+      KategorieEnum.K6
+    );
   }
   getTeilnahmenForKategorieKD(): IAnlassLink[] {
-    return this.getTeilnahmenForKategorie(KategorieEnum.KD);
+    return this.anlassService.getTeilnahmenForKategorie(
+      this.anlass,
+      KategorieEnum.KD
+    );
   }
   getTeilnahmenForKategorieKH(): IAnlassLink[] {
-    return this.getTeilnahmenForKategorie(KategorieEnum.KH);
+    return this.anlassService.getTeilnahmenForKategorie(
+      this.anlass,
+      KategorieEnum.KH
+    );
   }
   getTeilnahmenForKategorieK7(): IAnlassLink[] {
-    return this.getTeilnahmenForKategorie(KategorieEnum.K7);
-  }
-
-  getTeilnahmenForKategorie(katgorie: KategorieEnum): IAnlassLink[] {
-    const teilnahmen = this.anlassService.getTeilnehmerForAnlass(this.anlass);
-    const filteredLinks = teilnahmen.anlassLinks.filter((link) => {
-      return link.kategorie === katgorie;
-    });
-    return filteredLinks;
+    return this.anlassService.getTeilnahmenForKategorie(
+      this.anlass,
+      KategorieEnum.K7
+    );
   }
 
   get anzahlTeilnehmerBrevet1(): number {
@@ -312,5 +338,9 @@ export class EventsDetailComponent implements OnInit {
       .subscribe((result) => {
         console.log("Clicked: ", result);
       });
+  }
+
+  handleClickMe(event: PointerEvent) {
+    this.router.navigate(["anlass/anmeldungen/", this.anlass?.id]);
   }
 }
