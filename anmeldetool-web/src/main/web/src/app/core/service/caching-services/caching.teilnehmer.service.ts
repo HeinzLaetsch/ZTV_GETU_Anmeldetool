@@ -109,6 +109,13 @@ export class CachingTeilnehmerService {
     return tituFiltered;
   }
 
+  deleteTeilnehmer(
+    verein: IVerein,
+    teilnehmer: ITeilnehmer
+  ): Observable<boolean> {
+    this.removeTeilnehmer(teilnehmer);
+    return this.teilnehmerService.delete(verein, teilnehmer);
+  }
   delete(
     verein: IVerein,
     filter: string,

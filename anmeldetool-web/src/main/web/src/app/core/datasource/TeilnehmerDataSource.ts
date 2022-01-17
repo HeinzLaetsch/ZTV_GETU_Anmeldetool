@@ -79,7 +79,12 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     );
     */
   }
-
+  deleteTeilnehmer(
+    verein: IVerein,
+    teilnehmer: ITeilnehmer
+  ): Observable<boolean> {
+    return this.teilnehmerService.deleteTeilnehmer(verein, teilnehmer);
+  }
   delete(filter: string, tiTu: TiTuEnum, row: number): Observable<boolean> {
     return this.teilnehmerService.delete(
       this.verein,
