@@ -12,16 +12,24 @@ import lombok.Value;
 
 @Value
 @AllArgsConstructor
-public class TeilnehmerAnlassLinkDTO {
+public class TeilnehmerAnlassLinkCsvDTO {
 	UUID anlassId;
 
 	UUID teilnehmerId;
 
-	KategorieEnum kategorie;
-
-	boolean dirty;
+	UUID organisationId;
 
 	private int startnummer;
+
+	private String name;
+
+	private String vorname;
+
+	private int jahrgang;
+
+	private String verein;
+
+	private KategorieEnum kategorie;
 
 	private AbteilungEnum abteilung;
 

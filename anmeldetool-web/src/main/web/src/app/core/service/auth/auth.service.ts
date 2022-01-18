@@ -42,7 +42,7 @@ export class AuthService {
       if (this._selectedVerein) {
         return this._selectedVerein;
       }
-      return undefined;
+      return this._currentVerein;
     }
   }
 

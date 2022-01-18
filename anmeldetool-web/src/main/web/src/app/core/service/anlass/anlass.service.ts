@@ -1,5 +1,6 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import * as FileSaver from "file-saver";
 import { Observable, of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
@@ -335,6 +336,28 @@ export class AnlassService {
       .pipe(catchError(this.handleError<IAnlassLink[]>("getTeilnehmer", [])));
   }
 
+  // /anlaesse/{anlassId}/organisationen/{orgId}/teilnehmer/
+  getTeilnehmerForAnlassCsv(anlass: IAnlass): void {
+    const combinedUrl = this.url + "/" + anlass.id + "/teilnehmer/";
+    // console.log("getTeilnehmer called: ", combinedUrl);
+    this.http
+      .get(combinedUrl, { observe: "response", responseType: "text" })
+      .pipe(catchError(this.handleError<string>("getTeilnehmerForAnlass")))
+      .subscribe((result: HttpResponse<string>) => {
+        const header = result.headers.get("Content-Disposition");
+        const parts = header.split("filename=");
+        this.saveAsFile(
+          result.body,
+          parts[1].replace("%", ""),
+          "text/csv; charset=UTF-8"
+        );
+      });
+  }
+  private saveAsFile(buffer: any, fileName: string, fileType: string): void {
+    const asArray = [buffer];
+    const data: Blob = new Blob(asArray, { type: fileType });
+    FileSaver.saveAs(data, fileName);
+  }
   private handleError<T>(operation = "operation", result?: T) {
     return (error: any): Observable<T> => {
       console.error("HandleError: ", operation, " , Error: ", error);

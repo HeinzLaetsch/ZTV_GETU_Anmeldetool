@@ -17,22 +17,33 @@ import lombok.ToString;
 @Getter
 @Setter
 public class TeilnehmerAnlassLink extends Base {
-	
-    @Enumerated(EnumType.STRING)
+
+	@Enumerated(EnumType.STRING)
 	private KategorieEnum kategorie;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="TEILNEHMER_ID", nullable=false, insertable=true, updatable=true)
-    @ToString.Exclude
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "TEILNEHMER_ID", nullable = false, insertable = true, updatable = true)
+	@ToString.Exclude
 	private Teilnehmer teilnehmer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="ANLASS_ID", nullable=false, insertable=true, updatable=true)
-    @ToString.Exclude
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "ANLASS_ID", nullable = false, insertable = true, updatable = true)
+	@ToString.Exclude
 	private Anlass anlass;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="ORGANISATION_ID", nullable=false, insertable=true, updatable=true)
-    @ToString.Exclude
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "ORGANISATION_ID", nullable = false, insertable = true, updatable = true)
+	@ToString.Exclude
 	private Organisation organisation;
+
+	private Integer startnummer;
+
+	@Enumerated(EnumType.STRING)
+	private AbteilungEnum abteilung;
+
+	@Enumerated(EnumType.STRING)
+	private AnlageEnum anlage;
+
+	@Enumerated(EnumType.STRING)
+	private StartGeraetEnum startgeraet;
 }

@@ -9,10 +9,13 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.ztv.anmeldetool.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.anmeldetool.models.LoginData;
@@ -36,6 +40,7 @@ import org.ztv.anmeldetool.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.anmeldetool.models.OrganisationAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.models.Person;
 import org.ztv.anmeldetool.anmeldetool.models.PersonAnlassLink;
+import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.models.Wertungsrichter;
 import org.ztv.anmeldetool.anmeldetool.models.WertungsrichterBrevetEnum;
 import org.ztv.anmeldetool.anmeldetool.models.WertungsrichterEinsatz;
@@ -46,6 +51,8 @@ import org.ztv.anmeldetool.anmeldetool.service.LoginService;
 import org.ztv.anmeldetool.anmeldetool.service.OrganisationService;
 import org.ztv.anmeldetool.anmeldetool.service.PersonService;
 import org.ztv.anmeldetool.anmeldetool.service.RoleService;
+import org.ztv.anmeldetool.anmeldetool.service.ServiceException;
+import org.ztv.anmeldetool.anmeldetool.service.TeilnehmerAnlassLinkService;
 import org.ztv.anmeldetool.anmeldetool.service.TeilnehmerService;
 import org.ztv.anmeldetool.anmeldetool.service.VerbandService;
 import org.ztv.anmeldetool.anmeldetool.service.WertungsrichterEinsatzService;
@@ -56,6 +63,7 @@ import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.PersonAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.RolleDTO;
+import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkCsvDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.VerbandDTO;
@@ -67,6 +75,9 @@ import org.ztv.anmeldetool.anmeldetool.util.OrganisationMapper;
 import org.ztv.anmeldetool.anmeldetool.util.PersonAnlassLinkMapper;
 import org.ztv.anmeldetool.anmeldetool.util.PersonHelper;
 import org.ztv.anmeldetool.anmeldetool.util.PersonMapper;
+import org.ztv.anmeldetool.anmeldetool.util.TeilnehmerAnlassLinkExportImportMapper;
+import org.ztv.anmeldetool.anmeldetool.util.TeilnehmerAnlassLinkMapper;
+import org.ztv.anmeldetool.anmeldetool.util.TeilnehmerExportImport;
 import org.ztv.anmeldetool.anmeldetool.util.WertungsrichterEinsatzMapper;
 import org.ztv.anmeldetool.anmeldetool.util.WertungsrichterMapper;
 
@@ -105,6 +116,9 @@ public class AdminController {
 	TeilnehmerService teilnehmerSrv;
 
 	@Autowired
+	TeilnehmerAnlassLinkService teilnehmerAnlassLinkSrv;
+
+	@Autowired
 	WertungsrichterEinsatzService wertungsrichterEinsatzSrv;
 
 	@Autowired
@@ -126,7 +140,13 @@ public class AdminController {
 	OrganisationMapper organisationMapper;
 
 	@Autowired
+	TeilnehmerAnlassLinkMapper teilnehmerAnlassMapper;
+
+	@Autowired
 	WertungsrichterEinsatzMapper wertungsrichterEinsatzMapper;
+
+	@Autowired
+	TeilnehmerAnlassLinkExportImportMapper talExImMapper;
 
 	@Autowired
 	PasswordEncoder passwordEncoder;
@@ -136,6 +156,12 @@ public class AdminController {
 
 	// curl -d @login.json -H "Content-Type: application/json"
 	// http://localhost:8080/admin/login
+
+	private <T> ResponseEntity<T> getNotFound() {
+		URI requestURI = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+		return ResponseEntity.notFound().location(requestURI).build();
+	}
+
 	@PostMapping("/login")
 	public @ResponseBody ResponseEntity<PersonDTO> post(HttpServletRequest request, @RequestBody LoginData loginData) {
 		return loginSrv.login(request, loginData);
@@ -149,7 +175,7 @@ public class AdminController {
 			return anlassMapper.ToDto(anlass);
 		}).collect(Collectors.toList());
 		if (anlaesseDTO.size() == 0) {
-			return ResponseEntity.notFound().build();
+			return getNotFound();
 		} else {
 			return ResponseEntity.ok(anlaesseDTO);
 		}
@@ -166,6 +192,38 @@ public class AdminController {
 		return ResponseEntity.ok(this.oalMapper.toDto(oalResult));
 	}
 
+	@GetMapping(value = "/anlaesse/{anlassId}/teilnehmer/", produces = "text/csv;charset=UTF-8")
+	// @ResponseBody
+	public void getTeilnehmer(HttpServletRequest request, HttpServletResponse response, @PathVariable UUID anlassId) {
+		List<TeilnehmerAnlassLink> tals = null;
+		try {
+			tals = teilnehmerAnlassLinkSrv.getAllTeilnehmerForAnlassAndUpdateStartnummern(anlassId);
+			if (tals == null || tals.size() == 0) {
+				return;
+			}
+			List<TeilnehmerAnlassLinkCsvDTO> talsCsv = tals.stream().map(tal -> {
+				return talExImMapper.fromEntity(tal);
+			}).collect(Collectors.toList());
+
+			String reportName = "Teilnehmer_" + tals.get(0).getAnlass().getAnlassBezeichnung();
+
+			response.addHeader("Content-Disposition", "attachment; filename=" + reportName + ".csv");
+			response.addHeader("Content-Type", "text/csv");
+			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+
+			// response.setCharacterEncoding("UTF-8");
+			TeilnehmerExportImport.csvWriteToWriter(talsCsv, response);
+
+			// response.addHeader("Content-Length", "");
+		} catch (ServiceException ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+					"Unable to generate Teilnehmer Export: ", ex);
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+					"Unable to generate Teilnehmer Export: ", ex);
+		}
+	}
+
 	@GetMapping("/anlaesse/{anlassId}/organisationen/")
 	// @ResponseBody
 	public ResponseEntity<Collection<OrganisationDTO>> getVereinsStarts(HttpServletRequest request,
@@ -176,7 +234,7 @@ public class AdminController {
 		}).collect(Collectors.toList());
 
 		if (orgsDTO.size() == 0) {
-			return ResponseEntity.notFound().build();
+			return getNotFound();
 		} else {
 			return ResponseEntity.ok(orgsDTO);
 		}
@@ -195,7 +253,14 @@ public class AdminController {
 	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}/teilnehmer/")
 	public ResponseEntity<Collection<TeilnehmerAnlassLinkDTO>> getTeilnehmer(HttpServletRequest request,
 			@PathVariable UUID anlassId, @PathVariable UUID orgId) {
-		return anlassSrv.getTeilnahmen(anlassId, orgId);
+		List<TeilnehmerAnlassLink> links = anlassSrv.getTeilnahmen(anlassId, orgId);
+		List<TeilnehmerAnlassLinkDTO> linksDto = links.stream().map(link -> {
+			return teilnehmerAnlassMapper.fromTeilnehmerAnlassLink(link);
+		}).collect(Collectors.toList());
+		if (linksDto.size() == 0) {
+			return getNotFound();
+		}
+		return ResponseEntity.ok(linksDto);
 	}
 
 	@PatchMapping("/anlaesse/{anlassId}/organisationen/{orgId}/teilnehmer/{teilnehmerId}")
@@ -217,7 +282,7 @@ public class AdminController {
 		Collection<PersonDTO> wrDTOs = wrs.stream().map(person -> personMapper.PersonToPersonDTO(person))
 				.collect(Collectors.toList());
 		if (wrDTOs.size() == 0) {
-			return ResponseEntity.notFound().build();
+			return getNotFound();
 		} else {
 			return ResponseEntity.ok(wrDTOs);
 		}
@@ -236,7 +301,7 @@ public class AdminController {
 		Collection<PersonAnlassLinkDTO> palDTOs = pals.stream()
 				.map(pal -> palMapper.PersonAnlassLinkToPersonAnlassLinkDTO(pal)).collect(Collectors.toList());
 		if (palDTOs.size() == 0) {
-			return ResponseEntity.notFound().build();
+			return getNotFound();
 		} else {
 			return ResponseEntity.ok(palDTOs);
 		}
@@ -253,7 +318,7 @@ public class AdminController {
 			return ResponseEntity.badRequest().build();
 		}
 		if (pal == null) {
-			return ResponseEntity.notFound().build();
+			return getNotFound();
 		}
 		if (pal.getEinsaetze() == null || pal.getEinsaetze().isEmpty()) {
 			if (pal.getAnlass().getWertungsrichterSlots() != null) {
@@ -416,8 +481,7 @@ public class AdminController {
 		// vereinsId);
 		PersonDTO person = PersonHelper.createPersonDTO(personSrv.findPersonByBenutzername(benutzername));
 		if (person == null) {
-			URI requestURI = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
-			return ResponseEntity.notFound().location(requestURI).build();
+			return getNotFound();
 		}
 		return ResponseEntity.ok(person);
 	}
@@ -441,8 +505,7 @@ public class AdminController {
 		if (optWr.isPresent()) {
 			return ResponseEntity.ok(wrMapper.WertungsrichterToWertungsrichterDTO(optWr.get()));
 		}
-		URI requestURI = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
-		return ResponseEntity.notFound().location(requestURI).build();
+		return getNotFound();
 
 	}
 
