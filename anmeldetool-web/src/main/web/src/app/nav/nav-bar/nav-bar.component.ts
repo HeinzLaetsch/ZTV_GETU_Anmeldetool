@@ -1,6 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { Observable } from "rxjs";
+import { IAnlass } from "src/app/core/model/IAnlass";
+import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
 import { CachingTeilnehmerService } from "src/app/core/service/caching-services/caching.teilnehmer.service";
@@ -40,5 +42,13 @@ export class NavBarComponent implements OnInit {
     this.teilnehmerService.reset(oldSelectedVerein);
     this.teilnehmerService.loadTeilnehmer(verein);
     this.router.navigate(["/"]);
+  }
+
+  getAnlaesse(): IAnlass[] {
+    return this.anlassService.getAnlaesse(TiTuEnum.Alle);
+  }
+
+  setAnlass(anlass: IAnlass): void {
+    this.anlassService.getTeilnehmerForAnlassCsv(anlass);
   }
 }

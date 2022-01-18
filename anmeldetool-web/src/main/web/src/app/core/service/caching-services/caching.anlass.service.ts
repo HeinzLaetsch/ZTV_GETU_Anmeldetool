@@ -124,6 +124,10 @@ export class CachingAnlassService {
     return filteredLinks;
   }
 
+  getTeilnehmerForAnlassCsv(anlass: IAnlass): void {
+    this.anlassService.getTeilnehmerForAnlassCsv(anlass);
+  }
+
   getTeilnehmerForAnlass(anlass: IAnlass): IAnlassLinks {
     if (this.teilnamen) {
       return this.teilnamen[anlass.id];

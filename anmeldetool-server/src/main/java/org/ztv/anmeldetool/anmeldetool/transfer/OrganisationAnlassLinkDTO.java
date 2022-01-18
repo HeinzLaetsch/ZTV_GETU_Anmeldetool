@@ -17,4 +17,5 @@ public class OrganisationAnlassLinkDTO {
 	boolean startet;
 
 	private LocalDateTime verlaengerungsDate;
+
 }

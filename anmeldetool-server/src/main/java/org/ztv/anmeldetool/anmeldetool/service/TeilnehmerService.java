@@ -91,7 +91,7 @@ public class TeilnehmerService {
 		Teilnehmer teilnehmer = TeilnehmerHelper.createTeilnehmer(teilnehmerDTO);
 		teilnehmer.setOrganisation(organisation);
 
-		teilnehmerRepository.save(teilnehmer);
+		teilnehmer = teilnehmerRepository.save(teilnehmer);
 
 		teilnehmerDTO = TeilnehmerHelper.createTeilnehmerDTO(teilnehmer, organisation);
 		return ResponseEntity.ok(teilnehmerDTO);
@@ -129,6 +129,7 @@ public class TeilnehmerService {
 	public ResponseEntity<TeilnehmerDTO> update(Organisation organisation, TeilnehmerDTO teilnehmerDTO) {
 		Optional<Teilnehmer> teilnehmerOptional = teilnehmerRepository.findById(teilnehmerDTO.getId());
 		if (teilnehmerOptional.isEmpty()) {
+			log.warn("Could not find Teilnehmer with ID: {}", teilnehmerDTO.getId());
 			return ResponseEntity.notFound().build();
 		}
 		Teilnehmer teilnehmer2 = TeilnehmerHelper.createTeilnehmer(teilnehmerDTO);
@@ -176,7 +177,7 @@ public class TeilnehmerService {
 		} else {
 			teilnehmerAnlassLink.setAktiv(true);
 		}
-		teilnehmerAnlassLink.setKategorie(KategorieEnum.valueOf(tal.getKategorie()));
+		teilnehmerAnlassLink.setKategorie(tal.getKategorie());
 		teilnehmerAnlassLinkRepository.save(teilnehmerAnlassLink);
 
 		return ResponseEntity.ok().build();

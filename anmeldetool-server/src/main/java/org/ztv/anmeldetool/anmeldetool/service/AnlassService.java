@@ -1,7 +1,6 @@
 package org.ztv.anmeldetool.anmeldetool.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,8 +23,6 @@ import org.ztv.anmeldetool.anmeldetool.repositories.PersonenRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.TeilnehmerAnlassLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.PersonAnlassLinkDTO;
-import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
-import org.ztv.anmeldetool.anmeldetool.util.TeilnehmerAnlassLinkHelper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -154,13 +151,12 @@ public class AnlassService {
 		return anlaesse;
 	}
 
-	public ResponseEntity<Collection<TeilnehmerAnlassLinkDTO>> getTeilnahmen(UUID anlassId, UUID OrgId) {
+	public List<TeilnehmerAnlassLink> getTeilnahmen(UUID anlassId, UUID OrgId) {
 		Anlass anlass = this.findAnlassById(anlassId);
 		Organisation organisation = organisationSrv.findOrganisationById(OrgId);
 		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndOrganisation(anlass,
 				organisation);
-		return ResponseEntity
-				.ok(TeilnehmerAnlassLinkHelper.getTeilnehmerAnlassLinkDTOForTeilnehmerAnlassLink(teilnahmen));
+		return teilnahmen;
 	}
 
 	public OrganisationAnlassLink getVereinStarts(UUID anlassId, UUID orgId) {
