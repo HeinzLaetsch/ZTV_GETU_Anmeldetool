@@ -1,0 +1,27 @@
+<h2 mat-dialog-title>zu löschender Teilnehmer</h2>
+<mat-dialog-content class="mat-typography">
+  <div class="container">
+    <div class="row">
+      <div class="col label">Name:</div>
+      <div class="col">{{ data.name }}</div>
+    </div>
+    <div class="row">
+      <div class="col label">Vorname</div>
+      <div class="col">{{ data.vorname }}</div>
+    </div>
+    <div class="row">
+      <div class="col label">Jahrgang</div>
+      <div class="col">{{ data.jahrgang }}</div>
+    </div>
+    <div class="row">
+      <div class="col label">Geschlecht</div>
+      <div class="col">{{ data.tiTu }}</div>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="false" cdkFocusInitial>
+    Abbrechen
+  </button>
+  <button mat-button [mat-dialog-close]="true">löschen</button>
+</mat-dialog-actions>
