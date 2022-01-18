@@ -8,12 +8,14 @@ import { TeilnehmerComponent } from "./teilnehmer/teilnehmer.component";
 import { TeilnehmerRoutes } from "./teilnehmer.routes";
 import { TeilnehmerTableComponent } from "./teilnehmer/teilnehmer-table/teilnehmer-table.component";
 import { HasChangesComponent } from "./teilnehmer/guards/has-changes.component";
+import { DeleteUser } from "./teilnehmer/teilnehmer-table/delete-dialog/delete-user.component";
 
 @NgModule({
   declarations: [
     TeilnehmerComponent,
     TeilnehmerTableComponent,
     HasChangesComponent,
+    DeleteUser,
   ],
   imports: [
     CommonModule,

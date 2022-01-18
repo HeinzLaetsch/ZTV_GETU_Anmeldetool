@@ -75,6 +75,9 @@ button {
 }
 .aktion {
   max-width: 70px;
+  padding-left: 25px;
+  display: flex;
+  justify-content: right;
 }
 .rotate {
   /* Something you can count on */

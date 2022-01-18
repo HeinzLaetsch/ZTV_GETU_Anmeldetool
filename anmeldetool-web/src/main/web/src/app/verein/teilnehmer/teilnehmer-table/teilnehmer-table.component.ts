@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, Input, ViewChild } from "@angular/core";
 import { FormControl, Validators } from "@angular/forms";
+import { MatDialog } from "@angular/material/dialog";
 import { MatPaginator, PageEvent } from "@angular/material/paginator";
 import { MatSort, Sort } from "@angular/material/sort";
 import { ToastrService } from "ngx-toastr";
@@ -11,6 +12,7 @@ import { IAnlass } from "src/app/core/model/IAnlass";
 import { IAnlassLink } from "src/app/core/model/IAnlassLink";
 import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
 import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
+import { IUser } from "src/app/core/model/IUser";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
@@ -18,6 +20,7 @@ import { CachingAnlassService } from "src/app/core/service/caching-services/cach
 import { CachingTeilnehmerService } from "src/app/core/service/caching-services/caching.teilnehmer.service";
 import { CachingVereinService } from "src/app/core/service/caching-services/caching.verein.service";
 import { IVerein } from "../../verein";
+import { DeleteUser } from "./delete-dialog/delete-user.component";
 
 interface TeilnahmeControl {
   formControl: FormControl;
@@ -67,7 +70,8 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     private teilnehmerService: CachingTeilnehmerService,
     private vereinService: CachingVereinService,
     private anlassService: CachingAnlassService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    public dialog: MatDialog
   ) {
     // Assign the data to the data source for the table to render
     this.dataSource = new TeilnehmerDataSource(
@@ -627,11 +631,12 @@ export class TeilnehmerTableComponent implements AfterViewInit {
 
   delete(event: any, row: any, rowIndex: any) {
     // console.log("click fired: ", event, " row: ", row, " rowIndex: ", rowIndex);
-    this.dataSource
-      .delete(this.filterValue, this.tiTu, rowIndex)
-      .subscribe((results) => {
-        this.applyFilter(this.filterValue);
-      });
+    const toBeDeleted = this.dataSource.getTeilnehmer(
+      this.filterValue,
+      this.tiTu,
+      rowIndex
+    );
+    this.openDialog(toBeDeleted);
   }
 
   // Wenn Name oder Jahrgang geändert wird Wettkämpfe anzeigen, bei welchem das keine Rolle mehr spielt.
@@ -655,5 +660,23 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       }
     }
     return true;
+  }
+
+  private openDialog(toBeDeleted: ITeilnehmer) {
+    const dialogRef = this.dialog.open(DeleteUser, {
+      data: toBeDeleted,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.dataSource
+          .deleteTeilnehmer(this.authService.currentVerein, toBeDeleted)
+          .subscribe((results) => {
+            this.applyFilter(this.filterValue);
+          });
+      } else {
+        console.log(`Abbrechen result: ${result}`);
+      }
+    });
   }
 }
