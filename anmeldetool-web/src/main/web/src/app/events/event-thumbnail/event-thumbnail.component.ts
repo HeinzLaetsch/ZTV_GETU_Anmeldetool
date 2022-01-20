@@ -119,34 +119,12 @@ export class EventThumbnailComponent implements OnInit {
     return true;
   }
 
-  // TODO abfüllen
   get statusWertungsrichter(): WertungsrichterStatusEnum {
-    const pflichtBrevet1 =
-      this.wertungsrichterService.getWertungsrichterPflichtBrevet1(this.anlass);
-    const pflichtBrevet2 =
-      this.wertungsrichterService.getWertungsrichterPflichtBrevet2(this.anlass);
-
-    const statusBrevet1 =
-      this.wertungsrichterService.getStatusWertungsrichterBr(
-        this.assignedWr1s,
-        pflichtBrevet1
-      );
-    const statusBrevet2 =
-      this.wertungsrichterService.getStatusWertungsrichterBr(
-        this.assignedWr2s,
-        pflichtBrevet2
-      );
-    if (statusBrevet1 === WertungsrichterStatusEnum.NOTOK) {
-      return WertungsrichterStatusEnum.NOTOK;
-    }
-    if (statusBrevet2 === WertungsrichterStatusEnum.NOTOK) {
-      return WertungsrichterStatusEnum.NOTOK;
-    }
-    return WertungsrichterStatusEnum.OK;
-  }
-
-  getCleaned(): string {
-    return this.anlass.anlassBezeichnung.replace("%", "");
+    return this.wertungsrichterService.getStatusWertungsrichter(
+      this.anlass,
+      this.assignedWr1s,
+      this.assignedWr2s
+    );
   }
 
   fillassignedWrs() {

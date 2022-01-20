@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { IRolle } from "../../model/IRolle";
 import { IUser } from "../../model/IUser";
+import { AuthService } from "../auth/auth.service";
 import { RoleService } from "../role/role.service";
 
 @Injectable({
@@ -16,7 +17,10 @@ export class CachingRoleService {
 
   private roles: IRolle[];
 
-  constructor(private roleService: RoleService) {
+  constructor(
+    private roleService: RoleService,
+    private authService: AuthService
+  ) {
     this.rolesLoaded = new BehaviorSubject<boolean>(undefined);
   }
   reset(): Observable<boolean> {
@@ -49,10 +53,17 @@ export class CachingRoleService {
 
   getRoles(): IRolle[] {
     if (this.loaded) {
-      return this.roles.filter((role) => {
-        // console.log('Rolle: ', role);
-        return role.name !== "ADMINISTRATOR" && role.name !== "BENUTZER";
-      });
+      if (this.authService.isAdministrator()) {
+        return this.roles.filter((role) => {
+          // console.log('Rolle: ', role);
+          return role.name !== "BENUTZER";
+        });
+      } else {
+        return this.roles.filter((role) => {
+          // console.log('Rolle: ', role);
+          return role.name !== "ADMINISTRATOR" && role.name !== "BENUTZER";
+        });
+      }
     }
     return undefined;
   }

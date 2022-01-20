@@ -63,7 +63,9 @@ export class EventRegisterSummaryComponent implements OnInit {
   }
 
   get titel(): string {
-    return this.getCleaned() + " - " + this.authService.currentVerein.name;
+    return (
+      this.anlass.getCleaned() + " - " + this.authService.currentVerein.name
+    );
   }
   get vereinStarted(): boolean {
     return this.organisationAnlassLink?.startet;
@@ -219,36 +221,13 @@ export class EventRegisterSummaryComponent implements OnInit {
     return true;
   }
 
-  // TODO abfüllen
   get statusWertungsrichter(): WertungsrichterStatusEnum {
-    const pflichtBrevet1 =
-      this.wertungsrichterService.getWertungsrichterPflichtBrevet1(this.anlass);
-    const pflichtBrevet2 =
-      this.wertungsrichterService.getWertungsrichterPflichtBrevet2(this.anlass);
-
-    const statusBrevet1 =
-      this.wertungsrichterService.getStatusWertungsrichterBr(
-        this.assignedWr1s,
-        pflichtBrevet1
-      );
-    const statusBrevet2 =
-      this.wertungsrichterService.getStatusWertungsrichterBr(
-        this.assignedWr2s,
-        pflichtBrevet2
-      );
-    if (statusBrevet1 === WertungsrichterStatusEnum.NOTOK) {
-      return WertungsrichterStatusEnum.NOTOK;
-    }
-    if (statusBrevet2 === WertungsrichterStatusEnum.NOTOK) {
-      return WertungsrichterStatusEnum.NOTOK;
-    }
-    return WertungsrichterStatusEnum.KEINEPFLICHT;
+    return this.wertungsrichterService.getStatusWertungsrichter(
+      this.anlass,
+      this.assignedWr1s,
+      this.assignedWr2s
+    );
   }
-
-  getCleaned(): string {
-    return this.anlass.anlassBezeichnung.replace("%", "");
-  }
-
   fillassignedWrs() {
     this.wertungsrichterService
       .getEingeteilteWertungsrichter(this.anlass, 1)

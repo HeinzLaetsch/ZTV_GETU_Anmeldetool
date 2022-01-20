@@ -107,4 +107,30 @@ export class WertungsrichterService {
     if (anzahlTeilnehmer > 0) return Math.ceil(anzahlTeilnehmer / 10);
     return 0;
   }
+
+  // TODO abfüllen
+  getStatusWertungsrichter(
+    anlass: IAnlass,
+    assignedWr1s: Array<IUser>,
+    assignedWr2s: Array<IUser>
+  ): WertungsrichterStatusEnum {
+    const pflichtBrevet1 = this.getWertungsrichterPflichtBrevet1(anlass);
+    const pflichtBrevet2 = this.getWertungsrichterPflichtBrevet2(anlass);
+
+    const statusBrevet1 = this.getStatusWertungsrichterBr(
+      assignedWr1s,
+      pflichtBrevet1
+    );
+    const statusBrevet2 = this.getStatusWertungsrichterBr(
+      assignedWr2s,
+      pflichtBrevet2
+    );
+    if (statusBrevet1 === WertungsrichterStatusEnum.NOTOK) {
+      return WertungsrichterStatusEnum.NOTOK;
+    }
+    if (statusBrevet2 === WertungsrichterStatusEnum.NOTOK) {
+      return WertungsrichterStatusEnum.NOTOK;
+    }
+    return WertungsrichterStatusEnum.OK;
+  }
 }
