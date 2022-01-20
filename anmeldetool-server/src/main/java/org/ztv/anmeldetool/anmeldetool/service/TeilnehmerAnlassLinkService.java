@@ -1,5 +1,6 @@
 package org.ztv.anmeldetool.anmeldetool.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import org.ztv.anmeldetool.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.repositories.TeilnehmerAnlassLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.TeilnehmerRepository;
+import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkCsvDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,5 +68,30 @@ public class TeilnehmerAnlassLinkService {
 		List<TeilnehmerAnlassLink> tals = findAnlassTeilnahmen(anlassId);
 		tals = updateStartNummern(tals);
 		return tals;
+	}
+
+	public int updateAnlassTeilnahmen(UUID anlassId, List<TeilnehmerAnlassLinkCsvDTO> talsDto) throws ServiceException {
+		List<TeilnehmerAnlassLink> tals = findAnlassTeilnahmen(anlassId);
+		List<TeilnehmerAnlassLink> toUpdate = new ArrayList<TeilnehmerAnlassLink>();
+		int counter = 0;
+		for (TeilnehmerAnlassLinkCsvDTO talDto : talsDto) {
+			for (TeilnehmerAnlassLink tal : tals) {
+				if (tal.getStartnummer().compareTo(talDto.getStartnummer()) == 0
+						&& talDto.getTeilnehmerId().equals(tal.getTeilnehmer().getId())) {
+					tal.setAbteilung(talDto.getAbteilung());
+					tal.setAnlage(talDto.getAnlage());
+					tal.setStartgeraet(talDto.getStartgeraet());
+					toUpdate.add(tal);
+					counter++;
+					break;
+				}
+			}
+		}
+
+		toUpdate = teilnehmerAnlassLinkRepository.saveAll(toUpdate);
+		if (toUpdate == null || toUpdate.size() != counter) {
+			throw new ServiceException(this.getClass(), "Updated fehlgeschlagen");
+		}
+		return counter;
 	}
 }

@@ -71,11 +71,21 @@ public class AnlassService {
 			if (eingeteilteWrs.size() == 0) {
 				return true;
 			}
-			return eingeteilteWrs.stream().filter(pal -> {
+			boolean already = eingeteilteWrs.stream().filter(pal -> {
+				log.debug("verfügbar: {}, eingeteilt: {}, gleich: {}", person.getId(), pal.getPerson().getId(),
+						pal.getPerson().getId().equals(person.getId()));
 				return !pal.getPerson().getId().equals(person.getId());
-			}).count() > 0;
+			}).count() == eingeteilteWrs.size();
+			log.debug("Person {} ist eingeteilt {}", person.getBenutzername(), already);
+			return already;
 		}).collect(Collectors.toList());
 		return verfuegbare;
+	}
+
+	public List<PersonAnlassLink> getEingeteilteWertungsrichter(UUID anlassId) {
+		Anlass anlass = this.findAnlassById(anlassId);
+		List<PersonAnlassLink> pals = personAnlassLinkRepository.findByAnlass(anlass);
+		return pals;
 	}
 
 	public List<PersonAnlassLink> getEingeteilteWertungsrichter(UUID anlassId, UUID orgId,

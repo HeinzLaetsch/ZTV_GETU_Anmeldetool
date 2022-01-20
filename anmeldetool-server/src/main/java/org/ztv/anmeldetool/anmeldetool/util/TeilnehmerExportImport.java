@@ -1,9 +1,12 @@
 package org.ztv.anmeldetool.anmeldetool.util;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -11,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkCsvDTO;
 
 import com.opencsv.CSVWriter;
+import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
@@ -34,5 +38,17 @@ public class TeilnehmerExportImport {
 		writer.write(tals);
 		responseWriter.flush();
 		responseWriter.close();
+	}
+
+	public static List<TeilnehmerAnlassLinkCsvDTO> csvWriteToWriter(InputStream inputStream) throws IOException {
+		inputStream.read();
+		inputStream.read();
+		inputStream.read();
+		Reader targetReader = new InputStreamReader(inputStream, "UTF-8");
+		List<TeilnehmerAnlassLinkCsvDTO> tals = new CsvToBeanBuilder<TeilnehmerAnlassLinkCsvDTO>(targetReader)
+				.withType(TeilnehmerAnlassLinkCsvDTO.class).withQuoteChar(CSVWriter.NO_QUOTE_CHARACTER)
+				.withSeparator(';').withOrderedResults(false).build().parse();
+		targetReader.close();
+		return tals;
 	}
 }

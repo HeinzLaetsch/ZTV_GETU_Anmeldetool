@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkCsvDTO;
+import org.ztv.anmeldetool.anmeldetool.util.idmapper.AnlassFromIdMapper;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = { AnlassFromIdMapper.class })
 public interface TeilnehmerAnlassLinkExportImportMapper {

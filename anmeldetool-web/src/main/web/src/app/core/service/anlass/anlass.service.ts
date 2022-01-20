@@ -353,6 +353,33 @@ export class AnlassService {
         );
       });
   }
+
+  getWertungsrichterForAnlassCsv(anlass: IAnlass): void {
+    const combinedUrl = this.url + "/" + anlass.id + "/wertungsrichter/";
+    // console.log("getTeilnehmer called: ", combinedUrl);
+    this.http
+      .get(combinedUrl, { observe: "response", responseType: "text" })
+      .pipe(
+        catchError(this.handleError<string>("getWertungsrichterForAnlassCsv"))
+      )
+      .subscribe((result: HttpResponse<string>) => {
+        const header = result.headers.get("Content-Disposition");
+        const parts = header.split("filename=");
+        this.saveAsFile(
+          result.body,
+          parts[1].replace("%", ""),
+          "text/csv; charset=UTF-8"
+        );
+      });
+  }
+  public importTeilnehmerForAnlassCsv(
+    anlass: IAnlass,
+    formData: FormData
+  ): Observable<any> {
+    const combinedUrl = this.url + "/" + anlass.id + "/teilnehmer/";
+    return this.http.post<any>(combinedUrl, formData);
+  }
+
   private saveAsFile(buffer: any, fileName: string, fileType: string): void {
     const asArray = [buffer];
     const data: Blob = new Blob(asArray, { type: fileType });

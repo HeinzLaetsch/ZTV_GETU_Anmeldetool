@@ -23,14 +23,14 @@
             aria-haspopup="true"
             aria-expanded="false"
           >
-            Anlässe bearbeiten
+            Anlässe verwalten
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             <a
               *ngFor="let anlass of getAnlaesse()"
               class="dropdown-item"
-              (click)="setAnlass(anlass)"
-              >{{ anlass.anlassBezeichnung }}</a
+              [routerLink]="['/anlass', anlass.id, 'admin']"
+              >{{ anlass.getCleaned() }}</a
             >
           </div>
         </li>

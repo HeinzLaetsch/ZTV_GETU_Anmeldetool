@@ -13,8 +13,10 @@ import org.ztv.anmeldetool.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.anmeldetool.models.OrganisationAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.transfer.AnlassDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationDTO;
+import org.ztv.anmeldetool.anmeldetool.util.idmapper.OrganisationFromIdMapper;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = { WertungsrichterSlotMapper.class })
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = { WertungsrichterSlotMapper.class,
+		OrganisationFromIdMapper.class })
 public abstract class AnlassMapper {
 
 	@Autowired

@@ -9,7 +9,7 @@ import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterDTO;
 import org.ztv.anmeldetool.anmeldetool.util.idmapper.PersonFromIdMapper;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = { PersonFromIdMapper.class })
-public abstract class WertungsrichterMapper {
+public abstract class WertungsrichterExportMapper {
 
 	@Mapping(source = "person.id", target = "personId")
 	@Mapping(expression = "java(mapBrevet(wr))", target = "brevet")

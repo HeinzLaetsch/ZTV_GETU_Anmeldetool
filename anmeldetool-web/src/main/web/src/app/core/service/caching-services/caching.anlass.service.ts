@@ -128,6 +128,16 @@ export class CachingAnlassService {
     this.anlassService.getTeilnehmerForAnlassCsv(anlass);
   }
 
+  importTeilnehmerForAnlassCsv(
+    anlass: IAnlass,
+    formData: FormData
+  ): Observable<any> {
+    return this.anlassService.importTeilnehmerForAnlassCsv(anlass, formData);
+  }
+
+  getWertungsrichterForAnlassCsv(anlass: IAnlass): void {
+    this.anlassService.getWertungsrichterForAnlassCsv(anlass);
+  }
   getTeilnehmerForAnlass(anlass: IAnlass): IAnlassLinks {
     if (this.teilnamen) {
       return this.teilnamen[anlass.id];

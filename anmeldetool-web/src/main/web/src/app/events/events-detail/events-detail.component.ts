@@ -144,9 +144,7 @@ export class EventsDetailComponent implements OnInit {
     this.statusBr1 = this.getStatusBr1();
     this.statusBr2 = this.getStatusBr2();
   }
-  getCleaned(): string {
-    return this.anlass.anlassBezeichnung.replace("%", "");
-  }
+
   getTeilnahmenForKategorieK1(): IAnlassLink[] {
     return this.anlassService.getTeilnahmenForKategorie(
       this.anlass,

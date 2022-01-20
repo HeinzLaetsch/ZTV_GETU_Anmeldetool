@@ -142,7 +142,7 @@ export class EventThumbnailComponent implements OnInit {
     if (statusBrevet2 === WertungsrichterStatusEnum.NOTOK) {
       return WertungsrichterStatusEnum.NOTOK;
     }
-    return WertungsrichterStatusEnum.KEINEPFLICHT;
+    return WertungsrichterStatusEnum.OK;
   }
 
   getCleaned(): string {

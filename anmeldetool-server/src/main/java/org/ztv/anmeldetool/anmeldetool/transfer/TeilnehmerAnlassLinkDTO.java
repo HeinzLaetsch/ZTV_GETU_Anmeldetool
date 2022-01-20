@@ -17,6 +17,8 @@ public class TeilnehmerAnlassLinkDTO {
 
 	UUID teilnehmerId;
 
+	UUID organisationId;
+
 	KategorieEnum kategorie;
 
 	boolean dirty;

@@ -86,10 +86,12 @@ export class WertungsrichterService {
         return WertungsrichterStatusEnum.OK;
       }
     } else {
-      if (wertungsrichterPflicht === 0) return WertungsrichterStatusEnum.OK;
+      if (wertungsrichterPflicht === 0) {
+        return WertungsrichterStatusEnum.KEINEPFLICHT;
+      }
     }
     if (wertungsrichterPflicht === 0) {
-      return WertungsrichterStatusEnum.OK;
+      return WertungsrichterStatusEnum.KEINEPFLICHT;
     }
     return WertungsrichterStatusEnum.NOTOK;
   }

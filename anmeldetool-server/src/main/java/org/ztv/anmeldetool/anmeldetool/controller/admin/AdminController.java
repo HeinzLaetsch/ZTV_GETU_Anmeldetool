@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.ztv.anmeldetool.anmeldetool.models.Anlass;
@@ -60,6 +61,7 @@ import org.ztv.anmeldetool.anmeldetool.service.WertungsrichterService;
 import org.ztv.anmeldetool.anmeldetool.transfer.AnlassDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationDTO;
+import org.ztv.anmeldetool.anmeldetool.transfer.PersonAnlassLinkCsvDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.PersonAnlassLinkDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.RolleDTO;
@@ -72,6 +74,7 @@ import org.ztv.anmeldetool.anmeldetool.transfer.WertungsrichterEinsatzDTO;
 import org.ztv.anmeldetool.anmeldetool.util.AnlassMapper;
 import org.ztv.anmeldetool.anmeldetool.util.OrganisationAnlassLinkMapper;
 import org.ztv.anmeldetool.anmeldetool.util.OrganisationMapper;
+import org.ztv.anmeldetool.anmeldetool.util.PersonAnlassLinkExportImportMapper;
 import org.ztv.anmeldetool.anmeldetool.util.PersonAnlassLinkMapper;
 import org.ztv.anmeldetool.anmeldetool.util.PersonHelper;
 import org.ztv.anmeldetool.anmeldetool.util.PersonMapper;
@@ -79,6 +82,7 @@ import org.ztv.anmeldetool.anmeldetool.util.TeilnehmerAnlassLinkExportImportMapp
 import org.ztv.anmeldetool.anmeldetool.util.TeilnehmerAnlassLinkMapper;
 import org.ztv.anmeldetool.anmeldetool.util.TeilnehmerExportImport;
 import org.ztv.anmeldetool.anmeldetool.util.WertungsrichterEinsatzMapper;
+import org.ztv.anmeldetool.anmeldetool.util.WertungsrichterExport;
 import org.ztv.anmeldetool.anmeldetool.util.WertungsrichterMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -149,6 +153,9 @@ public class AdminController {
 	TeilnehmerAnlassLinkExportImportMapper talExImMapper;
 
 	@Autowired
+	PersonAnlassLinkExportImportMapper palExImMapper;
+
+	@Autowired
 	PasswordEncoder passwordEncoder;
 
 	@Autowired
@@ -192,6 +199,34 @@ public class AdminController {
 		return ResponseEntity.ok(this.oalMapper.toDto(oalResult));
 	}
 
+	@GetMapping(value = "/anlaesse/{anlassId}/wertungsrichter/", produces = "text/csv;charset=UTF-8")
+	// @ResponseBody
+	public void getWertungsrichter(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable UUID anlassId) {
+		try {
+
+			List<PersonAnlassLink> pals = anlassSrv.getEingeteilteWertungsrichter(anlassId);
+
+			List<PersonAnlassLinkCsvDTO> palsCsv = pals.stream().map(pal -> {
+				return palExImMapper.fromEntity(pal);
+			}).collect(Collectors.toList());
+
+			String reportName = "Wertungsrichter_" + pals.get(0).getAnlass().getAnlassBezeichnung();
+
+			response.addHeader("Content-Disposition", "attachment; filename=" + reportName + ".csv");
+			response.addHeader("Content-Type", "text/csv");
+			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+
+			// response.setCharacterEncoding("UTF-8");
+			WertungsrichterExport.csvWriteToWriter(palsCsv, response);
+
+			// response.addHeader("Content-Length", "");
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+					"Unable to generate Wertungsrichter Export: ", ex);
+		}
+	}
+
 	@GetMapping(value = "/anlaesse/{anlassId}/teilnehmer/", produces = "text/csv;charset=UTF-8")
 	// @ResponseBody
 	public void getTeilnehmer(HttpServletRequest request, HttpServletResponse response, @PathVariable UUID anlassId) {
@@ -222,6 +257,28 @@ public class AdminController {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
 					"Unable to generate Teilnehmer Export: ", ex);
 		}
+	}
+
+	// @RequestBody Resource resource) {
+	// , consumes = "application/octet-stream"
+
+	@PostMapping(value = "/anlaesse/{anlassId}/teilnehmer/")
+	// @ResponseBody
+	public ResponseEntity updateTeilnehmer(@PathVariable UUID anlassId,
+			@RequestParam("teilnehmer") MultipartFile teilnehmer) {
+		try {
+			// this.log.debug("Resource: {} , length: {}", resource.getFilename(),
+			// resource.contentLength());
+			this.log.info("Import: {} , length: {}", teilnehmer.getOriginalFilename(), teilnehmer.getSize());
+
+			List<TeilnehmerAnlassLinkCsvDTO> tals = TeilnehmerExportImport
+					.csvWriteToWriter(teilnehmer.getInputStream());
+			teilnehmerAnlassLinkSrv.updateAnlassTeilnahmen(anlassId, tals);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ResponseEntity.ok().build();
 	}
 
 	@GetMapping("/anlaesse/{anlassId}/organisationen/")
@@ -255,7 +312,7 @@ public class AdminController {
 			@PathVariable UUID anlassId, @PathVariable UUID orgId) {
 		List<TeilnehmerAnlassLink> links = anlassSrv.getTeilnahmen(anlassId, orgId);
 		List<TeilnehmerAnlassLinkDTO> linksDto = links.stream().map(link -> {
-			return teilnehmerAnlassMapper.fromTeilnehmerAnlassLink(link);
+			return teilnehmerAnlassMapper.toDto(link);
 		}).collect(Collectors.toList());
 		if (linksDto.size() == 0) {
 			return getNotFound();
@@ -298,8 +355,8 @@ public class AdminController {
 			brevetEnum = WertungsrichterBrevetEnum.Brevet_2;
 		}
 		List<PersonAnlassLink> pals = anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId, brevetEnum);
-		Collection<PersonAnlassLinkDTO> palDTOs = pals.stream()
-				.map(pal -> palMapper.PersonAnlassLinkToPersonAnlassLinkDTO(pal)).collect(Collectors.toList());
+		Collection<PersonAnlassLinkDTO> palDTOs = pals.stream().map(pal -> palMapper.toDto(pal))
+				.collect(Collectors.toList());
 		if (palDTOs.size() == 0) {
 			return getNotFound();
 		} else {
@@ -337,7 +394,7 @@ public class AdminController {
 				pal.setEinsaetze(wrEs);
 			}
 		}
-		PersonAnlassLinkDTO palDTO = this.palMapper.PersonAnlassLinkToPersonAnlassLinkDTO(pal);
+		PersonAnlassLinkDTO palDTO = this.palMapper.toDto(pal);
 		return ResponseEntity.ok(palDTO);
 	}
 
@@ -350,7 +407,7 @@ public class AdminController {
 			if (pal != null) {
 				pal.setKommentar(personAnlassLinkDTO.getKommentar());
 				pal = personAnlassLinkRepository.save(pal);
-				PersonAnlassLinkDTO palDTO = this.palMapper.PersonAnlassLinkToPersonAnlassLinkDTO(pal);
+				PersonAnlassLinkDTO palDTO = this.palMapper.toDto(pal);
 				return ResponseEntity.ok(palDTO);
 			} else {
 				return anlassSrv.updateEingeteilteWertungsrichter(anlassId, orgId, personId,

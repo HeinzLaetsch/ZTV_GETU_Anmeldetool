@@ -1,0 +1,60 @@
+<div class="container" *ngIf="administrator">
+  <div class="row">
+    <div class="col-9">
+      <h1>{{ anlass.getCleaned() }}</h1>
+    </div>
+    <div class="col-sm-3">
+      <h1>{{ anlass.tiTu }}</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-4">
+      <h2>Teilnehmer Import / Export</h2>
+    </div>
+    <div class="col-sm-2">
+      <button
+        mat-button
+        color="primary"
+        #tooltip="matTooltip"
+        matTooltip="Teilnehmer exportieren"
+        matTooltipPosition="below"
+        matTooltipHideDelay="500"
+        (click)="exportTeilnehmer()"
+      >
+        Exportieren
+      </button>
+    </div>
+    <div class="col-sm-2">
+      <button
+        mat-button
+        color="primary"
+        #tooltip="matTooltip"
+        matTooltip="Teilnehmer importieren"
+        matTooltipPosition="below"
+        matTooltipHideDelay="500"
+        (click)="importTeilnehmer()"
+      >
+        Importieren
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-4">
+      <h2>Wertungsrichter Export</h2>
+    </div>
+    <div class="col-sm-2">
+      <button
+        mat-button
+        color="primary"
+        #tooltip="matTooltip"
+        matTooltip="Wertungsrichter exportieren"
+        matTooltipPosition="below"
+        matTooltipHideDelay="500"
+        (click)="exportWertungsrichter()"
+      >
+        Exportieren
+      </button>
+    </div>
+  </div>
+</div>
+<ng-template #elseBlock>Zugriff verweigert</ng-template>

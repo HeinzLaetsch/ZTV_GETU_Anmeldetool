@@ -15,6 +15,10 @@ export class IAnlass {
   bank: string;
   position?: number;
 
+  getCleaned(): string {
+    return this.anlassBezeichnung.replace("%", "");
+  }
+
   set startDatum(startDatum: Date) {
     this.startDatum_ = startDatum;
   }

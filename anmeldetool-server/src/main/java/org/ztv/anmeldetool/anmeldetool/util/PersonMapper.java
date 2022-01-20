@@ -6,13 +6,13 @@ import org.ztv.anmeldetool.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.anmeldetool.models.OrganisationPersonLink;
 import org.ztv.anmeldetool.anmeldetool.models.Person;
 import org.ztv.anmeldetool.anmeldetool.transfer.PersonDTO;
+import org.ztv.anmeldetool.anmeldetool.util.idmapper.OrganisationFromIdMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-// @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {
-//		WertungsrichterMapper.class }, imports = Wertungsrichter.class)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = { WertungsrichterMapper.class,
+		OrganisationFromIdMapper.class })
 public abstract class PersonMapper {
 
 	public abstract PersonDTO PersonToPersonDTO(Person person);

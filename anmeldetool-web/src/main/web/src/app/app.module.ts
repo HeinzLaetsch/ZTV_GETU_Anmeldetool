@@ -18,6 +18,7 @@ import { ServiceModule } from "./core/service/service.module";
 import { Page404Component } from "./error/page404/page404.component";
 import {
   CreateEventComponent,
+  EventAdminComponent,
   EventListComponent,
   EventRegisterSummaryComponent,
   EventsDatesComponent,
@@ -55,6 +56,7 @@ export function initVereinservice(
     EventsDetailComponent,
     CreateEventComponent,
     EventRegisterSummaryComponent,
+    EventAdminComponent,
     Page404Component,
     NewAnmelderComponent,
     NewVereinComponent,
