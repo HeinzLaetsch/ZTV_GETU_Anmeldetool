@@ -24,6 +24,7 @@ import {
   EventsDatesComponent,
   EventsDetailComponent,
   EventThumbnailComponent,
+  Upload,
   WertungsrichterChipComponent,
   WertungsrichterSlotComponent,
 } from "./events/index";
@@ -47,6 +48,7 @@ export function initVereinservice(
 @NgModule({
   declarations: [
     AnmeldeToolComponent,
+    Upload,
     EventListComponent,
     WertungsrichterChipComponent,
     WertungsrichterSlotComponent,

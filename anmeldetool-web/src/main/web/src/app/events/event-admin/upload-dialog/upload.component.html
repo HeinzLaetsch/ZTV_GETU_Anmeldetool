@@ -10,23 +10,7 @@
   <div class="file-upload">
     {{ fileName || "Keine Datei selektiert" }}
   </div>
-  <div class="progress">
-    <mat-progress-bar
-      class="progress-bar"
-      mode="determinate"
-      [value]="uploadProgress"
-      *ngIf="uploading"
-    >
-    </mat-progress-bar>
-
-    <mat-icon
-      class="cancel-upload"
-      (click)="cancelUpload()"
-      *ngIf="uploadProgress"
-      >delete_forever</mat-icon
-    >
-  </div>
-  <div *ngIf="type === error">Upload fehlgeschlagen {{ upLoadError }}</div>
+  <div *ngIf="type === 'error'">Upload fehlgeschlagen {{ upLoadError }}</div>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button
