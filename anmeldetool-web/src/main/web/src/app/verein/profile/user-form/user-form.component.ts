@@ -243,8 +243,8 @@ export class UserFormComponent implements OnInit {
     this.changeEvent.saved = true;
     if (this.currentUser.id) {
       if (this.userHasChanged && this.changeEvent.userValid) {
+        this._localPassword = this.currentUser.password;
         this.authService.updateUser(this.currentUser).subscribe((user) => {
-          this._localPassword = this.currentUser.password;
           this.currentUser = user;
           this.userHasChanged = false;
           this.userChange.next(this.changeEvent);
@@ -265,6 +265,7 @@ export class UserFormComponent implements OnInit {
       }
       this.checkWrChanged();
     } else {
+      this._localPassword = this.currentUser.password;
       this.authService.createUser(this.currentUser).subscribe((user) => {
         this.currentUser = user;
         if (this.changeEvent.rolesChanged) {
