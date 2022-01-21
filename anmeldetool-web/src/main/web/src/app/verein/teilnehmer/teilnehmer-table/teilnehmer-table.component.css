@@ -59,6 +59,12 @@ button {
   padding: 0px;
 }
 
+.asText {
+  min-width: 20px;
+  text-align: center;
+  margin-left: 5px;
+  margin-right: 5px;
+}
 .centeredHeader {
   display: flex;
   justify-content: left;

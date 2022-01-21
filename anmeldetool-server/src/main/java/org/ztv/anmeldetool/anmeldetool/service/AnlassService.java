@@ -166,6 +166,11 @@ public class AnlassService {
 		Organisation organisation = organisationSrv.findOrganisationById(OrgId);
 		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndOrganisation(anlass,
 				organisation);
+		if (teilnahmen.size() > 0) {
+			log.debug("Teilnehmer {}", teilnahmen.get(0).getKategorie());
+			log.debug("Teilnehmer {}", teilnahmen.get(0).getTeilnehmer().getName());
+			log.debug("Teilnehmer {}", teilnahmen.get(0).getOrganisation().getName());
+		}
 		return teilnahmen;
 	}
 

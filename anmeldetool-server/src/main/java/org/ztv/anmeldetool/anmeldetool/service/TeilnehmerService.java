@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.ztv.anmeldetool.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.anmeldetool.models.KategorieEnum;
+import org.ztv.anmeldetool.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.anmeldetool.models.Teilnehmer;
 import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
@@ -177,7 +178,11 @@ public class TeilnehmerService {
 		} else {
 			teilnehmerAnlassLink.setAktiv(true);
 		}
-		teilnehmerAnlassLink.setKategorie(tal.getKategorie());
+		if (tal.getKategorie() != null) {
+			teilnehmerAnlassLink.setKategorie(tal.getKategorie());
+		} else {
+			teilnehmerAnlassLink.setMeldeStatus(MeldeStatusEnum.valueOf(tal.getMeldeStatus().toUpperCase()));
+		}
 		teilnehmerAnlassLinkRepository.save(teilnehmerAnlassLink);
 
 		return ResponseEntity.ok().build();

@@ -12,8 +12,8 @@ import { IAnlass } from "src/app/core/model/IAnlass";
 import { IAnlassLink } from "src/app/core/model/IAnlassLink";
 import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
 import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
-import { IUser } from "src/app/core/model/IUser";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
+import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
@@ -46,6 +46,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
 
   teilnahmenControls = new Array<Array<FormControl>>();
   teilnehmerControls = new Array<Array<FormControl>>();
+  mutationsControls = new Array<Array<FormControl>>();
   check1 = new FormControl();
   pageSize = 15;
 
@@ -122,8 +123,6 @@ export class TeilnehmerTableComponent implements AfterViewInit {
         });
         this.allDisplayedColumns.pop();
         this.allDisplayedColumns.push("aktion");
-        // this.teilnahmenControls = new Array<Array<FormControl>>();
-        // this.teilnehmerControls = new Array<Array<FormControl>>();
 
         let anzahlControls = this.pageSize;
         for (let i = 0; i <= anzahlControls; i++) {
@@ -136,6 +135,9 @@ export class TeilnehmerTableComponent implements AfterViewInit {
 
           const lineControls = new Array<FormControl>();
           this.teilnahmenControls.push(lineControls);
+
+          const mutationsControls = new Array<FormControl>();
+          this.mutationsControls.push(mutationsControls);
         }
         this.loadTeilnehmerPage();
         this.loadTeilnahmen(true);
@@ -158,6 +160,13 @@ export class TeilnehmerTableComponent implements AfterViewInit {
         this.teilnahmenControls.forEach((line) => {
           const cntr = new FormControl({
             value: KategorieEnum.KEINE_TEILNAHME,
+            disabled: true,
+          });
+          line.push(cntr);
+        });
+        this.mutationsControls.forEach((line) => {
+          const cntr = new FormControl({
+            value: undefined,
             disabled: true,
           });
           line.push(cntr);
@@ -211,6 +220,10 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   get isTeilnahmenLoaded(): Observable<boolean> {
     // console.log('TeilnehmerComponent::isTeilnehmerLoaded')
     return this.anlassService.isTeilnahmenLoaded();
+  }
+
+  getMeldeStatus(): String[] {
+    return Object.values(MeldeStatusEnum);
   }
 
   getKategorien(anlass: IAnlass): String[] {
@@ -347,6 +360,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
         // );
         if (result) {
           this.fillTeilnahmenControls(anlass);
+          this.fillMuationsControls(anlass);
         }
       });
   }
@@ -387,6 +401,43 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     });
   }
 
+  // TODO Mutation geschlossen Wettkampf zu oder nicht offen
+  fillMuationsControls(anlassOrg: IAnlass) {
+    let teilnehmerPos = 0;
+    this.mutationsControls.forEach((line) => {
+      let pos = 0;
+      this.anlaesse.forEach((anlass) => {
+        if (anlassOrg === anlass) {
+          const link = this.getTeilnahme(teilnehmerPos, anlass);
+          const mustEnable = this.mustEnableAnlass(pos);
+          if (link) {
+            if (!link.meldeStatus) {
+              if (link.kategorie === KategorieEnum.KEINE_TEILNAHME) {
+                line[pos].setValue(undefined);
+              } else {
+                line[pos].setValue(MeldeStatusEnum.STARTET);
+              }
+            } else {
+              line[pos].setValue(link.meldeStatus);
+            }
+          } else {
+            line[pos].setValue(undefined);
+          }
+          if (!mustEnable) {
+            if (!link || link.kategorie === KategorieEnum.KEINE_TEILNAHME) {
+              line[pos].disable();
+            } else {
+              line[pos].enable();
+            }
+          } else {
+            line[pos].disable();
+          }
+        }
+        pos++;
+      });
+      teilnehmerPos++;
+    });
+  }
   getTeilnahme(teilnehmerRecord: number, anlass: IAnlass): IAnlassLink {
     const tr = this.dataSource.getTeilnehmer(
       this.filterValue,
@@ -416,7 +467,10 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     this.loadTeilnahmen(false);
     this.loadTeilnehmerPage();
   }
-  mustEnableAnlass(colIndex: number) {
+  mustEnableAnlass(colIndex: number): boolean {
+    if (colIndex < 0 || this.checked[colIndex] === undefined) {
+      return false;
+    }
     const mustEnable =
       this.checked[colIndex].startet &&
       !this.isChangesDisabled(this.anlaesse[colIndex]);
@@ -426,6 +480,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     // console.log("Clicked: ", colIndex, ", ", check);
     let anzahlControls = this.pageSize;
     const mustEnable = this.mustEnableAnlass(colIndex);
+
     for (let i = 0; i <= anzahlControls; i++) {
       if (mustEnable) {
         this.teilnahmenControls[i][colIndex].enable();
@@ -574,6 +629,19 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     console.log("Value Change fired: ", value);
   }
 
+  private updateMutationen(rowIndex: any, colIndex: any) {
+    const anlass = this.anlaesse[colIndex];
+    this.dataSource.valid = this.mutationsControls[rowIndex][colIndex].valid;
+    this.dataSource.updateMutationen(
+      this.filterValue,
+      this.tiTu,
+      rowIndex,
+      this.mutationsControls[rowIndex][colIndex].value,
+      anlass
+    );
+    this.dataSource.dirty = true;
+  }
+
   private updateTeilnahmen(rowIndex: any, colIndex: any) {
     const anlass = this.anlaesse[colIndex];
     this.dataSource.valid = this.teilnahmenControls[rowIndex][colIndex].valid;
@@ -581,7 +649,6 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       this.filterValue,
       this.tiTu,
       rowIndex,
-      colIndex,
       this.teilnahmenControls[rowIndex][colIndex].value,
       anlass
     );
@@ -618,15 +685,12 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     this.updateTeilnehmer(rowIndex, colIndex);
   }
 
-  change(
-    event: any,
-    teilnehmer: boolean,
-    row: any,
-    rowIndex: any,
-    colIndex: any,
-    anlass: IAnlass
-  ) {
+  change(rowIndex: any, colIndex: any) {
     this.updateTeilnahmen(rowIndex, colIndex);
+  }
+
+  changeMutation(rowIndex: any, colIndex: any) {
+    this.updateMutationen(rowIndex, colIndex);
   }
 
   delete(event: any, row: any, rowIndex: any) {

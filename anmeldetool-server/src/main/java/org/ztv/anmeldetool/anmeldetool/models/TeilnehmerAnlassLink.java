@@ -21,6 +21,9 @@ public class TeilnehmerAnlassLink extends Base {
 	@Enumerated(EnumType.STRING)
 	private KategorieEnum kategorie;
 
+	@Enumerated(EnumType.STRING)
+	private MeldeStatusEnum meldeStatus;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "TEILNEHMER_ID", nullable = false, insertable = true, updatable = true)
 	@ToString.Exclude

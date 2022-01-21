@@ -134,6 +134,7 @@
         </mat-header-cell>
         <mat-cell *matCellDef="let row; let rowIndex = index" class="kategorie">
           <mat-select
+            *ngIf="mustEnableAnlass(colIndex)"
             type="text"
             placeholder="keine Teilnahme"
             aria-label="Kategorie"
@@ -143,12 +144,35 @@
             matTooltip="Wähle die Kategorie aus"
             matTooltipPosition="below"
             matTooltipHideDelay="100"
-            (selectionChange)="
-              change($event, false, row, rowIndex, colIndex, anlass)
-            "
+            (selectionChange)="change(rowIndex, colIndex)"
           >
             <mat-option
               *ngFor="let option of getKategorien(anlass)"
+              [value]="option"
+            >
+              {{ option }}
+            </mat-option>
+          </mat-select>
+          <span class="asText" *ngIf="!mustEnableAnlass(colIndex)">{{
+            teilnahmenControls[rowIndex][colIndex].value.startsWith("keine")
+              ? "-"
+              : teilnahmenControls[rowIndex][colIndex].value
+          }}</span>
+          <mat-select
+            *ngIf="!mustEnableAnlass()"
+            type="text"
+            placeholder="-"
+            aria-label="Kategorie"
+            matInput
+            [formControl]="mutationsControls[rowIndex][colIndex]"
+            #tooltip="matTooltip"
+            matTooltip="Abmelden oder Ummelden"
+            matTooltipPosition="below"
+            matTooltipHideDelay="100"
+            (selectionChange)="changeMutation(rowIndex, colIndex)"
+          >
+            <mat-option
+              *ngFor="let option of getMeldeStatus()"
               [value]="option"
             >
               {{ option }}

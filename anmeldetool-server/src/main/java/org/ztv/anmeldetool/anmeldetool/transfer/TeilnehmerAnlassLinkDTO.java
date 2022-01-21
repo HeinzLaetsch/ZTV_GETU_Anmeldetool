@@ -13,15 +13,17 @@ import lombok.Value;
 @Value
 @AllArgsConstructor
 public class TeilnehmerAnlassLinkDTO {
-	UUID anlassId;
+	private UUID anlassId;
 
-	UUID teilnehmerId;
+	private UUID teilnehmerId;
 
-	UUID organisationId;
+	private UUID organisationId;
 
-	KategorieEnum kategorie;
+	private KategorieEnum kategorie;
 
-	boolean dirty;
+	private String meldeStatus;
+
+	private boolean dirty;
 
 	private int startnummer;
 

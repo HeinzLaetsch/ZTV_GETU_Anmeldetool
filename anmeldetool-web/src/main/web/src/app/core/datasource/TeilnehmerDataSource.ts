@@ -9,6 +9,7 @@ import { IAnlassLink } from "../model/IAnlassLink";
 import { IAnlassLinks } from "../model/IAnlassLinks";
 import { ITeilnehmer } from "../model/ITeilnehmer";
 import { KategorieEnum } from "../model/KategorieEnum";
+import { MeldeStatusEnum } from "../model/MeldeStatusEnum";
 import { TiTuEnum } from "../model/TiTuEnum";
 import { CachingTeilnehmerService } from "../service/caching-services/caching.teilnehmer.service";
 
@@ -167,11 +168,65 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
       previousIndex
     )[row].dirty = true;
   }
+
+  updateMutationen(
+    filter: string,
+    tiTu: TiTuEnum,
+    row: number,
+    value: MeldeStatusEnum,
+    anlass: IAnlass
+  ) {
+    if (
+      !this.teilnehmerService.getTeilnehmer(
+        filter,
+        this.sortValue,
+        tiTu,
+        this.paginator,
+        undefined
+      )
+    ) {
+      console.log("Empty");
+    }
+    const teilnehmer = this.teilnehmerService.getTeilnehmer(
+      filter,
+      this.sortValue,
+      tiTu,
+      this.paginator,
+      undefined
+    )[row];
+
+    if (!teilnehmer.teilnahmen) {
+      const teilnahmen: IAnlassLinks = {
+        dirty: true,
+        anlassLinks: new Array<IAnlassLink>(),
+      };
+      teilnehmer.teilnahmen = teilnahmen;
+    }
+    const links = teilnehmer.teilnahmen; // [col] = value;
+    const filtered = links.anlassLinks.filter((link) => {
+      return link.anlassId === anlass.id;
+    });
+    links.dirty = true;
+
+    if (filtered.length > 0) {
+      filtered[0].meldeStatus = value;
+      filtered[0].dirty = true;
+    } else {
+      const newLink: IAnlassLink = {
+        anlassId: anlass.id,
+        teilnehmerId: teilnehmer.id,
+        kategorie: undefined,
+        meldeStatus: value,
+        dirty: true,
+      };
+      links.anlassLinks.push(newLink);
+    }
+  }
+
   updateTeilnahme(
     filter: string,
     tiTu: TiTuEnum,
     row: number,
-    col: number,
     value: any,
     anlass: IAnlass
   ) {
