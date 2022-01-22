@@ -41,4 +41,5 @@ h2 {
 
 .red {
   color: var(--ztv-error) !important;
+  font-weight: 550;
 }

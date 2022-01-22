@@ -1,6 +1,7 @@
 package org.ztv.anmeldetool.anmeldetool.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ztv.anmeldetool.anmeldetool.models.Anlass;
+import org.ztv.anmeldetool.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.repositories.TeilnehmerAnlassLinkRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.TeilnehmerRepository;
@@ -39,6 +41,8 @@ public class TeilnehmerAnlassLinkService {
 			throw new ServiceException(this.getClass(),
 					String.format("Could not find Anlass with id: %s", anlassId.toString()));
 		}
+		List<MeldeStatusEnum> exclusion = Arrays
+				.asList(new MeldeStatusEnum[] { MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG });
 		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndAktiv(anlass, true);
 		return teilnahmen;
 	}

@@ -159,7 +159,7 @@
               : teilnahmenControls[rowIndex][colIndex].value
           }}</span>
           <mat-select
-            *ngIf="!mustEnableAnlass()"
+            *ngIf="!meldenOffen(colIndex)"
             type="text"
             placeholder="-"
             aria-label="Kategorie"

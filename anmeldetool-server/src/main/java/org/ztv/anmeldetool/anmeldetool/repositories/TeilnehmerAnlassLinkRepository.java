@@ -15,6 +15,10 @@ import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
 public interface TeilnehmerAnlassLinkRepository extends JpaRepository<TeilnehmerAnlassLink, UUID> {
 	List<TeilnehmerAnlassLink> findByTeilnehmerAndAnlass(Teilnehmer teilnehmer, Anlass anlass);
 
+	// List<TeilnehmerAnlassLink> findByAnlassAndAktivAndMeldeStatusNotIn(Anlass
+	// anlass, boolean aktiv,
+	// List<MeldeStatusEnum> exclusion);
+
 	List<TeilnehmerAnlassLink> findByAnlassAndAktiv(Anlass anlass, boolean aktiv);
 
 	List<TeilnehmerAnlassLink> findByAnlassAndOrganisation(Anlass anlass, Organisation organisation);

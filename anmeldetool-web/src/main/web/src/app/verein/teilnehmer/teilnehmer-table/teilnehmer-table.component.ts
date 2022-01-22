@@ -409,7 +409,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       this.anlaesse.forEach((anlass) => {
         if (anlassOrg === anlass) {
           const link = this.getTeilnahme(teilnehmerPos, anlass);
-          const mustEnable = this.mustEnableAnlass(pos);
+          const meldenGeschlossen = !this.meldenOffen(pos);
           if (link) {
             if (!link.meldeStatus) {
               if (link.kategorie === KategorieEnum.KEINE_TEILNAHME) {
@@ -423,7 +423,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
           } else {
             line[pos].setValue(undefined);
           }
-          if (!mustEnable) {
+          if (!meldenGeschlossen) {
             if (!link || link.kategorie === KategorieEnum.KEINE_TEILNAHME) {
               line[pos].disable();
             } else {
@@ -467,6 +467,13 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     this.loadTeilnahmen(false);
     this.loadTeilnehmerPage();
   }
+  meldenOffen(colIndex: number): boolean {
+    if (colIndex < 0 || this.checked[colIndex] === undefined) {
+      return false;
+    }
+    return this.isMutationenDisabled(this.anlaesse[colIndex]);
+  }
+
   mustEnableAnlass(colIndex: number): boolean {
     if (colIndex < 0 || this.checked[colIndex] === undefined) {
       return false;
@@ -726,6 +733,33 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     return true;
   }
 
+  isMutationenDisabled(anlass: IAnlass) {
+    if (this.authService.isAdministrator()) {
+      return false;
+    }
+    const nicht_offen = anlass.anzeigeStatus.hasStatus(
+      AnzeigeStatusEnum.NOCH_NICHT_OFFEN
+    );
+    const closed = anlass.anzeigeStatus.hasStatus(
+      AnzeigeStatusEnum.ERFASSEN_CLOSED
+    );
+    const verlaengert = anlass.anzeigeStatus.hasStatus(
+      AnzeigeStatusEnum.VERLAENGERT
+    );
+    const mutationen_closed = anlass.anzeigeStatus.hasStatus(
+      AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED
+    );
+    if (!nicht_offen) {
+      if (!closed) {
+        if (!verlaengert) {
+          if (!mutationen_closed) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
   private openDialog(toBeDeleted: ITeilnehmer) {
     const dialogRef = this.dialog.open(DeleteUser, {
       data: toBeDeleted,
