@@ -186,6 +186,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
       )
     ) {
       console.log("Empty");
+      return;
     }
     const teilnehmer = this.teilnehmerService.getTeilnehmer(
       filter,

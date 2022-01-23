@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
 import { Sort } from "@angular/material/sort";
-import { BehaviorSubject, forkJoin, Observable } from "rxjs";
+import { BehaviorSubject, forkJoin, Observable, of } from "rxjs";
 import { tap } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
 import { ITeilnehmer } from "../../model/ITeilnehmer";
@@ -41,17 +41,21 @@ export class CachingTeilnehmerService {
     this.teilnehmerLoaded = new BehaviorSubject<number>(undefined);
     // this.teilnehmerLoaded = new Subject<number>();
   }
-  reset(verein: IVerein): Observable<any[]> {
+  reset(verein: IVerein): Observable<boolean[]> {
     this.loaded = false;
     this.dirty = false;
     this.valid = true;
-    const observables = new Array<Observable<any>>();
+    const observables = new Array<Observable<boolean>>();
     this.teilnehmer.forEach((teilnehmer) => {
       if (teilnehmer.onlyCreated) {
         observables.push(this.teilnehmerService.delete(verein, teilnehmer));
       }
     });
-    return forkJoin(observables);
+    if (observables.length === 0) {
+      return of([true]);
+    } else {
+      return forkJoin(observables);
+    }
     // return this.loadTeilnehmer(verein);
   }
 

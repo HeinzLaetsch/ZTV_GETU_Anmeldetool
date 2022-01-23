@@ -127,14 +127,20 @@
               (click)="clicked($event, colIndex)"
               (ngModelChange)="checkedClicked($event, colIndex)"
               [ngModel]="getStartet(colIndex)"
-              [disabled]="isChangesDisabled(anlass)"
+              [disabled]="isErfassenDisabled(anlass) && !administrator"
               >Verein startet
             </mat-checkbox>
           </div>
         </mat-header-cell>
         <mat-cell *matCellDef="let row; let rowIndex = index" class="kategorie">
           <mat-select
-            *ngIf="mustEnableAnlass(colIndex)"
+            *ngIf="
+              showKategorieSelect(
+                colIndex,
+                anlass,
+                teilnahmenControls[rowIndex][colIndex].value
+              )
+            "
             type="text"
             placeholder="keine Teilnahme"
             aria-label="Kategorie"
@@ -153,13 +159,29 @@
               {{ option }}
             </mat-option>
           </mat-select>
-          <span class="asText" *ngIf="!mustEnableAnlass(colIndex)">{{
-            teilnahmenControls[rowIndex][colIndex].value.startsWith("keine")
-              ? "-"
-              : teilnahmenControls[rowIndex][colIndex].value
-          }}</span>
+          <span
+            class="asText"
+            *ngIf="
+              showKategorieSpan(
+                colIndex,
+                anlass,
+                teilnahmenControls[rowIndex][colIndex].value
+              )
+            "
+            >{{
+              teilnahmenControls[rowIndex][colIndex].value.startsWith("keine")
+                ? "-"
+                : teilnahmenControls[rowIndex][colIndex].value
+            }}</span
+          >
           <mat-select
-            *ngIf="!meldenOffen(colIndex)"
+            *ngIf="
+              showMutationSelect(
+                colIndex,
+                anlass,
+                teilnahmenControls[rowIndex][colIndex].value
+              )
+            "
             type="text"
             placeholder="-"
             aria-label="Kategorie"
@@ -178,6 +200,17 @@
               {{ option }}
             </mat-option>
           </mat-select>
+          <span
+            class="asText"
+            *ngIf="
+              showMutationSpan(
+                colIndex,
+                anlass,
+                teilnahmenControls[rowIndex][colIndex].value
+              )
+            "
+            >{{ mutationsControls[rowIndex][colIndex].value }}</span
+          >
         </mat-cell>
 
         <ng-container
@@ -194,7 +227,7 @@
             <button
               mat-raised-button
               (click)="copyAll($event, colIndex)"
-              [disabled]="!mustEnableAnlass(colIndex)"
+              [disabled]="!mustEnableAnlass(colIndex) && !administrator"
             >
               <mat-icon
                 class="material-icons color_gray"
@@ -215,7 +248,7 @@
             <button
               mat-raised-button
               (click)="copy($event, row, rowIndex, colIndex, anlass)"
-              [disabled]="!mustEnableAnlass(colIndex)"
+              [disabled]="!mustEnableAnlass(colIndex) && !administrator"
             >
               <mat-icon
                 class="material-icons color_gray"

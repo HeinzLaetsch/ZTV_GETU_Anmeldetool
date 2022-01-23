@@ -145,7 +145,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   }
 
   getStatusClass(anlass: IAnlass): string {
-    if (this.isChangesDisabled(anlass)) {
+    if (this.isErfassenDisabled(anlass)) {
       return "opacity_03";
     } else {
       return "opacity_10";
@@ -298,22 +298,10 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   }
   public saveTeilnehmer() {
     console.log("saveTeilnehmer");
-    /*
-    this._startsChanges.forEach((start) => {
-      this.anlassService
-        .updateVereinsStart(
-          start.anlass,
-          this.authService.currentVerein,
-          start.start
-        )
-        .subscribe((response) => {
-          console.log("updateVereinsStart");
-        });
-    });
-    */
     this.dataSource
       .saveAll(this.authService.currentVerein)
       .subscribe((results) => {
+        this.initAll();
         console.log("result of SaveAll: ", results);
       });
   }
@@ -379,6 +367,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
           const link = this.getTeilnahme(teilnehmerPos, anlass);
           // console.log("Old Line :", teilnehmerPos, "/", pos, " Pos: ", line[pos].value);
           const mustEnable = this.mustEnableAnlass(pos);
+          const erlaubt = this.getNeuAnmeldungErlaubtForAnlass(anlass);
           if (link) {
             if (link.kategorie === "KEIN_START") {
               line[pos].setValue(KategorieEnum.KEINE_TEILNAHME);
@@ -388,10 +377,14 @@ export class TeilnehmerTableComponent implements AfterViewInit {
           } else {
             line[pos].setValue(KategorieEnum.KEINE_TEILNAHME);
           }
-          if (mustEnable) {
+          if (mustEnable || this.administrator) {
             line[pos].enable();
           } else {
-            line[pos].disable();
+            if (erlaubt && this.checked[pos]?.startet) {
+              line[pos].enable();
+            } else {
+              line[pos].disable();
+            }
           }
           // console.log("New Line :", teilnehmerPos, "/", pos, " Pos: ", line[pos].value);
         }
@@ -409,7 +402,6 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       this.anlaesse.forEach((anlass) => {
         if (anlassOrg === anlass) {
           const link = this.getTeilnahme(teilnehmerPos, anlass);
-          const meldenGeschlossen = !this.meldenOffen(pos);
           if (link) {
             if (!link.meldeStatus) {
               if (link.kategorie === KategorieEnum.KEINE_TEILNAHME) {
@@ -423,14 +415,14 @@ export class TeilnehmerTableComponent implements AfterViewInit {
           } else {
             line[pos].setValue(undefined);
           }
-          if (!meldenGeschlossen) {
+          if (this.mutationenDisabled(pos) && !this.administrator) {
+            line[pos].disable();
+          } else {
             if (!link || link.kategorie === KategorieEnum.KEINE_TEILNAHME) {
               line[pos].disable();
             } else {
               line[pos].enable();
             }
-          } else {
-            line[pos].disable();
           }
         }
         pos++;
@@ -467,7 +459,107 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     this.loadTeilnahmen(false);
     this.loadTeilnehmerPage();
   }
-  meldenOffen(colIndex: number): boolean {
+
+  showKategorieSpan(
+    colIndex: number,
+    anlass: IAnlass,
+    value: KategorieEnum
+  ): boolean {
+    if (!this.mustEnableAnlass(colIndex)) {
+      return false;
+    }
+    if (this.administrator) {
+      return false;
+    }
+    if (KategorieEnum.KEINE_TEILNAHME === value) {
+      if (this.anlassService.neuAnmeldungErlaubt(anlass)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  showKategorieSelect(
+    colIndex: number,
+    anlass: IAnlass,
+    value: KategorieEnum
+  ): boolean {
+    const basis = this.mustEnableAnlass(colIndex);
+    if (!basis) {
+      return false;
+    }
+    if (this.administrator) {
+      return true;
+    }
+    if (KategorieEnum.KEINE_TEILNAHME === value) {
+      const erlaubt = this.anlassService.neuAnmeldungErlaubt(anlass);
+      if (erlaubt) {
+        return true;
+      }
+    }
+  }
+
+  showMutationSpan(
+    colIndex: number,
+    anlass: IAnlass,
+    value: KategorieEnum
+  ): boolean {
+    if (this.administrator) {
+      return false;
+    }
+    // isErfassenDisabled(anlass)
+    if (!this.mustEnableAnlass(colIndex)) {
+      return false;
+    }
+    const erfassenDisabled = this.isErfassenDisabled(this.anlaesse[colIndex]);
+    const mutationenDisabled = this.isMutationenDisabled(
+      this.anlaesse[colIndex]
+    );
+
+    if (erfassenDisabled) {
+      if (!mutationenDisabled) {
+        if (KategorieEnum.KEINE_TEILNAHME === value) {
+          if (this.anlassService.neuAnmeldungErlaubt(anlass)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  showMutationSelect(
+    colIndex: number,
+    anlass: IAnlass,
+    value: KategorieEnum
+  ): boolean {
+    if (this.administrator) {
+      return true;
+    }
+    // isErfassenDisabled(anlass)
+    if (!this.mustEnableAnlass(colIndex)) {
+      return false;
+    }
+    const erfassenDisabled = this.isErfassenDisabled(this.anlaesse[colIndex]);
+    const mutationenDisabled = this.isMutationenDisabled(
+      this.anlaesse[colIndex]
+    );
+
+    if (erfassenDisabled) {
+      if (!mutationenDisabled) {
+        if (KategorieEnum.KEINE_TEILNAHME === value) {
+          if (this.anlassService.neuAnmeldungErlaubt(anlass)) {
+            return false;
+          }
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
+  mutationenDisabled(colIndex: number): boolean {
     if (colIndex < 0 || this.checked[colIndex] === undefined) {
       return false;
     }
@@ -478,21 +570,35 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     if (colIndex < 0 || this.checked[colIndex] === undefined) {
       return false;
     }
-    const mustEnable =
-      this.checked[colIndex].startet &&
-      !this.isChangesDisabled(this.anlaesse[colIndex]);
+
+    const mustEnable = this.checked[colIndex].startet;
     return mustEnable;
+  }
+  getNeuAnmeldungErlaubtForAnlass(anlass: IAnlass) {
+    const erlaubt = this.anlassService.neuAnmeldungErlaubt(anlass);
+    return erlaubt;
+  }
+
+  getNeuAnmeldungErlaubt(colIndex: number) {
+    const erlaubt = this.anlassService.neuAnmeldungErlaubt(
+      this.anlaesse[colIndex]
+    );
+    return erlaubt;
   }
   private checkForIndex(colIndex: number, check: boolean) {
     // console.log("Clicked: ", colIndex, ", ", check);
     let anzahlControls = this.pageSize;
     const mustEnable = this.mustEnableAnlass(colIndex);
-
+    const erlaubt = this.getNeuAnmeldungErlaubt(colIndex);
     for (let i = 0; i <= anzahlControls; i++) {
       if (mustEnable) {
         this.teilnahmenControls[i][colIndex].enable();
       } else {
-        this.teilnahmenControls[i][colIndex].disable();
+        if (erlaubt && this.checked[colIndex].startet) {
+          this.teilnahmenControls[i][colIndex].enable();
+        } else {
+          this.teilnahmenControls[i][colIndex].disable();
+        }
       }
     }
   }
@@ -709,13 +815,16 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     );
     this.openDialog(toBeDeleted);
   }
+  get administrator(): boolean {
+    return this.authService.isAdministrator();
+  }
 
   // Wenn Name oder Jahrgang geändert wird Wettkämpfe anzeigen, bei welchem das keine Rolle mehr spielt.
   // überprüfen, dass nur einzelne Buchstaben geändert werden, keine komplett neuen Namen.
-  isChangesDisabled(anlass: IAnlass) {
-    if (this.authService.isAdministrator()) {
+  isErfassenDisabled(anlass: IAnlass) {
+    /*if (this.authService.isAdministrator()) {
       return false;
-    }
+    }*/
     const nicht_offen = anlass.anzeigeStatus.hasStatus(
       AnzeigeStatusEnum.NOCH_NICHT_OFFEN
     );
@@ -734,9 +843,11 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   }
 
   isMutationenDisabled(anlass: IAnlass) {
+    // Admin raus
+    /*
     if (this.authService.isAdministrator()) {
       return false;
-    }
+    }*/
     const nicht_offen = anlass.anzeigeStatus.hasStatus(
       AnzeigeStatusEnum.NOCH_NICHT_OFFEN
     );
@@ -749,8 +860,9 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     const mutationen_closed = anlass.anzeigeStatus.hasStatus(
       AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED
     );
+    // Falls Anzahl Umeldungen != Anzahl Neumeldungen erlaube hinzufügen Kat muss gleich sein
     if (!nicht_offen) {
-      if (!closed) {
+      if (closed) {
         if (!verlaengert) {
           if (!mutationen_closed) {
             return false;

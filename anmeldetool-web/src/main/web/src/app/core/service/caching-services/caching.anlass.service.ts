@@ -10,6 +10,7 @@ import { ITeilnehmer } from "../../model/ITeilnehmer";
 import { IUser } from "../../model/IUser";
 import { IWertungsrichterEinsatz } from "../../model/IWertungsrichterEinsatz";
 import { KategorieEnum } from "../../model/KategorieEnum";
+import { MeldeStatusEnum } from "../../model/MeldeStatusEnum";
 import { TiTuEnum } from "../../model/TiTuEnum";
 import { AnlassService } from "../anlass/anlass.service";
 
@@ -223,6 +224,32 @@ export class CachingAnlassService {
     return undefined;
   }
 
+  neuAnmeldungErlaubt(anlass: IAnlass): boolean {
+    const anlassLinks: IAnlassLinks = this.teilnamen[anlass.id];
+    const anzahlUmmeldungen = anlassLinks.anlassLinks.filter((link) => {
+      const isUmmeldung = link.meldeStatus === MeldeStatusEnum.UMMELDUNG;
+      return isUmmeldung;
+    }).length;
+    const neuMeldungen = anlassLinks.anlassLinks.filter((link) => {
+      return link.meldeStatus === MeldeStatusEnum.NEUMELDUNG;
+    }).length;
+    return anzahlUmmeldungen > neuMeldungen;
+  }
+  neuAnmeldungErlaubtKategorie(
+    anlass: IAnlass,
+    kategorie: KategorieEnum
+  ): boolean {
+    const anlassLinks: IAnlassLinks = this.teilnamen[anlass.id];
+    const anzahlUmmeldungen = anlassLinks.anlassLinks.filter((link) => {
+      const sameKat = link.kategorie === kategorie;
+      const isUmmeldung = link.meldeStatus === MeldeStatusEnum.UMMELDUNG;
+      return sameKat && isUmmeldung;
+    }).length;
+    const neuMeldungen = anlassLinks.anlassLinks.filter((link) => {
+      return link.meldeStatus === MeldeStatusEnum.NEUMELDUNG;
+    }).length;
+    return anzahlUmmeldungen > neuMeldungen;
+  }
   loadTeilnahmen(
     anlass: IAnlass,
     verein: IVerein,
