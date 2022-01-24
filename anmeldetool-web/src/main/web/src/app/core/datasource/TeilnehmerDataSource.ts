@@ -229,7 +229,8 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     tiTu: TiTuEnum,
     row: number,
     value: any,
-    anlass: IAnlass
+    anlass: IAnlass,
+    erfassenDisabled: boolean
   ) {
     // const effRow = pageEvent.previousPageIndex * this.paginator.pageSize + row;
     if (
@@ -266,14 +267,20 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     if (value === KategorieEnum.KEINE_TEILNAHME) {
       corrected = "KEIN_START";
     }
+    let meldeStatus = MeldeStatusEnum.STARTET;
+    if (erfassenDisabled) {
+      meldeStatus = MeldeStatusEnum.NEUMELDUNG;
+    }
     if (filtered.length > 0) {
       filtered[0].kategorie = corrected;
+      filtered[0].meldeStatus = meldeStatus;
       filtered[0].dirty = true;
     } else {
       const newLink: IAnlassLink = {
         anlassId: anlass.id,
         teilnehmerId: teilnehmer.id,
         kategorie: corrected,
+        meldeStatus,
         dirty: true,
       };
       links.anlassLinks.push(newLink);

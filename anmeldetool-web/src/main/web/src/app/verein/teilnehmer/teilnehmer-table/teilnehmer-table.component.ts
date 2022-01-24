@@ -225,8 +225,23 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   getMeldeStatus(): String[] {
     return Object.values(MeldeStatusEnum);
   }
-
   getKategorien(anlass: IAnlass): String[] {
+    if (this.isErfassenDisabled && !this.administrator) {
+      if (this.anlassService.neuAnmeldungErlaubt(anlass)) {
+        const katRaw = this.getKategorienRaw(anlass);
+        const reduced = katRaw.filter((kategorie) => {
+          return this.anlassService.neuAnmeldungErlaubtKategorie(
+            anlass,
+            kategorie
+          );
+        });
+        return reduced;
+      }
+      return [KategorieEnum.KEINE_TEILNAHME];
+    }
+    return this.getKategorienRaw(anlass);
+  }
+  getKategorienRaw(anlass: IAnlass): KategorieEnum[] {
     let k5 = Object.keys(KategorieEnum).findIndex(
       (key) => key === KategorieEnum.K5
     );
@@ -519,10 +534,9 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     if (erfassenDisabled) {
       if (!mutationenDisabled) {
         if (KategorieEnum.KEINE_TEILNAHME === value) {
-          if (this.anlassService.neuAnmeldungErlaubt(anlass)) {
-            return false;
-          }
+          return true;
         }
+        return false;
       }
       return true;
     }
@@ -549,9 +563,9 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     if (erfassenDisabled) {
       if (!mutationenDisabled) {
         if (KategorieEnum.KEINE_TEILNAHME === value) {
-          if (this.anlassService.neuAnmeldungErlaubt(anlass)) {
-            return false;
-          }
+          //if (this.anlassService.neuAnmeldungErlaubt(anlass)) {
+          return false;
+          //}
         }
         return true;
       }
@@ -725,7 +739,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     this.teilnahmenControls[rowIndex][newIndex].setValue(
       this.teilnahmenControls[rowIndex][colIndex].value
     );
-    this.updateTeilnahmen(rowIndex, newIndex);
+    this.updateTeilnahmen(rowIndex, newIndex, false);
   }
   copyAll(event: any, colIndex: any) {
     let rowIndex = 0;
@@ -733,7 +747,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     const newIndex = rest.findIndex((element) => element) + colIndex + 1;
     this.teilnahmenControls.forEach((anlassCntrLine) => {
       anlassCntrLine[newIndex].setValue(anlassCntrLine[colIndex].value);
-      this.updateTeilnahmen(rowIndex, newIndex);
+      this.updateTeilnahmen(rowIndex, newIndex, false);
       rowIndex++;
     });
     console.log("Copy All clicked: ", event, " ,colIndex: ", colIndex);
@@ -755,7 +769,11 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     this.dataSource.dirty = true;
   }
 
-  private updateTeilnahmen(rowIndex: any, colIndex: any) {
+  private updateTeilnahmen(
+    rowIndex: any,
+    colIndex: any,
+    erfassenDisabled: boolean
+  ) {
     const anlass = this.anlaesse[colIndex];
     this.dataSource.valid = this.teilnahmenControls[rowIndex][colIndex].valid;
     this.dataSource.updateTeilnahme(
@@ -763,7 +781,8 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       this.tiTu,
       rowIndex,
       this.teilnahmenControls[rowIndex][colIndex].value,
-      anlass
+      anlass,
+      erfassenDisabled
     );
     this.dataSource.dirty = true;
   }
@@ -799,7 +818,8 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   }
 
   change(rowIndex: any, colIndex: any) {
-    this.updateTeilnahmen(rowIndex, colIndex);
+    const erfassenDisabled = this.isErfassenDisabled(this.anlaesse[colIndex]);
+    this.updateTeilnahmen(rowIndex, colIndex, erfassenDisabled);
   }
 
   changeMutation(rowIndex: any, colIndex: any) {

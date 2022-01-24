@@ -180,8 +180,11 @@ public class TeilnehmerService {
 		}
 		if (tal.getKategorie() != null) {
 			teilnehmerAnlassLink.setKategorie(tal.getKategorie());
-		} else {
-			teilnehmerAnlassLink.setMeldeStatus(MeldeStatusEnum.valueOf(tal.getMeldeStatus().toUpperCase()));
+		}
+		MeldeStatusEnum neuerStatus = MeldeStatusEnum.valueOf(tal.getMeldeStatus().toUpperCase());
+		if (tal.getMeldeStatus() != null && !(teilnehmerAnlassLink.getMeldeStatus() == MeldeStatusEnum.NEUMELDUNG
+				&& neuerStatus == MeldeStatusEnum.STARTET)) {
+			teilnehmerAnlassLink.setMeldeStatus(neuerStatus);
 		}
 		teilnehmerAnlassLinkRepository.save(teilnehmerAnlassLink);
 
