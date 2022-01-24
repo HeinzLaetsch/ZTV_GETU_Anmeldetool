@@ -226,7 +226,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     return Object.values(MeldeStatusEnum);
   }
   getKategorien(anlass: IAnlass): String[] {
-    if (this.isErfassenDisabled && !this.administrator) {
+    if (this.isErfassenDisabled(anlass) && !this.administrator) {
       if (this.anlassService.neuAnmeldungErlaubt(anlass)) {
         const katRaw = this.getKategorienRaw(anlass);
         const reduced = katRaw.filter((kategorie) => {
@@ -486,12 +486,17 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     if (this.administrator) {
       return false;
     }
-    if (KategorieEnum.KEINE_TEILNAHME === value) {
-      if (this.anlassService.neuAnmeldungErlaubt(anlass)) {
-        return false;
+    const erfassenDisabled = this.isErfassenDisabled(this.anlaesse[colIndex]);
+
+    if (erfassenDisabled) {
+      if (KategorieEnum.KEINE_TEILNAHME === value) {
+        if (this.anlassService.neuAnmeldungErlaubt(anlass)) {
+          return false;
+        }
       }
+      return true;
     }
-    return true;
+    return false;
   }
 
   showKategorieSelect(
@@ -506,12 +511,18 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     if (this.administrator) {
       return true;
     }
-    if (KategorieEnum.KEINE_TEILNAHME === value) {
-      const erlaubt = this.anlassService.neuAnmeldungErlaubt(anlass);
-      if (erlaubt) {
-        return true;
+    const erfassenDisabled = this.isErfassenDisabled(this.anlaesse[colIndex]);
+
+    if (erfassenDisabled) {
+      if (KategorieEnum.KEINE_TEILNAHME === value) {
+        const erlaubt = this.anlassService.neuAnmeldungErlaubt(anlass);
+        if (erlaubt) {
+          return true;
+        }
       }
+      return false;
     }
+    return true;
   }
 
   showMutationSpan(
