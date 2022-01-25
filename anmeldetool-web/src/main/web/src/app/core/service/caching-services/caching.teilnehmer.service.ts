@@ -277,6 +277,7 @@ export class CachingTeilnehmerService {
     this.teilnehmer.forEach((teilnehmer) => {
       if (teilnehmer.dirty) {
         teilnehmer.dirty = false;
+        teilnehmer.onlyCreated = false;
         this.dirty = false;
         observables.push(this.teilnehmerService.save(verein, teilnehmer));
       }
