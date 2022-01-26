@@ -4,7 +4,6 @@ import { IAnlass } from "src/app/core/model/IAnlass";
 import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
 import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
 import { CachingTeilnehmerService } from "src/app/core/service/caching-services/caching.teilnehmer.service";
@@ -61,19 +60,16 @@ export class EventStartListComponent implements OnInit {
   }
 
   get brevet2Anlass(): boolean {
-    return this.anlass.hoechsteKategorie > KategorieEnum.K4;
+    const br2 = this.anlass.hoechsteKategorie > KategorieEnum.K4;
+    return br2;
   }
 
   get tuAnlass(): boolean {
-    return (
-      this.anlass.tiTu === TiTuEnum.Tu || this.anlass.tiTu === TiTuEnum.Alle
-    );
+    return this.anlass.tuAnlass;
   }
 
   get tiAnlass(): boolean {
-    return (
-      this.anlass.tiTu === TiTuEnum.Ti || this.anlass.tiTu === TiTuEnum.Alle
-    );
+    return this.anlass.tiAnlass;
   }
 
   get anzahlTeilnehmer(): number {

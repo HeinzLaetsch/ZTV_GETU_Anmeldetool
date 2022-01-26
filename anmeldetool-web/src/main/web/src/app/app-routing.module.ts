@@ -47,6 +47,7 @@ const routes: Routes = [
     path: "teilnehmer",
     loadChildren: () =>
       import("./verein/teilnehmer.module").then((m) => m.TeilnehmerModule),
+    canActivate: [EventRouteActivatorService],
     // resolve: [{ anzahlTeilnehmer: TeilnehmerResolverService }],
   },
   {

@@ -113,6 +113,26 @@ export class IAnlass {
   published_: boolean;
 
   tiTu: TiTuEnum;
+  get tuAnlass(): boolean {
+    const key = TiTuEnum[this.tiTu];
+    const tuAnlass = key === TiTuEnum.Tu || key === TiTuEnum.Alle;
+    return tuAnlass;
+  }
+  get tiAnlass(): boolean {
+    const key = TiTuEnum[this.tiTu];
+    const tiAnlass =
+      key === TiTuEnum.Ti.toString() || key === TiTuEnum.Alle.toString();
+    return tiAnlass;
+  }
+
+  get brevet1Anlass(): boolean {
+    return this.tiefsteKategorie < KategorieEnum.K5;
+  }
+
+  get brevet2Anlass(): boolean {
+    const br2 = this.hoechsteKategorie > KategorieEnum.K4;
+    return br2;
+  }
   tiefsteKategorie: KategorieEnum;
   hoechsteKategorie: KategorieEnum;
   wertungsrichterSlots?: IWertungsrichterSlot[];
