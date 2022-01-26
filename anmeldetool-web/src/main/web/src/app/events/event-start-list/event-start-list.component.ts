@@ -76,6 +76,10 @@ export class EventStartListComponent implements OnInit {
     );
   }
 
+  get anzahlTeilnehmer(): number {
+    return this.alleTeilnehmer?.length;
+  }
+
   getTeilnahmenForKategorieK1(): ITeilnehmer[] {
     return this.alleTeilnehmer.filter((teilnehmer) => {
       return teilnehmer.teilnahmen.anlassLinks[0].kategorie == KategorieEnum.K1;
