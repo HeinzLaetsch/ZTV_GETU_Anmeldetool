@@ -19,6 +19,8 @@ public interface TeilnehmerAnlassLinkRepository extends JpaRepository<Teilnehmer
 	// anlass, boolean aktiv,
 	// List<MeldeStatusEnum> exclusion);
 
+	List<TeilnehmerAnlassLink> findByTeilnehmer(Teilnehmer teilnehmer);
+
 	List<TeilnehmerAnlassLink> findByAnlassAndAktiv(Anlass anlass, boolean aktiv);
 
 	List<TeilnehmerAnlassLink> findByAnlassAndOrganisation(Anlass anlass, Organisation organisation);

@@ -452,7 +452,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       teilnehmerRecord
     );
     if (tr) {
-      return this.anlassService.getTeilnehmer(anlass, tr);
+      return this.anlassService.getTeilnahme(anlass, tr);
     }
     // console.log("Teilnehmer yet not Loaded: ", anlass.anlassBezeichnung);
     return undefined;

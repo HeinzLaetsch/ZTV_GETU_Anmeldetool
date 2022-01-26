@@ -139,6 +139,7 @@ export class CachingAnlassService {
   getWertungsrichterForAnlassCsv(anlass: IAnlass): void {
     this.anlassService.getWertungsrichterForAnlassCsv(anlass);
   }
+
   getTeilnehmerForAnlass(anlass: IAnlass): IAnlassLinks {
     if (this.teilnamen) {
       return this.teilnamen[anlass.id];
@@ -146,7 +147,25 @@ export class CachingAnlassService {
     return undefined;
   }
 
-  getTeilnehmer(anlass: IAnlass, teilnehmer: ITeilnehmer): IAnlassLink {
+  getTeilnahmenForAnlassSorted(anlass: IAnlass): IAnlassLink[] {
+    if (this.teilnamen) {
+      const kategories = Object.keys(KategorieEnum);
+      return this.teilnamen[anlass.id].anlassLinks.sort((a, b) => {
+        return this.compare(
+          kategories.indexOf(a.kategorie),
+          kategories.indexOf(b.kategorie),
+          true
+        );
+      });
+    }
+    return undefined;
+  }
+
+  compare(a: number | string, b: number | string, isAsc: boolean) {
+    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+  }
+
+  getTeilnahme(anlass: IAnlass, teilnehmer: ITeilnehmer): IAnlassLink {
     // TODO Lade hier
     if (this.teilnamen) {
       const anlassTeilnahmen = this.getTeilnehmerForAnlass(anlass);

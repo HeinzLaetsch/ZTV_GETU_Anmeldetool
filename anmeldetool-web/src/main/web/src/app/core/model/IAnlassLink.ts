@@ -4,4 +4,8 @@ export interface IAnlassLink {
   anlassId: string;
   teilnehmerId: string;
   dirty?: boolean;
+  startnummer?: number;
+  abteilung?: string;
+  anlage?: string;
+  startgeraet?: string;
 }

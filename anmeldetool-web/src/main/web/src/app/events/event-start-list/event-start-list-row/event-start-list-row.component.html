@@ -1,0 +1,29 @@
+<div class="row">
+  <div class="col-sm-1">
+    {{ teilnehmer.teilnahmen.anlassLinks[0].startnummer }}
+  </div>
+  <div class="col-sm-2">{{ teilnehmer.name }}</div>
+  <div class="col-sm-2">{{ teilnehmer.vorname }}</div>
+  <div class="col-sm-1">{{ teilnehmer.jahrgang }}</div>
+  <div *ngIf="showDetail" class="col-sm-1">
+    {{ abteilung }}
+  </div>
+  <div *ngIf="!showDetail" class="col-sm-1">
+    {{ abteilung }}
+  </div>
+  <div *ngIf="showDetail" class="col-sm-1">
+    {{ anlage }}
+  </div>
+  <div *ngIf="!showDetail" class="col-sm-1">
+    {{ anlage }}
+  </div>
+  <div *ngIf="showDetail" class="col-sm-2">
+    {{ teilnehmer.teilnahmen.anlassLinks[0].startgeraet }}
+  </div>
+  <div *ngIf="!showDetail" class="col-sm-2">
+    {{ teilnehmer.teilnahmen.anlassLinks[0].startgeraet }}
+  </div>
+  <div class="col-sm-2">
+    {{ teilnehmer.teilnahmen.anlassLinks[0].meldeStatus }}
+  </div>
+</div>

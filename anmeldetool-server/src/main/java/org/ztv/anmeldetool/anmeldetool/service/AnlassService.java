@@ -168,7 +168,11 @@ public class AnlassService {
 				organisation);
 		if (teilnahmen.size() > 0) {
 			log.debug("Teilnehmer {}", teilnahmen.get(0).getKategorie());
-			log.debug("Teilnehmer {}", teilnahmen.get(0).getTeilnehmer().getName());
+			try {
+				log.debug("Teilnehmer {}", teilnahmen.get(0).getTeilnehmer().getName());
+			} catch (Exception ex) {
+				log.warn("Kein Teilnehmer message: {} ", ex.getMessage());
+			}
 			log.debug("Teilnehmer {}", teilnahmen.get(0).getOrganisation().getName());
 		}
 		return teilnahmen;

@@ -1,11 +1,12 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
-import { EventRegisterSummaryComponent } from "./events/event-register-summary/event-register-summary.component";
 import {
   EventAdminComponent,
   EventListComponent,
+  EventRegisterSummaryComponent,
   EventRouteActivatorService,
   EventsDetailComponent,
+  EventStartListComponent,
 } from "./events/index";
 
 const routes: Routes = [
@@ -26,6 +27,12 @@ const routes: Routes = [
   {
     path: "anlass/:id/anmeldung",
     component: EventRegisterSummaryComponent,
+    canActivate: [EventRouteActivatorService],
+    data: { roles: ["Admin", "Anmelder"] },
+  },
+  {
+    path: "anlass/:id/startliste",
+    component: EventStartListComponent,
     canActivate: [EventRouteActivatorService],
     data: { roles: ["Admin", "Anmelder"] },
   },

@@ -311,7 +311,15 @@ public class AdminController {
 	public ResponseEntity<Collection<TeilnehmerAnlassLinkDTO>> getTeilnehmer(HttpServletRequest request,
 			@PathVariable UUID anlassId, @PathVariable UUID orgId) {
 		List<TeilnehmerAnlassLink> links = anlassSrv.getTeilnahmen(anlassId, orgId);
-		List<TeilnehmerAnlassLinkDTO> linksDto = links.stream().map(link -> {
+		List<TeilnehmerAnlassLink> cleanedLinks = links.stream().filter(link -> {
+			try {
+				String name = link.getTeilnehmer().getName();
+				return true;
+			} catch (Exception ex) {
+				return false;
+			}
+		}).collect(Collectors.toList());
+		List<TeilnehmerAnlassLinkDTO> linksDto = cleanedLinks.stream().map(link -> {
 			return teilnehmerAnlassMapper.toDto(link);
 		}).collect(Collectors.toList());
 		if (linksDto.size() == 0) {

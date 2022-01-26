@@ -1,6 +1,6 @@
 <div class="container">
   <div class="row">
-    <div class="col-9">
+    <div class="col-7">
       <h2>{{ anlass.getCleaned() }}</h2>
     </div>
     <div class="col-sm-1">
@@ -9,6 +9,11 @@
     <div class="col-sm-2">
       <div [routerLink]="['anmeldung']" class="well hoverwell button">
         Anmeldungs Übersicht
+      </div>
+    </div>
+    <div class="col-sm-2">
+      <div [routerLink]="['startliste']" class="well hoverwell button">
+        Startliste
       </div>
     </div>
   </div>

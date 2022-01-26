@@ -1,0 +1,250 @@
+<div *ngIf="vereinStarted; else nostart">
+  <div id="printArea" class="container-sm">
+    <div class="row">
+      <div class="col-sm-7">
+        <h1>Startliste</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-10">
+        <h1>{{ titel }}</h1>
+      </div>
+      <div class="col-sm">
+        <h1>{{ anlass.tiTu }}</h1>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-2">
+        <span *ngIf="anlass.startDatum === anlass.endDatum">am</span>
+        <span *ngIf="anlass.startDatum !== anlass.endDatum">von</span>:
+      </div>
+      <div class="col-sm-2 text-bold">
+        {{ anlass.startDatum | date: "EEE, d MMMM , y":"GMT+1":"DE-CH" }}
+      </div>
+      <div class="col-sm-2" *ngIf="anlass.startDatum !== anlass.endDatum">
+        bis:
+      </div>
+      <div
+        class="col-sm text-bold"
+        *ngIf="anlass.startDatum !== anlass.endDatum"
+      >
+        {{ anlass.endDatum | date: "EEE, d MMMM , y":"GMT+1":"DE-CH" }}
+        >
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">Geschlecht:</div>
+      <div class="col-sm-2 text-bold">
+        {{ anlass.tiTu }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">Startberechtigt:</div>
+      <div class="col-sm-2 text-bold">
+        {{ anlass.tiefsteKategorie }}
+      </div>
+      <div class="col-sm-2">bis</div>
+      <div class="col-sm-2 text-bold">
+        {{ anlass.hoechsteKategorie }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">Ort:</div>
+      <div class="col-sm-2 text-bold">{{ anlass.ort }}</div>
+      <div class="col-sm-2">Halle:</div>
+      <div class="col-sm-2 text-bold">{{ anlass.halle }}</div>
+      <div class="col-sm-2">Organisator:</div>
+      <div class="col-sm-2 text-bold">{{ anlass.organisator }}</div>
+    </div>
+
+    <div class="row border-bottom divider"></div>
+    <div class="row divider"></div>
+
+    <div class="row">
+      <div class="col-sm-8"><h2>Teilnehmer</h2></div>
+      <div class="col-sm-2 total">Total Teilnehmer:</div>
+      <div class="col-sm-2 total">
+        {{ anzahlTeilnehmer }}
+      </div>
+    </div>
+    <ng-container
+      *ngIf="brevet1Anlass && getTeilnahmenForKategorieK1().length > 0"
+    >
+      <app-event-start-list-header
+        [titel]="'Kategorie 1'"
+      ></app-event-start-list-header>
+      <app-event-start-list-row
+        *ngFor="let teilnehmer of getTeilnahmenForKategorieK1()"
+        [anlass]="anlass"
+        [teilnehmer]="teilnehmer"
+      ></app-event-start-list-row>
+    </ng-container>
+
+    <ng-container
+      *ngIf="brevet1Anlass && getTeilnahmenForKategorieK2().length > 0"
+    >
+      <app-event-start-list-header
+        [titel]="'Kategorie 2'"
+      ></app-event-start-list-header>
+      <app-event-start-list-row
+        *ngFor="let teilnehmer of getTeilnahmenForKategorieK2()"
+        [anlass]="anlass"
+        [teilnehmer]="teilnehmer"
+      ></app-event-start-list-row>
+    </ng-container>
+
+    <ng-container
+      *ngIf="brevet1Anlass && getTeilnahmenForKategorieK3().length > 0"
+    >
+      <app-event-start-list-header
+        [titel]="'Kategorie 3'"
+      ></app-event-start-list-header>
+      <app-event-start-list-row
+        *ngFor="let teilnehmer of getTeilnahmenForKategorieK3()"
+        [anlass]="anlass"
+        [teilnehmer]="teilnehmer"
+      ></app-event-start-list-row>
+    </ng-container>
+
+    <ng-container
+      *ngIf="brevet1Anlass && getTeilnahmenForKategorieK4().length > 0"
+    >
+      <app-event-start-list-header
+        [titel]="'Kategorie 4'"
+      ></app-event-start-list-header>
+      <app-event-start-list-row
+        *ngFor="let teilnehmer of getTeilnahmenForKategorieK4()"
+        [anlass]="anlass"
+        [teilnehmer]="teilnehmer"
+      ></app-event-start-list-row>
+    </ng-container>
+
+    <ng-container
+      *ngIf="
+        tuAnlass && brevet2Anlass && getTeilnahmenForKategorieK5().length > 0
+      "
+    >
+      <app-event-start-list-header
+        [titel]="'Kategorie 5'"
+      ></app-event-start-list-header>
+      <app-event-start-list-row
+        *ngFor="let teilnehmer of getTeilnahmenForKategorieK5()"
+        [anlass]="anlass"
+        [teilnehmer]="teilnehmer"
+      ></app-event-start-list-row>
+    </ng-container>
+
+    <ng-container
+      *ngIf="
+        tiAnlass && brevet2Anlass && getTeilnahmenForKategorieK5A().length > 0
+      "
+    >
+      <app-event-start-list-header
+        [titel]="'Kategorie 5A'"
+      ></app-event-start-list-header>
+      <app-event-start-list-row
+        *ngFor="let teilnehmer of getTeilnahmenForKategorieK5A()"
+        [anlass]="anlass"
+        [teilnehmer]="teilnehmer"
+      ></app-event-start-list-row>
+    </ng-container>
+
+    <ng-container
+      *ngIf="
+        tiAnlass && brevet2Anlass && getTeilnahmenForKategorieK5B().length > 0
+      "
+    >
+      <app-event-start-list-header
+        [titel]="'Kategorie 5B'"
+      ></app-event-start-list-header>
+      <app-event-start-list-row
+        *ngFor="let teilnehmer of getTeilnahmenForKategorieK5B()"
+        [anlass]="anlass"
+        [teilnehmer]="teilnehmer"
+      ></app-event-start-list-row>
+    </ng-container>
+
+    <ng-container
+      *ngIf="brevet2Anlass && getTeilnahmenForKategorieK6().length > 0"
+    >
+      <app-event-start-list-header
+        [titel]="'Kategorie 6'"
+      ></app-event-start-list-header>
+
+      <app-event-start-list-row
+        *ngFor="let teilnehmer of getTeilnahmenForKategorieK6()"
+        [anlass]="anlass"
+        [teilnehmer]="teilnehmer"
+      ></app-event-start-list-row>
+    </ng-container>
+
+    <ng-container
+      *ngIf="
+        tiAnlass && brevet2Anlass && getTeilnahmenForKategorieKD().length > 0
+      "
+    >
+      <app-event-start-list-header
+        [titel]="'Kategorie Damen'"
+      ></app-event-start-list-header>
+      <app-event-start-list-row
+        *ngFor="let teilnehmer of getTeilnahmenForKategorieKD()"
+        [anlass]="anlass"
+        [teilnehmer]="teilnehmer"
+      ></app-event-start-list-row>
+    </ng-container>
+
+    <ng-container
+      *ngIf="
+        tuAnlass && brevet2Anlass && getTeilnahmenForKategorieKH().length > 0
+      "
+    >
+      <app-event-start-list-header
+        [titel]="'Kategorie Herren'"
+      ></app-event-start-list-header>
+      <app-event-start-list-row
+        *ngFor="let teilnehmer of getTeilnahmenForKategorieKH()"
+        [anlass]="anlass"
+        [teilnehmer]="teilnehmer"
+      ></app-event-start-list-row>
+    </ng-container>
+
+    <ng-container
+      *ngIf="brevet2Anlass && getTeilnahmenForKategorieK7().length > 0"
+    >
+      <app-event-start-list-header
+        [titel]="'Kategorie 7'"
+      ></app-event-start-list-header>
+
+      <app-event-start-list-row
+        *ngFor="let teilnehmer of getTeilnahmenForKategorieK7()"
+        [anlass]="anlass"
+        [teilnehmer]="teilnehmer"
+      ></app-event-start-list-row>
+    </ng-container>
+
+    <div class="row"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-9"></div>
+        <div class="col-sm-2 well hoverwell button" (click)="print()">
+          Ausdrucken
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template #nostart>
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <h2>{{ titel }}</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col warnung">
+          <h3>Dein Verein ist nicht angemeldet</h3>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>

@@ -111,6 +111,9 @@ public class TeilnehmerService {
 		if (teilnehmerOptional.isEmpty()) {
 			return ResponseEntity.notFound().build();
 		}
+		List<TeilnehmerAnlassLink> links = this.teilnehmerAnlassLinkRepository
+				.findByTeilnehmer(teilnehmerOptional.get());
+		this.teilnehmerAnlassLinkRepository.deleteAll(links);
 		teilnehmerRepository.delete(teilnehmerOptional.get());
 		return ResponseEntity.ok(true);
 	}

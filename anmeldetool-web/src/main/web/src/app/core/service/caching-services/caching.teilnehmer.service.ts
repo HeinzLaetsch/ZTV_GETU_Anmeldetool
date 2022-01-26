@@ -4,6 +4,7 @@ import { Sort } from "@angular/material/sort";
 import { BehaviorSubject, forkJoin, Observable, of } from "rxjs";
 import { tap } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
+import { IAnlass } from "../../model/IAnlass";
 import { ITeilnehmer } from "../../model/ITeilnehmer";
 import { KategorieEnum } from "../../model/KategorieEnum";
 import { TiTuEnum } from "../../model/TiTuEnum";
@@ -183,7 +184,7 @@ export class CachingTeilnehmerService {
     console.log("Sort: ", sort.active);
     const isAsc = sort.direction === "asc";
     const anlass = this.anlassService.getAnlassById(sort.active);
-
+    const kategories = Object.keys(KategorieEnum);
     this.sortedTeilnehmer = tituFiltered.sort((a, b) => {
       switch (sort.active) {
         case "name":
@@ -195,8 +196,8 @@ export class CachingTeilnehmerService {
         case "stvnummer":
           return this.compare(a.stvNummer, b.stvNummer, isAsc);
         default:
-          const aLink = this.anlassService.getTeilnehmer(anlass, a);
-          const bLink = this.anlassService.getTeilnehmer(anlass, b);
+          const aLink = this.anlassService.getTeilnahme(anlass, a);
+          const bLink = this.anlassService.getTeilnahme(anlass, b);
           if (!aLink) {
             if (bLink) {
               return 1;
@@ -209,7 +210,6 @@ export class CachingTeilnehmerService {
             }
             return 0;
           }
-          const kategories = Object.keys(KategorieEnum);
           return this.compare(
             kategories.indexOf(aLink.kategorie),
             kategories.indexOf(bLink.kategorie),
@@ -220,10 +220,25 @@ export class CachingTeilnehmerService {
     return this.sortedTeilnehmer;
   }
 
-  compare(a: number | string, b: number | string, isAsc: boolean) {
+  private compare(a: number | string, b: number | string, isAsc: boolean) {
     return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
   }
-
+  public getTeilnehmerForAnlass(anlass: IAnlass) {
+    const aLinks = this.anlassService.getTeilnahmenForAnlassSorted(anlass);
+    const teilnehmer = aLinks.map((alink) => {
+      if (alink.kategorie != KategorieEnum.KEINE_TEILNAHME) {
+        const teilnehmer = this.getTeilnehmerById(alink.teilnehmerId);
+        const copy = Object.assign(teilnehmer);
+        copy.teilnahmen = {
+          anlassLinks: [alink],
+        };
+        return copy;
+      }
+    });
+    return teilnehmer.filter((teilnehmer) => {
+      return !!teilnehmer?.teilnahmen;
+    });
+  }
   private filterByName(
     filter: string,
     teilnehmer: ITeilnehmer[]

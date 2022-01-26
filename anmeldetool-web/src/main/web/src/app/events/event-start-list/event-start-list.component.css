@@ -1,0 +1,45 @@
+.warnung {
+  background-color: var(--ztv-warning) !important;
+}
+
+.text-bold {
+  font-weight: 550;
+}
+
+h2 {
+  padding-top: 0.5rem;
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
+  padding-bottom: 0.2rem;
+}
+
+.divider {
+  height: 1rem;
+}
+
+.button {
+  height: 100%;
+  width: 100%;
+  margin: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.total {
+  border: 1px;
+  font-weight: 550;
+}
+
+.header {
+  font-weight: 400;
+}
+
+.green {
+  color: var(--ztv-ok) !important;
+}
+
+.red {
+  color: var(--ztv-error) !important;
+  font-weight: 550;
+}
