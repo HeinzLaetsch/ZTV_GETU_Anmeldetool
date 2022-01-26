@@ -15,7 +15,10 @@ export class EventRouteActivatorService {
 
   canActivate(route: ActivatedRouteSnapshot) {
     // console.log(this.anlassService.getAnlassById(route.params.id));
-    const eventExists = !!this.anlassService.getAnlassById(route.params.id);
+    let eventExists = true;
+    if (route.params.id) {
+      eventExists = !!this.anlassService.getAnlassById(route.params.id);
+    }
     // console.log('canActivate ', eventExists);
     const isAllowed =
       this.authService.isAdministrator() ||
