@@ -29,7 +29,14 @@ public class TeilnehmerAnlassLinkDTO {
 
 	private AbteilungEnum abteilung;
 
+	private boolean abteilungFix;
+
 	private AnlageEnum anlage;
 
+	private boolean anlageFix;
+
 	private StartGeraetEnum startgeraet;
+
+	private boolean startgeraetFix;
+
 }

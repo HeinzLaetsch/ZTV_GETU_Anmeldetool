@@ -44,9 +44,15 @@ public class TeilnehmerAnlassLink extends Base {
 	@Enumerated(EnumType.STRING)
 	private AbteilungEnum abteilung;
 
+	private boolean abteilungFix = false;
+
 	@Enumerated(EnumType.STRING)
 	private AnlageEnum anlage;
 
+	private boolean anlageFix = false;
+
 	@Enumerated(EnumType.STRING)
 	private StartGeraetEnum startgeraet;
+
+	private boolean startgeraetFix = false;
 }
