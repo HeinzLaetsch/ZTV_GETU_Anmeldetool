@@ -235,6 +235,7 @@ export class UserFormComponent implements OnInit {
     this.changeEvent.wrChanged = false;
     this.changeEvent.canceled = true;
     this.changeEvent.saved = false;
+    this.changeEvent.rolesChanged = false;
     this.userChange.next(this.changeEvent);
   }
 
