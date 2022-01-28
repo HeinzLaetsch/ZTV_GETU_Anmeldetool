@@ -14,8 +14,8 @@ export class IAnlass {
   zuGunsten: string;
   bank: string;
   position?: number;
+  abteilungFix?: boolean;
   anlageFix?: boolean;
-  startgeraet?: string;
   startgeraetFix?: boolean;
 
   getCleaned(): string {

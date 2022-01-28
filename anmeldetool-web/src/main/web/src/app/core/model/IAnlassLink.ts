@@ -6,6 +6,6 @@ export interface IAnlassLink {
   dirty?: boolean;
   startnummer?: number;
   abteilung?: string;
-  abteilungFix?: boolean;
+  startgeraet?: string;
   anlage?: string;
 }
