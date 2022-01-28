@@ -1,5 +1,5 @@
 package org.ztv.anmeldetool.anmeldetool.models;
 
-public enum StartGeraetEnum {
+public enum GeraetEnum {
 	RECK, BODEN, SCHAUKELRINGE, SPRUNG, BARREN
 }
