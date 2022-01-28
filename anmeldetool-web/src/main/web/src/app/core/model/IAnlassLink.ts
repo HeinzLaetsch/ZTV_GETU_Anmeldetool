@@ -8,7 +8,4 @@ export interface IAnlassLink {
   abteilung?: string;
   abteilungFix?: boolean;
   anlage?: string;
-  anlageFix?: boolean;
-  startgeraet?: string;
-  startgeraetFix?: boolean;
 }

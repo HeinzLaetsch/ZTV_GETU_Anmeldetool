@@ -75,6 +75,10 @@ public class Anlass extends Base {
 	@ToString.Exclude
 	private List<WertungsrichterSlot> wertungsrichterSlots;
 
+	private boolean startgeraetFix = false;
+	private boolean abteilungFix = false;
+	private boolean anlageFix = false;
+
 	public Anlass() {
 		this.organisationenLinks = new ArrayList<OrganisationAnlassLink>();
 		this.wertungsrichterSlots = new ArrayList<WertungsrichterSlot>();

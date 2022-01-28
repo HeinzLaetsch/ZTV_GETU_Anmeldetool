@@ -14,6 +14,9 @@ export class IAnlass {
   zuGunsten: string;
   bank: string;
   position?: number;
+  anlageFix?: boolean;
+  startgeraet?: string;
+  startgeraetFix?: boolean;
 
   getCleaned(): string {
     return this.anlassBezeichnung.replace("%", "");
