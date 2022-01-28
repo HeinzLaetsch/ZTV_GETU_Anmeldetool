@@ -4,6 +4,7 @@ import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
 import { IUser } from "src/app/core/model/IUser";
+import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterStatusEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
@@ -46,7 +47,9 @@ export class EventThumbnailComponent implements OnInit {
           const links = this.anlassService.getTeilnehmerForAnlass(this.anlass);
           if (links) {
             if (links.anlassLinks)
-              this.anzahlTeilnehmer = links.anlassLinks.length;
+              this.anzahlTeilnehmer = links.anlassLinks.filter((link) => {
+                return link.kategorie !== KategorieEnum.KEINE_TEILNAHME;
+              }).length;
           }
         }
       });
