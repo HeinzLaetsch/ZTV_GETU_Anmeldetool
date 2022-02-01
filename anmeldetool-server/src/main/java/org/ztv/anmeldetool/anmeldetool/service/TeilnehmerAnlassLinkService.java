@@ -46,6 +46,11 @@ public class TeilnehmerAnlassLinkService {
 		return teilnahmen;
 	}
 
+	public TeilnehmerAnlassLink save(TeilnehmerAnlassLink tal) {
+		TeilnehmerAnlassLink saved = this.teilnehmerAnlassLinkRepository.saveAndFlush(tal);
+		return saved;
+	}
+
 	public List<TeilnehmerAnlassLink> findAnlassTeilnahmen(UUID anlassId) throws ServiceException {
 		Anlass anlass = anlassSrv.findAnlassById(anlassId);
 		if (anlass == null) {

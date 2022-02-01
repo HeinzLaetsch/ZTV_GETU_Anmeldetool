@@ -56,5 +56,36 @@
       </button>
     </div>
   </div>
+  <div class="row">
+    <div class="col-4">
+      <h2>Lauflisten</h2>
+    </div>
+    <div class="col-sm-2">
+      <button
+        mat-button
+        color="primary"
+        #tooltip="matTooltip"
+        matTooltip="Lauflisten löschen"
+        matTooltipPosition="below"
+        matTooltipHideDelay="500"
+        (click)="lauflistenLoeschen()"
+      >
+        Lauflisten löschen
+      </button>
+    </div>
+    <div class="col-sm-2">
+      <button
+        mat-button
+        color="primary"
+        #tooltip="matTooltip"
+        matTooltip="Lauflisten als PDF"
+        matTooltipPosition="below"
+        matTooltipHideDelay="500"
+        (click)="lauflistenPDF()"
+      >
+        Lauflisten PDF
+      </button>
+    </div>
+  </div>
 </div>
 <ng-template #elseBlock>Zugriff verweigert</ng-template>

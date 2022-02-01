@@ -2,8 +2,10 @@ import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute, Router } from "@angular/router";
 import { IAnlass } from "src/app/core/model/IAnlass";
+import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
+import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.service";
 import { Upload } from "./upload-dialog/upload.component";
 
 @Component({
@@ -18,7 +20,8 @@ export class EventAdminComponent implements OnInit {
     public dialog: MatDialog,
     private route: ActivatedRoute,
     public authService: AuthService,
-    private anlassService: CachingAnlassService
+    private anlassService: CachingAnlassService,
+    private ranglistenService: RanglistenService
   ) {}
 
   ngOnInit() {
@@ -40,5 +43,16 @@ export class EventAdminComponent implements OnInit {
   }
   exportWertungsrichter(): void {
     this.anlassService.getWertungsrichterForAnlassCsv(this.anlass);
+  }
+  lauflistenLoeschen(): void {
+    this.ranglistenService
+      .deleteLauflistenForAnlassAndKategorie(this.anlass, KategorieEnum.K1)
+      .subscribe(() => {
+        console.error("Success");
+      });
+  }
+
+  lauflistenPDF(): void {
+    this.ranglistenService.getLauflistenPdf(this.anlass, KategorieEnum.K1);
   }
 }

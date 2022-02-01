@@ -18,12 +18,16 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 @Entity()
 @Table(name = "LAUFLISTEN_CONTAINER")
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 public class LauflistenContainer extends Base {
@@ -33,7 +37,8 @@ public class LauflistenContainer extends Base {
 	@ToString.Exclude
 	private Anlass anlass;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lauflistenContainer")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lauflistenContainer", cascade = { CascadeType.PERSIST,
+			CascadeType.MERGE })
 	@ToString.Exclude
 	private List<TeilnehmerAnlassLink> teilnehmerAnlassLinks;
 
@@ -49,14 +54,24 @@ public class LauflistenContainer extends Base {
 
 	private int key;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lauflistenContainer", cascade = { CascadeType.ALL })
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "lauflistenContainer", cascade = { CascadeType.ALL })
 	@ToString.Exclude
 	private List<Laufliste> geraeteLauflisten;
 
-	public LauflistenContainer createFromTal(AnlagenLauflisten anlagenLauflisten, TeilnehmerAnlassLink tal) {
+	LauflistenContainer(AnlagenLauflisten anlagenLauflisten) {
 		this.anlagenLauflisten = anlagenLauflisten;
+	}
+
+	public int incrementKey() {
+		key = this.anlagenLauflisten.incrementKey();
+		return key;
+	}
+
+	public LauflistenContainer createFromTal(TeilnehmerAnlassLink tal) {
 		if (geraeteLauflisten == null) {
 			geraeteLauflisten = new ArrayList<Laufliste>();
+			this.anlass = tal.getAnlass();
+			this.kategorie = tal.getKategorie();
 			// geraeteLauflisten.clear();
 			GeraetEnum[] values = GeraetEnum.values();
 			Map<GeraetEnum, Laufliste> hashListen = new HashMap<GeraetEnum, Laufliste>();
@@ -80,6 +95,7 @@ public class LauflistenContainer extends Base {
 			teilnehmerAnlassLinks = new ArrayList<TeilnehmerAnlassLink>();
 		}
 		teilnehmerAnlassLinks.add(tal);
+		tal.setLauflistenContainer(this);
 		return this;
 	}
 
@@ -91,6 +107,6 @@ public class LauflistenContainer extends Base {
 			quersumme += rest;
 			hashCode /= 10;
 		}
-		return String.format("%d", quersumme);
+		return String.format("%03d", incrementKey()) + String.format("%d", quersumme);
 	}
 }

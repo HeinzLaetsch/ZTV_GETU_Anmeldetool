@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +27,14 @@ public class LauflistenServiceTests {
 	AnlassRepository anlassRepo;
 
 	@Test
+	// @Transactional
+	public void testDeleteAllLauflistenForAnlassAndKategorie() throws Exception {
+		Iterable<Anlass> iterable = anlassRepo.findAll();
+		int anzahl = lauflistenService.deleteLauflistenForAnlassAndKategorie(iterable.iterator().next(),
+				KategorieEnum.K1);
+	}
+
+	@Test
 	public void testFindLauflistenForAnlassAndKategorie() throws Exception {
 		Iterable<Anlass> iterable = anlassRepo.findAll();
 		List<LauflistenContainer> allContainer = lauflistenService
@@ -33,10 +43,22 @@ public class LauflistenServiceTests {
 	}
 
 	@Test
+	@Transactional
+	public void testDeleteLauflistenForAnlassAndKategorie() throws Exception {
+		testGenerateLauflistenForAnlassAndKategorie();
+		Iterable<Anlass> iterable = anlassRepo.findAll();
+		int anzahl = lauflistenService.deleteLauflistenForAnlassAndKategorie(iterable.iterator().next(),
+				KategorieEnum.K1);
+		assertThat(anzahl).isEqualTo(5);
+	}
+
+	@Test
+	@Transactional
 	public void testGenerateLauflistenForAnlassAndKategorie() throws Exception {
 		Iterable<Anlass> iterable = anlassRepo.findAll();
 		AnlassLauflisten anlassContainer = lauflistenService
 				.generateLauflistenForAnlassAndKategorie(iterable.iterator().next(), KategorieEnum.K1);
 		assertThat(anlassContainer).isNotNull();
+		assertThat(anlassContainer.getLauflistenContainer().size()).isEqualTo(5);
 	}
 }

@@ -1,11 +1,33 @@
 package org.ztv.anmeldetool.anmeldetool.models;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import lombok.Getter;
+
+@Getter
 public class AnlagenLauflisten {
 
 	private Map<GeraetEnum, LauflistenContainer> startgeraeteLauflisten;
+
+	private AbteilungsLaufliste abteilungsLaufliste;
+
+	AnlagenLauflisten(AbteilungsLaufliste abteilungsLaufliste) {
+		this.abteilungsLaufliste = abteilungsLaufliste;
+	}
+
+	public List<LauflistenContainer> getLauflistenContainer() {
+		if (startgeraeteLauflisten == null) {
+			return new ArrayList<>();
+		}
+		return new ArrayList<>(startgeraeteLauflisten.values());
+	}
+
+	public int incrementKey() {
+		return this.abteilungsLaufliste.incrementKey();
+	}
 
 	public AnlagenLauflisten createFromTal(TeilnehmerAnlassLink tal) {
 		if (startgeraeteLauflisten == null) {
@@ -15,10 +37,10 @@ public class AnlagenLauflisten {
 		if (startgeraeteLauflisten.containsKey(tal.getStartgeraet())) {
 			startgeraeteLaufliste = startgeraeteLauflisten.get(tal.getStartgeraet());
 		} else {
-			startgeraeteLaufliste = new LauflistenContainer();
+			startgeraeteLaufliste = new LauflistenContainer(this);
 			startgeraeteLauflisten.put(tal.getStartgeraet(), startgeraeteLaufliste);
 		}
-		startgeraeteLaufliste.createFromTal(this, tal);
+		startgeraeteLaufliste.createFromTal(tal);
 
 		return this;
 	}

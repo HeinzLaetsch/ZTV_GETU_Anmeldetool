@@ -8,6 +8,7 @@ import org.ztv.anmeldetool.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.anmeldetool.models.AnlassLauflisten;
 import org.ztv.anmeldetool.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.anmeldetool.models.LauflistenContainer;
+import org.ztv.anmeldetool.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.repositories.LauflistenContainerRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.LauflistenRepository;
@@ -37,13 +38,53 @@ public class LauflistenService {
 
 	public AnlassLauflisten generateLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie)
 			throws ServiceException {
+
 		List<LauflistenContainer> existierende = lauflistenContainerRepo.findByAnlassAndKategorie(anlass, kategorie);
-		lauflistenContainerRepo.deleteAll(existierende);
-		List<TeilnehmerAnlassLink> tals = talService.findAnlassTeilnahmenByKategorie(anlass, kategorie);
-		AnlassLauflisten anlasslaufListen = new AnlassLauflisten();
-		for (TeilnehmerAnlassLink tal : tals) {
-			anlasslaufListen.createFromTal(tal);
+		if (existierende.size() > 0) {
+			throw new ServiceException(LauflistenService.class,
+					String.format("Es existieren schon Lauflisten für Anlass {} und Kategorie {}",
+							anlass.getAnlassBezeichnung(), kategorie));
 		}
-		return anlasslaufListen;
+		try {
+			List<TeilnehmerAnlassLink> tals = talService.findAnlassTeilnahmenByKategorie(anlass, kategorie);
+			AnlassLauflisten anlasslaufListen = new AnlassLauflisten();
+			for (TeilnehmerAnlassLink tal : tals) {
+				if (tal.getAbteilung() != null && tal.getAnlage() != null && tal.getStartgeraet() != null
+						&& tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET
+						&& tal.getMeldeStatus() != MeldeStatusEnum.UMMELDUNG) {
+					anlasslaufListen.createFromTal(tal);
+				}
+			}
+			persistLauflisten(anlasslaufListen);
+			return anlasslaufListen;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new ServiceException(LauflistenService.class,
+					String.format("Fehler beim generieren von Lauflisten für Anlass {} und Kategorie {}, {}",
+							anlass.getAnlassBezeichnung(), kategorie, ex.getMessage()));
+		}
+	}
+
+	public int deleteLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie) throws ServiceException {
+		List<LauflistenContainer> existierende = lauflistenContainerRepo.findByAnlassAndKategorie(anlass, kategorie);
+		existierende.forEach(container -> {
+			container.getTeilnehmerAnlassLinks().forEach(tal -> {
+				tal.setLauflistenContainer(null);
+				talService.save(tal);
+			});
+		});
+		lauflistenContainerRepo.deleteAll(existierende);
+		return existierende.size();
+	}
+
+	private void persistLauflisten(AnlassLauflisten anlassLaufListen) {
+		List<LauflistenContainer> concated = anlassLaufListen.getLauflistenContainer();
+		log.debug("Anzahl Elements {}", concated.size());
+		/*
+		 * concated.forEach(container -> {
+		 * container.getTeilnehmerAnlassLinks().forEach(tal -> {
+		 * tal.setLauflistenContainer(container); talService.save(tal); }); });
+		 */
+		lauflistenContainerRepo.saveAll(concated);
 	}
 }
