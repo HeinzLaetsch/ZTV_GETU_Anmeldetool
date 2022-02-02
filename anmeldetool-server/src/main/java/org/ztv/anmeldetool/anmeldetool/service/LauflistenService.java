@@ -1,9 +1,12 @@
 package org.ztv.anmeldetool.anmeldetool.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.ztv.anmeldetool.anmeldetool.models.AbteilungEnum;
+import org.ztv.anmeldetool.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.anmeldetool.models.AnlassLauflisten;
 import org.ztv.anmeldetool.anmeldetool.models.KategorieEnum;
@@ -31,15 +34,28 @@ public class LauflistenService {
 	@Autowired
 	TeilnehmerService teilnehmerService;
 
-	public List<LauflistenContainer> findLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie) {
-		List<LauflistenContainer> existierende = lauflistenContainerRepo.findByAnlassAndKategorie(anlass, kategorie);
+	public List<LauflistenContainer> findLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie,
+			AbteilungEnum abteilung, AnlageEnum anlage) {
+		List<LauflistenContainer> existierende = lauflistenContainerRepo
+				.findByAnlassAndKategorieOrderByStartgeraetAsc(anlass, kategorie);
+		existierende = existierende.stream().filter(container -> {
+			if (container.getTeilnehmerAnlassLinks() != null && container.getTeilnehmerAnlassLinks().size() > 0
+					&& container.getTeilnehmerAnlassLinks().get(0).getAbteilung() != null) {
+				if (abteilung.equals(AbteilungEnum.UNDEFINED)
+						|| container.getTeilnehmerAnlassLinks().get(0).getAbteilung().equals(abteilung)) {
+					return true;
+				}
+			}
+			return false;
+		}).collect(Collectors.toList());
 		return existierende;
 	}
 
-	public AnlassLauflisten generateLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie)
-			throws ServiceException {
+	public AnlassLauflisten generateLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie,
+			AbteilungEnum abteilung, AnlageEnum anlage) throws ServiceException {
 
-		List<LauflistenContainer> existierende = lauflistenContainerRepo.findByAnlassAndKategorie(anlass, kategorie);
+		List<LauflistenContainer> existierende = findLauflistenForAnlassAndKategorie(anlass, kategorie, abteilung,
+				anlage);
 		if (existierende.size() > 0) {
 			throw new ServiceException(LauflistenService.class,
 					String.format("Es existieren schon Lauflisten für Anlass {} und Kategorie {}",
@@ -52,7 +68,7 @@ public class LauflistenService {
 				if (tal.getAbteilung() != null && tal.getAnlage() != null && tal.getStartgeraet() != null
 						&& tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET
 						&& tal.getMeldeStatus() != MeldeStatusEnum.UMMELDUNG) {
-					anlasslaufListen.createFromTal(tal);
+					anlasslaufListen.createFromTal(tal, abteilung, anlage);
 				}
 			}
 			persistLauflisten(anlasslaufListen);
@@ -65,12 +81,16 @@ public class LauflistenService {
 		}
 	}
 
-	public int deleteLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie) throws ServiceException {
-		List<LauflistenContainer> existierende = lauflistenContainerRepo.findByAnlassAndKategorie(anlass, kategorie);
+	public int deleteLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie, AbteilungEnum abteilung,
+			AnlageEnum anlage) throws ServiceException {
+		List<LauflistenContainer> existierende = findLauflistenForAnlassAndKategorie(anlass, kategorie, abteilung,
+				anlage);
 		existierende.forEach(container -> {
 			container.getTeilnehmerAnlassLinks().forEach(tal -> {
-				tal.setLauflistenContainer(null);
-				talService.save(tal);
+				if (abteilung.equals(AbteilungEnum.UNDEFINED) || tal.getAbteilung().equals(abteilung)) {
+					tal.setLauflistenContainer(null);
+					talService.save(tal);
+				}
 			});
 		});
 		lauflistenContainerRepo.deleteAll(existierende);

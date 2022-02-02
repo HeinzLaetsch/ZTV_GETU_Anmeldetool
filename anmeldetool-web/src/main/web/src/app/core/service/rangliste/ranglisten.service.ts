@@ -1,9 +1,12 @@
 import { HttpClient, HttpHeaders, HttpResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import * as FileSaver from "file-saver";
-import { Observable, of } from "rxjs";
+import { Observable, of, Subject, Subscription } from "rxjs";
 import { catchError } from "rxjs/operators";
 import { environment } from "src/environments/environment";
+import { AbteilungEnum } from "../../model/AbteilungEnum";
+import { AnlageEnum } from "../../model/AnlageEnum";
+import { AnzeigeStatusEnum } from "../../model/AnzeigeStatusEnum";
 import { IAnlass } from "../../model/IAnlass";
 import { KategorieEnum } from "../../model/KategorieEnum";
 
@@ -16,9 +19,26 @@ export class RanglistenService {
 
   constructor(private http: HttpClient) {}
 
-  getLauflistenPdf(anlass: IAnlass, kategorie: KategorieEnum): void {
+  getLauflistenPdf(
+    anlass: IAnlass,
+    kategorie: KategorieEnum,
+    abteilung: AbteilungEnum,
+    anlage: AnlageEnum
+  ): Observable<string> {
+    const statusResponse = new Subject<string>();
+
     const combinedUrl =
-      this.url + "/" + anlass?.id + "/" + "lauflisten" + "/" + kategorie;
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "lauflisten" +
+      "/" +
+      kategorie +
+      "/" +
+      abteilung +
+      "/" +
+      anlage;
     // console.log("getTeilnehmer called: ", combinedUrl);
     let headers: HttpHeaders = new HttpHeaders();
     headers = headers.append("Accept", "application/pdf");
@@ -28,12 +48,16 @@ export class RanglistenService {
         responseType: "blob",
         headers,
       })
-      .pipe(catchError(this.handleError<any>("getLauflistenPdf")))
+      .pipe(
+        catchError(this.handleError<any>("getLauflistenPdf", statusResponse))
+      )
       .subscribe((result: HttpResponse<string>) => {
         const header = result.headers.get("Content-Disposition");
         const parts = header.split("filename=");
         this.saveAsFile(result.body, parts[1], "application/pdf");
+        statusResponse.next("Success");
       });
+    return statusResponse.asObservable();
   }
   private saveAsFile(buffer: any, fileName: string, fileType: string): void {
     const asArray = [buffer];
@@ -41,27 +65,62 @@ export class RanglistenService {
     FileSaver.saveAs(data, fileName);
   }
 
+  getAbteilungenForAnlass(    anlass: IAnlass,
+    kategorie: KategorieEnum,
+): Observable<AbteilungEnum[]> {
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "lauflisten" +
+      "/" +
+      kategorie;
+    return this.http.get<AbteilungEnum[]>(combinedUrl).pipe(
+      catchError((error) => {
+        this.handleError<AbteilungEnum[]>("getAbteilungenForAnlass");
+        return of(undefined);
+      })
+    );
+  }
   deleteLauflistenForAnlassAndKategorie(
     anlass: IAnlass,
-    kategorie: KategorieEnum
-  ): Observable<boolean> {
+    kategorie: KategorieEnum,
+    abteilung: AbteilungEnum,
+    anlage: AnlageEnum
+  ): Observable<string> {
     const combinedUrl =
-      this.url + "/" + anlass?.id + "/" + "lauflisten" + "/" + kategorie;
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "lauflisten" +
+      "/" +
+      kategorie +
+      "/" +
+      abteilung +
+      "/" +
+      anlage;
     console.log("deleteLauflistenForAnlassAndKategorie called: ", combinedUrl);
     if (!anlass) {
-      return of(false);
+      return of("failed");
     }
-    return this.http.delete<boolean>(combinedUrl).pipe(
+    return this.http.delete<string>(combinedUrl).pipe(
       catchError((error) => {
         this.handleError<boolean>("deleteLauflistenForAnlassAndKategorie");
-        return of(false);
+        return of("failed");
       })
     );
   }
 
-  private handleError<T>(operation = "operation", result?: T) {
+  private handleError<T>(
+    operation = "operation",
+    statusResponse?: Subject<string>,
+    result?: T
+  ) {
     return (error: any): Observable<T> => {
       console.error(error);
+      statusResponse?.next(error);
       return of(result as T);
     };
   }

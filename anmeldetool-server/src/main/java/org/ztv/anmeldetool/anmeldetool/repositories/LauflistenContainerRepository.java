@@ -12,5 +12,5 @@ import org.ztv.anmeldetool.anmeldetool.models.LauflistenContainer;
 @Repository
 public interface LauflistenContainerRepository extends JpaRepository<LauflistenContainer, UUID> {
 
-	List<LauflistenContainer> findByAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie);
+	List<LauflistenContainer> findByAnlassAndKategorieOrderByStartgeraetAsc(Anlass anlass, KategorieEnum kategorie);
 }

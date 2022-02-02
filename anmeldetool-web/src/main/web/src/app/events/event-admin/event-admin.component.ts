@@ -1,6 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute, Router } from "@angular/router";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
+import { AbteilungEnum } from "src/app/core/model/AbteilungEnum";
+import { AnlageEnum } from "src/app/core/model/AnlageEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
@@ -15,6 +19,18 @@ import { Upload } from "./upload-dialog/upload.component";
 })
 export class EventAdminComponent implements OnInit {
   anlass: IAnlass;
+
+  private readonly lauflistenPDF$: Subject<void> = new Subject();
+
+  message: string;
+  hasError: boolean = false;
+
+  abteilungen: AbteilungEnum[];
+  selectedAbteilung: AbteilungEnum;
+
+  kategorien: KategorieEnum[];
+  selectedKategorie: KategorieEnum;
+
   constructor(
     private router: Router,
     public dialog: MatDialog,
@@ -28,6 +44,7 @@ export class EventAdminComponent implements OnInit {
     const anlassId: string = this.route.snapshot.params.id;
     // console.log("url param: ", anlassId);
     this.anlass = this.anlassService.getAnlassById(anlassId);
+    this.kategorien = this.anlass.getKategorienRaw();
   }
 
   get administrator(): boolean {
@@ -44,15 +61,69 @@ export class EventAdminComponent implements OnInit {
   exportWertungsrichter(): void {
     this.anlassService.getWertungsrichterForAnlassCsv(this.anlass);
   }
-  lauflistenLoeschen(): void {
+
+  getAbteilungenForAnlass(): void {
     this.ranglistenService
-      .deleteLauflistenForAnlassAndKategorie(this.anlass, KategorieEnum.K1)
-      .subscribe(() => {
-        console.error("Success");
+      .getAbteilungenForAnlass(this.anlass, this.selectedKategorie)
+      .subscribe((result) => {
+        this.abteilungen = result;
+      });
+  }
+
+  changeKategorie(event: any) {
+    console.log("Event: ", event);
+    this.selectedKategorie = event;
+    this.getAbteilungenForAnlass();
+  }
+  changeAbteilung(event: any) {
+    console.log("Event: ", event);
+    this.selectedAbteilung = event;
+    // this.getAbteilungenForAnlass();
+  }
+
+  lauflistenLoeschen(): void {
+    this.hasError = false;
+    this.ranglistenService
+      .deleteLauflistenForAnlassAndKategorie(
+        this.anlass,
+        KategorieEnum.K1,
+        AbteilungEnum.ABTEILUNG_1,
+        AnlageEnum.ANLAGE_1
+      )
+      .pipe(takeUntil(this.lauflistenPDF$))
+      .subscribe((result) => {
+        console.error("result: ", result);
+        if (!result || result === "Success") {
+          this.message = "Löschen erfolgreich durchgeführt";
+          this.hasError = false;
+        } else {
+          this.message = "Löschen fehlgeschlagen";
+          this.hasError = true;
+        }
+        this.lauflistenPDF$.next();
       });
   }
 
   lauflistenPDF(): void {
-    this.ranglistenService.getLauflistenPdf(this.anlass, KategorieEnum.K1);
+    this.hasError = false;
+    this.ranglistenService
+      .getLauflistenPdf(
+        this.anlass,
+        KategorieEnum.K1,
+        AbteilungEnum.ABTEILUNG_1,
+        AnlageEnum.ANLAGE_1
+      )
+      .pipe(takeUntil(this.lauflistenPDF$))
+      .subscribe((result) => {
+        console.error("result: ", result);
+        if (result === "Success") {
+          this.message = "Listen erfolgreich generiert";
+          this.hasError = false;
+        } else {
+          this.message = "Listen generieren fehlgeschlagen";
+          this.hasError = true;
+        }
+        this.lauflistenPDF$.next();
+      });
   }
 }

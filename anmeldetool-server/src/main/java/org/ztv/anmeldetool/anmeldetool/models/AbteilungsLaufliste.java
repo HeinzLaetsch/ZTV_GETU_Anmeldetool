@@ -29,18 +29,20 @@ public class AbteilungsLaufliste {
 		return this.anlassLauflisten.incrementKey();
 	}
 
-	public AbteilungsLaufliste createFromTal(TeilnehmerAnlassLink tal) {
+	public AbteilungsLaufliste createFromTal(TeilnehmerAnlassLink tal, AnlageEnum anlage) {
 		if (anlagenLauflisten == null) {
 			anlagenLauflisten = new HashMap<AnlageEnum, AnlagenLauflisten>();
 		}
-		AnlagenLauflisten anlageLaufliste;
-		if (anlagenLauflisten.containsKey(tal.getAnlage())) {
-			anlageLaufliste = anlagenLauflisten.get(tal.getAnlage());
-		} else {
-			anlageLaufliste = new AnlagenLauflisten(this);
-			anlagenLauflisten.put(tal.getAnlage(), anlageLaufliste);
+		if (anlage.equals(AnlageEnum.UNDEFINED) || anlage.equals(tal.getAnlage())) {
+			AnlagenLauflisten anlageLaufliste;
+			if (anlagenLauflisten.containsKey(tal.getAnlage())) {
+				anlageLaufliste = anlagenLauflisten.get(tal.getAnlage());
+			} else {
+				anlageLaufliste = new AnlagenLauflisten(this);
+				anlagenLauflisten.put(tal.getAnlage(), anlageLaufliste);
+			}
+			anlageLaufliste.createFromTal(tal);
 		}
-		anlageLaufliste.createFromTal(tal);
 		return this;
 	}
 }

@@ -39,6 +39,7 @@ public class AnlagenLauflisten {
 		} else {
 			startgeraeteLaufliste = new LauflistenContainer(this);
 			startgeraeteLauflisten.put(tal.getStartgeraet(), startgeraeteLaufliste);
+			startgeraeteLaufliste.setStartgeraet(tal.getStartgeraet());
 		}
 		startgeraeteLaufliste.createFromTal(tal);
 
