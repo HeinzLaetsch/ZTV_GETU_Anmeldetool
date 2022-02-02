@@ -121,7 +121,9 @@ export class TeilnehmerTableComponent implements AfterViewInit {
               "Btn"
           );
         });
-        this.allDisplayedColumns.pop();
+        if (this.anlaesse.length > 0) {
+          this.allDisplayedColumns.pop();
+        }
         this.allDisplayedColumns.push("aktion");
 
         let anzahlControls = this.pageSize;

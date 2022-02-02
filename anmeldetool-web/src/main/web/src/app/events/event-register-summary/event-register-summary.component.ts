@@ -145,20 +145,25 @@ export class EventRegisterSummaryComponent implements OnInit {
     return this.anlass.tiefsteKategorie < KategorieEnum.K5;
   }
 
-  get breve2tAnlass(): boolean {
-    return this.anlass.hoechsteKategorie > KategorieEnum.K4;
+  get brevet2Anlass(): boolean {
+    const b2 = this.anlass.hoechsteKategorie > KategorieEnum.K4;
+    return b2;
   }
 
   get tuAnlass(): boolean {
-    return (
-      this.anlass.tiTu === TiTuEnum.Tu || this.anlass.tiTu === TiTuEnum.Alle
-    );
+    const tiTus = Object.keys(TiTuEnum);
+    const tuAnlass =
+      tiTus.indexOf(this.anlass.tiTu) === 1 ||
+      tiTus.indexOf(this.anlass.tiTu) === 2;
+    return tuAnlass;
   }
 
   get tiAnlass(): boolean {
-    return (
-      this.anlass.tiTu === TiTuEnum.Ti || this.anlass.tiTu === TiTuEnum.Alle
-    );
+    const tiTus = Object.keys(TiTuEnum);
+    const tiuAnlass =
+      tiTus.indexOf(this.anlass.tiTu) === 0 ||
+      tiTus.indexOf(this.anlass.tiTu) === 2;
+    return tiuAnlass;
   }
 
   isEnabled(): boolean {
