@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ztv.anmeldetool.anmeldetool.models.AbteilungEnum;
+import org.ztv.anmeldetool.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.anmeldetool.models.MeldeStatusEnum;
@@ -45,6 +46,17 @@ public class TeilnehmerAnlassLinkService {
 		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndAktivAndKategorie(anlass,
 				true, exclusion, kategorie);
 		return teilnahmen;
+	}
+
+	public List<AnlageEnum> findAbteilungenByKategorieAndAbteilung(Anlass anlass, KategorieEnum kategorie,
+			AbteilungEnum abteilung) throws ServiceException {
+
+		UUID anlass_id = anlass.getId();
+		String kategorieName = kategorie.name();
+		String abteilungName = abteilung.name();
+		List<AnlageEnum> anlagen = teilnehmerAnlassLinkRepository
+				.findDistinctByAnlassAndAktivAndKategorieAndAbteilung(anlass_id, true, kategorieName, abteilungName);
+		return anlagen;
 	}
 
 	public List<AbteilungEnum> findAbteilungenByKategorie(Anlass anlass, KategorieEnum kategorie)

@@ -31,6 +31,9 @@ export class EventAdminComponent implements OnInit {
   kategorien: KategorieEnum[];
   selectedKategorie: KategorieEnum;
 
+  anlagen: AnlageEnum[];
+  selectedAnlage: AnlageEnum;
+
   constructor(
     private router: Router,
     public dialog: MatDialog,
@@ -69,26 +72,55 @@ export class EventAdminComponent implements OnInit {
         this.abteilungen = result;
       });
   }
+  getAnlagenForAnlass(): void {
+    this.ranglistenService
+      .getAnlagenForAnlass(
+        this.anlass,
+        this.selectedKategorie,
+        this.selectedAbteilung
+      )
+      .subscribe((result) => {
+        this.anlagen = result;
+      });
+  }
 
   changeKategorie(event: any) {
     console.log("Event: ", event);
     this.selectedKategorie = event;
+    this.selectedAbteilung = undefined;
+    this.selectedAnlage = undefined;
     this.getAbteilungenForAnlass();
   }
   changeAbteilung(event: any) {
     console.log("Event: ", event);
     this.selectedAbteilung = event;
-    // this.getAbteilungenForAnlass();
+    this.selectedAnlage = undefined;
+    this.getAnlagenForAnlass();
+  }
+  changeAnlage(event: any) {
+    console.log("Event: ", event);
+    this.selectedAnlage = event;
+    // this.getAnlagenForAnlass();
   }
 
+  get isButtonsDisabled(): boolean {
+    if (
+      this.selectedKategorie &&
+      this.selectedAbteilung &&
+      this.selectedAnlage
+    ) {
+      return false;
+    }
+    return true;
+  }
   lauflistenLoeschen(): void {
     this.hasError = false;
     this.ranglistenService
       .deleteLauflistenForAnlassAndKategorie(
         this.anlass,
-        KategorieEnum.K1,
-        AbteilungEnum.ABTEILUNG_1,
-        AnlageEnum.ANLAGE_1
+        this.selectedKategorie,
+        this.selectedAbteilung,
+        this.selectedAnlage
       )
       .pipe(takeUntil(this.lauflistenPDF$))
       .subscribe((result) => {
@@ -109,9 +141,9 @@ export class EventAdminComponent implements OnInit {
     this.ranglistenService
       .getLauflistenPdf(
         this.anlass,
-        KategorieEnum.K1,
-        AbteilungEnum.ABTEILUNG_1,
-        AnlageEnum.ANLAGE_1
+        this.selectedKategorie,
+        this.selectedAbteilung,
+        this.selectedAnlage
       )
       .pipe(takeUntil(this.lauflistenPDF$))
       .subscribe((result) => {

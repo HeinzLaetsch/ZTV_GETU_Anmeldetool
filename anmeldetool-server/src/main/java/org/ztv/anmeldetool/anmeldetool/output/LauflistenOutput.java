@@ -82,8 +82,25 @@ public class LauflistenOutput {
 
 		float[] headerWidths = { 10.0f, 30.0f, 60.0f };
 		Table headerTable = new Table(UnitValue.createPercentArray(headerWidths)).useAllAvailableWidth();
+		Text abt1 = new Text(
+				"Abteilung: " + laufliste.getLauflistenContainer().getTeilnehmerAnlassLinks().get(0).getAbteilung())
+						.setFont(fontN).setFontSize(12);
+		Cell cell = new Cell(1, 2);
+		cell.add(new Paragraph(abt1));
+
+		cell.setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.BOTTOM);
+		headerTable.addCell(cell);
+
+		Text anlage = new Text(
+				"Anlage: " + laufliste.getLauflistenContainer().getTeilnehmerAnlassLinks().get(0).getAnlage())
+						.setFont(fontN).setFontSize(12);
+		cell = new Cell();
+		cell.add(new Paragraph(anlage));
+		cell.setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.BOTTOM);
+		headerTable.addCell(cell);
+
 		Text liste1 = new Text("Laufliste  ").setFont(fontN).setFontSize(16);
-		Cell cell = new Cell();
+		cell = new Cell();
 		cell.add(new Paragraph(liste1));
 		cell.setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.BOTTOM);
 		headerTable.addCell(cell);
@@ -121,8 +138,8 @@ public class LauflistenOutput {
 
 		addEmptyLine(new Paragraph().setFont(fontN), 1);
 
-		float[] widths1 = { 6.0f, 20.0f, 20.0f, 20.0f, 34.0f };
-		float[] widths2 = { 6.0f, 20.0f, 20.0f, 20.0f, 17.0f, 17.0f };
+		float[] widths1 = { 6.0f, 6.0f, 20.0f, 20.0f, 20.0f, 28.0f };
+		float[] widths2 = { 6.0f, 6.0f, 20.0f, 20.0f, 20.0f, 14.0f, 14.0f };
 		float[] widths = widths1;
 		boolean isSprung = false;
 		if (geraet.equals(GeraetEnum.SPRUNG)) {
@@ -159,19 +176,11 @@ public class LauflistenOutput {
 
 	private static void addTableHeader(Table table, boolean isSprung) {
 		if (isSprung) {
-			Stream.of("Kat.", "Verein", "Name", "Vorname", "Note 1", "Note 2").forEach(columnTitle -> {
-				Cell header = new Cell();
-				// header.setBackgroundColor(BaseColor.LIGHT_GRAY);
-				// header.setBorder(1);
-				// header.setP
+			Stream.of("Kat.", "Nr.", "Verein", "Name", "Vorname", "Note 1", "Note 2").forEach(columnTitle -> {
 				table.addCell(columnTitle);
 			});
 		} else {
-			Stream.of("Kat.", "Verein", "Name", "Vorname", "Note").forEach(columnTitle -> {
-				Cell header = new Cell();
-				// header.setBackgroundColor(BaseColor.LIGHT_GRAY);
-				// header.setBorder(1);
-				// header.setP
+			Stream.of("Kat.", "Nr.", "Verein", "Name", "Vorname", "Note").forEach(columnTitle -> {
 				table.addCell(columnTitle);
 			});
 		}
@@ -182,6 +191,12 @@ public class LauflistenOutput {
 		cell.setMinHeight(30);
 		cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
 		cell.add(new Paragraph(tal.getKategorie().name()));
+		table.addCell(cell);
+
+		cell = new Cell();
+		cell.setMinHeight(30);
+		cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
+		cell.add(new Paragraph(tal.getStartnummer().toString()).setTextAlignment(TextAlignment.RIGHT));
 		table.addCell(cell);
 
 		cell = new Cell();
@@ -222,21 +237,4 @@ public class LauflistenOutput {
 			paragraph.add(new Paragraph(" "));
 		}
 	}
-
-	/*
-	 * private void addCustomRows(PdfPTable table) throws URISyntaxException,
-	 * BadElementException, IOException { Path path =
-	 * Paths.get(ClassLoader.getSystemResource("Java_logo.png").toURI()); Image img
-	 * = Image.getInstance(path.toAbsolutePath().toString()); img.scalePercent(10);
-	 * 
-	 * PdfPCell imageCell = new PdfPCell(img); table.addCell(imageCell);
-	 * 
-	 * PdfPCell horizontalAlignCell = new PdfPCell(new Phrase("row 2, col 2"));
-	 * horizontalAlignCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-	 * table.addCell(horizontalAlignCell);
-	 * 
-	 * PdfPCell verticalAlignCell = new PdfPCell(new Phrase("row 2, col 3"));
-	 * verticalAlignCell.setVerticalAlignment(Element.ALIGN_BOTTOM);
-	 * table.addCell(verticalAlignCell); }
-	 */
 }

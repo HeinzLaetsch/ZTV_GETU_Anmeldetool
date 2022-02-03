@@ -45,17 +45,30 @@ public class AnlassController {
 	TeilnehmerAnlassLinkService teilnehmerAnlassLinkService;
 
 	@DeleteMapping("/{anlassId}/lauflisten/{kategorie}/{abteilung}/{anlage}")
-	public ResponseEntity<?> deleteEingeteilteWertungsrichter(HttpServletRequest request, @PathVariable UUID anlassId,
+	public ResponseEntity<?> deleteLauflisten(HttpServletRequest request, @PathVariable UUID anlassId,
 			@PathVariable KategorieEnum kategorie, @PathVariable AbteilungEnum abteilung,
 			@PathVariable AnlageEnum anlage) {
 		try {
 			Anlass anlass = anlassService.findAnlassById(anlassId);
-			// KategorieEnum kategorieEnum = KategorieEnum.valueOf(kategorie);
 			lauflistenService.deleteLauflistenForAnlassAndKategorie(anlass, kategorie, abteilung, anlage);
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
-			log.warn("deleteEingeteilteWertungsrichter", e);
+			log.warn("deleteLauflisten", e);
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not delete", e);
+		}
+	}
+
+	@GetMapping(value = "/{anlassId}/lauflisten/{kategorie}/{abteilung}")
+	public ResponseEntity<List<AnlageEnum>> getAnlagen(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable UUID anlassId, @PathVariable KategorieEnum kategorie, @PathVariable AbteilungEnum abteilung) {
+		try {
+			Anlass anlass = anlassService.findAnlassById(anlassId);
+			List<AnlageEnum> anlagen = teilnehmerAnlassLinkService.findAbteilungenByKategorieAndAbteilung(anlass,
+					kategorie, abteilung);
+			return ResponseEntity.ok(anlagen);
+		} catch (Exception ex) {
+			log.error("Unable to query Anlagen: ", ex);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to query Anlagen: ", ex);
 		}
 	}
 
@@ -67,7 +80,8 @@ public class AnlassController {
 			List<AbteilungEnum> abteilungen = teilnehmerAnlassLinkService.findAbteilungenByKategorie(anlass, kategorie);
 			return ResponseEntity.ok(abteilungen);
 		} catch (Exception ex) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Lauflisten: ", ex);
+			log.error("Unable to query Abteilungen: ", ex);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to query Abteilungen: ", ex);
 		}
 	}
 
@@ -77,7 +91,6 @@ public class AnlassController {
 			@PathVariable AnlageEnum anlage) {
 		try {
 			Anlass anlass = anlassService.findAnlassById(anlassId);
-			// KategorieEnum kategorieEnum = KategorieEnum.valueOf(kategorie);
 
 			response.addHeader("Content-Disposition", "attachment; filename=Lauflisten-" + kategorie + ".pdf");
 			response.addHeader("Content-Type", "application/pdf");
@@ -86,8 +99,6 @@ public class AnlassController {
 			AnlassLauflisten anlassLauflisten = lauflistenService.generateLauflistenForAnlassAndKategorie(anlass,
 					kategorie, abteilung, anlage);
 			LauflistenOutput.createLaufListe(anlassLauflisten, response);
-
-			// response.addHeader("Content-Length", "");
 		} catch (Exception ex) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Lauflisten: ", ex);
 		}

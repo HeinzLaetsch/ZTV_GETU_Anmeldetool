@@ -8,7 +8,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-4">
+    <div class="col-3">
       <h2>Teilnehmer Import / Export</h2>
     </div>
     <div class="col-sm-2">
@@ -39,7 +39,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-4">
+    <div class="col-3">
       <h2>Wertungsrichter Export</h2>
     </div>
     <div class="col-sm-2">
@@ -98,12 +98,18 @@
     <div class="col-2">
       <mat-form-field appearance="fill">
         <mat-label>Anlage</mat-label>
-        <select matNativeControl required>
-          <option value="Abteilung_1">Anlage 1</option>
-          <option value="Abteilung_2">Anlage 2</option>
-          <option value="Abteilung_3">Anlage 3</option>
-          <option value="Abteilung_4">Anlage 4</option>
-        </select>
+        <mat-select
+          type="text"
+          placeholder="-"
+          aria-label="Anlage"
+          matInput
+          (ngModelChange)="changeAnlage($event)"
+          [ngModel]="selectedAnlage"
+        >
+          <mat-option *ngFor="let option of anlagen" [value]="option">
+            {{ option }}
+          </mat-option>
+        </mat-select>
       </mat-form-field>
     </div>
     <div class="col-sm-2">
@@ -115,6 +121,7 @@
         matTooltipPosition="below"
         matTooltipHideDelay="500"
         (click)="lauflistenLoeschen()"
+        [disabled]="isButtonsDisabled"
       >
         Lauflisten löschen
       </button>
@@ -128,6 +135,7 @@
         matTooltipPosition="below"
         matTooltipHideDelay="500"
         (click)="lauflistenPDF()"
+        [disabled]="isButtonsDisabled"
       >
         Lauflisten PDF
       </button>

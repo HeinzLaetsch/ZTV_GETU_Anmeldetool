@@ -65,17 +65,12 @@ export class RanglistenService {
     FileSaver.saveAs(data, fileName);
   }
 
-  getAbteilungenForAnlass(    anlass: IAnlass,
-    kategorie: KategorieEnum,
-): Observable<AbteilungEnum[]> {
+  getAbteilungenForAnlass(
+    anlass: IAnlass,
+    kategorie: KategorieEnum
+  ): Observable<AbteilungEnum[]> {
     const combinedUrl =
-      this.url +
-      "/" +
-      anlass?.id +
-      "/" +
-      "lauflisten" +
-      "/" +
-      kategorie;
+      this.url + "/" + anlass?.id + "/" + "lauflisten" + "/" + kategorie;
     return this.http.get<AbteilungEnum[]>(combinedUrl).pipe(
       catchError((error) => {
         this.handleError<AbteilungEnum[]>("getAbteilungenForAnlass");
@@ -83,6 +78,22 @@ export class RanglistenService {
       })
     );
   }
+
+  getAnlagenForAnlass(
+    anlass: IAnlass,
+    kategorie: KategorieEnum,
+    abteilung: AbteilungEnum,
+  ): Observable<AnlageEnum[]> {
+    const combinedUrl =
+      this.url + "/" + anlass?.id + "/" + "lauflisten" + "/" + kategorie + "/" + abteilung;
+    return this.http.get<AnlageEnum[]>(combinedUrl).pipe(
+      catchError((error) => {
+        this.handleError<AnlageEnum[]>("getAnlagenForAnlass");
+        return of(undefined);
+      })
+    );
+  }
+
   deleteLauflistenForAnlassAndKategorie(
     anlass: IAnlass,
     kategorie: KategorieEnum,
