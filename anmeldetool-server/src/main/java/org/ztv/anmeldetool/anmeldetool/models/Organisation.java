@@ -53,4 +53,8 @@ public class Organisation extends Base {
 			personenLink.setOrganisation(this);
 		}
 	}
+
+	public int compareTo(Organisation o1) {
+		return this.name.compareTo(o1.getName());
+	}
 }

@@ -145,6 +145,38 @@ export class IAnlass {
   constructor() {
     this.anzeigeStatus = new Anzeigestatus();
   }
+  getKategorienRaw(): KategorieEnum[] {
+    let k5 = Object.keys(KategorieEnum).findIndex(
+      (key) => key === KategorieEnum.K5
+    );
+    const start = Object.keys(KategorieEnum).findIndex(
+      (key) => key === this.tiefsteKategorie
+    );
+    let end = Object.keys(KategorieEnum).findIndex(
+      (key) => key === this.hoechsteKategorie
+    );
+    // Keine Teilnahme
+    let filtered = Object.values(KategorieEnum).slice(0, 1);
+    if (end > k5) {
+      filtered = filtered.concat(Object.values(KategorieEnum).slice(start, k5));
+      if (this.tiTu === TiTuEnum.Ti) {
+        filtered.push(KategorieEnum.K5A);
+        filtered.push(KategorieEnum.K5B);
+        filtered.push(KategorieEnum.K6);
+        filtered.push(KategorieEnum.KD);
+      } else {
+        filtered.push(KategorieEnum.K5);
+        filtered.push(KategorieEnum.K6);
+        filtered.push(KategorieEnum.KH);
+      }
+      filtered.push(KategorieEnum.K7);
+    } else {
+      filtered = filtered.concat(
+        Object.values(KategorieEnum).slice(start, end + 1)
+      );
+    }
+    return filtered;
+  }
 
   public updateAnzeigeStatus(): void {
     if (this.anmeldungBeginn) {

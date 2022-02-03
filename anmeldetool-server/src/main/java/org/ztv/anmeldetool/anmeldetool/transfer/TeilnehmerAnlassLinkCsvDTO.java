@@ -5,7 +5,7 @@ import java.util.UUID;
 import org.ztv.anmeldetool.anmeldetool.models.AbteilungEnum;
 import org.ztv.anmeldetool.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.anmeldetool.models.KategorieEnum;
-import org.ztv.anmeldetool.anmeldetool.models.StartGeraetEnum;
+import org.ztv.anmeldetool.anmeldetool.models.GeraetEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,5 +37,5 @@ public class TeilnehmerAnlassLinkCsvDTO {
 
 	private AnlageEnum anlage;
 
-	private StartGeraetEnum startgeraet;
+	private GeraetEnum startgeraet;
 }

@@ -1,5 +1,6 @@
 package org.ztv.anmeldetool.anmeldetool.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.util.StreamUtils;
 import org.ztv.anmeldetool.anmeldetool.transfer.TeilnehmerAnlassLinkCsvDTO;
 
 import com.opencsv.CSVWriter;
@@ -41,10 +43,16 @@ public class TeilnehmerExportImport {
 	}
 
 	public static List<TeilnehmerAnlassLinkCsvDTO> csvWriteToWriter(InputStream inputStream) throws IOException {
-		inputStream.read();
-		inputStream.read();
-		inputStream.read();
-		Reader targetReader = new InputStreamReader(inputStream, "UTF-8");
+		byte[] cachedBody = StreamUtils.copyToByteArray(inputStream);
+		int start = 0;
+		if (cachedBody[0] == 239 && cachedBody[1] == 187 && cachedBody[2] == 191) {
+			// int char1 = inputStream.read();
+			// int char2 = inputStream.read();
+			// int char3 = inputStream.read();
+			start = 3;
+		}
+		InputStream byteArrayInputStream = new ByteArrayInputStream(cachedBody, start, cachedBody.length);
+		Reader targetReader = new InputStreamReader(byteArrayInputStream, "UTF-8");
 		List<TeilnehmerAnlassLinkCsvDTO> tals = new CsvToBeanBuilder<TeilnehmerAnlassLinkCsvDTO>(targetReader)
 				.withType(TeilnehmerAnlassLinkCsvDTO.class).withQuoteChar(CSVWriter.NO_QUOTE_CHARACTER)
 				.withSeparator(';').withOrderedResults(false).build().parse();

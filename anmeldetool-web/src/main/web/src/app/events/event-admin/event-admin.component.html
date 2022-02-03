@@ -8,7 +8,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-4">
+    <div class="col-3">
       <h2>Teilnehmer Import / Export</h2>
     </div>
     <div class="col-sm-2">
@@ -39,7 +39,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-4">
+    <div class="col-3">
       <h2>Wertungsrichter Export</h2>
     </div>
     <div class="col-sm-2">
@@ -54,6 +54,103 @@
       >
         Exportieren
       </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-3">
+      <h2>Lauflisten</h2>
+    </div>
+    <div class="col-1">
+      <mat-form-field appearance="fill">
+        <mat-label>Kategorie</mat-label>
+        <mat-select
+          type="text"
+          placeholder="-"
+          aria-label="Kategorie"
+          matInput
+          (ngModelChange)="changeKategorie($event)"
+          [ngModel]="selectedKategorie"
+        >
+          <mat-option *ngFor="let option of kategorien" [value]="option">
+            {{ option }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="col-2">
+      <mat-form-field appearance="fill">
+        <mat-label>Abteilung</mat-label>
+        <mat-select
+          type="text"
+          placeholder="-"
+          aria-label="Abteilung"
+          matInput
+          (ngModelChange)="changeAbteilung($event)"
+          [ngModel]="selectedAbteilung"
+        >
+          <mat-option *ngFor="let option of abteilungen" [value]="option">
+            {{ option }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="col-2">
+      <mat-form-field appearance="fill">
+        <mat-label>Anlage</mat-label>
+        <mat-select
+          type="text"
+          placeholder="-"
+          aria-label="Anlage"
+          matInput
+          (ngModelChange)="changeAnlage($event)"
+          [ngModel]="selectedAnlage"
+        >
+          <mat-option *ngFor="let option of anlagen" [value]="option">
+            {{ option }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="col-sm-2">
+      <button
+        mat-button
+        color="primary"
+        #tooltip="matTooltip"
+        matTooltip="Lauflisten löschen"
+        matTooltipPosition="below"
+        matTooltipHideDelay="500"
+        (click)="lauflistenLoeschen()"
+        [disabled]="isButtonsDisabled"
+      >
+        Lauflisten löschen
+      </button>
+    </div>
+    <div class="col-sm-2">
+      <button
+        mat-button
+        color="primary"
+        #tooltip="matTooltip"
+        matTooltip="Lauflisten als PDF"
+        matTooltipPosition="below"
+        matTooltipHideDelay="500"
+        (click)="lauflistenPDF()"
+        [disabled]="isButtonsDisabled"
+      >
+        Lauflisten PDF
+      </button>
+    </div>
+  </div>
+  <div class="row" *ngIf="message">
+    <div class="col" *ngIf="!hasError">
+      <em class="success">
+        {{ message }}
+      </em>
+    </div>
+    <div class="col" *ngIf="hasError">
+      <em class="error">
+        {{ message }}
+      </em>
     </div>
   </div>
 </div>

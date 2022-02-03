@@ -1,20 +1,29 @@
-em {
-    float: right;
-    color: #E05C65;
-    padding-left: 10px; 
+em.error {
+  float: right;
+  color: var(--ztv-error);
+  padding-left: 10px;
+}
+em.success {
+  float: right;
+  color: var(--ztv-ok);
+  padding-left: 10px;
 }
 .error input {
-    background-color: #E3C3C5;
+  background-color: #e3c3c5;
 }
 .error ::-webkit-input-placeholder {
-    color: #999;
+  color: #999;
 }
 .error ::-moz-placeholder {
-    color: #999;
+  color: #999;
 }
-.error :-moz-placeholder{
-    color: #999;
+.error :-moz-placeholder {
+  color: #999;
 }
 .error :-ms-input-placeholder {
-    color: #999;
+  color: #999;
+}
+
+mat-form-field {
+  width: 100%;
 }

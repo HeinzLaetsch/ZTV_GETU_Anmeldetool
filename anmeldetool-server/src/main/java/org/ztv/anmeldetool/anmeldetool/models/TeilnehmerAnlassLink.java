@@ -1,5 +1,6 @@
 package org.ztv.anmeldetool.anmeldetool.models;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -39,6 +40,11 @@ public class TeilnehmerAnlassLink extends Base {
 	@ToString.Exclude
 	private Organisation organisation;
 
+	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	@JoinColumn(name = "LAUFLISTEN_CONTAINER_ID", nullable = true, insertable = true, updatable = true)
+	@ToString.Exclude
+	private LauflistenContainer lauflistenContainer;
+
 	private Integer startnummer;
 
 	@Enumerated(EnumType.STRING)
@@ -48,5 +54,5 @@ public class TeilnehmerAnlassLink extends Base {
 	private AnlageEnum anlage;
 
 	@Enumerated(EnumType.STRING)
-	private StartGeraetEnum startgeraet;
+	private GeraetEnum startgeraet;
 }
