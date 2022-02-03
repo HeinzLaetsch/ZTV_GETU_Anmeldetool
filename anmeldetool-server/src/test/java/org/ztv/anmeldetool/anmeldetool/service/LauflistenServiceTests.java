@@ -6,10 +6,13 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.ztv.anmeldetool.anmeldetool.models.AbteilungEnum;
+import org.ztv.anmeldetool.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.anmeldetool.models.AnlassLauflisten;
 import org.ztv.anmeldetool.anmeldetool.models.KategorieEnum;
@@ -18,6 +21,7 @@ import org.ztv.anmeldetool.anmeldetool.repositories.AnlassRepository;
 
 @SpringBootTest
 @ActiveProfiles("eclipse")
+@Disabled
 public class LauflistenServiceTests {
 
 	@Autowired
@@ -31,14 +35,14 @@ public class LauflistenServiceTests {
 	public void testDeleteAllLauflistenForAnlassAndKategorie() throws Exception {
 		Iterable<Anlass> iterable = anlassRepo.findAll();
 		int anzahl = lauflistenService.deleteLauflistenForAnlassAndKategorie(iterable.iterator().next(),
-				KategorieEnum.K1);
+				KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1);
 	}
 
 	@Test
 	public void testFindLauflistenForAnlassAndKategorie() throws Exception {
 		Iterable<Anlass> iterable = anlassRepo.findAll();
-		List<LauflistenContainer> allContainer = lauflistenService
-				.findLauflistenForAnlassAndKategorie(iterable.iterator().next(), KategorieEnum.K1);
+		List<LauflistenContainer> allContainer = lauflistenService.findLauflistenForAnlassAndKategorie(
+				iterable.iterator().next(), KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1);
 		assertThat(allContainer.size()).isGreaterThan(0);
 	}
 
@@ -48,7 +52,7 @@ public class LauflistenServiceTests {
 		testGenerateLauflistenForAnlassAndKategorie();
 		Iterable<Anlass> iterable = anlassRepo.findAll();
 		int anzahl = lauflistenService.deleteLauflistenForAnlassAndKategorie(iterable.iterator().next(),
-				KategorieEnum.K1);
+				KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1);
 		assertThat(anzahl).isEqualTo(5);
 	}
 
@@ -56,8 +60,8 @@ public class LauflistenServiceTests {
 	@Transactional
 	public void testGenerateLauflistenForAnlassAndKategorie() throws Exception {
 		Iterable<Anlass> iterable = anlassRepo.findAll();
-		AnlassLauflisten anlassContainer = lauflistenService
-				.generateLauflistenForAnlassAndKategorie(iterable.iterator().next(), KategorieEnum.K1);
+		AnlassLauflisten anlassContainer = lauflistenService.generateLauflistenForAnlassAndKategorie(
+				iterable.iterator().next(), KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1);
 		assertThat(anlassContainer).isNotNull();
 		assertThat(anlassContainer.getLauflistenContainer().size()).isEqualTo(5);
 	}
