@@ -51,6 +51,13 @@ const routes: Routes = [
     // resolve: [{ anzahlTeilnehmer: TeilnehmerResolverService }],
   },
   {
+    path: "rechnungsbuero",
+    loadChildren: () =>
+      import("./rechnungsbuero/rechnungsbuero.module").then(
+        (m) => m.RechnungsbueroModule
+      ),
+  },
+  {
     path: "user",
     loadChildren: () =>
       import("./verein/user.module").then((m) => m.UserModule),

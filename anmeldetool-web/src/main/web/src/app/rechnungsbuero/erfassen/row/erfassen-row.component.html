@@ -1,0 +1,61 @@
+<ng-container *ngIf="eintrag">
+  <div class="row" [ngClass]="getBackground()">
+    <div class="col-1 label number">{{ eintrag.startnummer }}</div>
+    <div class="col-2 label">{{ eintrag.verein }}</div>
+    <div class="col-2 label">{{ eintrag.name }}</div>
+    <div class="col-2 label">{{ eintrag.vorname }}</div>
+    <ng-container *ngIf="sprung">
+      <div class="col-1 data centered">
+        <mat-form-field appearance="fill">
+          <!--mat-label>Note 1</mat-label-->
+          <input matInput [formControl]="note_1_Cntr" type="text" />
+        </mat-form-field>
+      </div>
+      <div class="col-1 data centered">
+        <mat-form-field appearance="fill">
+          <mat-label>Note 2</mat-label>
+          <input matInput [formControl]="note_2_Cntr" type="text" />
+        </mat-form-field>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="!sprung">
+      <div class="col-1 data centered">
+        <!--mat-form-field appearance="fill"-->
+        <!--mat-label>Note</mat-label-->
+        <input matInput [formControl]="note_1_Cntr" type="text" />
+        <!--/mat-form-field-->
+      </div>
+    </ng-container>
+    <div class="col-1 data centered">
+      <img
+        *ngIf="!saved"
+        class="icon"
+        src="assets/images/skype/white-question-mark.png"
+      />
+      <img
+        *ngIf="saved"
+        class="icon"
+        src="assets/images/skype/check-mark.png"
+      />
+    </div>
+    <div class="col-1 data centered">
+      <img
+        *ngIf="!eintrag.checked"
+        class="icon"
+        src="assets/images/skype/white-question-mark.png"
+      />
+    </div>
+    <div class="col-1 data centered">
+      <img
+        *ngIf="eintrag.checked && !eintrag.error"
+        class="icon"
+        src="assets/images/skype/check-mark.png"
+      />
+      <img
+        *ngIf="eintrag.checked && eintrag.error"
+        class="icon"
+        src="assets/images/skype/cross-mark.png"
+      />
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,36 @@
+mat-form-field {
+  width: 100%;
+}
+.label {
+  color: var(--ztv-black);
+  padding-top: 0.3em;
+}
+.data {
+  color: var(--ztv-black);
+  padding-top: 0.3em;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.number {
+  text-align: right;
+}
+.errorBg {
+  background-color: var(--ztv-light-red);
+}
+
+.okBg {
+  background-color: var(--ztv-light-green);
+}
+
+.notTouchedBg {
+  background-color: var(--ztv-lighter-gray);
+}
+
+.centered {
+  display: flex;
+  justify-content: center;
+}
+
+Input {
+  background-color: var(--ztv-white);
+}

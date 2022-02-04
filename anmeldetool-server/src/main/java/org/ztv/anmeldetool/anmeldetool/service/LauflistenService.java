@@ -1,6 +1,7 @@
 package org.ztv.anmeldetool.anmeldetool.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.ztv.anmeldetool.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.anmeldetool.models.AnlassLauflisten;
 import org.ztv.anmeldetool.anmeldetool.models.KategorieEnum;
+import org.ztv.anmeldetool.anmeldetool.models.Laufliste;
 import org.ztv.anmeldetool.anmeldetool.models.LauflistenContainer;
 import org.ztv.anmeldetool.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
@@ -95,6 +97,13 @@ public class LauflistenService {
 		});
 		lauflistenContainerRepo.deleteAll(existierende);
 		return existierende.size();
+	}
+
+	public Optional<Laufliste> findLauflistenForAnlassAndSearch(Anlass anlass, String search) {
+		List<Laufliste> lauflisten = lauflistenRepo.findByKey(search);
+		return lauflisten.stream().filter(liste -> {
+			return liste.getLauflistenContainer().getAnlass().equals(anlass);
+		}).findFirst();
 	}
 
 	private void persistLauflisten(AnlassLauflisten anlassLaufListen) {

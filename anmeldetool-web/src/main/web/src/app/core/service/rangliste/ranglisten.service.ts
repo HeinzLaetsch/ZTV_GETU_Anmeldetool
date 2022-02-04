@@ -7,7 +7,10 @@ import { environment } from "src/environments/environment";
 import { AbteilungEnum } from "../../model/AbteilungEnum";
 import { AnlageEnum } from "../../model/AnlageEnum";
 import { AnzeigeStatusEnum } from "../../model/AnzeigeStatusEnum";
+import { GeraeteEnum } from "../../model/GeraeteEnum";
 import { IAnlass } from "../../model/IAnlass";
+import { ILaufliste } from "../../model/ILaufliste";
+import { ILauflistenEintrag } from "../../model/ILauflistenEintrag";
 import { KategorieEnum } from "../../model/KategorieEnum";
 
 @Injectable({
@@ -82,10 +85,18 @@ export class RanglistenService {
   getAnlagenForAnlass(
     anlass: IAnlass,
     kategorie: KategorieEnum,
-    abteilung: AbteilungEnum,
+    abteilung: AbteilungEnum
   ): Observable<AnlageEnum[]> {
     const combinedUrl =
-      this.url + "/" + anlass?.id + "/" + "lauflisten" + "/" + kategorie + "/" + abteilung;
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "lauflisten" +
+      "/" +
+      kategorie +
+      "/" +
+      abteilung;
     return this.http.get<AnlageEnum[]>(combinedUrl).pipe(
       catchError((error) => {
         this.handleError<AnlageEnum[]>("getAnlagenForAnlass");
@@ -124,6 +135,48 @@ export class RanglistenService {
     );
   }
 
+  searchLauflisteByKey(
+    anlass: IAnlass,
+    search: string
+  ): Observable<ILaufliste> {
+    const combinedUrl =
+      this.url + "/" + anlass?.id + "/" + "lauflisten?search=" + search;
+    return this.http.get<ILaufliste>(combinedUrl).pipe(
+      catchError((error) => {
+        this.handleError<ILaufliste>("searchLauflisteByKey");
+        return of(undefined);
+      })
+    );
+
+    /*
+    const eintrag: ILauflistenEintrag = {
+      id: "311",
+      laufliste_id: "1",
+      startnummer: 1,
+      name: "Muster",
+      verein: "TV Rägi",
+      vorname: "Hans",
+      tal_id: "12",
+      checked: false,
+      error: false,
+    };
+    const liste: ILaufliste = {
+      id: "1",
+      laufliste: "00131",
+      geraet: GeraeteEnum.SPRUNG,
+      abteilung: AbteilungEnum.ABTEILUNG_1,
+      anlage: AnlageEnum.ANLAGE_1,
+      eintraege: [eintrag, eintrag],
+    };
+    return of(liste);
+    */
+  }
+  updateLauflistenEintrag(
+    eintrag: ILauflistenEintrag
+  ): Observable<ILauflistenEintrag> {
+    return of(eintrag);
+  }
+
   private handleError<T>(
     operation = "operation",
     statusResponse?: Subject<string>,
@@ -131,6 +184,7 @@ export class RanglistenService {
   ) {
     return (error: any): Observable<T> => {
       console.error(error);
+      9;
       statusResponse?.next(error);
       return of(result as T);
     };

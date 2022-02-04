@@ -47,6 +47,33 @@
             >Teilnehmer</a
           >
         </li>
+        <li class="nav-item dropdown" *ngIf="authService.isAdministrator()">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            id="navbarDropdownMenuLink"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            Rechnungsbüro
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a
+              class="dropdown-item"
+              [routerLink]="['/rechnungsbuero', 'erfassen']"
+              >Noten erfassen</a
+            >
+            <a class="dropdown-item" [routerLink]="['/rechnungsbuero', 'check']"
+              >Noten check</a
+            >
+            <a
+              class="dropdown-item"
+              [routerLink]="['/rechnungsbuero/ranglisten']"
+              >Ranglisten</a
+            >
+          </div>
+        </li>
         <li>
           <a
             *ngIf="
