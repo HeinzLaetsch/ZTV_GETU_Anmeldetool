@@ -4,6 +4,7 @@ import { IAnlass } from "src/app/core/model/IAnlass";
 import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
 import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
+import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
 import { CachingTeilnehmerService } from "src/app/core/service/caching-services/caching.teilnehmer.service";
@@ -40,6 +41,14 @@ export class EventStartListComponent implements OnInit {
     this.alleTeilnehmer = this.teilnehmerService.getTeilnehmerForAnlass(
       this.anlass
     );
+    this.alleTeilnehmer.forEach((teilnehmer) => {
+      if (teilnehmer.teilnahmen && teilnehmer.teilnahmen.anlassLinks[0]) {
+        if (!teilnehmer.teilnahmen.anlassLinks[0].meldeStatus) {
+          teilnehmer.teilnahmen.anlassLinks[0].meldeStatus =
+            MeldeStatusEnum.STARTET;
+        }
+      }
+    });
   }
 
   print() {

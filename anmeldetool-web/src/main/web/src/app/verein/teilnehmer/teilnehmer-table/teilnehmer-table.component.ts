@@ -398,7 +398,11 @@ export class TeilnehmerTableComponent implements AfterViewInit {
                 line[pos].setValue(MeldeStatusEnum.STARTET);
               }
             } else {
-              line[pos].setValue(link.meldeStatus);
+              if (link.kategorie === KategorieEnum.KEINE_TEILNAHME) {
+                line[pos].setValue(undefined);
+              } else {
+                line[pos].setValue(link.meldeStatus);
+              }
             }
           } else {
             line[pos].setValue(undefined);
@@ -730,8 +734,17 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     const rest = this.checked.slice(colIndex + 1);
     const newIndex = rest.findIndex((element) => element) + colIndex + 1;
     this.teilnahmenControls.forEach((anlassCntrLine) => {
-      anlassCntrLine[newIndex].setValue(anlassCntrLine[colIndex].value);
-      this.updateTeilnahmen(rowIndex, newIndex, false);
+      const anlassIndex = Object.keys(KategorieEnum).findIndex(
+        (key) => key === this.anlaesse[newIndex].tiefsteKategorie
+      );
+      const teilnehmerIndex = Object.keys(KategorieEnum).findIndex(
+        (key) => key === anlassCntrLine[colIndex].value
+      );
+
+      if (anlassIndex <= teilnehmerIndex) {
+        anlassCntrLine[newIndex].setValue(anlassCntrLine[colIndex].value);
+        this.updateTeilnahmen(rowIndex, newIndex, false);
+      }
       rowIndex++;
     });
     console.log("Copy All clicked: ", event, " ,colIndex: ", colIndex);

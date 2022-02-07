@@ -181,6 +181,7 @@ export class IAnlass {
   public updateAnzeigeStatus(): void {
     if (this.anmeldungBeginn) {
       const asMoment = moment(this.anmeldungBeginn);
+      asMoment.add(1, "days");
       if (asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN);
       } else {
@@ -190,11 +191,14 @@ export class IAnlass {
       this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN);
     }
     this.erfassenVerlaengert_;
+    this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED);
     if (this.erfassenGeschlossen) {
       const asMoment = moment(this.erfassenGeschlossen);
+      asMoment.add(1, "days");
       if (asMoment.isBefore()) {
         if (this.erfassenVerlaengert) {
           const asMoment2 = moment(this.erfassenVerlaengert);
+          asMoment2.add(1, "days");
           if (asMoment2.isBefore()) {
             this.anzeigeStatus.setStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED);
           }
@@ -210,6 +214,7 @@ export class IAnlass {
 
     if (this.crossKategorieAenderungenGeschlossen) {
       const asMoment = moment(this.crossKategorieAenderungenGeschlossen);
+      asMoment.add(1, "days");
       if (asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.CROSS_KATEGORIE_CLOSED);
       } else {
@@ -222,6 +227,7 @@ export class IAnlass {
     }
     if (this.aenderungenInKategorieGeschlossen) {
       const asMoment = moment(this.aenderungenInKategorieGeschlossen);
+      asMoment.add(1, "days");
       if (asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.IN_KATEGORIE_CLOSED);
       } else {
@@ -233,6 +239,7 @@ export class IAnlass {
 
     if (this.aenderungenNichtMehrErlaubt) {
       const asMoment = moment(this.aenderungenNichtMehrErlaubt);
+      asMoment.add(1, "days");
       if (asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED);
       } else {
@@ -246,6 +253,7 @@ export class IAnlass {
 
     if (this.endDatum) {
       const asMoment = moment(this.endDatum);
+      asMoment.add(1, "days");
       if (asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.CLOSED);
       } else {
@@ -263,6 +271,7 @@ export class IAnlass {
 
     if (this.erfassenVerlaengert) {
       const asMoment = moment(this.erfassenVerlaengert);
+      asMoment.add(1, "days");
       if (!asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.VERLAENGERT);
       } else {
