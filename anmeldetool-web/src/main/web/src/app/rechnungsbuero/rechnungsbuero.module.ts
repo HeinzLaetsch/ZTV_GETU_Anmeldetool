@@ -8,12 +8,14 @@ import { ErfassenComponent } from "./erfassen/erfassen.component";
 import { RechnungsbueroRoutes } from "./rechnungsbuero.routes";
 import { ErfassenHeaderComponent } from "./erfassen/header/erfassen-header.component";
 import { ErfassenRowComponent } from "./erfassen/row/erfassen-row.component";
+import { LauflistenStatusComponent } from "./erfassen/laufliste-status/lauflisten-status.component";
 
 @NgModule({
   declarations: [
     ErfassenComponent,
     ErfassenHeaderComponent,
     ErfassenRowComponent,
+    LauflistenStatusComponent,
   ],
   imports: [
     CommonModule,

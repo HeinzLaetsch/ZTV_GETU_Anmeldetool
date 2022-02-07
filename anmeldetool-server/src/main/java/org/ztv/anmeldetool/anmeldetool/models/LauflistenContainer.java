@@ -92,6 +92,9 @@ public class LauflistenContainer extends Base {
 			GeraetEnum[] values = GeraetEnum.values();
 			Map<GeraetEnum, Laufliste> hashListen = new HashMap<GeraetEnum, Laufliste>();
 			for (GeraetEnum value : values) {
+				if (GeraetEnum.UNDEFINED.equals(value)) {
+					continue;
+				}
 				Laufliste laufliste;
 				if (!hashListen.containsKey(value)) {
 					laufliste = new Laufliste();

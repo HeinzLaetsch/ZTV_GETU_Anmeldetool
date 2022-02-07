@@ -1,53 +1,60 @@
-<div class="container">
+<div class="container-fluid">
   <div class="row">
     <h1>{{ title }}</h1>
   </div>
   <div class="row">
-    <mat-form-field appearance="fill">
-      <mat-label>Lauflisten Schlüssel</mat-label>
-      <input matInput type="text" [(ngModel)]="search" />
-      <button
-        *ngIf="search"
-        matSuffix
-        mat-icon-button
-        aria-label="Clear"
-        (click)="search = ''"
-      >
-        <mat-icon>close</mat-icon>
-      </button>
-    </mat-form-field>
-    <button
-      mat-icon-button
-      color="primary"
-      aria-label="Suche Laufliste"
-      (click)="searchLaufliste()"
-      [disabled]="!search"
-    >
-      <mat-icon>search</mat-icon>
-    </button>
-  </div>
-  <div class="row">
-    <div class="col-2 side">
-      <app-erfassen-header [laufliste]="laufliste"></app-erfassen-header>
+    <div class="col-2">
+      <app-lauflisten-status [anlass]="anlass"></app-lauflisten-status>
     </div>
-    <div *ngIf="laufliste" class="col-10">
-      <div class="row blue">
-        <div class="col-1">Nr.</div>
-        <div class="col-2">Verein</div>
-        <div class="col-2">Name</div>
-        <div class="col-2">Vorname</div>
-        <div *ngIf="!sprung" class="col-1 centered">Note</div>
-        <div *ngIf="sprung" class="col-1 centered">Note 1</div>
-        <div *ngIf="sprung" class="col-1 centered">Note 2</div>
-        <div class="col-1 centered">saved</div>
-        <div class="col-1 centered">geprüft</div>
-        <div class="col-1 centered">Fehler</div>
+    <div class="col-10">
+      <div class="row">
+        <mat-form-field appearance="fill">
+          <mat-label>Lauflisten Schlüssel</mat-label>
+          <input matInput type="text" [(ngModel)]="search" />
+          <button
+            *ngIf="search"
+            matSuffix
+            mat-icon-button
+            aria-label="Clear"
+            (click)="search = ''"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+        <button
+          mat-icon-button
+          color="primary"
+          aria-label="Suche Laufliste"
+          (click)="searchLaufliste()"
+          [disabled]="!search"
+        >
+          <mat-icon>search</mat-icon>
+        </button>
       </div>
-      <app-erfassen-row
-        *ngFor="let eintrag of laufliste.eintraege"
-        [eintrag]="eintrag"
-        [sprung]="sprung"
-      ></app-erfassen-row>
+      <div class="row">
+        <div class="col-2 side">
+          <app-erfassen-header [laufliste]="laufliste"></app-erfassen-header>
+        </div>
+        <div *ngIf="laufliste" class="col-10">
+          <div class="row blue">
+            <div class="col-1">Nr.</div>
+            <div class="col-2">Verein</div>
+            <div class="col-2">Name</div>
+            <div class="col-2">Vorname</div>
+            <div *ngIf="!sprung" class="col-1 centered">Note</div>
+            <div *ngIf="sprung" class="col-1 centered">Note 1</div>
+            <div *ngIf="sprung" class="col-1 centered">Note 2</div>
+            <div class="col-1 centered">saved</div>
+            <div class="col-1 centered">geprüft</div>
+            <div class="col-1 centered">Fehler</div>
+          </div>
+          <app-erfassen-row
+            *ngFor="let eintrag of laufliste.eintraege"
+            [eintrag]="eintrag"
+            [sprung]="sprung"
+          ></app-erfassen-row>
+        </div>
+      </div>
     </div>
   </div>
 </div>
