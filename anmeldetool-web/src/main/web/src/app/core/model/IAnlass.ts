@@ -159,7 +159,7 @@ export class IAnlass {
     let filtered = Object.values(KategorieEnum).slice(0, 1);
     if (end > k5) {
       filtered = filtered.concat(Object.values(KategorieEnum).slice(start, k5));
-      if (this.tiTu === TiTuEnum.Ti) {
+      if (this.tiAnlass) {
         filtered.push(KategorieEnum.K5A);
         filtered.push(KategorieEnum.K5B);
         filtered.push(KategorieEnum.K6);
