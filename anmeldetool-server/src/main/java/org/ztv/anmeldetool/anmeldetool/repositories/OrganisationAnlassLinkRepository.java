@@ -15,4 +15,6 @@ public interface OrganisationAnlassLinkRepository extends JpaRepository<Organisa
 	List<OrganisationAnlassLink> findByOrganisationAndAnlass(Organisation organisation, Anlass anlass);
 
 	List<OrganisationAnlassLink> findByAnlass(Anlass anlass);
+
+	List<OrganisationAnlassLink> findByAnlassAndAktiv(Anlass anlass, boolean aktiv);
 }
