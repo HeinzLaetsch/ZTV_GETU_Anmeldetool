@@ -1,0 +1,27 @@
+<mat-expansion-panel>
+  <mat-expansion-panel-header>
+    <mat-panel-title> {{ anlage }} </mat-panel-title>
+    <mat-panel-description>
+      Erfasst
+      <img
+        *ngIf="!erfasst"
+        class="smallIcon"
+        src="assets/images/skype/white-question-mark.png"
+      />
+      <img
+        *ngIf="erfasst"
+        class="smallIcon"
+        src="assets/images/skype/check-mark.png"
+      />
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+  <app-laufliste-status
+    *ngFor="let laufliste of lauflisten"
+    [anlass]="anlass"
+    [kategorie]="kategorie"
+    [abteilung]="abteilung"
+    [anlage]="anlage"
+    [laufliste]="laufliste"
+    (lauflisteSelectedEvent)="lauflisteSelected($event)"
+  ></app-laufliste-status>
+</mat-expansion-panel>

@@ -1,0 +1,9 @@
+.mat-expansion-panel-body {
+  padding: 0 !important;
+}
+.kategorie-title {
+  color: var(--ztv-black);
+  font-weight: 400;
+  font-size: 0.8em;
+  padding: 0.3em;
+}

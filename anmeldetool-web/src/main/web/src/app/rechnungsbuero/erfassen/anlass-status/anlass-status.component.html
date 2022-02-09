@@ -1,0 +1,9 @@
+<mat-accordion>
+  <app-kategorie-status
+    *ngFor="let kategorie of getKategorien()"
+    [anlass]="anlass"
+    [kategorie]="kategorie"
+    (lauflisteSelectedEvent)="lauflisteSelected($event)"
+  ></app-kategorie-status>
+</mat-accordion>
+s

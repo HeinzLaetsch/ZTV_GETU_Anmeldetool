@@ -14,7 +14,7 @@ export class ErfassenRowComponent implements OnInit {
   @Input()
   sprung: boolean;
   @Output()
-  notenErrorEvent = new EventEmitter<ILauflistenEintrag>();
+  entryChangedEvent = new EventEmitter<ILauflistenEintrag>();
 
   note_1_Cntr: FormControl;
   note_2_Cntr: FormControl;
@@ -52,9 +52,9 @@ export class ErfassenRowComponent implements OnInit {
       }
     }
     if (hasErrors) {
-      this.notenErrorEvent.next(this.eintrag);
+      // this.entryChangedEvent.emit(this.eintrag);
     } else {
-      this.notenErrorEvent.next(this.eintrag);
+      // this.entryChangedEvent.emit(this.eintrag);
       this.update();
     }
   }
@@ -66,8 +66,8 @@ export class ErfassenRowComponent implements OnInit {
         if (eintrag) {
           this.eintrag = eintrag;
           this.saved = true;
+          this.entryChangedEvent.emit(this.eintrag);
         } else {
-          this.notenErrorEvent.next(this.eintrag);
           this.saved = false;
         }
       });

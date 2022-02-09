@@ -1,6 +1,7 @@
 package org.ztv.anmeldetool.anmeldetool.controller.admin;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,9 +17,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -28,6 +33,8 @@ import org.ztv.anmeldetool.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.anmeldetool.models.AnlassLauflisten;
 import org.ztv.anmeldetool.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.anmeldetool.models.Laufliste;
+import org.ztv.anmeldetool.anmeldetool.models.LauflistenContainer;
+import org.ztv.anmeldetool.anmeldetool.models.OrganisationAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.output.LauflistenOutput;
 import org.ztv.anmeldetool.anmeldetool.service.AnlassService;
@@ -35,6 +42,7 @@ import org.ztv.anmeldetool.anmeldetool.service.LauflistenService;
 import org.ztv.anmeldetool.anmeldetool.service.TeilnehmerAnlassLinkService;
 import org.ztv.anmeldetool.anmeldetool.transfer.LauflisteDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.LauflistenEintragDTO;
+import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationAnlassLinkDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -144,6 +152,36 @@ public class AnlassController {
 		} catch (Exception ex) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Lauflisten: ", ex);
 		}
+	}
+
+	@GetMapping(value = "/{anlassId}/lauflisten/{kategorie}/{abteilung}/{anlage}")
+	public ResponseEntity<List<LauflisteDTO>> getLauflisten(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable UUID anlassId, @PathVariable KategorieEnum kategorie, @PathVariable AbteilungEnum abteilung,
+			@PathVariable AnlageEnum anlage) {
+		try {
+			Anlass anlass = anlassService.findAnlassById(anlassId);
+
+			List<LauflistenContainer> listen = lauflistenService.getLauflistenForAnlassAndKategorie(anlass, kategorie,
+					abteilung, anlage);
+			List<Laufliste> alle = new ArrayList<Laufliste>();
+			for (LauflistenContainer container : listen) {
+				alle.addAll(container.getGeraeteLauflisten());
+			}
+
+			List<LauflisteDTO> listenDTO = alle.stream().map(laufliste -> {
+				return LauflisteDTO.builder().laufliste(laufliste.getKey()).geraet(laufliste.getGeraet())
+						.id(laufliste.getId()).checked(laufliste.isChecked()).erfasst(laufliste.isErfasst()).build();
+			}).collect(Collectors.toList());
+			return ResponseEntity.ok(listenDTO);
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Lauflisten: ", ex);
+		}
+	}
+
+	@PutMapping("/{anlassId}/lauflisten/{lauslistenId}/lauflisteneintraege/{lauflisteneintragId}")
+	public @ResponseBody ResponseEntity<LauflistenEintragDTO> patchAnlassVereine(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable UUID anlassId, @PathVariable UUID lauslistenId, @PathVariable UUID lauflisteneintragId, @RequestBody LauflistenEintragDTO lauflistenEintragDto) {
+		return lauflistenService.;
 	}
 
 	private <T> ResponseEntity<T> getNotFound() {

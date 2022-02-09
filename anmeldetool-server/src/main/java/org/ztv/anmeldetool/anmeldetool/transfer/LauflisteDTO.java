@@ -23,5 +23,9 @@ public class LauflisteDTO {
 
 	AnlageEnum anlage;
 
+	private boolean erfasst;
+
+	private boolean checked;
+
 	List<LauflistenEintragDTO> eintraege;
 }

@@ -1,0 +1,35 @@
+.laufliste-body {
+  display: flex;
+  font-weight: 400;
+  font-size: 0.7em;
+}
+.one {
+  flex: 1 1 20%;
+  padding-left: 5px;
+}
+.two {
+  flex: 1 1 30%;
+}
+.three {
+  flex: 1 1 15%;
+}
+.four {
+  flex: 1 1 10%;
+}
+.five {
+  flex: 1 1 15%;
+}
+.six {
+  flex: 1 1 10%;
+}
+.well {
+  background-color: var(--ztv-white);
+  color: var(--ztv-black);
+  cursor: pointer;
+}
+
+.hoverwell:hover {
+  background-color: var(--ztv-blue);
+  color: var(--ztv-white);
+  cursor: pointer;
+}

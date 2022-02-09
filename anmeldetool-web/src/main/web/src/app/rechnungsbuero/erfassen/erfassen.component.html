@@ -4,7 +4,10 @@
   </div>
   <div class="row">
     <div class="col-2">
-      <app-lauflisten-status [anlass]="anlass"></app-lauflisten-status>
+      <app-anlass-status
+        [anlass]="anlass"
+        (lauflisteSelectedEvent)="lauflisteSelected($event)"
+      ></app-anlass-status>
     </div>
     <div class="col-10">
       <div class="row">
@@ -52,6 +55,7 @@
             *ngFor="let eintrag of laufliste.eintraege"
             [eintrag]="eintrag"
             [sprung]="sprung"
+            (entryChangedEvent)="entryChanged($event)"
           ></app-erfassen-row>
         </div>
       </div>

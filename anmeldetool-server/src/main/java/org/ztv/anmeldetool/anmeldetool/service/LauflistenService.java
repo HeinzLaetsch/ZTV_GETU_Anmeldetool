@@ -83,6 +83,13 @@ public class LauflistenService {
 		}
 	}
 
+	public List<LauflistenContainer> getLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie,
+			AbteilungEnum abteilung, AnlageEnum anlage) {
+		List<LauflistenContainer> existierende = findLauflistenForAnlassAndKategorie(anlass, kategorie, abteilung,
+				anlage);
+		return existierende;
+	}
+
 	public int deleteLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie, AbteilungEnum abteilung,
 			AnlageEnum anlage) throws ServiceException {
 		List<LauflistenContainer> existierende = findLauflistenForAnlassAndKategorie(anlass, kategorie, abteilung,

@@ -1,20 +1,31 @@
-import { Component, Input, OnInit, Output } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewEncapsulation,
+} from "@angular/core";
 import { AbteilungEnum } from "src/app/core/model/AbteilungEnum";
 import { AnlageEnum } from "src/app/core/model/AnlageEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
+import { ILaufliste } from "src/app/core/model/ILaufliste";
 import { IUser } from "src/app/core/model/IUser";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
-import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.service";
 
 @Component({
-  selector: "app-lauflisten-status",
-  templateUrl: "./lauflisten-status.component.html",
-  styleUrls: ["./lauflisten-status.component.css"],
+  selector: "app-anlass-status",
+  templateUrl: "./anlass-status.component.html",
+  styleUrls: ["./anlass-status.component.css"],
+  encapsulation: ViewEncapsulation.None,
 })
-export class LauflistenStatusComponent implements OnInit {
+export class AnlassStatusComponent implements OnInit {
   @Input()
   anlass: IAnlass;
+
+  @Output()
+  lauflisteSelectedEvent = new EventEmitter<ILaufliste>();
 
   currentUser: IUser;
   panelOpenState = false;
@@ -23,25 +34,13 @@ export class LauflistenStatusComponent implements OnInit {
   abteilungen: AbteilungEnum[][];
   anlagen: AnlageEnum;
 
-  constructor(
-    private authService: AuthService,
-    private ranglistenService: RanglistenService
-  ) {
+  constructor(private authService: AuthService) {
     this.abteilungen = new Array();
   }
 
   ngOnInit() {
     this.currentUser = this.authService.currentUser;
     this.kategorien = this.anlass.getKategorienRaw().slice(1);
-    this.kategorien.forEach((kategorie) => {
-      this.abteilungen.push([]);
-      this.ranglistenService
-        .getAbteilungenForAnlass(this.anlass, kategorie)
-        .subscribe((result) => {
-          const index = this.kategorien.indexOf(kategorie);
-          this.abteilungen[index] = result;
-        });
-    });
   }
 
   getKategorien(): KategorieEnum[] {
@@ -54,5 +53,9 @@ export class LauflistenStatusComponent implements OnInit {
       return this.abteilungen[index];
     }
     return [];
+  }
+
+  lauflisteSelected(laufliste: ILaufliste): void {
+    this.lauflisteSelectedEvent.emit(laufliste);
   }
 }

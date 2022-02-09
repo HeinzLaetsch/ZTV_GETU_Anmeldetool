@@ -1,0 +1,26 @@
+<mat-expansion-panel>
+  <mat-expansion-panel-header>
+    <mat-panel-title> {{ kategorie }} </mat-panel-title>
+    <mat-panel-description>
+      Erfasst
+      <img
+        *ngIf="!erfasst"
+        class="smallIcon"
+        src="assets/images/skype/white-question-mark.png"
+      />
+      <img
+        *ngIf="erfasst"
+        class="smallIcon"
+        src="assets/images/skype/check-mark.png"
+      />
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+  <app-abteilung-status
+    *ngFor="let abteilung of abteilungen"
+    [anlass]="anlass"
+    [kategorie]="kategorie"
+    [abteilung]="abteilung"
+    (erfasstEvent)="erfasstChanged($event)"
+    (lauflisteSelectedEvent)="lauflisteSelected($event)"
+  ></app-abteilung-status>
+</mat-expansion-panel>

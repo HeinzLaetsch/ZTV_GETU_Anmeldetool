@@ -8,14 +8,22 @@ import { ErfassenComponent } from "./erfassen/erfassen.component";
 import { RechnungsbueroRoutes } from "./rechnungsbuero.routes";
 import { ErfassenHeaderComponent } from "./erfassen/header/erfassen-header.component";
 import { ErfassenRowComponent } from "./erfassen/row/erfassen-row.component";
-import { LauflistenStatusComponent } from "./erfassen/laufliste-status/lauflisten-status.component";
+import { AnlassStatusComponent } from "./erfassen/anlass-status/anlass-status.component";
+import { KategorieStatusComponent } from "./erfassen/anlass-status/kategorie-status/kategorie-status.component";
+import { AbteilungStatusComponent } from "./erfassen/anlass-status/abteilung-status/abteilung-status.component";
+import { AnlageStatusComponent } from "./erfassen/anlass-status/anlage-status/anlage-status.component";
+import { LauflisteStatusComponent } from "./erfassen/anlass-status/laufliste-status/laufliste-status.component";
 
 @NgModule({
   declarations: [
     ErfassenComponent,
     ErfassenHeaderComponent,
     ErfassenRowComponent,
-    LauflistenStatusComponent,
+    AnlassStatusComponent,
+    KategorieStatusComponent,
+    AbteilungStatusComponent,
+    AnlageStatusComponent,
+    LauflisteStatusComponent,
   ],
   imports: [
     CommonModule,

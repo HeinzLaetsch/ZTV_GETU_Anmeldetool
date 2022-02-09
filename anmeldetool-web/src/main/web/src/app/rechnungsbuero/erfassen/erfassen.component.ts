@@ -2,11 +2,11 @@ import { Component, OnInit } from "@angular/core";
 import { GeraeteEnum } from "src/app/core/model/GeraeteEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { ILaufliste } from "src/app/core/model/ILaufliste";
+import { ILauflistenEintrag } from "src/app/core/model/ILauflistenEintrag";
 import { IUser } from "src/app/core/model/IUser";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
-import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
 import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.service";
 
 @Component({
@@ -52,5 +52,14 @@ export class ErfassenComponent implements OnInit {
       .subscribe((laufliste) => {
         this.laufliste = laufliste;
       });
+  }
+
+  lauflisteSelected(laufliste: ILaufliste): void {
+    this.search = laufliste.laufliste;
+    this.searchLaufliste();
+  }
+
+  entryChanged(entry: ILauflistenEintrag) {
+    console.log("Entry: ", entry);
   }
 }

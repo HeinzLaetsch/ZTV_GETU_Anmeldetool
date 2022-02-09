@@ -1,13 +1,11 @@
 import { HttpClient, HttpHeaders, HttpResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import * as FileSaver from "file-saver";
-import { Observable, of, Subject, Subscription } from "rxjs";
+import { Observable, of, Subject } from "rxjs";
 import { catchError } from "rxjs/operators";
 import { environment } from "src/environments/environment";
 import { AbteilungEnum } from "../../model/AbteilungEnum";
 import { AnlageEnum } from "../../model/AnlageEnum";
-import { AnzeigeStatusEnum } from "../../model/AnzeigeStatusEnum";
-import { GeraeteEnum } from "../../model/GeraeteEnum";
 import { IAnlass } from "../../model/IAnlass";
 import { ILaufliste } from "../../model/ILaufliste";
 import { ILauflistenEintrag } from "../../model/ILauflistenEintrag";
@@ -62,6 +60,36 @@ export class RanglistenService {
       });
     return statusResponse.asObservable();
   }
+
+  getLauflisten(
+    anlass: IAnlass,
+    kategorie: KategorieEnum,
+    abteilung: AbteilungEnum,
+    anlage: AnlageEnum
+  ): Observable<ILaufliste[]> {
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "lauflisten" +
+      "/" +
+      kategorie +
+      "/" +
+      abteilung +
+      "/" +
+      anlage;
+    // console.log("getTeilnehmer called: ", combinedUrl);
+    // Accept JSON let headers: HttpHeaders = new HttpHeaders();
+    // headers = headers.append("Accept", "application/pdf");
+    return this.http.get<ILaufliste[]>(combinedUrl).pipe(
+      catchError((error) => {
+        this.handleError<ILaufliste[]>("getLauflisten");
+        return of(undefined);
+      })
+    );
+  }
+
   private saveAsFile(buffer: any, fileName: string, fileType: string): void {
     const asArray = [buffer];
     const data: Blob = new Blob(asArray, { type: fileType });
@@ -172,9 +200,16 @@ export class RanglistenService {
     */
   }
   updateLauflistenEintrag(
+    anlass: IAnlass,
     eintrag: ILauflistenEintrag
   ): Observable<ILauflistenEintrag> {
-    return of(eintrag);
+    const combinedUrl =
+      this.url + "/" + anlass?.id + "/" + "lauflisten/"+ eintrag.laufliste_id+"/lauflisteneintraege/" + eintrag.id;
+    return this.http.put<ILauflistenEintrag>(combinedUrl, eintrag).pipe(
+      catchError((error) => {
+        this.handleError<ILauflistenEintrag>("updateLauflistenEintrag");
+        return of(undefined);
+      })
   }
 
   private handleError<T>(
