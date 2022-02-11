@@ -15,7 +15,12 @@
       <div class="row">
         <mat-form-field appearance="fill">
           <mat-label>Lauflisten Schlüssel</mat-label>
-          <input matInput type="text" [(ngModel)]="search" />
+          <input
+            matInput
+            type="text"
+            [(ngModel)]="search"
+            (keyup.enter)="searchLaufliste()"
+          />
           <button
             *ngIf="search"
             matSuffix
