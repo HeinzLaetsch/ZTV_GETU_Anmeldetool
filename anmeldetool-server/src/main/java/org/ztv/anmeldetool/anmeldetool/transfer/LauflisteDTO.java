@@ -13,19 +13,21 @@ import lombok.Value;
 @Value
 @Builder
 public class LauflisteDTO {
-	UUID id;
+	private UUID id;
 
-	String laufliste;
+	private String laufliste;
 
-	GeraetEnum geraet;
+	private GeraetEnum geraet;
 
-	AbteilungEnum abteilung;
+	private AbteilungEnum abteilung;
 
-	AnlageEnum anlage;
+	private AnlageEnum anlage;
+
+	private int abloesung;
 
 	private boolean erfasst;
 
 	private boolean checked;
 
-	List<LauflistenEintragDTO> eintraege;
+	private List<LauflistenEintragDTO> eintraege;
 }

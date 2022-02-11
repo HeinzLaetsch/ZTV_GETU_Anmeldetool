@@ -87,16 +87,16 @@ export class ErfassenRowComponent implements OnInit {
         this.note_2_Cntr.enable();
       }
       this.note_1_Cntr.valueChanges.subscribe((value) => {
-        if (this.note_1_Cntr.value !== value) {
-          this.note_1_correct = +this.note_1_Cntr.value === this.eintrag.note_1;
-          this.fireCheckedEvent();
-        }
+        // if (this.note_1_Cntr.value !== value) {
+        this.note_1_correct = +this.note_1_Cntr.value === this.eintrag.note_1;
+        this.fireCheckedEvent();
+        // }
       });
       this.note_2_Cntr.valueChanges.subscribe((value) => {
-        if (this.note_2_Cntr.value !== value) {
-          this.note_2_correct = +this.note_2_Cntr.value === this.eintrag.note_2;
-          this.fireCheckedEvent();
-        }
+        // if (this.note_2_Cntr.value !== value) {
+        this.note_2_correct = +this.note_2_Cntr.value === this.eintrag.note_2;
+        this.fireCheckedEvent();
+        // }
       });
     }
     if (this.eintrag.deleted) {
@@ -211,7 +211,7 @@ export class ErfassenRowComponent implements OnInit {
     this.update();
   }
   delete() {
-    console.log("Delete");
+    // console.log("Delete");
     const dialogRef = this.dialog.open(NotenBlattZurueckZiehen, {
       data: this.eintrag,
     });

@@ -66,12 +66,22 @@ export class ErfassenComponent implements OnInit, OnDestroy {
   }
 
   searchLaufliste() {
-    console.log("Suche: ", this.search);
+    // console.log("Suche: ", this.search);
     this.ranglistenService
       .searchLauflisteByKey(this.anlass, this.search)
       .subscribe((laufliste) => {
         this.laufliste = laufliste;
       });
+  }
+  get sortedEintraege() {
+    return this.laufliste.eintraege.sort((a, b) => {
+      if (a.startOrder < b.startOrder) {
+        return -1;
+      }
+      if (a.startOrder > b.startOrder) {
+        return 1;
+      }
+    });
   }
 
   lauflisteSelected(laufliste: ILaufliste): void {

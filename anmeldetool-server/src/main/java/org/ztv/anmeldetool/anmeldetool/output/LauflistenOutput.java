@@ -146,24 +146,36 @@ public class LauflistenOutput {
 			widths = widths2;
 			isSprung = true;
 		}
+		laufliste.setAbloesung(currentIndex);
 		Table table = new Table(UnitValue.createPercentArray(widths)).useAllAvailableWidth();
 		table.setFixedLayout();
 		addTableHeader(table, isSprung);
 		int index = 0;
+		int startOrder = 0;
 		for (TeilnehmerAnlassLink tal : laufliste.getLauflistenContainer().getTeilnehmerAnlassLinksOrdered()) {
 			if (index >= geraet.ordinal()) {
-				addRows(table, tal, isSprung);
+				addRow(table, tal, isSprung);
+				updateStartOrder(tal, laufliste, startOrder++);
 			}
 			index++;
 		}
 		index = 0;
 		for (TeilnehmerAnlassLink tal : laufliste.getLauflistenContainer().getTeilnehmerAnlassLinksOrdered()) {
 			if (index < geraet.ordinal()) {
-				addRows(table, tal, isSprung);
+				addRow(table, tal, isSprung);
+				updateStartOrder(tal, laufliste, startOrder++);
 			}
 			index++;
 		}
 		document.add(table);
+	}
+
+	private static void updateStartOrder(TeilnehmerAnlassLink tal, Laufliste laufliste, int startOrder) {
+		laufliste.getEinzelnoten().stream().forEach(einzelnote -> {
+			if (tal.getId().equals(einzelnote.getNotenblatt().getTal().getId())) {
+				einzelnote.setStartOrder(startOrder);
+			}
+		});
 	}
 
 	private static void addContainer(Document document, LauflistenContainer container, GeraetEnum geraet,
@@ -186,7 +198,7 @@ public class LauflistenOutput {
 		}
 	}
 
-	private static void addRows(Table table, TeilnehmerAnlassLink tal, boolean isSprung) {
+	private static void addRow(Table table, TeilnehmerAnlassLink tal, boolean isSprung) {
 		Cell cell = new Cell();
 		cell.setMinHeight(30);
 		cell.setVerticalAlignment(VerticalAlignment.MIDDLE);

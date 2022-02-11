@@ -67,7 +67,7 @@
             <div class="col-1 centered">geprüft</div>
           </div>
           <app-erfassen-row
-            *ngFor="let eintrag of laufliste.eintraege"
+            *ngFor="let eintrag of sortedEintraege"
             [anlass]="anlass"
             [eintrag]="eintrag"
             [sprung]="sprung"

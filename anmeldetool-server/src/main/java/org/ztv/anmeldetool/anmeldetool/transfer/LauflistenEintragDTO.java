@@ -11,6 +11,7 @@ public class LauflistenEintragDTO {
 	UUID id;
 	UUID laufliste_id;
 	int startnummer;
+	int startOrder;
 	String verein;
 	String name;
 	String vorname;

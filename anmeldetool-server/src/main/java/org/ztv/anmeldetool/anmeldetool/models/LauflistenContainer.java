@@ -115,17 +115,38 @@ public class LauflistenContainer extends Base {
 		}
 		teilnehmerAnlassLinks.add(tal);
 		tal.setLauflistenContainer(this);
+		updateEinzelnoten(tal);
 		return this;
+	}
+
+	private void updateEinzelnoten(TeilnehmerAnlassLink tal) {
+		List<Einzelnote> einzelnoten = tal.getNotenblatt().getEinzelnoten();
+		this.getGeraeteLauflisten().stream().forEach(laufliste -> {
+			if (laufliste.getEinzelnoten() == null) {
+				laufliste.setEinzelnoten(new ArrayList<Einzelnote>());
+			}
+			einzelnoten.stream().forEach(einzelnote -> {
+				if (laufliste.getGeraet().equals(einzelnote.getGeraet())) {
+					laufliste.getEinzelnoten().add(einzelnote);
+					einzelnote.setLaufliste(laufliste);
+				}
+			});
+		});
 	}
 
 	private String getKey(int hashCode) {
 		// max int 2147483647
+		hashCode = Math.abs(hashCode);
 		int quersumme = 0;
 		for (int stelle = 1; stelle <= 10; stelle++) {
 			int rest = hashCode % 10;
 			quersumme += rest;
 			hashCode /= 10;
 		}
-		return String.format("%03d", incrementKey()) + String.format("%d", quersumme);
+		String key = String.format("%03d", incrementKey()) + String.format("%d", quersumme);
+		if (key.length() > 5) {
+			System.out.println("Help: " + key);
+		}
+		return key;
 	}
 }

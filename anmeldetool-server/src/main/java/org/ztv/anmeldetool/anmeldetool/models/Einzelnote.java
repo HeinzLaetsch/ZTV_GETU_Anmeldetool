@@ -8,6 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,7 +27,15 @@ public class Einzelnote extends Base {
 	@JoinColumn(name = "NOTENBLATT_ID", nullable = false, insertable = true, updatable = true)
 	private Notenblatt notenblatt;
 
-	@Enumerated(EnumType.ORDINAL)
+	// @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE,
+	// CascadeType.PERSIST })
+	// @ManyToOne(fetch = FetchType.LAZY)
+	// @JoinColumn(name = "LAUFLISTEN_ID", nullable = true, insertable = true,
+	// updatable = true)
+	@Transient
+	private Laufliste laufliste;
+
+	@Enumerated(EnumType.STRING)
 	private GeraetEnum geraet;
 
 	private float note_1;
@@ -36,4 +45,6 @@ public class Einzelnote extends Base {
 	private boolean erfasst;
 
 	private boolean checked;
+
+	private int startOrder;
 }

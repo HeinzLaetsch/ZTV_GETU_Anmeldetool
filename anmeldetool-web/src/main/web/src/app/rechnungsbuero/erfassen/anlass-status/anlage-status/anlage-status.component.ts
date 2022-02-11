@@ -59,6 +59,14 @@ export class AnlageStatusComponent implements OnInit {
       .getLauflisten(this.anlass, this.kategorie, this.abteilung, this.anlage)
       .subscribe((lauflisten) => {
         this.lauflisten = lauflisten.sort((a, b) => {
+          if (a.abloesung < b.abloesung) {
+            return -1;
+          }
+          if (a.abloesung > b.abloesung) {
+            return 1;
+          }
+          return 0;
+          /*
           if (a.geraet < b.geraet) {
             return -1;
           }
@@ -66,6 +74,7 @@ export class AnlageStatusComponent implements OnInit {
             return 1;
           }
           return 0;
+          */
         });
         this.lauflisten.forEach((laufliste) => {
           this.erfasstLauflisten.push(laufliste.erfasst);

@@ -95,16 +95,17 @@ public class AnlassController {
 				Einzelnote einzelnote = tal.getNotenblatt().getEinzelnoteForGeraet(laufliste.getGeraet());
 
 				return LauflistenEintragDTO.builder().id(tal.getId()).laufliste_id(laufliste.getId())
-						.startnummer(tal.getStartnummer()).verein(tal.getOrganisation().getName())
-						.name(tal.getTeilnehmer().getName()).vorname(tal.getTeilnehmer().getVorname())
-						.note_1(einzelnote.getNote_1()).note_2(einzelnote.getNote_2()).checked(einzelnote.isChecked())
-						.erfasst(einzelnote.isErfasst()).tal_id(tal.getId()).deleted(tal.isDeleted()).build();
+						.startnummer(tal.getStartnummer()).startOrder(einzelnote.getStartOrder())
+						.verein(tal.getOrganisation().getName()).name(tal.getTeilnehmer().getName())
+						.vorname(tal.getTeilnehmer().getVorname()).note_1(einzelnote.getNote_1())
+						.note_2(einzelnote.getNote_2()).checked(einzelnote.isChecked()).erfasst(einzelnote.isErfasst())
+						.tal_id(tal.getId()).deleted(tal.isDeleted()).build();
 			}).collect(Collectors.toList());
 
 			LauflisteDTO lauflisteDTO = LauflisteDTO.builder().laufliste(laufliste.getKey())
 					.abteilung(firstTal.getAbteilung()).anlage(firstTal.getAnlage()).geraet(laufliste.getGeraet())
 					.id(laufliste.getId()).eintraege(eintraege).erfasst(laufliste.isErfasst())
-					.checked(laufliste.isChecked()).build();
+					.checked(laufliste.isChecked()).abloesung(laufliste.getAbloesung()).build();
 			return ResponseEntity.ok(lauflisteDTO);
 		} catch (Exception ex) {
 			log.error("Unable to query LauflisteDTO: ", ex);
@@ -153,6 +154,17 @@ public class AnlassController {
 			AnlassLauflisten anlassLauflisten = lauflistenService.generateLauflistenForAnlassAndKategorie(anlass,
 					kategorie, abteilung, anlage);
 			LauflistenOutput.createLaufListe(anlassLauflisten, response);
+			anlassLauflisten.getLauflistenContainer().stream().forEach(container -> {
+				lauflistenService.saveAllLauflisten(container.getGeraeteLauflisten());
+				container.getGeraeteLauflisten().stream().forEach(laufliste -> {
+					laufliste.getEinzelnoten().stream().forEach(einzelnote -> {
+						Einzelnote note = lauflistenService.findEinzelnoteById(einzelnote.getId()).get();
+						note.setStartOrder(einzelnote.getStartOrder());
+						lauflistenService.saveEinzelnote(note);
+						// lauflistenService.saveAllEinzelnoten();
+					});
+				});
+			});
 		} catch (Exception ex) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Lauflisten: ", ex);
 		}
@@ -233,8 +245,8 @@ public class AnlassController {
 	}
 
 	@DeleteMapping("/{anlassId}/lauflisten/{lauflistenId}/lauflisteneintraege/{lauflisteneintragId}")
-	public ResponseEntity<Boolean> deleteEingeteilteWertungsrichter(HttpServletRequest request,
-			@PathVariable UUID anlassId, @PathVariable UUID lauflistenId, @PathVariable UUID lauflisteneintragId,
+	public ResponseEntity<Boolean> deleteLauflistenEintrag(HttpServletRequest request, @PathVariable UUID anlassId,
+			@PathVariable UUID lauflistenId, @PathVariable UUID lauflisteneintragId,
 			@RequestParam(name = "grund") String grund) {
 		try {
 			Optional<TeilnehmerAnlassLink> talOpt = teilnehmerAnlassLinkService

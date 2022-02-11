@@ -1,5 +1,7 @@
 package org.ztv.anmeldetool.anmeldetool.models;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -7,6 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +30,8 @@ public class Laufliste extends Base {
 	@Enumerated(EnumType.STRING)
 	private GeraetEnum geraet;
 
+	private int abloesung;
+
 	private boolean erfasst;
 
 	private boolean checked;
@@ -35,4 +40,11 @@ public class Laufliste extends Base {
 	@JoinColumn(name = "LAUFLISTEN_CONTAINER_ID", nullable = false, insertable = true, updatable = true)
 	@ToString.Exclude
 	private LauflistenContainer lauflistenContainer;
+
+	// @OneToMany(fetch = FetchType.LAZY, mappedBy = "laufliste", cascade = {
+	// CascadeType.MERGE, CascadeType.PERSIST })
+	// @OneToMany(fetch = FetchType.LAZY, mappedBy = "laufliste")
+	@ToString.Exclude
+	@Transient
+	private List<Einzelnote> einzelnoten;
 }

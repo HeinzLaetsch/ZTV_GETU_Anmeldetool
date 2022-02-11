@@ -11,4 +11,5 @@ export interface ILauflistenEintrag {
   checked: boolean;
   erfasst: boolean;
   deleted: boolean;
+  startOrder: number;
 }

@@ -53,12 +53,24 @@ public class LauflistenService {
 		return this.lauflistenRepo.findById(id);
 	}
 
+	public Optional<Einzelnote> findEinzelnoteById(UUID id) {
+		return this.einzelnotenRepo.findById(id);
+	}
+
 	public Einzelnote saveEinzelnote(Einzelnote einzelnote) {
 		return einzelnotenRepo.save(einzelnote);
 	}
 
+	public List<Einzelnote> saveAllEinzelnoten(List<Einzelnote> einzelnoten) {
+		return einzelnotenRepo.saveAll(einzelnoten);
+	}
+
 	public Laufliste saveLaufliste(Laufliste laufliste) {
 		return lauflistenRepo.save(laufliste);
+	}
+
+	public List<Laufliste> saveAllLauflisten(List<Laufliste> lauflisten) {
+		return lauflistenRepo.saveAll(lauflisten);
 	}
 
 	public LauflistenContainer saveLaufliste(LauflistenContainer lauflistenContainer) {
@@ -99,8 +111,8 @@ public class LauflistenService {
 				if (tal.getAbteilung() != null && tal.getAnlage() != null && tal.getStartgeraet() != null
 						&& tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET
 						&& tal.getMeldeStatus() != MeldeStatusEnum.UMMELDUNG) {
+					tal = this.createNotenblatt(tal);
 					anlasslaufListen.createFromTal(tal, abteilung, anlage);
-					this.createNotenblatt(tal);
 				}
 			}
 			persistLauflisten(anlasslaufListen);

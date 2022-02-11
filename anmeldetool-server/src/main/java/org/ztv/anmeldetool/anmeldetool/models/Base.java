@@ -45,4 +45,22 @@ public abstract class Base {
 		this.aktiv = aktiv;
 		this.changeDate = changeDate;
 	}
+
+	@Override
+	public int hashCode() {
+		if (id != null) {
+			return id.hashCode();
+		}
+		return super.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		Base other = (Base) obj;
+		if (id != null) {
+			if (other.id != null)
+				return id == other.id;
+		}
+		return true;
+	}
 }

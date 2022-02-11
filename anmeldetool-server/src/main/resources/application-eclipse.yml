@@ -43,7 +43,7 @@ logging:
     org.flywaydb: INFO
     org.springframework.web.cors: DEBUG
     org.hibernate.SQL: DEBUG
-    org.hibernate.type: TRACE
+    org.hibernate.type: INFO
     org.ztv.anmeldetool: DEBUG
 
 management:

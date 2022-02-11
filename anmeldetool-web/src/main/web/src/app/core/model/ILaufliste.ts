@@ -9,6 +9,7 @@ export interface ILaufliste {
   geraet: GeraeteEnum;
   abteilung: AbteilungEnum;
   anlage: AnlageEnum;
+  abloesung: number;
   erfasst?: boolean;
   checked?: boolean;
   eintraege: ILauflistenEintrag[];
