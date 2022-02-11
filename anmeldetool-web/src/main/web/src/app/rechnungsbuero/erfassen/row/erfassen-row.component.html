@@ -4,36 +4,88 @@
     <div class="col-2 label">{{ eintrag.verein }}</div>
     <div class="col-2 label">{{ eintrag.name }}</div>
     <div class="col-2 label">{{ eintrag.vorname }}</div>
-    <ng-container *ngIf="sprung">
-      <div class="col-1 data centered">
-        <mat-form-field appearance="fill">
-          <!--mat-label>Note 1</mat-label-->
-          <input matInput [formControl]="note_1_Cntr" type="text" />
-        </mat-form-field>
-      </div>
-      <div class="col-1 data centered">
-        <mat-form-field appearance="fill">
-          <mat-label>Note 2</mat-label>
-          <input matInput [formControl]="note_2_Cntr" type="text" />
-        </mat-form-field>
-      </div>
+    <!-- Mode Erfassen -->
+    <ng-container *ngIf="modeErfassen">
+      <ng-container *ngIf="sprung">
+        <div class="col-1 data centered">
+          <input
+            matInput
+            [formControl]="note_1_Cntr"
+            type="text"
+            class="note"
+          />
+        </div>
+        <div class="col-1 data centered">
+          <input
+            matInput
+            [formControl]="note_2_Cntr"
+            type="text"
+            class="note"
+          />
+        </div>
+      </ng-container>
+      <ng-container *ngIf="!sprung">
+        <div class="col-1 data centered">
+          <input
+            matInput
+            [formControl]="note_1_Cntr"
+            type="text"
+            class="note"
+          />
+        </div>
+      </ng-container>
     </ng-container>
-    <ng-container *ngIf="!sprung">
-      <div class="col-1 data centered">
-        <!--mat-form-field appearance="fill"-->
-        <!--mat-label>Note</mat-label-->
-        <input matInput [formControl]="note_1_Cntr" type="text" />
-        <!--/mat-form-field-->
-      </div>
+    <!-- Mode Check -->
+    <ng-container *ngIf="!modeErfassen">
+      <ng-container *ngIf="sprung">
+        <div class="col-1 data centered">
+          <span [ngClass]="getNotenStyle()">{{
+            eintrag.note_1 | number: "1.2-2"
+          }}</span>
+          <input
+            matInput
+            [formControl]="note_1_Cntr"
+            type="text"
+            class="note"
+          />
+        </div>
+        <div class="col-1 data centered">
+          <span [ngClass]="getNotenStyle()">{{
+            eintrag.note_2 | number: "1.2-2"
+          }}</span>
+          <input
+            matInput
+            [formControl]="note_2_Cntr"
+            type="text"
+            class="note"
+          />
+        </div>
+      </ng-container>
+      <ng-container *ngIf="!sprung">
+        <div class="col-1 data centered">
+          <span [ngClass]="getNotenStyle()">{{
+            eintrag.note_1 | number: "1.2-2"
+          }}</span>
+        </div>
+        <div class="col-1 data centered">
+          <input
+            matInput
+            [formControl]="note_1_Cntr"
+            type="text"
+            class="note"
+          />
+        </div>
+      </ng-container>
     </ng-container>
+
     <div class="col-1 data centered">
       <img
-        *ngIf="!saved"
+        *ngIf="!eintrag.erfasst"
         class="icon"
         src="assets/images/skype/white-question-mark.png"
       />
       <img
-        *ngIf="saved"
+        *ngIf="eintrag.erfasst"
         class="icon"
         src="assets/images/skype/check-mark.png"
       />
@@ -44,18 +96,42 @@
         class="icon"
         src="assets/images/skype/white-question-mark.png"
       />
-    </div>
-    <div class="col-1 data centered">
       <img
-        *ngIf="eintrag.checked && !eintrag.error"
+        *ngIf="eintrag.checked"
         class="icon"
         src="assets/images/skype/check-mark.png"
       />
-      <img
-        *ngIf="eintrag.checked && eintrag.error"
-        class="icon"
-        src="assets/images/skype/cross-mark.png"
-      />
+    </div>
+    <div *ngIf="!eintrag.deleted" class="col-1 centered">
+      <button mat-raised-button tabindex="-1">
+        <mat-icon
+          class="material-icons color_gray"
+          aria-hidden="false"
+          aria-label="Note leeren"
+          #tooltip="matTooltip"
+          matTooltip="Note leeren"
+          matTooltipPosition="below"
+          matTooltipHideDelay="100"
+          (click)="leeren()"
+          >clear</mat-icon
+        >
+      </button>
+      <button mat-raised-button [disabled]="eintrag.checked" tabindex="-1">
+        <mat-icon
+          class="material-icons color_gray"
+          aria-hidden="false"
+          aria-label="Notenblatt zurückziehen"
+          #tooltip="matTooltip"
+          matTooltip="Notenblatt zurückziehen"
+          matTooltipPosition="below"
+          matTooltipHideDelay="100"
+          (click)="delete()"
+          >delete</mat-icon
+        >
+      </button>
+    </div>
+    <div *ngIf="eintrag.deleted" class="col-1 centered deleted">
+      Notenblatt zurückgezogen
     </div>
   </div>
 </ng-container>

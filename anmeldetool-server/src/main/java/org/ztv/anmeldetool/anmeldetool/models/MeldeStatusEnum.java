@@ -1,7 +1,8 @@
 package org.ztv.anmeldetool.anmeldetool.models;
 
 public enum MeldeStatusEnum {
-	STARTET("Startet"), ABGEMELDET("Abgemeldet"), UMMELDUNG("Ummeldung"), NEUMELDUNG("Neumeldung");
+	STARTET("Startet"), ABGEMELDET("Abgemeldet"), UMMELDUNG("Ummeldung"), NEUMELDUNG("Neumeldung"),
+	VERLETZT("Verletzt"), NICHTGESTARTET("Nicht gestartet");
 
 	public final String text;
 

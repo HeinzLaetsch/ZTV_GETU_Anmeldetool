@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>Notenblatt und zurückziehen von</h2>
+<mat-dialog-content class="mat-typography">
+  <div class="container">
+    <div class="row">
+      <div class="col-5 label">Name:</div>
+      <div class="col-7">{{ eintrag.name }}</div>
+    </div>
+    <div class="row">
+      <div class="col-5 label">Vorname</div>
+      <div class="col-7">{{ eintrag.vorname }}</div>
+    </div>
+    <div class="row">
+      <div class="col-5 label">Startnummer</div>
+      <div class="col-7">{{ eintrag.startnummer }}</div>
+    </div>
+    <div class="row">
+      <div class="col-5 label">Verein</div>
+      <div class="col-7">{{ eintrag.verein }}</div>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="ABBRECHEN" cdkFocusInitial>
+    Abbrechen
+  </button>
+  <button mat-button [mat-dialog-close]="VERLETZT">verletzt</button>
+  <button mat-button [mat-dialog-close]="NICHT_ANGETRETEN">
+    nicht gestartet
+  </button>
+</mat-dialog-actions>

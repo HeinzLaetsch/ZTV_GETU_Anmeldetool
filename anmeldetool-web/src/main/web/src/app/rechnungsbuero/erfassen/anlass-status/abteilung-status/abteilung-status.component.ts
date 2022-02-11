@@ -28,17 +28,26 @@ export class AbteilungStatusComponent implements OnInit {
   kategorie: KategorieEnum;
   @Input()
   abteilung: AbteilungEnum;
+  @Input()
+  erfasstChangedEmitter: EventEmitter<ILaufliste>;
+  @Input()
+  checkedChangedEmitter: EventEmitter<ILaufliste>;
   @Output()
   erfasstEvent = new EventEmitter<ChangeEvent>();
+  @Output()
+  checkedEvent = new EventEmitter<ChangeEvent>();
   @Output()
   lauflisteSelectedEvent = new EventEmitter<ILaufliste>();
 
   erfasst: boolean;
   erfasstAnlagen: boolean[];
+  checked: boolean;
+  checkedAnlagen: boolean[];
 
   anlagen: AnlageEnum[];
   constructor(private ranglistenService: RanglistenService) {
     this.erfasstAnlagen = new Array(Object.keys(AnlageEnum).length);
+    this.checkedAnlagen = new Array(Object.keys(AnlageEnum).length);
   }
 
   ngOnInit() {
@@ -47,6 +56,9 @@ export class AbteilungStatusComponent implements OnInit {
       .subscribe((anlagen) => {
         this.anlagen = anlagen;
       });
+    this.erfasstChangedEmitter.subscribe((laufliste) => {
+      // console.log("AbteilungStatusComponent: Laufliste changed: ", laufliste);
+    });
   }
   erfasstChanged(changeEvent: ChangeEvent) {
     this.erfasstAnlagen[this.getIndex(changeEvent.topic)] = changeEvent.status;
@@ -62,6 +74,21 @@ export class AbteilungStatusComponent implements OnInit {
       topic: this.abteilung,
     };
     this.erfasstEvent.emit(eventData);
+  }
+  checkedChanged(changeEvent: ChangeEvent) {
+    this.checkedAnlagen[this.getIndex(changeEvent.topic)] = changeEvent.status;
+    const nichtAlle = this.checkedAnlagen.filter((checked) => {
+      if (checked === false) {
+        return true;
+      }
+      return false;
+    });
+    this.checked = nichtAlle.length === 0;
+    const eventData: ChangeEvent = {
+      status: this.checked,
+      topic: this.abteilung,
+    };
+    this.checkedEvent.emit(eventData);
   }
 
   lauflisteSelected(laufliste: ILaufliste): void {

@@ -6,5 +6,12 @@ export const RechnungsbueroRoutes = [
     path: "erfassen",
     component: ErfassenComponent,
     canActivate: [AuthRouteActivatorService],
+    data: { function: "erfassen" },
+  },
+  {
+    path: "check",
+    component: ErfassenComponent,
+    canActivate: [AuthRouteActivatorService],
+    data: { function: "check" },
   },
 ];

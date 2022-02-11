@@ -7,6 +7,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.Getter;
@@ -44,6 +45,11 @@ public class TeilnehmerAnlassLink extends Base {
 	@JoinColumn(name = "LAUFLISTEN_CONTAINER_ID", nullable = true, insertable = true, updatable = true)
 	@ToString.Exclude
 	private LauflistenContainer lauflistenContainer;
+
+	@OneToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	@JoinColumn(name = "notenblatt_id", referencedColumnName = "id", nullable = true, insertable = true, updatable = true)
+	@ToString.Exclude
+	private Notenblatt notenblatt;
 
 	private Integer startnummer;
 

@@ -13,6 +13,7 @@ import { KategorieStatusComponent } from "./erfassen/anlass-status/kategorie-sta
 import { AbteilungStatusComponent } from "./erfassen/anlass-status/abteilung-status/abteilung-status.component";
 import { AnlageStatusComponent } from "./erfassen/anlass-status/anlage-status/anlage-status.component";
 import { LauflisteStatusComponent } from "./erfassen/anlass-status/laufliste-status/laufliste-status.component";
+import { NotenBlattZurueckZiehen } from "./erfassen/row/delete-dialog/delete-notenblatt.component";
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { LauflisteStatusComponent } from "./erfassen/anlass-status/laufliste-sta
     AbteilungStatusComponent,
     AnlageStatusComponent,
     LauflisteStatusComponent,
+    NotenBlattZurueckZiehen,
   ],
   imports: [
     CommonModule,

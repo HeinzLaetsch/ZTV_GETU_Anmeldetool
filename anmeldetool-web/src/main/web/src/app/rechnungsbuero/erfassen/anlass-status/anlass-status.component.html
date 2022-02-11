@@ -3,6 +3,8 @@
     *ngFor="let kategorie of getKategorien()"
     [anlass]="anlass"
     [kategorie]="kategorie"
+    [erfasstChangedEmitter]="erfasstChangedEmitter"
+    [checkedChangedEmitter]="checkedChangedEmitter"
     (lauflisteSelectedEvent)="lauflisteSelected($event)"
   ></app-kategorie-status>
 </mat-accordion>

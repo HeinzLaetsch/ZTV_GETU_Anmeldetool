@@ -2,7 +2,7 @@
   <mat-expansion-panel-header>
     <mat-panel-title> {{ abteilung }} </mat-panel-title>
     <mat-panel-description>
-      Erfasst
+      erfasst
       <img
         *ngIf="!erfasst"
         class="smallIcon"
@@ -10,6 +10,17 @@
       />
       <img
         *ngIf="erfasst"
+        class="smallIcon"
+        src="assets/images/skype/check-mark.png"
+      />
+      checked
+      <img
+        *ngIf="!checked"
+        class="smallIcon"
+        src="assets/images/skype/white-question-mark.png"
+      />
+      <img
+        *ngIf="checked"
         class="smallIcon"
         src="assets/images/skype/check-mark.png"
       />
@@ -21,7 +32,10 @@
     [kategorie]="kategorie"
     [abteilung]="abteilung"
     [anlage]="anlage"
+    [erfasstChangedEmitter]="erfasstChangedEmitter"
+    [checkedChangedEmitter]="checkedChangedEmitter"
     (erfasstEvent)="erfasstChanged($event)"
+    (checkedEvent)="checkedChanged($event)"
     (lauflisteSelectedEvent)="lauflisteSelected($event)"
   ></app-anlage-status>
 </mat-expansion-panel>

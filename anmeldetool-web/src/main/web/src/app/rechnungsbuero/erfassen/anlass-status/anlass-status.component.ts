@@ -1,3 +1,4 @@
+import { THIS_EXPR } from "@angular/compiler/src/output/output_ast";
 import {
   Component,
   EventEmitter,
@@ -23,6 +24,10 @@ import { AuthService } from "src/app/core/service/auth/auth.service";
 export class AnlassStatusComponent implements OnInit {
   @Input()
   anlass: IAnlass;
+  @Input()
+  erfasstChangedEmitter: EventEmitter<ILaufliste>;
+  @Input()
+  checkedChangedEmitter: EventEmitter<ILaufliste>;
 
   @Output()
   lauflisteSelectedEvent = new EventEmitter<ILaufliste>();
@@ -41,6 +46,9 @@ export class AnlassStatusComponent implements OnInit {
   ngOnInit() {
     this.currentUser = this.authService.currentUser;
     this.kategorien = this.anlass.getKategorienRaw().slice(1);
+    this.erfasstChangedEmitter.subscribe((laufliste) => {
+      // console.log("AnlassStatusComponent : Laufliste changed: ", laufliste);
+    });
   }
 
   getKategorien(): KategorieEnum[] {

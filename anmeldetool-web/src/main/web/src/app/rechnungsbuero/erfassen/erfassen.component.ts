@@ -1,4 +1,6 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, EventEmitter, OnDestroy, OnInit } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
+import { Subject, Subscription } from "rxjs";
 import { GeraeteEnum } from "src/app/core/model/GeraeteEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { ILaufliste } from "src/app/core/model/ILaufliste";
@@ -14,35 +16,53 @@ import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.ser
   templateUrl: "./erfassen.component.html",
   styleUrls: ["./erfassen.component.css"],
 })
-export class ErfassenComponent implements OnInit {
+export class ErfassenComponent implements OnInit, OnDestroy {
+  private routeSubject: Subscription;
+
+  checkedChangedEmitter = new EventEmitter<ILaufliste>();
+
+  erfasstChangedEmitter = new EventEmitter<ILaufliste>();
+
   currentUser: IUser;
   anlass: IAnlass;
   laufliste: ILaufliste;
 
   search: string;
 
+  modeErfassen = true;
+
   constructor(
     private authService: AuthService,
     private anlassService: CachingAnlassService,
-    private ranglistenService: RanglistenService
+    private ranglistenService: RanglistenService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
     this.currentUser = this.authService.currentUser;
     this.anlass = this.anlassService.getAnlaesse(TiTuEnum.Tu)[0];
+    this.routeSubject = this.route.data.subscribe((params) => {
+      if (params.function === "erfassen") {
+        this.modeErfassen = true;
+      } else {
+        this.modeErfassen = false;
+      }
+    });
   }
 
   get sprung(): boolean {
-    if (this.laufliste?.geraet === GeraeteEnum.SPRUNG) {
+    if (
+      this.laufliste?.geraet === GeraeteEnum.SPRUNG.toString().toUpperCase()
+    ) {
       return true;
     }
     return false;
   }
   get title(): string {
-    if (this.sprung) {
+    if (this.modeErfassen) {
       return "Noten erfassen";
     }
-    return "Note erfassen";
+    return "Note überprüfen";
   }
 
   searchLaufliste() {
@@ -59,7 +79,57 @@ export class ErfassenComponent implements OnInit {
     this.searchLaufliste();
   }
 
+  private updateLaufliste(): void {
+    this.ranglistenService
+      .updateLaufliste(this.anlass, this.laufliste)
+      .subscribe((laufliste) => {
+        this.laufliste = laufliste;
+        if (this.modeErfassen) {
+          this.erfasstChangedEmitter.emit(laufliste);
+        } else {
+          this.checkedChangedEmitter.emit(laufliste);
+        }
+      });
+  }
   entryChanged(entry: ILauflistenEintrag) {
-    console.log("Entry: ", entry);
+    const toBeUpdated = this.laufliste.eintraege.filter((eintrag) => {
+      return eintrag.tal_id === entry.tal_id;
+    })[0];
+    if (this.modeErfassen) {
+      toBeUpdated.erfasst = entry.erfasst;
+      const notErfasst = this.laufliste.eintraege.filter((eintrag) => {
+        return !eintrag.erfasst && !eintrag.deleted;
+      });
+      if (notErfasst.length === 0) {
+        this.laufliste.erfasst = true;
+        this.updateLaufliste();
+      } else {
+        // TODO handle rollback
+        const old = this.laufliste.erfasst;
+        this.laufliste.erfasst = false;
+        if (old) {
+          this.updateLaufliste();
+        }
+      }
+    } else {
+      toBeUpdated.checked = entry.checked;
+      const notChecked = this.laufliste.eintraege.filter((eintrag) => {
+        return !eintrag.checked && !eintrag.deleted;
+      });
+      if (notChecked.length === 0) {
+        this.laufliste.checked = true;
+        this.updateLaufliste();
+      } else {
+        const old = this.laufliste.checked;
+        this.laufliste.checked = false;
+        if (old) {
+          this.updateLaufliste();
+        }
+      }
+    }
+  }
+
+  ngOnDestroy() {
+    this.routeSubject.unsubscribe();
   }
 }

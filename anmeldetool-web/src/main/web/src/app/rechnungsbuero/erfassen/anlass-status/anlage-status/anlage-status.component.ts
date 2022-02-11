@@ -30,8 +30,14 @@ export class AnlageStatusComponent implements OnInit {
   abteilung: AbteilungEnum;
   @Input()
   anlage: AnlageEnum;
+  @Input()
+  erfasstChangedEmitter: EventEmitter<ILaufliste>;
+  @Input()
+  checkedChangedEmitter: EventEmitter<ILaufliste>;
   @Output()
   erfasstEvent = new EventEmitter<ChangeEvent>();
+  @Output()
+  checkedEvent = new EventEmitter<ChangeEvent>();
   @Output()
   lauflisteSelectedEvent = new EventEmitter<ILaufliste>();
 
@@ -40,21 +46,47 @@ export class AnlageStatusComponent implements OnInit {
   erfasst = true;
   erfasstLauflisten: boolean[];
 
+  checked = true;
+  checkedLauflisten: boolean[];
+
   constructor(private ranglistenService: RanglistenService) {
     this.erfasstLauflisten = new Array<boolean>();
+    this.checkedLauflisten = new Array<boolean>();
   }
 
   ngOnInit(): void {
     this.ranglistenService
       .getLauflisten(this.anlass, this.kategorie, this.abteilung, this.anlage)
       .subscribe((lauflisten) => {
-        this.lauflisten = lauflisten;
+        this.lauflisten = lauflisten.sort((a, b) => {
+          if (a.geraet < b.geraet) {
+            return -1;
+          }
+          if (a.geraet > b.geraet) {
+            return 1;
+          }
+          return 0;
+        });
         this.lauflisten.forEach((laufliste) => {
           this.erfasstLauflisten.push(laufliste.erfasst);
+          this.checkedLauflisten.push(laufliste.checked);
         });
         this.erfasstChanged();
+        this.checkedChanged();
       });
+    this.erfasstChangedEmitter.subscribe((laufliste) => {
+      // console.log("AnlageStatusComponent: Laufliste changed: ", laufliste);
+    });
   }
+
+  lauflisteErfasstChanged(lauflisten: ILaufliste) {
+    this.erfasstChanged();
+  }
+
+  lauflisteCheckedChanged(lauflisten: ILaufliste) {
+    this.checkedChanged();
+  }
+
   erfasstChanged() {
     const nichtAlle = this.erfasstLauflisten.filter((erfasst) => {
       if (erfasst === false) {
@@ -67,8 +99,22 @@ export class AnlageStatusComponent implements OnInit {
       status: this.erfasst,
       topic: this.anlage,
     };
-    eventData.status = true;
     this.erfasstEvent.emit(eventData);
+  }
+
+  checkedChanged() {
+    const nichtAlle = this.checkedLauflisten.filter((checked) => {
+      if (checked === false) {
+        return true;
+      }
+      return false;
+    });
+    this.checked = nichtAlle.length === 0;
+    const eventData: ChangeEvent = {
+      status: this.checked,
+      topic: this.anlage,
+    };
+    this.checkedEvent.emit(eventData);
   }
 
   lauflisteSelected(laufliste: ILaufliste): void {

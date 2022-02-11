@@ -1,7 +1,3 @@
-import { IPersonAnlassLink } from "./IPersonAnlassLink";
-import { IRolle } from "./IRolle";
-import { IWertungsrichter } from "./IWertungsrichter";
-
 export interface ILauflistenEintrag {
   id: string;
   laufliste_id: string;
@@ -13,5 +9,6 @@ export interface ILauflistenEintrag {
   note_2?: number;
   tal_id: string;
   checked: boolean;
-  error: boolean;
+  erfasst: boolean;
+  deleted: boolean;
 }

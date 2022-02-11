@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,10 +30,12 @@ import org.ztv.anmeldetool.anmeldetool.models.AbteilungEnum;
 import org.ztv.anmeldetool.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.anmeldetool.models.AnlassLauflisten;
+import org.ztv.anmeldetool.anmeldetool.models.Einzelnote;
+import org.ztv.anmeldetool.anmeldetool.models.GeraetEnum;
 import org.ztv.anmeldetool.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.anmeldetool.models.Laufliste;
 import org.ztv.anmeldetool.anmeldetool.models.LauflistenContainer;
-import org.ztv.anmeldetool.anmeldetool.models.OrganisationAnlassLink;
+import org.ztv.anmeldetool.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.anmeldetool.output.LauflistenOutput;
 import org.ztv.anmeldetool.anmeldetool.service.AnlassService;
@@ -42,7 +43,6 @@ import org.ztv.anmeldetool.anmeldetool.service.LauflistenService;
 import org.ztv.anmeldetool.anmeldetool.service.TeilnehmerAnlassLinkService;
 import org.ztv.anmeldetool.anmeldetool.transfer.LauflisteDTO;
 import org.ztv.anmeldetool.anmeldetool.transfer.LauflistenEintragDTO;
-import org.ztv.anmeldetool.anmeldetool.transfer.OrganisationAnlassLinkDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -92,15 +92,19 @@ public class AnlassController {
 			TeilnehmerAnlassLink firstTal = tals.get(0);
 
 			List<LauflistenEintragDTO> eintraege = tals.stream().map(tal -> {
-				return LauflistenEintragDTO.builder().id(null).laufliste_id(laufliste.getId())
+				Einzelnote einzelnote = tal.getNotenblatt().getEinzelnoteForGeraet(laufliste.getGeraet());
+
+				return LauflistenEintragDTO.builder().id(tal.getId()).laufliste_id(laufliste.getId())
 						.startnummer(tal.getStartnummer()).verein(tal.getOrganisation().getName())
-						.name(tal.getTeilnehmer().getName()).vorname(tal.getTeilnehmer().getVorname()).note_1(-1f)
-						.note_2(-2f).checked(false).error(false).tal_id(tal.getId()).build();
+						.name(tal.getTeilnehmer().getName()).vorname(tal.getTeilnehmer().getVorname())
+						.note_1(einzelnote.getNote_1()).note_2(einzelnote.getNote_2()).checked(einzelnote.isChecked())
+						.erfasst(einzelnote.isErfasst()).tal_id(tal.getId()).deleted(tal.isDeleted()).build();
 			}).collect(Collectors.toList());
 
-			LauflisteDTO lauflisteDTO = LauflisteDTO.builder().abteilung(firstTal.getAbteilung())
-					.anlage(firstTal.getAnlage()).geraet(laufliste.getGeraet()).id(laufliste.getId())
-					.eintraege(eintraege).build();
+			LauflisteDTO lauflisteDTO = LauflisteDTO.builder().laufliste(laufliste.getKey())
+					.abteilung(firstTal.getAbteilung()).anlage(firstTal.getAnlage()).geraet(laufliste.getGeraet())
+					.id(laufliste.getId()).eintraege(eintraege).erfasst(laufliste.isErfasst())
+					.checked(laufliste.isChecked()).build();
 			return ResponseEntity.ok(lauflisteDTO);
 		} catch (Exception ex) {
 			log.error("Unable to query LauflisteDTO: ", ex);
@@ -178,10 +182,81 @@ public class AnlassController {
 		}
 	}
 
-	@PutMapping("/{anlassId}/lauflisten/{lauslistenId}/lauflisteneintraege/{lauflisteneintragId}")
-	public @ResponseBody ResponseEntity<LauflistenEintragDTO> patchAnlassVereine(HttpServletRequest request, HttpServletResponse response,
-			@PathVariable UUID anlassId, @PathVariable UUID lauslistenId, @PathVariable UUID lauflisteneintragId, @RequestBody LauflistenEintragDTO lauflistenEintragDto) {
-		return lauflistenService.;
+	@PutMapping("/{anlassId}/lauflisten/{lauflistenId}/lauflisteneintraege/{lauflisteneintragId}")
+	public @ResponseBody ResponseEntity<LauflistenEintragDTO> putAnlassVereine(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable UUID anlassId, @PathVariable UUID lauflistenId,
+			@PathVariable UUID lauflisteneintragId, @RequestBody LauflistenEintragDTO lauflistenEintragDto) {
+		// return lauflistenService.;
+		Optional<TeilnehmerAnlassLink> talOpt = teilnehmerAnlassLinkService
+				.findTeilnehmerAnlassLinkById(lauflistenEintragDto.getTal_id());
+		Optional<Laufliste> lauflisteOpt = this.lauflistenService
+				.findLauflisteById(lauflistenEintragDto.getLaufliste_id());
+		if (talOpt.isPresent() && lauflisteOpt.isPresent()) {
+			TeilnehmerAnlassLink tal = talOpt.get();
+			Laufliste laufliste = lauflisteOpt.get();
+			Einzelnote einzelnote = tal.getNotenblatt().getEinzelnoteForGeraet(laufliste.getGeraet());
+			einzelnote.setNote_1(lauflistenEintragDto.getNote_1());
+			einzelnote.setNote_2(lauflistenEintragDto.getNote_2());
+			if (einzelnote.getNote_1() > 0
+					&& (einzelnote.getNote_2() > 0 || !GeraetEnum.SPRUNG.equals(laufliste.getGeraet()))) {
+				einzelnote.setErfasst(true);
+			} else {
+				einzelnote.setErfasst(false);
+			}
+			einzelnote.setChecked(lauflistenEintragDto.isChecked());
+			einzelnote = lauflistenService.saveEinzelnote(einzelnote);
+			LauflistenEintragDTO le = LauflistenEintragDTO.builder().id(tal.getId()).laufliste_id(laufliste.getId())
+					.startnummer(tal.getStartnummer()).verein(tal.getOrganisation().getName())
+					.name(tal.getTeilnehmer().getName()).vorname(tal.getTeilnehmer().getVorname())
+					.note_1(einzelnote.getNote_1()).note_2(einzelnote.getNote_2()).checked(einzelnote.isChecked())
+					.erfasst(einzelnote.isErfasst()).tal_id(tal.getId()).deleted(tal.isDeleted()).build();
+			return ResponseEntity.ok(le);
+		} else {
+			return this.getNotFound();
+		}
+	}
+
+	@PutMapping("/{anlassId}/lauflisten/{lauflistenId}")
+	public @ResponseBody ResponseEntity<LauflisteDTO> putLaufliste(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable UUID anlassId, @PathVariable UUID lauflistenId,
+			@RequestBody LauflisteDTO lauflisteDto) {
+		Optional<Laufliste> lauflisteOpt = lauflistenService.findLauflisteById(lauflisteDto.getId());
+		if (lauflisteOpt.isPresent()) {
+			Laufliste laufliste = lauflisteOpt.get();
+			laufliste.setErfasst(lauflisteDto.isErfasst());
+			laufliste.setChecked(lauflisteDto.isChecked());
+			laufliste = lauflistenService.saveLaufliste(laufliste);
+			return ResponseEntity.ok(lauflisteDto);
+		} else {
+			return this.getNotFound();
+		}
+	}
+
+	@DeleteMapping("/{anlassId}/lauflisten/{lauflistenId}/lauflisteneintraege/{lauflisteneintragId}")
+	public ResponseEntity<Boolean> deleteEingeteilteWertungsrichter(HttpServletRequest request,
+			@PathVariable UUID anlassId, @PathVariable UUID lauflistenId, @PathVariable UUID lauflisteneintragId,
+			@RequestParam(name = "grund") String grund) {
+		try {
+			Optional<TeilnehmerAnlassLink> talOpt = teilnehmerAnlassLinkService
+					.findTeilnehmerAnlassLinkById(lauflisteneintragId);
+			if (talOpt.isEmpty()) {
+				return this.getNotFound();
+			}
+			TeilnehmerAnlassLink tal = talOpt.get();
+			tal.setDeleted(true);
+			tal.setAktiv(false);
+			if ("nichtAngetreten".equals(grund)) {
+				tal.setMeldeStatus(MeldeStatusEnum.NICHTGESTARTET);
+			}
+			if ("verletzt".equals(grund)) {
+				tal.setMeldeStatus(MeldeStatusEnum.VERLETZT);
+			}
+			teilnehmerAnlassLinkService.save(tal);
+
+			return ResponseEntity.ok(Boolean.TRUE);
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().build();
+		}
 	}
 
 	private <T> ResponseEntity<T> getNotFound() {

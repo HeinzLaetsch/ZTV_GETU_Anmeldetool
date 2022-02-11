@@ -1,6 +1,9 @@
 .mat-expansion-panel-body {
   padding: 0 !important;
 }
+mat-panel-description {
+  font-size: 0.7em !important;
+}
 .abteilung-body {
   color: var(--ztv-black);
   font-weight: 400;

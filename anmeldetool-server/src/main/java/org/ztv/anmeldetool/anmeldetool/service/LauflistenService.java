@@ -1,7 +1,9 @@
 package org.ztv.anmeldetool.anmeldetool.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +12,18 @@ import org.ztv.anmeldetool.anmeldetool.models.AbteilungEnum;
 import org.ztv.anmeldetool.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.anmeldetool.models.AnlassLauflisten;
+import org.ztv.anmeldetool.anmeldetool.models.Einzelnote;
+import org.ztv.anmeldetool.anmeldetool.models.GeraetEnum;
 import org.ztv.anmeldetool.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.anmeldetool.models.Laufliste;
 import org.ztv.anmeldetool.anmeldetool.models.LauflistenContainer;
 import org.ztv.anmeldetool.anmeldetool.models.MeldeStatusEnum;
+import org.ztv.anmeldetool.anmeldetool.models.Notenblatt;
 import org.ztv.anmeldetool.anmeldetool.models.TeilnehmerAnlassLink;
+import org.ztv.anmeldetool.anmeldetool.repositories.EinzelnotenRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.LauflistenContainerRepository;
 import org.ztv.anmeldetool.anmeldetool.repositories.LauflistenRepository;
+import org.ztv.anmeldetool.anmeldetool.repositories.NotenblaetterRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,10 +38,32 @@ public class LauflistenService {
 	LauflistenContainerRepository lauflistenContainerRepo;
 
 	@Autowired
+	NotenblaetterRepository notenblaetterRepo;
+
+	@Autowired
+	EinzelnotenRepository einzelnotenRepo;
+
+	@Autowired
 	TeilnehmerAnlassLinkService talService;
 
 	@Autowired
 	TeilnehmerService teilnehmerService;
+
+	public Optional<Laufliste> findLauflisteById(UUID id) {
+		return this.lauflistenRepo.findById(id);
+	}
+
+	public Einzelnote saveEinzelnote(Einzelnote einzelnote) {
+		return einzelnotenRepo.save(einzelnote);
+	}
+
+	public Laufliste saveLaufliste(Laufliste laufliste) {
+		return lauflistenRepo.save(laufliste);
+	}
+
+	public LauflistenContainer saveLaufliste(LauflistenContainer lauflistenContainer) {
+		return lauflistenContainerRepo.save(lauflistenContainer);
+	}
 
 	public List<LauflistenContainer> findLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie,
 			AbteilungEnum abteilung, AnlageEnum anlage) {
@@ -71,6 +100,7 @@ public class LauflistenService {
 						&& tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET
 						&& tal.getMeldeStatus() != MeldeStatusEnum.UMMELDUNG) {
 					anlasslaufListen.createFromTal(tal, abteilung, anlage);
+					this.createNotenblatt(tal);
 				}
 			}
 			persistLauflisten(anlasslaufListen);
@@ -94,16 +124,39 @@ public class LauflistenService {
 			AnlageEnum anlage) throws ServiceException {
 		List<LauflistenContainer> existierende = findLauflistenForAnlassAndKategorie(anlass, kategorie, abteilung,
 				anlage);
+		List<Notenblatt> notenblaetter = new ArrayList<Notenblatt>();
 		existierende.forEach(container -> {
 			container.getTeilnehmerAnlassLinks().forEach(tal -> {
 				if (abteilung.equals(AbteilungEnum.UNDEFINED) || tal.getAbteilung().equals(abteilung)) {
 					tal.setLauflistenContainer(null);
 					talService.save(tal);
+					notenblaetter.add(tal.getNotenblatt());
+					tal.setNotenblatt(null);
 				}
 			});
 		});
+		notenblaetterRepo.deleteAll(notenblaetter);
 		lauflistenContainerRepo.deleteAll(existierende);
 		return existierende.size();
+	}
+
+	private TeilnehmerAnlassLink createNotenblatt(TeilnehmerAnlassLink tal) {
+		Notenblatt notenblatt = new Notenblatt();
+		List<Einzelnote> einzelnoten = new ArrayList<Einzelnote>();
+		notenblatt.setEinzelnoten(einzelnoten);
+		notenblatt.setTal(tal);
+		tal.setNotenblatt(notenblatt);
+		GeraetEnum[] values = GeraetEnum.values();
+		for (GeraetEnum value : values) {
+			if (GeraetEnum.UNDEFINED.equals(value)) {
+				continue;
+			}
+			Einzelnote einzelnote = new Einzelnote();
+			einzelnote.setNotenblatt(notenblatt);
+			einzelnote.setGeraet(value);
+			einzelnoten.add(einzelnote);
+		}
+		return tal;
 	}
 
 	public Optional<Laufliste> findLauflistenForAnlassAndSearch(Anlass anlass, String search) {
@@ -116,11 +169,6 @@ public class LauflistenService {
 	private void persistLauflisten(AnlassLauflisten anlassLaufListen) {
 		List<LauflistenContainer> concated = anlassLaufListen.getLauflistenContainer();
 		log.debug("Anzahl Elements {}", concated.size());
-		/*
-		 * concated.forEach(container -> {
-		 * container.getTeilnehmerAnlassLinks().forEach(tal -> {
-		 * tal.setLauflistenContainer(container); talService.save(tal); }); });
-		 */
 		lauflistenContainerRepo.saveAll(concated);
 	}
 }

@@ -18,5 +18,6 @@ public class LauflistenEintragDTO {
 	float note_2;
 	UUID tal_id;
 	boolean checked;
-	boolean error;
+	boolean erfasst;
+	boolean deleted;
 }

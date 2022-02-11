@@ -4,7 +4,6 @@ import { AnlageEnum } from "src/app/core/model/AnlageEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { ILaufliste } from "src/app/core/model/ILaufliste";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.service";
 
 @Component({
   selector: "app-laufliste-status",
@@ -22,12 +21,40 @@ export class LauflisteStatusComponent implements OnInit {
   anlage: AnlageEnum;
   @Input()
   laufliste: ILaufliste;
+  @Input()
+  erfasstChangedEmitter: EventEmitter<ILaufliste>;
+  @Input()
+  checkedChangedEmitter: EventEmitter<ILaufliste>;
   @Output()
   lauflisteSelectedEvent = new EventEmitter<ILaufliste>();
+  @Output()
+  lauflisteErfasstEvent = new EventEmitter<ILaufliste>();
 
-  constructor(private ranglistenService: RanglistenService) {}
+  @Output()
+  lauflisteCheckedEvent = new EventEmitter<ILaufliste>();
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.erfasstChangedEmitter.subscribe((laufliste) => {
+      if (laufliste.id === this.laufliste.id) {
+        console.log(
+          "LauflisteStatusComponent : Laufliste changed: ",
+          laufliste
+        );
+        this.laufliste.erfasst = laufliste.erfasst;
+        this.lauflisteErfasstEvent.emit(this.laufliste);
+      }
+    });
+    this.checkedChangedEmitter.subscribe((laufliste) => {
+      if (laufliste.id === this.laufliste.id) {
+        console.log(
+          "LauflisteStatusComponent : Laufliste changed: ",
+          laufliste
+        );
+        this.laufliste.checked = laufliste.checked;
+        this.lauflisteCheckedEvent.emit(this.laufliste);
+      }
+    });
+  }
 
   clicked(event: any) {
     this.lauflisteSelectedEvent.emit(this.laufliste);

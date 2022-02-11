@@ -24,6 +24,10 @@ export class KategorieStatusComponent implements OnInit {
   anlass: IAnlass;
   @Input()
   kategorie: KategorieEnum;
+  @Input()
+  erfasstChangedEmitter: EventEmitter<ILaufliste>;
+  @Input()
+  checkedChangedEmitter: EventEmitter<ILaufliste>;
   @Output()
   lauflisteSelectedEvent = new EventEmitter<ILaufliste>();
 
@@ -31,9 +35,12 @@ export class KategorieStatusComponent implements OnInit {
 
   erfasst = false;
   erfasstAbteilungen: boolean[];
+  checked = false;
+  checkedAbteilungen: boolean[];
 
   constructor(private ranglistenService: RanglistenService) {
     this.erfasstAbteilungen = new Array(Object.keys(AbteilungEnum).length);
+    this.checkedAbteilungen = new Array(Object.keys(AbteilungEnum).length);
   }
 
   ngOnInit() {
@@ -42,6 +49,9 @@ export class KategorieStatusComponent implements OnInit {
       .subscribe((abteilungen) => {
         this.abteilungen = abteilungen;
       });
+    this.erfasstChangedEmitter.subscribe((laufliste) => {
+      // console.log("KategorieStatusComponent: Laufliste changed: ", laufliste);
+    });
   }
 
   erfasstChanged(changeEvent: ChangeEvent) {
@@ -54,6 +64,17 @@ export class KategorieStatusComponent implements OnInit {
       return false;
     });
     this.erfasst = nichtAlle.length === 0;
+  }
+  checkedChanged(changeEvent: ChangeEvent) {
+    this.checkedAbteilungen[this.getIndex(changeEvent.topic)] =
+      changeEvent.status;
+    const nichtAlle = this.checkedAbteilungen.filter((checked) => {
+      if (checked === false) {
+        return true;
+      }
+      return false;
+    });
+    this.checked = nichtAlle.length === 0;
   }
 
   lauflisteSelected(laufliste: ILaufliste): void {

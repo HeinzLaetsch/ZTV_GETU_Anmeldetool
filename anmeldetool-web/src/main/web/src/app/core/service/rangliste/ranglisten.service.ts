@@ -175,43 +175,65 @@ export class RanglistenService {
         return of(undefined);
       })
     );
-
-    /*
-    const eintrag: ILauflistenEintrag = {
-      id: "311",
-      laufliste_id: "1",
-      startnummer: 1,
-      name: "Muster",
-      verein: "TV Rägi",
-      vorname: "Hans",
-      tal_id: "12",
-      checked: false,
-      error: false,
-    };
-    const liste: ILaufliste = {
-      id: "1",
-      laufliste: "00131",
-      geraet: GeraeteEnum.SPRUNG,
-      abteilung: AbteilungEnum.ABTEILUNG_1,
-      anlage: AnlageEnum.ANLAGE_1,
-      eintraege: [eintrag, eintrag],
-    };
-    return of(liste);
-    */
   }
   updateLauflistenEintrag(
     anlass: IAnlass,
     eintrag: ILauflistenEintrag
   ): Observable<ILauflistenEintrag> {
     const combinedUrl =
-      this.url + "/" + anlass?.id + "/" + "lauflisten/"+ eintrag.laufliste_id+"/lauflisteneintraege/" + eintrag.id;
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "lauflisten/" +
+      eintrag.laufliste_id +
+      "/lauflisteneintraege/" +
+      eintrag.id;
     return this.http.put<ILauflistenEintrag>(combinedUrl, eintrag).pipe(
       catchError((error) => {
         this.handleError<ILauflistenEintrag>("updateLauflistenEintrag");
         return of(undefined);
       })
+    );
   }
 
+  updateLaufliste(
+    anlass: IAnlass,
+    laufliste: ILaufliste
+  ): Observable<ILaufliste> {
+    const combinedUrl =
+      this.url + "/" + anlass?.id + "/" + "lauflisten/" + laufliste.id;
+    return this.http.put<ILaufliste>(combinedUrl, laufliste).pipe(
+      catchError((error) => {
+        this.handleError<ILaufliste>("updateLaufliste");
+        return of(undefined);
+      })
+    );
+  }
+
+  public deleteNotenblatt(
+    anlass: IAnlass,
+    eintrag: ILauflistenEintrag,
+    grund: string
+  ): Observable<boolean> {
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "lauflisten/" +
+      eintrag.laufliste_id +
+      "/lauflisteneintraege/" +
+      eintrag.id +
+      "?grund=" +
+      grund;
+    return this.http.delete<boolean>(combinedUrl).pipe(
+      catchError((error) => {
+        this.handleError<boolean>("deleteNotenblatt");
+        return of(false);
+      })
+    );
+  }
   private handleError<T>(
     operation = "operation",
     statusResponse?: Subject<string>,

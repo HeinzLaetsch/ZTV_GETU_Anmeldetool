@@ -7,6 +7,8 @@
       <app-anlass-status
         [anlass]="anlass"
         (lauflisteSelectedEvent)="lauflisteSelected($event)"
+        [erfasstChangedEmitter]="erfasstChangedEmitter"
+        [checkedChangedEmitter]="checkedChangedEmitter"
       ></app-anlass-status>
     </div>
     <div class="col-10">
@@ -20,6 +22,7 @@
             mat-icon-button
             aria-label="Clear"
             (click)="search = ''"
+            tabindex="-1"
           >
             <mat-icon>close</mat-icon>
           </button>
@@ -30,6 +33,7 @@
           aria-label="Suche Laufliste"
           (click)="searchLaufliste()"
           [disabled]="!search"
+          tabindex="-1"
         >
           <mat-icon>search</mat-icon>
         </button>
@@ -44,17 +48,30 @@
             <div class="col-2">Verein</div>
             <div class="col-2">Name</div>
             <div class="col-2">Vorname</div>
-            <div *ngIf="!sprung" class="col-1 centered">Note</div>
+            <div *ngIf="!sprung && !modeErfassen" class="col-2 centered">
+              Note
+            </div>
+            <div *ngIf="!sprung && modeErfassen" class="col-1 centered">
+              Note
+            </div>
+
             <div *ngIf="sprung" class="col-1 centered">Note 1</div>
+            <!--div *ngIf="sprung && !modeErfassen" class="col-1 centered">
+              Note 1
+            </div-->
             <div *ngIf="sprung" class="col-1 centered">Note 2</div>
-            <div class="col-1 centered">saved</div>
+            <!--div *ngIf="sprung && !modeErfassen" class="col-1 centered">
+              Note 2
+            </div-->
+            <div class="col-1 centered">gespeichert</div>
             <div class="col-1 centered">geprüft</div>
-            <div class="col-1 centered">Fehler</div>
           </div>
           <app-erfassen-row
             *ngFor="let eintrag of laufliste.eintraege"
+            [anlass]="anlass"
             [eintrag]="eintrag"
             [sprung]="sprung"
+            [modeErfassen]="modeErfassen"
             (entryChangedEvent)="entryChanged($event)"
           ></app-erfassen-row>
         </div>

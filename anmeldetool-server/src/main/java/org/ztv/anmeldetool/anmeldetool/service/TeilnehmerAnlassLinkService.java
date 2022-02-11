@@ -38,6 +38,10 @@ public class TeilnehmerAnlassLinkService {
 	@Autowired
 	TeilnehmerAnlassLinkRepository teilnehmerAnlassLinkRepository;
 
+	public Optional<TeilnehmerAnlassLink> findTeilnehmerAnlassLinkById(UUID id) {
+		return teilnehmerAnlassLinkRepository.findById(id);
+	}
+
 	public List<TeilnehmerAnlassLink> findAnlassTeilnahmenByKategorie(Anlass anlass, KategorieEnum kategorie)
 			throws ServiceException {
 

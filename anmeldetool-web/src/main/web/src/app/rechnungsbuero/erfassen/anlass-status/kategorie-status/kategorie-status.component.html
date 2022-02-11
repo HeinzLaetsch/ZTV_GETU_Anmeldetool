@@ -13,6 +13,17 @@
         class="smallIcon"
         src="assets/images/skype/check-mark.png"
       />
+      checked
+      <img
+        *ngIf="!checked"
+        class="smallIcon"
+        src="assets/images/skype/white-question-mark.png"
+      />
+      <img
+        *ngIf="checked"
+        class="smallIcon"
+        src="assets/images/skype/check-mark.png"
+      />
     </mat-panel-description>
   </mat-expansion-panel-header>
   <app-abteilung-status
@@ -20,7 +31,10 @@
     [anlass]="anlass"
     [kategorie]="kategorie"
     [abteilung]="abteilung"
+    [erfasstChangedEmitter]="erfasstChangedEmitter"
+    [checkedChangedEmitter]="checkedChangedEmitter"
     (erfasstEvent)="erfasstChanged($event)"
+    (checkedEvent)="checkedChanged($event)"
     (lauflisteSelectedEvent)="lauflisteSelected($event)"
   ></app-abteilung-status>
 </mat-expansion-panel>

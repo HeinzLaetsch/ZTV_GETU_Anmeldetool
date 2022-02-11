@@ -1,6 +1,7 @@
 import { DatePipe, registerLocaleData } from "@angular/common";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import localeDeCH from "@angular/common/locales/de-CH";
+import localeDe from "@angular/common/locales/de";
 import { APP_INITIALIZER, LOCALE_ID, NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from "@angular/material/form-field";
@@ -38,6 +39,7 @@ import { LoginDialogComponent } from "./verein/login/login-dialog.component";
 import { NewAnmelderComponent } from "./verein/new-anmelder/new-anmelder.component";
 import { NewVereinComponent } from "./verein/new-verein/new-verein.component";
 registerLocaleData(localeDeCH, "de-ch");
+registerLocaleData(localeDe, "de");
 
 export function initVereinservice(
   vereinService: CachingVereinService
