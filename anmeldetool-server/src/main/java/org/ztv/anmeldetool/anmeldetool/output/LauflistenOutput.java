@@ -1,6 +1,8 @@
 package org.ztv.anmeldetool.anmeldetool.output;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,6 +40,63 @@ public class LauflistenOutput {
 
 		PdfDocument pdf = new PdfDocument(new PdfWriter(response.getOutputStream()));
 		Document document = new Document(pdf);
+		List<LauflistenContainer> lcs = anlassLauflisten.getLauflistenContainer();
+		lcs.sort(new Comparator<LauflistenContainer>() {
+			@Override
+			public int compare(LauflistenContainer o1, LauflistenContainer o2) {
+				return o1.getStartgeraetOrd() < o2.getStartgeraetOrd() ? -1
+						: o1.getStartgeraetOrd() == o2.getStartgeraetOrd() ? 0 : 1;
+			}
+		});
+
+		List<List<Laufliste>> geraeteListen = new ArrayList<List<Laufliste>>();
+
+		int currentIndex = 0;
+		int korrektur = 1; // wegen Undefined bei Ti == 2
+		int maxGeraete = GeraetEnum.values().length - korrektur;
+
+		for (GeraetEnum geraet : GeraetEnum.values()) {
+			if (geraet.equals(GeraetEnum.UNDEFINED)) {
+				continue;
+			}
+			List<Laufliste> gl = new ArrayList<Laufliste>();
+			geraeteListen.add(gl);
+			for (LauflistenContainer lc : lcs) {
+				int pos = lc.getStartgeraetOrd() + currentIndex;
+				if (pos >= maxGeraete) {
+					pos = (lc.getStartgeraetOrd() + currentIndex) - maxGeraete;
+				}
+				if (lc.getGeraeteLauflisten() != null && pos < lc.getGeraeteLauflisten().size()) {
+					gl.add(lc.getGeraeteLauflisten().get(pos));
+				}
+			}
+			currentIndex++;
+		}
+		boolean first = true;
+		int geraeteIndex = 0;
+		for (List<Laufliste> gl : geraeteListen) {
+			GeraetEnum geraet = GeraetEnum.values()[geraeteIndex];
+			for (Laufliste ll : gl) {
+				int wechsel = ll.getGeraet().ordinal() - ll.getLauflistenContainer().getStartgeraetOrd() + 1;
+				if (wechsel < 1) {
+					wechsel += maxGeraete;
+				}
+				if (!first) {
+					AreaBreak aB = new AreaBreak();
+					document.add(aB);
+				}
+				first = false;
+				addLaufliste(document, ll, geraet, wechsel++);
+			}
+		}
+		document.close();
+	}
+
+	public static void createLaufListeAlt(AnlassLauflisten anlassLauflisten, HttpServletResponse response)
+			throws DocumentException, IOException {
+
+		PdfDocument pdf = new PdfDocument(new PdfWriter(response.getOutputStream()));
+		Document document = new Document(pdf);
 
 		boolean first = true;
 		int currentIndex = 0;
@@ -48,6 +107,10 @@ public class LauflistenOutput {
 			List<LauflistenContainer> lc = anlassLauflisten.getLauflistenContainer();
 			int wechsel = 1;
 			for (int index = currentIndex; index >= 0; index--) {
+				if (lc.size() <= index) {
+					wechsel++;
+					continue;
+				}
 
 				int startgeraeteIndex = lc.get(index).getStartgeraet().ordinal();
 				if (startgeraeteIndex <= geraet.ordinal()) {
@@ -150,18 +213,23 @@ public class LauflistenOutput {
 		Table table = new Table(UnitValue.createPercentArray(widths)).useAllAvailableWidth();
 		table.setFixedLayout();
 		addTableHeader(table, isSprung);
-		int index = 0;
+		int index = 1;
+		int korrIndex = currentIndex;
+		List<TeilnehmerAnlassLink> tals = laufliste.getLauflistenContainer().getTeilnehmerAnlassLinksOrdered();
+		if (tals.size() < korrIndex) {
+			korrIndex -= tals.size();
+		}
 		int startOrder = 0;
-		for (TeilnehmerAnlassLink tal : laufliste.getLauflistenContainer().getTeilnehmerAnlassLinksOrdered()) {
-			if (index >= geraet.ordinal()) {
+		for (TeilnehmerAnlassLink tal : tals) {
+			if (index >= korrIndex) {
 				addRow(table, tal, isSprung);
 				updateStartOrder(tal, laufliste, startOrder++);
 			}
 			index++;
 		}
-		index = 0;
-		for (TeilnehmerAnlassLink tal : laufliste.getLauflistenContainer().getTeilnehmerAnlassLinksOrdered()) {
-			if (index < geraet.ordinal()) {
+		index = 1;
+		for (TeilnehmerAnlassLink tal : tals) {
+			if (index < korrIndex) {
 				addRow(table, tal, isSprung);
 				updateStartOrder(tal, laufliste, startOrder++);
 			}

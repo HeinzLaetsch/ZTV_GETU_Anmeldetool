@@ -9,6 +9,7 @@ import { IUser } from "src/app/core/model/IUser";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
+import { CachingVereinService } from "src/app/core/service/caching-services/caching.verein.service";
 import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.service";
 
 @Component({
@@ -40,9 +41,10 @@ export class ErfassenComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.currentUser = this.authService.currentUser;
-    this.anlass = this.anlassService.getAnlaesse(TiTuEnum.Tu)[0];
-    this.routeSubject = this.route.data.subscribe((params) => {
-      if (params.function === "erfassen") {
+    const organisatorId: string = this.route.snapshot.params.id;
+    this.anlass = this.anlassService.getAnlassByOrganisatorId(organisatorId);
+    this.routeSubject = this.route.params.subscribe((param) => {
+      if (param.function === "erfassen") {
         this.modeErfassen = true;
       } else {
         this.modeErfassen = false;

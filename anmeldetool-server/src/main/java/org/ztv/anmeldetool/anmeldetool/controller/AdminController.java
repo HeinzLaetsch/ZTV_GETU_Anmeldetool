@@ -1,4 +1,4 @@
-package org.ztv.anmeldetool.anmeldetool.controller.admin;
+package org.ztv.anmeldetool.anmeldetool.controller;
 
 import java.net.URI;
 import java.util.Collection;

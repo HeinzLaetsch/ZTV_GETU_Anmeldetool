@@ -22,25 +22,25 @@ const routes: Routes = [
     path: "anlass/:id",
     component: EventsDetailComponent,
     canActivate: [EventRouteActivatorService],
-    data: { roles: ["Admin", "Anmelder"] },
+    data: { roles: ["Anmelder"] },
   },
   {
     path: "anlass/:id/anmeldung",
     component: EventRegisterSummaryComponent,
     canActivate: [EventRouteActivatorService],
-    data: { roles: ["Admin", "Anmelder"] },
+    data: { roles: ["Anmelder"] },
   },
   {
     path: "anlass/:id/startliste",
     component: EventStartListComponent,
     canActivate: [EventRouteActivatorService],
-    data: { roles: ["Admin", "Anmelder"] },
+    data: { roles: ["Anmelder"] },
   },
   {
     path: "anlass/:id/admin",
     component: EventAdminComponent,
     canActivate: [EventRouteActivatorService],
-    data: { roles: ["Admininistrator"] },
+    data: { roles: [] },
   },
   // {path: 'page404', component: Page404Component},
   {
@@ -64,8 +64,6 @@ const routes: Routes = [
   },
   { path: "", redirectTo: "anlass", pathMatch: "full" },
 ];
-// src\app\verein\teilnehmer.module.ts
-// loadChildren: "./verein/teilnehmer.module#TeilnehmerModule",
 
 @NgModule({
   imports: [

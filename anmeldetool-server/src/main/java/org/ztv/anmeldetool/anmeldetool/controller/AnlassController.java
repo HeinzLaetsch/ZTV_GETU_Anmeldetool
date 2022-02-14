@@ -1,4 +1,4 @@
-package org.ztv.anmeldetool.anmeldetool.controller.admin;
+package org.ztv.anmeldetool.anmeldetool.controller;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -166,6 +166,7 @@ public class AnlassController {
 				});
 			});
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Lauflisten: ", ex);
 		}
 	}

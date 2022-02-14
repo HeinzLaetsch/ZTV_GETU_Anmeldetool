@@ -3,15 +3,15 @@ import { ErfassenComponent } from "./erfassen/erfassen.component";
 
 export const RechnungsbueroRoutes = [
   {
-    path: "erfassen",
+    path: ":id/:function",
     component: ErfassenComponent,
     canActivate: [AuthRouteActivatorService],
-    data: { function: "erfassen" },
+    data: { roles: ["RECHNUNGSBUERO"] },
   },
   {
-    path: "check",
+    path: ":id/:function",
     component: ErfassenComponent,
     canActivate: [AuthRouteActivatorService],
-    data: { function: "check" },
+    data: { roles: ["RECHNUNGSBUERO"] },
   },
 ];

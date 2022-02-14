@@ -10,10 +10,12 @@ import lombok.Setter;
 @Builder
 public class RolleDTO {
 	String id;
-	
+
 	String name;
-	
+
 	String beschreibung;
-	
+
 	boolean aktiv;
+
+	boolean publicAssignable;
 }

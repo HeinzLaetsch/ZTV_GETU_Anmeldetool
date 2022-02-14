@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -29,7 +31,11 @@ public class Anlass extends Base {
 
 	private String halle;
 
-	private String organisator;
+	// TODO replace private String organisator;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "ORGANISATOR_ID", nullable = false, insertable = true, updatable = true)
+	@ToString.Exclude
+	private Organisation organisator;
 
 	private String iban;
 

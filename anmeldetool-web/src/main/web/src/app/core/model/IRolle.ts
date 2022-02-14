@@ -3,4 +3,5 @@ export interface IRolle {
   name: string;
   aktiv: boolean;
   beschreibung?: string;
+  publicAssignable?: boolean;
 }

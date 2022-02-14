@@ -13,6 +13,7 @@ import { KategorieEnum } from "../../model/KategorieEnum";
 import { MeldeStatusEnum } from "../../model/MeldeStatusEnum";
 import { TiTuEnum } from "../../model/TiTuEnum";
 import { AnlassService } from "../anlass/anlass.service";
+import { CachingVereinService } from "./caching.verein.service";
 
 export interface IHash {
   [anlassId: string]: IAnlassLinks;
@@ -35,7 +36,10 @@ export class CachingAnlassService {
 
   private teilnamen: IHash = {};
 
-  constructor(private anlassService: AnlassService) {
+  constructor(
+    private anlassService: AnlassService,
+    private vereinService: CachingVereinService
+  ) {
     this.anlaesseLoaded = new BehaviorSubject<boolean>(undefined);
     this.teilnahmenLoaded = new BehaviorSubject<boolean>(false);
   }
@@ -194,7 +198,13 @@ export class CachingAnlassService {
     if (!this._loadRunning && !this.loaded) {
       this._loadRunning = true;
       this.anlassService.getAnlaesse().subscribe((anlaesse) => {
-        this.anlaesse = anlaesse;
+        // this.anlaesse = anlaesse;
+        this.anlaesse = anlaesse.map((anlass) => {
+          anlass.organisator = this.vereinService.getVereinById(
+            anlass.organisatorId
+          )?.name;
+          return anlass;
+        });
         this._loadRunning = false;
         this.loaded = true;
         this.anlaesseLoaded.next(true);
@@ -231,6 +241,12 @@ export class CachingAnlassService {
   getAnlassById(id: string) {
     if (this.loaded) {
       return this.anlaesse.find((anlass) => anlass.id === id);
+    }
+    return undefined;
+  }
+  getAnlassByOrganisatorId(id: string) {
+    if (this.loaded) {
+      return this.anlaesse.find((anlass) => anlass.organisatorId === id);
     }
     return undefined;
   }

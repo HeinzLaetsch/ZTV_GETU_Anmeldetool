@@ -26,6 +26,7 @@ public abstract class AnlassMapper {
 	@Mapping(expression = "java(mapOrganisationenDTO(anlass.getOrganisationenLinks()))", target = "organisationen")
 	@Mapping(source = "startDate", target = "startDatum")
 	@Mapping(source = "endDate", target = "endDatum")
+	@Mapping(source = "organisator.id", target = "organisatorId")
 	public abstract AnlassDTO ToDto(Anlass anlass);
 
 	public List<OrganisationDTO> mapOrganisationenDTO(List<OrganisationAnlassLink> links) {

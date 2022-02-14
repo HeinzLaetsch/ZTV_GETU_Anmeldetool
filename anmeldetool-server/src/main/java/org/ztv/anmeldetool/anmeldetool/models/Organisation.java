@@ -1,6 +1,7 @@
 package org.ztv.anmeldetool.anmeldetool.models;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -34,6 +35,10 @@ public class Organisation extends Base {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "organisation", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	@ToString.Exclude
 	private final Set<OrganisationPersonLink> personenLinks;
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "organisator", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	@ToString.Exclude
+	private List<Anlass> organisierteAnlaesse;
 
 	public Organisation() {
 		this.personenLinks = new HashSet<OrganisationPersonLink>();

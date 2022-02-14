@@ -8,5 +8,6 @@ export const TeilnehmerRoutes = [
     component: TeilnehmerComponent,
     canActivate: [AuthRouteActivatorService],
     canDeactivate: [CanDeactivateGuard],
+    data: { roles: ["ANMELDER"] },
   },
 ];

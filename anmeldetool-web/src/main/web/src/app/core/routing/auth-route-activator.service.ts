@@ -9,10 +9,19 @@ export class AuthRouteActivatorService {
   constructor(public authService: AuthService, private router: Router) {}
 
   canActivate(route: ActivatedRouteSnapshot) {
-    // console.log("check Auth");
+    if (this.authService.isAdministrator()) {
+      return true;
+    }
     const isAuthenticated = this.authService.isAuthenticated();
+    let accessAllowed = true;
+    if (route.data.roles) {
+      route.data.roles.forEach((roleName) => {
+        const hasRole = this.authService.hasRole(roleName);
+        accessAllowed = accessAllowed && hasRole;
+      });
+    }
     // console.log("canActivate ", isAuthenticated);
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !accessAllowed) {
       this.router.navigate(["/"]);
     }
     return isAuthenticated;

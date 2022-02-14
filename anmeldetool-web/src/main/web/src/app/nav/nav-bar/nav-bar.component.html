@@ -30,7 +30,7 @@
               *ngFor="let anlass of getAnlaesse()"
               class="dropdown-item"
               [routerLink]="['/anlass', anlass.id, 'admin']"
-              >{{ anlass.getCleaned() }}</a
+              >{{ anlass.getCleaned() }} {{ anlass.organisator }}</a
             >
           </div>
         </li>
@@ -47,7 +47,10 @@
             >Teilnehmer</a
           >
         </li>
-        <li class="nav-item dropdown" *ngIf="authService.isAdministrator()">
+        <li
+          class="nav-item dropdown"
+          *ngIf="authService.isRechnungsbuero() && authService.currentVerein"
+        >
           <a
             class="nav-link dropdown-toggle"
             href="#"
@@ -61,15 +64,17 @@
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             <a
               class="dropdown-item"
-              [routerLink]="['/rechnungsbuero', 'erfassen']"
+              [routerLink]="['/rechnungsbuero', organisator.id, 'erfassen']"
               >Noten erfassen</a
             >
-            <a class="dropdown-item" [routerLink]="['/rechnungsbuero', 'check']"
+            <a
+              class="dropdown-item"
+              [routerLink]="['/rechnungsbuero', organisator.id, 'check']"
               >Noten überprüfen</a
             >
             <a
               class="dropdown-item"
-              [routerLink]="['/rechnungsbuero/ranglisten']"
+              [routerLink]="['/rechnungsbuero/ranglisten', organisator.id]"
               >Ranglisten</a
             >
           </div>

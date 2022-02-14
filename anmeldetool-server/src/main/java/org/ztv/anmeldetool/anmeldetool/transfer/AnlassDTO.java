@@ -22,7 +22,8 @@ public class AnlassDTO {
 
 	String halle;
 
-	String organisator;
+	// String organisator;
+	UUID organisatorId;
 
 	private String iban;
 

@@ -1,14 +1,41 @@
 package org.ztv.anmeldetool.anmeldetool.models;
 
 public enum RollenEnum {
-	BENUTZER("Basis Rolle"), ADMINISTRATOR("Administrator"), VEREINSVERANTWORTLICHER("Kann den Verein verwalten"),
-	ANMELDER("Darf Wettkämpfe anmelden"), WERTUNGSRICHTER("Wertungsrichter");
+	BENUTZER("Basis Rolle", false, true), ADMINISTRATOR("Administrator", false),
+	VEREINSVERANTWORTLICHER("Kann den Verein verwalten"), ANMELDER("Darf Wettkämpfe anmelden"),
+	WERTUNGSRICHTER("Wertungsrichter"), RECHNUNGSBUERO("Rechnungsbüro", false),;
 	// , SEKRETARIAT("Sekretariat")
+
+	private boolean publicAssignable;
+
+	private boolean aktiv;
 
 	private String beschreibung;
 
 	RollenEnum(String beschreibung) {
 		this.beschreibung = beschreibung;
+		this.aktiv = false;
+		this.publicAssignable = true;
+	}
+
+	RollenEnum(String beschreibung, boolean publicAssignable) {
+		this.beschreibung = beschreibung;
+		this.aktiv = false;
+		this.publicAssignable = publicAssignable;
+	}
+
+	RollenEnum(String beschreibung, boolean publicAssignable, boolean aktiv) {
+		this.beschreibung = beschreibung;
+		this.aktiv = aktiv;
+		this.publicAssignable = publicAssignable;
+	}
+
+	public boolean isPublicAssignable() {
+		return publicAssignable;
+	}
+
+	public boolean isAktiv() {
+		return aktiv;
 	}
 
 	public String getBeschreibung() {

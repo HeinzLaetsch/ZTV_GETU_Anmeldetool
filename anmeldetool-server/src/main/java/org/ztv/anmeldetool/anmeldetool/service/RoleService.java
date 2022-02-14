@@ -20,30 +20,32 @@ import org.ztv.anmeldetool.anmeldetool.transfer.RolleDTO;
 public class RoleService {
 	@Autowired
 	RollenRepository rollenRep;
-	
+
 	@Autowired
 	OrganisationService orgService;
-	
+
 	@Autowired
 	PersonService personenService;
-	
+
 	@Autowired
 	OrganisationPersonLinkRepository oplRepo;
-	
+
 	public Rolle findByName(String name) {
 		return rollenRep.findByName(name);
 	}
 
 	public ResponseEntity<Collection<RolleDTO>> findAll() {
-		Iterable<Rolle> rollen = rollenRep.findAll(); 
+		Iterable<Rolle> rollen = rollenRep.findAll();
 		Collection<RolleDTO> rollenDTO = new ArrayList<RolleDTO>();
 		for (Rolle rolle : rollen) {
-			rollenDTO.add(RolleDTO.builder().id(rolle.getId().toString()).name(rolle.getName()).beschreibung(rolle.getBeschreibung()).build());
+			rollenDTO.add(RolleDTO.builder().id(rolle.getId().toString()).name(rolle.getName())
+					.beschreibung(rolle.getBeschreibung()).aktiv(rolle.isAktiv())
+					.publicAssignable(rolle.isPublicAssignable()).build());
 		}
 		return ResponseEntity.ok(rollenDTO);
 	}
-	
-	public ResponseEntity findAllForUser(String vereinsId, String userId) {
+
+	public ResponseEntity<Collection<RolleDTO>> findAllForUser(String vereinsId, String userId) {
 		Organisation org = orgService.findOrganisationById(UUID.fromString(vereinsId));
 		if (org == null) {
 			return ResponseEntity.notFound().build();
@@ -53,7 +55,9 @@ public class RoleService {
 		Collection<RolleDTO> rollenDTO = new ArrayList<RolleDTO>();
 		for (OrganisationPersonLink opl : opls) {
 			for (RollenLink rl : opl.getRollenLink()) {
-				rollenDTO.add(RolleDTO.builder().id(rl.getId().toString()).name(rl.getRolle().getName()).beschreibung(rl.getRolle().getBeschreibung()).aktiv(rl.isAktiv()).build());				
+				rollenDTO.add(RolleDTO.builder().id(rl.getId().toString()).name(rl.getRolle().getName())
+						.beschreibung(rl.getRolle().getBeschreibung()).aktiv(rl.isAktiv())
+						.publicAssignable(rl.getRolle().isPublicAssignable()).build());
 			}
 		}
 		return ResponseEntity.ok(rollenDTO);
