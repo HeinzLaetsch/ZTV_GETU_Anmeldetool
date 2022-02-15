@@ -443,8 +443,15 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       // Anlass
       const end = sort.active.indexOf("///");
       const anlassBezeichnung = sort.active.slice(0, end);
-      const anlass =
-        this.anlassService.getAnlassByAnlassBezeichnung(anlassBezeichnung);
+      const tituStart = end + 3;
+      let tituStr = sort.active.slice(tituStart, tituStart + 2);
+      if (tituStr === "Al") {
+        tituStr = "Alle";
+      }
+      const anlass = this.anlassService.getAnlassByAnlassBezeichnung(
+        anlassBezeichnung,
+        tituStr
+      );
       sort.active = anlass.id;
     }
     this.dataSource.sort(sort);
