@@ -8,6 +8,8 @@ create table NOTENBLATT
  
     TEILNEHMER_ANLASS_LINK_ID    	uuid,
     GESAMT_PUNKTZAHL	decimal(5,3),
+    RANG			integer,
+    AUSZEICHNUNG	BOOLEAN,
  	ERFASST		 	BOOLEAN,
  	CHECKED		 	BOOLEAN,
    

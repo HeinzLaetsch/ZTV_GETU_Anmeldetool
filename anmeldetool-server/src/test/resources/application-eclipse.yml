@@ -12,9 +12,10 @@ spring:
     password: adrian2000
   jpa:
      database-platform: org.hibernate.dialect.PostgreSQLDialect
-     show-sql: "true"
+     show-sql: "false"
      properties:
         hibernate:
+           enable_lazy_load_no_trans: "true"        
            jdbc:
               # time_zone: "Europe/Zurich"
               time_zone: "GMT+1"
@@ -23,7 +24,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/getuwettkaempfe
     username: postgres
-    password: adrian2000
+    password: getu@ztv
   jackson:
      deserialization:
         adjust-dates-to-context-time-zone: true
@@ -42,7 +43,7 @@ logging:
     org.springframework.security: DEBUG
     org.flywaydb: INFO
     org.springframework.web.cors: DEBUG
-    org.hibernate.SQL: DEBUG
+    org.hibernate.SQL: WARN
     org.ztv.anmeldetool: DEBUG
 
 management:

@@ -104,7 +104,7 @@ export class WertungsrichterService {
 
   getWertungsrichterPflichtBrevet2(anlass: IAnlass): number {
     const anzahlTeilnehmer = this.anlassService.getTeilnahmen(anlass, 2).length;
-    if (anzahlTeilnehmer > 0) return Math.ceil(anzahlTeilnehmer / 10);
+    if (anzahlTeilnehmer > 0) return Math.ceil(anzahlTeilnehmer / 15);
     return 0;
   }
 
