@@ -2,6 +2,7 @@ package org.ztv.anmeldetool.service;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest
 @ActiveProfiles("eclipse")
-// @Disabled
+@Disabled
 @Slf4j
 public class RanglistenServiceTests {
 

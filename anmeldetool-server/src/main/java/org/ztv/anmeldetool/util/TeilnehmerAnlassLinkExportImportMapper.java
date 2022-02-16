@@ -14,6 +14,7 @@ public interface TeilnehmerAnlassLinkExportImportMapper {
 	@Mapping(source = "teilnehmer.name", target = "name")
 	@Mapping(source = "teilnehmer.vorname", target = "vorname")
 	@Mapping(source = "teilnehmer.jahrgang", target = "jahrgang")
+	@Mapping(source = "teilnehmer.tiTu", target = "tiTu")
 	@Mapping(source = "organisation.name", target = "verein")
 	@Mapping(source = "organisation.id", target = "organisationId")
 	@Mapping(source = "anlass.id", target = "anlassId")

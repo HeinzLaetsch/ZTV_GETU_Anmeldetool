@@ -37,13 +37,17 @@ import org.ztv.anmeldetool.models.Laufliste;
 import org.ztv.anmeldetool.models.LauflistenContainer;
 import org.ztv.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.models.Notenblatt;
+import org.ztv.anmeldetool.models.RanglisteConfiguration;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
+import org.ztv.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.output.LauflistenOutput;
 import org.ztv.anmeldetool.service.AnlassService;
 import org.ztv.anmeldetool.service.LauflistenService;
+import org.ztv.anmeldetool.service.RanglistenService;
 import org.ztv.anmeldetool.service.TeilnehmerAnlassLinkService;
 import org.ztv.anmeldetool.transfer.LauflisteDTO;
 import org.ztv.anmeldetool.transfer.LauflistenEintragDTO;
+import org.ztv.anmeldetool.transfer.RanglisteDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,7 +64,29 @@ public class AnlassController {
 	LauflistenService lauflistenService;
 
 	@Autowired
+	RanglistenService ranglistenService;
+
+	@Autowired
 	TeilnehmerAnlassLinkService teilnehmerAnlassLinkService;
+
+	@GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}")
+	public ResponseEntity<List<RanglisteDTO>> getRangliste(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable UUID anlassId, @PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie) {
+		try {
+			Anlass anlass = anlassService.findAnlassById(anlassId);
+			Optional<RanglisteConfiguration> ranglistenConfig = anlass.getRanglisteConfigurationen().stream()
+					.filter(conf -> {
+						return conf.getKategorie().equals(kategorie) && conf.getTiTu().equals(tiTu);
+					}).findFirst();
+			List<TeilnehmerAnlassLink> tals = ranglistenService.createRangliste(anlass, kategorie, tiTu,
+					ranglistenConfig.isPresent() ? ranglistenConfig.get().getMaxAuszeichnung() : 0);
+			List<RanglisteDTO> ranglistenDTOs = null;
+			return ResponseEntity.ok(ranglistenDTOs);
+		} catch (Exception ex) {
+			log.error("Unable to query LauflisteDTO: ", ex);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to query LauflisteDTO: ", ex);
+		}
+	}
 
 	@DeleteMapping("/{anlassId}/lauflisten/{kategorie}/{abteilung}/{anlage}")
 	public ResponseEntity<?> deleteLauflisten(HttpServletRequest request, @PathVariable UUID anlassId,

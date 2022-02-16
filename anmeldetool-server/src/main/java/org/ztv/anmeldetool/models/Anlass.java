@@ -85,6 +85,10 @@ public class Anlass extends Base {
 	private boolean abteilungFix = false;
 	private boolean anlageFix = false;
 
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "anlass")
+	@ToString.Exclude
+	private List<RanglisteConfiguration> ranglisteConfigurationen;
+
 	public Anlass() {
 		this.organisationenLinks = new ArrayList<OrganisationAnlassLink>();
 		this.wertungsrichterSlots = new ArrayList<WertungsrichterSlot>();
