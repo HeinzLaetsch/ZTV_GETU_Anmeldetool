@@ -47,7 +47,8 @@ import org.ztv.anmeldetool.service.RanglistenService;
 import org.ztv.anmeldetool.service.TeilnehmerAnlassLinkService;
 import org.ztv.anmeldetool.transfer.LauflisteDTO;
 import org.ztv.anmeldetool.transfer.LauflistenEintragDTO;
-import org.ztv.anmeldetool.transfer.RanglisteDTO;
+import org.ztv.anmeldetool.transfer.RanglistenEntryDTO;
+import org.ztv.anmeldetool.util.TeilnehmerAnlassLinkRanglistenMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -69,9 +70,13 @@ public class AnlassController {
 	@Autowired
 	TeilnehmerAnlassLinkService teilnehmerAnlassLinkService;
 
+	@Autowired
+	TeilnehmerAnlassLinkRanglistenMapper talrMapper;
+
 	@GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}")
-	public ResponseEntity<List<RanglisteDTO>> getRangliste(HttpServletRequest request, HttpServletResponse response,
-			@PathVariable UUID anlassId, @PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie) {
+	public ResponseEntity<List<RanglistenEntryDTO>> getRangliste(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable UUID anlassId, @PathVariable TiTuEnum tiTu,
+			@PathVariable KategorieEnum kategorie) {
 		try {
 			Anlass anlass = anlassService.findAnlassById(anlassId);
 			Optional<RanglisteConfiguration> ranglistenConfig = anlass.getRanglisteConfigurationen().stream()
@@ -79,8 +84,10 @@ public class AnlassController {
 						return conf.getKategorie().equals(kategorie) && conf.getTiTu().equals(tiTu);
 					}).findFirst();
 			List<TeilnehmerAnlassLink> tals = ranglistenService.createRangliste(anlass, kategorie, tiTu,
-					ranglistenConfig.isPresent() ? ranglistenConfig.get().getMaxAuszeichnung() : 0);
-			List<RanglisteDTO> ranglistenDTOs = null;
+					ranglistenConfig.isPresent() ? ranglistenConfig.get().getMaxAuszeichnungen() : 0);
+			List<RanglistenEntryDTO> ranglistenDTOs = tals.stream().map(tal -> {
+				return talrMapper.fromEntity(tal);
+			}).collect(Collectors.toList());
 			return ResponseEntity.ok(ranglistenDTOs);
 		} catch (Exception ex) {
 			log.error("Unable to query LauflisteDTO: ", ex);

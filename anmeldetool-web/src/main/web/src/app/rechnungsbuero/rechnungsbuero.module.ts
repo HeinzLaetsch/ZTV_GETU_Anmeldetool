@@ -14,6 +14,7 @@ import { AbteilungStatusComponent } from "./erfassen/anlass-status/abteilung-sta
 import { AnlageStatusComponent } from "./erfassen/anlass-status/anlage-status/anlage-status.component";
 import { LauflisteStatusComponent } from "./erfassen/anlass-status/laufliste-status/laufliste-status.component";
 import { NotenBlattZurueckZiehen } from "./erfassen/row/delete-dialog/delete-notenblatt.component";
+import { RechnungsbueroComponent } from "./rechnungsbuero/rechnungsbuero.component";
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { NotenBlattZurueckZiehen } from "./erfassen/row/delete-dialog/delete-not
     AnlageStatusComponent,
     LauflisteStatusComponent,
     NotenBlattZurueckZiehen,
+    RechnungsbueroComponent,
   ],
   imports: [
     CommonModule,

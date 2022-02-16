@@ -83,6 +83,7 @@ export class ErfassenComponent implements OnInit, OnDestroy {
       if (a.startOrder > b.startOrder) {
         return 1;
       }
+      return 0;
     });
   }
 

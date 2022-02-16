@@ -9,7 +9,9 @@ import { AnlageEnum } from "../../model/AnlageEnum";
 import { IAnlass } from "../../model/IAnlass";
 import { ILaufliste } from "../../model/ILaufliste";
 import { ILauflistenEintrag } from "../../model/ILauflistenEintrag";
+import { IRanglistenEntry } from "../../model/IRanglistenEntry";
 import { KategorieEnum } from "../../model/KategorieEnum";
+import { TiTuEnum } from "../../model/TiTuEnum";
 
 @Injectable({
   providedIn: "root",
@@ -19,6 +21,26 @@ export class RanglistenService {
   private url: string = this.apiHost + "/anlaesse";
 
   constructor(private http: HttpClient) {}
+
+  getRangliste(
+    anlass: IAnlass,
+    tiTu: string,
+    kategorie: KategorieEnum
+  ): Observable<IRanglistenEntry[]> {
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "ranglisten" +
+      "/" +
+      tiTu +
+      "/" +
+      kategorie;
+    return this.http
+      .get<IRanglistenEntry[]>(combinedUrl)
+      .pipe(catchError(this.handleError<any>("getRangliste")));
+  }
 
   getLauflistenPdf(
     anlass: IAnlass,

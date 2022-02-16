@@ -27,5 +27,5 @@ public class RanglisteConfiguration extends Base {
 
 	private TiTuEnum tiTu;
 
-	private int maxAuszeichnung;
+	private int maxAuszeichnungen;
 }
