@@ -112,7 +112,7 @@ public class PersonService {
 	}
 
 	public ResponseEntity<PersonDTO> create(PersonDTO personDTO, UUID organisationsId) {
-		if (persRepo.findById(personDTO.getId()).isPresent()) {
+		if (personDTO.getId() != null && persRepo.findById(personDTO.getId()).isPresent()) {
 			// Existiert momentan nur Merge
 			log.warn("User existiert: {} , {} , {} , {}", personDTO.getId(), personDTO.getEmail(), personDTO.getName(),
 					personDTO.getVorname());
