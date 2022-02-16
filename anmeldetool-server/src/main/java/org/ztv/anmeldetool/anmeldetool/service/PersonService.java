@@ -112,6 +112,12 @@ public class PersonService {
 	}
 
 	public ResponseEntity<PersonDTO> create(PersonDTO personDTO, UUID organisationsId) {
+		if (persRepo.findById(personDTO.getId()).isPresent()) {
+			// Existiert momentan nur Merge
+			log.warn("User existiert: {} , {} , {} , {}", personDTO.getId(), personDTO.getEmail(), personDTO.getName(),
+					personDTO.getVorname());
+			return update(personDTO, organisationsId);
+		}
 		Organisation organisation = null;
 		if (organisationsId == null && personDTO.getOrganisationids().size() > 0) {
 			organisation = organisationSrv.findOrganisationById(personDTO.getOrganisationids().get(0));
