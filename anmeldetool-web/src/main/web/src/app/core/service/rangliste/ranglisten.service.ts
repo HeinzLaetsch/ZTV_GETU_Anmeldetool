@@ -9,9 +9,9 @@ import { AnlageEnum } from "../../model/AnlageEnum";
 import { IAnlass } from "../../model/IAnlass";
 import { ILaufliste } from "../../model/ILaufliste";
 import { ILauflistenEintrag } from "../../model/ILauflistenEintrag";
+import { IRanglistenConfiguration } from "../../model/IRanglistenConfiguration";
 import { IRanglistenEntry } from "../../model/IRanglistenEntry";
 import { KategorieEnum } from "../../model/KategorieEnum";
-import { TiTuEnum } from "../../model/TiTuEnum";
 
 @Injectable({
   providedIn: "root",
@@ -22,10 +22,32 @@ export class RanglistenService {
 
   constructor(private http: HttpClient) {}
 
-  getRangliste(
+  getRanglisteConfiguration(
     anlass: IAnlass,
     tiTu: string,
     kategorie: KategorieEnum
+  ): Observable<IRanglistenConfiguration> {
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "ranglisten" +
+      "/" +
+      tiTu +
+      "/" +
+      kategorie +
+      "/config";
+    return this.http
+      .get<IRanglistenConfiguration>(combinedUrl)
+      .pipe(catchError(this.handleError<any>("getRanglisteConfiguration")));
+  }
+
+  getRangliste(
+    anlass: IAnlass,
+    tiTu: string,
+    kategorie: KategorieEnum,
+    maxAuszeichnungen: number
   ): Observable<IRanglistenEntry[]> {
     const combinedUrl =
       this.url +
@@ -36,7 +58,9 @@ export class RanglistenService {
       "/" +
       tiTu +
       "/" +
-      kategorie;
+      kategorie +
+      "?maxAuszeichnungen=" +
+      maxAuszeichnungen;
     return this.http
       .get<IRanglistenEntry[]>(combinedUrl)
       .pipe(catchError(this.handleError<any>("getRangliste")));

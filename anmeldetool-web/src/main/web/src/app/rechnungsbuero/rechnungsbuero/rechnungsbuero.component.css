@@ -19,3 +19,9 @@ mat-form-field {
 .centered {
   text-align: center;
 }
+.mat-slider-vertical {
+  height: 100%;
+}
+.mat-slider-horizontal {
+  width: 100%;
+}

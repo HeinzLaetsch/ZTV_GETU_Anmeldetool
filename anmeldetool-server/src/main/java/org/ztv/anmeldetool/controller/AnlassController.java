@@ -47,7 +47,9 @@ import org.ztv.anmeldetool.service.RanglistenService;
 import org.ztv.anmeldetool.service.TeilnehmerAnlassLinkService;
 import org.ztv.anmeldetool.transfer.LauflisteDTO;
 import org.ztv.anmeldetool.transfer.LauflistenEintragDTO;
+import org.ztv.anmeldetool.transfer.RanglisteConfigurationDTO;
 import org.ztv.anmeldetool.transfer.RanglistenEntryDTO;
+import org.ztv.anmeldetool.util.RanglistenConfigurationMapper;
 import org.ztv.anmeldetool.util.TeilnehmerAnlassLinkRanglistenMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -73,18 +75,67 @@ public class AnlassController {
 	@Autowired
 	TeilnehmerAnlassLinkRanglistenMapper talrMapper;
 
-	@GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}")
-	public ResponseEntity<List<RanglistenEntryDTO>> getRangliste(HttpServletRequest request,
+	@Autowired
+	RanglistenConfigurationMapper rcMapper;
+
+	@PutMapping("/{anlassId}/ranglisten/{tiTu}/{kategorie}/config")
+	public @ResponseBody ResponseEntity<RanglisteConfigurationDTO> putRanglistenConfig(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable UUID anlassId, @PathVariable TiTuEnum tiTu,
+			@PathVariable KategorieEnum kategorie, @RequestBody RanglisteConfigurationDTO dto) {
+		RanglisteConfiguration entity = rcMapper.toEntity(dto);
+		entity = ranglistenService.saveRanglisteConfiguration(entity);
+		dto = rcMapper.fromEntity(entity);
+		if (dto != null) {
+			return ResponseEntity.ok(dto);
+		} else {
+			return this.getNotFound();
+		}
+	}
+
+	@GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}/config")
+	public ResponseEntity<RanglisteConfigurationDTO> getRanglistenConfig(HttpServletRequest request,
 			HttpServletResponse response, @PathVariable UUID anlassId, @PathVariable TiTuEnum tiTu,
 			@PathVariable KategorieEnum kategorie) {
 		try {
 			Anlass anlass = anlassService.findAnlassById(anlassId);
-			Optional<RanglisteConfiguration> ranglistenConfig = anlass.getRanglisteConfigurationen().stream()
-					.filter(conf -> {
-						return conf.getKategorie().equals(kategorie) && conf.getTiTu().equals(tiTu);
-					}).findFirst();
-			List<TeilnehmerAnlassLink> tals = ranglistenService.createRangliste(anlass, kategorie, tiTu,
-					ranglistenConfig.isPresent() ? ranglistenConfig.get().getMaxAuszeichnungen() : 0);
+			RanglisteConfiguration ranglistenConfig = ranglistenService.getRanglisteConfiguration(anlass, kategorie,
+					tiTu);
+			if (ranglistenConfig.getMaxAuszeichnungen() == 0) {
+				List<TeilnehmerAnlassLink> tals = ranglistenService.getTeilnehmerSorted(anlass, kategorie, tiTu);
+				int maxAuszeichnungen = ranglistenService.calcMaxAuszeichnungen(tals,
+						ranglistenConfig.getMaxAuszeichnungen());
+				ranglistenConfig.setMaxAuszeichnungen(maxAuszeichnungen);
+			}
+
+			RanglisteConfigurationDTO dto = rcMapper.fromEntity(ranglistenConfig);
+			return ResponseEntity.ok(dto);
+		} catch (Exception ex) {
+			log.error("Unable to query RanglistenConfig: ", ex);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to query RanglistenConfig: ",
+					ex);
+		}
+	}
+
+	@GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}")
+	public ResponseEntity<List<RanglistenEntryDTO>> getRangliste(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable UUID anlassId, @PathVariable TiTuEnum tiTu,
+			@PathVariable KategorieEnum kategorie,
+			@RequestParam(name = "maxAuszeichnungen") Optional<Integer> maxAuszeichungenOpt) {
+		try {
+			Anlass anlass = anlassService.findAnlassById(anlassId);
+			RanglisteConfiguration ranglistenConfig = ranglistenService.getRanglisteConfiguration(anlass, kategorie,
+					tiTu);
+			List<TeilnehmerAnlassLink> tals = ranglistenService.getTeilnehmerSorted(anlass, kategorie, tiTu);
+
+			int maxAuszeichnungen = ranglistenService.calcMaxAuszeichnungen(tals,
+					ranglistenConfig.getMaxAuszeichnungen());
+			if (maxAuszeichungenOpt.isPresent() && maxAuszeichungenOpt.get() > 0) {
+				maxAuszeichnungen = maxAuszeichungenOpt.get();
+				ranglistenConfig.setMaxAuszeichnungen(maxAuszeichnungen);
+				ranglistenConfig = ranglistenService.saveRanglisteConfiguration(ranglistenConfig);
+			}
+			tals = ranglistenService.createRangliste(tals, maxAuszeichnungen);
+
 			List<RanglistenEntryDTO> ranglistenDTOs = tals.stream().map(tal -> {
 				return talrMapper.fromEntity(tal);
 			}).collect(Collectors.toList());
@@ -295,6 +346,7 @@ public class AnlassController {
 						note = einzelnote.getNote_2();
 					}
 				}
+				einzelnote.setZaehlbar(note);
 			}
 			gesamtPunktzahl += note;
 		}

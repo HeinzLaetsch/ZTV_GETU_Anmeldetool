@@ -2,43 +2,22 @@
   <div class="row">
     <h1>{{ anlass.getCleaned() }}</h1>
   </div>
-  <div *ngFor="let entry of ranglistenEntries" class="row">
-    <div class="col">
-      {{ entry.rang }}
-    </div>
-    <div class="col">
-      {{ entry.name }}
-    </div>
-    <div class="col">
-      {{ entry.vorname }}
-    </div>
-    <div class="col">
-      {{ entry.verein }}
-    </div>
-    <div class="col">
-      {{ entry.jahrgang }}
-    </div>
-    <div class="col">
-      {{ entry.noteReck }}
-    </div>
-    <div class="col">
-      {{ entry.noteBoden }}
-    </div>
-    <div class="col">
-      {{ entry.noteSchaukelringe }}
-    </div>
-    <div class="col">
-      {{ entry.noteSprung1 }} /
-      {{ entry.noteSprung2 }}
-    </div>
-    <div class="col">
-      {{ entry.noteZaehlbar }}
-    </div>
-    <div class="col">
-      {{ entry.noteBarren }}
-    </div>
-    <div class="col">
-      {{ entry.auszeichnung }}
-    </div>
+  <div class="row">
+    <mat-slider
+      min="0"
+      [max]="anzahl"
+      [(ngModel)]="maxAuszeichnungen"
+      thumbLabel
+      tickInterval="1"
+      (change)="sliderChanged($event)"
+    ></mat-slider>
   </div>
+  <app-ranglisten-header></app-ranglisten-header>
+  <app-ranglisten-entry
+    [anlass]="anlass"
+    [entry]="entry"
+    [highlighted]="highlighted"
+    [index]="i"
+    *ngFor="let entry of ranglistenEntries; index as i"
+  ></app-ranglisten-entry>
 </div>

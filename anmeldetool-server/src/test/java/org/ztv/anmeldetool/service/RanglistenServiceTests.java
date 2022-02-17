@@ -29,7 +29,11 @@ public class RanglistenServiceTests {
 	@Test
 	public void testCreateRanglisteK5() throws Exception {
 		Anlass anlass = anlassService.getAllAnlaesse().get(0);
-		List<TeilnehmerAnlassLink> tals = ranglistenService.createRangliste(anlass, KategorieEnum.K5, TiTuEnum.Tu, 0);
+
+		List<TeilnehmerAnlassLink> tals = ranglistenService.getTeilnehmerSorted(anlass, KategorieEnum.K5, TiTuEnum.Tu);
+		int maxAuszeichnung = ranglistenService.calcMaxAuszeichnungen(tals, 0);
+
+		tals = ranglistenService.createRangliste(tals, maxAuszeichnung);
 		tals.forEach(tal -> {
 			log.info(String.format("%d %s %s %.2f", tal.getNotenblatt().getRang(), tal.getTeilnehmer().getName(),
 					tal.getTeilnehmer().getVorname(), tal.getNotenblatt().getGesamtPunktzahl()));
@@ -39,10 +43,13 @@ public class RanglistenServiceTests {
 	@Test
 	public void testCreateRanglisteK6() throws Exception {
 		Anlass anlass = anlassService.getAllAnlaesse().get(0);
-		List<TeilnehmerAnlassLink> tals = ranglistenService.createRangliste(anlass, KategorieEnum.K6, TiTuEnum.Tu, 0);
+		List<TeilnehmerAnlassLink> tals = ranglistenService.getTeilnehmerSorted(anlass, KategorieEnum.K6, TiTuEnum.Tu);
+		int maxAuszeichnung = ranglistenService.calcMaxAuszeichnungen(tals, 0);
+
+		tals = ranglistenService.createRangliste(tals, maxAuszeichnung);
 		tals.forEach(tal -> {
 			log.info(String.format("%d %s %s %.2f", tal.getNotenblatt().getRang(), tal.getTeilnehmer().getName(),
-					tal.getTeilnehmer().getVorname(), runden(tal.getNotenblatt().getGesamtPunktzahl())));
+					tal.getTeilnehmer().getVorname(), tal.getNotenblatt().getGesamtPunktzahl()));
 		});
 	}
 
