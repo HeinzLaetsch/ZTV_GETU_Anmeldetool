@@ -61,4 +61,8 @@ public class AnlassDTO {
 	List<OrganisationDTO> organisationen;
 
 	List<WertungsrichterSlotDTO> wertungsrichterSlots;
+
+	private boolean startgeraetFix;
+	private boolean abteilungFix;
+	private boolean anlageFix;
 }

@@ -5,24 +5,18 @@
   <div class="col-sm-2">{{ teilnehmer.name }}</div>
   <div class="col-sm-2">{{ teilnehmer.vorname }}</div>
   <div class="col-sm-1">{{ teilnehmer.jahrgang }}</div>
-  <div *ngIf="showDetail" class="col-sm-1">
+  <div *ngIf="anlass.abteilungFix" class="col-sm-1">
     {{ abteilung }}
   </div>
-  <div *ngIf="!showDetail" class="col-sm-1">
-    {{ abteilung }}
-  </div>
-  <div *ngIf="showDetail" class="col-sm-1">
+  <div *ngIf="!anlass.abteilungFix" class="col-sm-1"></div>
+  <div *ngIf="anlass.anlageFix" class="col-sm-1">
     {{ anlage }}
   </div>
-  <div *ngIf="!showDetail" class="col-sm-1">
-    {{ anlage }}
-  </div>
-  <div *ngIf="showDetail" class="col-sm-2">
+  <div *ngIf="!anlass.anlageFix" class="col-sm-1"></div>
+  <div *ngIf="anlass.startgeraetFix" class="col-sm-2">
     {{ teilnehmer.teilnahmen.anlassLinks[0].startgeraet }}
   </div>
-  <div *ngIf="!showDetail" class="col-sm-2">
-    {{ teilnehmer.teilnahmen.anlassLinks[0].startgeraet }}
-  </div>
+  <div *ngIf="!anlass.startgeraetFix" class="col-sm-2"></div>
   <div class="col-sm-2">
     {{ teilnehmer.teilnahmen.anlassLinks[0].meldeStatus }}
   </div>
