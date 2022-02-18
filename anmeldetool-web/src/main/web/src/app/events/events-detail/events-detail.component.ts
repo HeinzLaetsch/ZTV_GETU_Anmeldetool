@@ -12,6 +12,7 @@ import { IAnlassLink } from "src/app/core/model/IAnlassLink";
 import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
 import { IUser } from "src/app/core/model/IUser";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
+import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterStatusEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
@@ -104,7 +105,12 @@ export class EventsDetailComponent implements OnInit {
     }
     return true;
   }
-
+  isTuAnlass(): boolean {
+    return this.anlass.tuAnlass;
+  }
+  isTiAnlass(): boolean {
+    return this.anlass.tiAnlass;
+  }
   isBrevet1Anlass(): boolean {
     // console.log("Brevet 1: ", this.anlass.tiefsteKategorie <= KategorieEnum.K4);
     return this.anlass.tiefsteKategorie <= KategorieEnum.K4;

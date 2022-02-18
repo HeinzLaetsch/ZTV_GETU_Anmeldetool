@@ -15,7 +15,10 @@ import org.ztv.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.MeldeStatusEnum;
+import org.ztv.anmeldetool.models.Organisation;
+import org.ztv.anmeldetool.models.OrganisationAnlassLink;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
+import org.ztv.anmeldetool.repositories.OrganisationAnlassLinkRepository;
 import org.ztv.anmeldetool.repositories.TeilnehmerAnlassLinkRepository;
 import org.ztv.anmeldetool.repositories.TeilnehmerRepository;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkCsvDTO;
@@ -37,6 +40,9 @@ public class TeilnehmerAnlassLinkService {
 
 	@Autowired
 	TeilnehmerAnlassLinkRepository teilnehmerAnlassLinkRepository;
+
+	@Autowired
+	OrganisationAnlassLinkRepository organisationAnlassLinkRepository;
 
 	public Optional<TeilnehmerAnlassLink> findTeilnehmerAnlassLinkById(UUID id) {
 		return teilnehmerAnlassLinkRepository.findById(id);
@@ -97,8 +103,12 @@ public class TeilnehmerAnlassLinkService {
 		List<MeldeStatusEnum> exclusion = Arrays
 				.asList(new MeldeStatusEnum[] { MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG });
 
+		List<OrganisationAnlassLink> orgLinks = organisationAnlassLinkRepository.findByAnlassAndAktiv(anlass, true);
+		List<Organisation> orgs = orgLinks.stream().map(oal -> {
+			return oal.getOrganisation();
+		}).collect(Collectors.toList());
 		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndAktiv(anlass, true,
-				exclusion);
+				exclusion, orgs);
 		return teilnahmen;
 	}
 

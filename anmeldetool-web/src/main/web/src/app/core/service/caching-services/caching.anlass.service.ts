@@ -250,10 +250,11 @@ export class CachingAnlassService {
     }
     return undefined;
   }
-  getAnlassByAnlassBezeichnung(anlassBezeichnung: string) {
+  getAnlassByAnlassBezeichnung(anlassBezeichnung: string, titu: string) {
     if (this.loaded) {
       return this.anlaesse.find(
-        (anlass) => anlass.anlassBezeichnung === anlassBezeichnung
+        (anlass) =>
+          anlass.anlassBezeichnung === anlassBezeichnung && anlass.tiTu === titu
       );
     }
     return undefined;
