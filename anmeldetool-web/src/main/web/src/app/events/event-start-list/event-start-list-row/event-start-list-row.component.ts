@@ -17,13 +17,17 @@ export class EventStartListRowComponent implements OnInit {
 
   constructor(public authService: AuthService) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log("Anlass: ", this.anlass);
+  }
 
   get administrator(): boolean {
     return this.authService.isAdministrator();
   }
 
   get showDetail(): boolean {
+    this.anlass.abteilungFix;
+
     if (
       this.anlass.anzeigeStatus.hasStatus(
         AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED

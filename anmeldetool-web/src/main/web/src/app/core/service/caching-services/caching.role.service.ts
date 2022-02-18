@@ -56,12 +56,12 @@ export class CachingRoleService {
       if (this.authService.isAdministrator()) {
         return this.roles.filter((role) => {
           // console.log('Rolle: ', role);
-          return role.name !== "BENUTZER";
+          return role.aktiv;
         });
       } else {
         return this.roles.filter((role) => {
           // console.log('Rolle: ', role);
-          return role.name !== "ADMINISTRATOR" && role.name !== "BENUTZER";
+          return role.publicAssignable && role.aktiv;
         });
       }
     }

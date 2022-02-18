@@ -1,0 +1,18 @@
+<ng-container *ngIf="laufliste">
+  <div class="col label">Laufliste</div>
+  <div class="col data">{{ laufliste.laufliste }}</div>
+  <div class="col label">Gerät</div>
+  <div class="col data">{{ laufliste.geraet }}</div>
+  <div class="col label">Abteilung</div>
+  <div class="col data">
+    {{ laufliste.abteilung.substring(laufliste.abteilung.indexOf("_") + 1) }}
+  </div>
+  <div class="col label">Anlage</div>
+  <div class="col data">
+    {{ laufliste.anlage.substring(laufliste.anlage.indexOf("_") + 1) }}
+  </div>
+  <div class="col label">Wechsel</div>
+  <div class="col data">
+    {{ laufliste.abloesung }}
+  </div>
+</ng-container>

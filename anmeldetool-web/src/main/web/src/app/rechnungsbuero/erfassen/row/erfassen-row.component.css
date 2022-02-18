@@ -1,0 +1,80 @@
+mat-form-field {
+  width: 100%;
+}
+.label {
+  color: var(--ztv-black);
+  padding-top: 0.3em;
+  position: relative;
+  top: 5px;
+}
+.note {
+  font-weight: 500;
+  padding-left: 0.3em;
+}
+.data {
+  color: var(--ztv-black);
+  padding-top: 0.3em;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.number {
+  text-align: right;
+}
+.errorBg {
+  background-color: var(--ztv-light-red);
+}
+
+.okBg {
+  background-color: var(--ztv-light-green);
+}
+
+.notTouchedBg {
+  background-color: var(--ztv-lighter-gray);
+}
+
+.centered {
+  display: flex;
+  justify-content: center;
+}
+
+Input {
+  background-color: var(--ztv-white);
+}
+.show_note {
+  min-width: 35px;
+  position: relative;
+  top: 5px;
+  color: var(--ztv-light-black);
+  text-align: right;
+  float: right;
+  padding-right: 2px;
+}
+.show_note_error {
+  min-width: 35px;
+  position: relative;
+  top: 5px;
+  font-weight: 600;
+  color: var(--ztv-light-black);
+  text-align: right;
+  float: right;
+  padding-right: 2px;
+}
+.hide_note {
+  min-width: 35px;
+  position: relative;
+  top: 5px;
+  color: var(--ztv-lighter-gray);
+}
+.mat-raised-button {
+  background-color: var(--ztv-lighter-gray);
+  width: auto;
+  height: 30px;
+  line-height: 30px;
+}
+.material-icons.color_gray {
+  color: rgba(0, 0, 0, 0.54);
+}
+.deleted {
+  line-height: 15px;
+  background-color: var(--ztv-light-red);
+}

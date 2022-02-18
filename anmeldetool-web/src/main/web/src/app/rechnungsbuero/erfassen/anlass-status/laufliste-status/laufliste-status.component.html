@@ -1,0 +1,34 @@
+<div class="well hoverwell laufliste-body" (click)="clicked($event)">
+  <div class="one">
+    {{ laufliste.laufliste }}
+  </div>
+  <div class="two">
+    {{ laufliste.geraet }}
+  </div>
+  <div class="three">erfasst</div>
+  <div class="four">
+    <img
+      *ngIf="!laufliste.erfasst"
+      class="smallIcon"
+      src="assets/images/skype/white-question-mark.png"
+    />
+    <img
+      *ngIf="laufliste.erfasst"
+      class="smallIcon"
+      src="assets/images/skype/check-mark.png"
+    />
+  </div>
+  <div class="five">checked</div>
+  <div class="six">
+    <img
+      *ngIf="!laufliste.checked"
+      class="smallIcon"
+      src="assets/images/skype/white-question-mark.png"
+    />
+    <img
+      *ngIf="laufliste.checked"
+      class="smallIcon"
+      src="assets/images/skype/check-mark.png"
+    />
+  </div>
+</div>

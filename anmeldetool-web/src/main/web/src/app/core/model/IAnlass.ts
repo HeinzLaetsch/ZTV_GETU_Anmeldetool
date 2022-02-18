@@ -9,7 +9,8 @@ export class IAnlass {
   anlassBezeichnung: string;
   ort: string;
   halle: string;
-  organisator: string;
+  organisator?: string;
+  organisatorId: string;
   iban: string;
   zuGunsten: string;
   bank: string;

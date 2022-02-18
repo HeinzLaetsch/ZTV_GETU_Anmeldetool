@@ -1,0 +1,27 @@
+mat-form-field {
+  min-width: 400px;
+  max-width: 400px;
+  width: 400px;
+}
+
+.side {
+  background-color: var(--ztv-blue);
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  min-height: 100%;
+}
+
+.blue {
+  background-color: var(--ztv-blue);
+  font-weight: 400;
+  color: var(--ztv-white);
+}
+.centered {
+  text-align: center;
+}
+.mat-slider-vertical {
+  height: 100%;
+}
+.mat-slider-horizontal {
+  width: 100%;
+}

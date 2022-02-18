@@ -1,0 +1,26 @@
+.centered {
+  text-align: center;
+}
+.right {
+  text-align: right;
+}
+.col-base {
+  padding-left: 3px;
+  padding-right: 3px;
+  max-width: 100%;
+  position: relative;
+  width: 100%;
+  font-weight: 600;
+}
+.col-1 {
+  flex-basis: 0;
+  flex-grow: 1;
+}
+.col-2 {
+  flex-basis: 0;
+  flex-grow: 2;
+}
+.col-3 {
+  flex-basis: 0;
+  flex-grow: 2;
+}

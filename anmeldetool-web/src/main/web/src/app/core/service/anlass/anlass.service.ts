@@ -26,7 +26,9 @@ export class AnlassService {
     return this.http.get<IAnlass[]>(this.url).pipe(
       map((anlaesse) => {
         return anlaesse.map((value) => {
+          // Check wieso Copy
           return Object.assign(new IAnlass(), value);
+          // return value;
         });
       }),
       catchError(this.handleError<IAnlass[]>("getAnlaesse", []))

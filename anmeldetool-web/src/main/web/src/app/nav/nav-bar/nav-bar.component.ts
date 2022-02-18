@@ -48,7 +48,11 @@ export class NavBarComponent implements OnInit {
     return this.anlassService.getAnlaesse(TiTuEnum.Alle);
   }
 
-  setAnlass(anlass: IAnlass): void {
+  /*setAnlass(anlass: IAnlass): void {
     this.anlassService.getTeilnehmerForAnlassCsv(anlass);
+  }*/
+
+  get organisator(): IVerein {
+    return this.authService.currentVerein;
   }
 }

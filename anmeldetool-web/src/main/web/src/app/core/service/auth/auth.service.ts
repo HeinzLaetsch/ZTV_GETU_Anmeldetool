@@ -159,9 +159,9 @@ export class AuthService {
     }
   }
 
-  private hasRole(roleName: string): boolean {
+  hasRole(roleName: string): boolean {
     const rollen = this.currentUser.rollen.filter(
-      (role) => role.name === roleName
+      (role) => role.name === roleName.toUpperCase()
     );
     // console.log('Rollen: ' , rollen, ' , Name: ', roleName);
     if (rollen && rollen.length > 0) {
@@ -174,7 +174,8 @@ export class AuthService {
     if (this.isAdministrator()) {
       return true;
     }
-    if (this.isAuthenticated()) return this.hasRole("ANMELDER");
+    if (this.isAuthenticated())
+      return this.hasRole("ANMELDER") || this.isVereinsVerantwortlicher();
     else return false;
   }
 
@@ -196,6 +197,14 @@ export class AuthService {
 
   isAdministrator(): boolean {
     if (this.isAuthenticated()) return this.hasRole("ADMINISTRATOR");
+    else return false;
+  }
+
+  isRechnungsbuero(): boolean {
+    if (this.isAdministrator()) {
+      return true;
+    }
+    if (this.isAuthenticated()) return this.hasRole("RECHNUNGSBUERO");
     else return false;
   }
 

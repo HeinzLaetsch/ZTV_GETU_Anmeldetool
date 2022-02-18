@@ -1,0 +1,23 @@
+<div class="container-fluid">
+  <div class="row">
+    <h1>{{ anlass.getCleaned() }}</h1>
+  </div>
+  <div class="row">
+    <mat-slider
+      min="0"
+      [max]="anzahl"
+      [(ngModel)]="maxAuszeichnungen"
+      thumbLabel
+      tickInterval="1"
+      (change)="sliderChanged($event)"
+    ></mat-slider>
+  </div>
+  <app-ranglisten-header></app-ranglisten-header>
+  <app-ranglisten-entry
+    [anlass]="anlass"
+    [entry]="entry"
+    [highlighted]="highlighted"
+    [index]="i"
+    *ngFor="let entry of ranglistenEntries; index as i"
+  ></app-ranglisten-entry>
+</div>
