@@ -1,7 +1,9 @@
 package org.ztv.anmeldetool.service;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -9,11 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.KategorieEnum;
+import org.ztv.anmeldetool.models.Notenblatt;
 import org.ztv.anmeldetool.models.RanglisteConfiguration;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.repositories.NotenblaetterRepository;
 import org.ztv.anmeldetool.repositories.RanglisteConfigurationRepository;
+import org.ztv.anmeldetool.transfer.RanglistenEntryDTO;
+import org.ztv.anmeldetool.transfer.TeamwertungDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +35,34 @@ public class RanglistenService {
 	@Autowired
 	RanglisteConfigurationRepository ranglisteConfigurationRepo;
 
+	public List<TeamwertungDTO> getTeamwertung(KategorieEnum kategorie, List<RanglistenEntryDTO> entries) {
+		Map<String, TeamwertungDTO> teamwertungen = new HashMap();
+		for (RanglistenEntryDTO entry : entries) {
+			TeamwertungDTO teamwertung;
+			if (teamwertungen.containsKey(entry.getVerein())) {
+				teamwertung = teamwertungen.get(entry.getVerein());
+			} else {
+				teamwertung = new TeamwertungDTO();
+				teamwertung.setVerein(entry.getVerein());
+				teamwertungen.put(entry.getVerein(), teamwertung);
+			}
+			teamwertung.setAnzahlResultate(teamwertung.getAnzahlResultate() + 1);
+			teamwertung.setGesamtPunktzahl(teamwertung.getGesamtPunktzahl() + entry.getGesamtPunktzahl());
+		}
+		List<TeamwertungDTO> result = teamwertungen.values().stream()
+				.sorted(Comparator.comparing(tw -> tw.getGesamtPunktzahl(), Comparator.reverseOrder()))
+				.collect(Collectors.toList());
+		int rang = 0;
+		for (TeamwertungDTO tw : result) {
+			tw.setRang(++rang);
+		}
+		return result;
+	}
+
+	public Notenblatt saveNotenblatt(Notenblatt notenblatt) {
+		return notenblaetterRepo.save(notenblatt);
+	}
+
 	public RanglisteConfiguration saveRanglisteConfiguration(RanglisteConfiguration rc) {
 		Optional<RanglisteConfiguration> entityOpt = ranglisteConfigurationRepo.findById(rc.getId());
 		if (entityOpt.isPresent()) {
@@ -37,6 +70,18 @@ public class RanglistenService {
 			return ranglisteConfigurationRepo.save(entityOpt.get());
 		}
 		return ranglisteConfigurationRepo.save(rc);
+	}
+
+	public List<TeilnehmerAnlassLink> getRanglistePerVerein(Anlass anlass, TiTuEnum tiTu, KategorieEnum kategorie)
+			throws ServiceException {
+		List<TeilnehmerAnlassLink> tals = talService.findWettkampfTeilnahmenByKategorieOrderByOrganisation(anlass,
+				kategorie);
+		/*
+		 * tals = tals.stream().sorted( Comparator.comparing(tal ->
+		 * tal.getNotenblatt().getGesamtPunktzahl(), Comparator.reverseOrder()))
+		 * .collect(Collectors.toList());
+		 */
+		return tals;
 	}
 
 	public RanglisteConfiguration getRanglisteConfiguration(Anlass anlass, KategorieEnum kategorie, TiTuEnum tiTu) {
@@ -63,6 +108,7 @@ public class RanglistenService {
 	public List<TeilnehmerAnlassLink> getTeilnehmerSorted(Anlass anlass, KategorieEnum kategorie, TiTuEnum titu)
 			throws ServiceException {
 		List<TeilnehmerAnlassLink> tals = talService.findWettkampfTeilnahmenByKategorie(anlass, kategorie);
+
 		tals = tals.stream().sorted(
 				Comparator.comparing(tal -> tal.getNotenblatt().getGesamtPunktzahl(), Comparator.reverseOrder()))
 				.collect(Collectors.toList());

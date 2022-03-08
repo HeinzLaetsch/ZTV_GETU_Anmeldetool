@@ -1,4 +1,5 @@
 import { Component, EventEmitter, OnDestroy, OnInit } from "@angular/core";
+import { MatSelect } from "@angular/material/select";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subject, Subscription } from "rxjs";
 import { GeraeteEnum } from "src/app/core/model/GeraeteEnum";
@@ -43,10 +44,14 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
     this.currentUser = this.authService.currentUser;
     const organisatorId: string = this.route.snapshot.params.id;
     this.anlass = this.anlassService.getAnlassByOrganisatorId(organisatorId);
+    this.tiTu = this.anlass.tiTu;
     this.getRangliste();
     this.getConfig();
   }
 
+  get filterOk(): boolean {
+    return !!this.kategorie;
+  }
   get anzahl(): number {
     if (this.ranglistenEntries) {
       return this.ranglistenEntries.length;
@@ -64,6 +69,38 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
     console.log("Slider: ", value);
     this.getRangliste();
   }
+  getTeamwertung() {
+    let filter = "Tu";
+    if (this.tiTu === TiTuEnum.Ti) {
+      filter = "Ti";
+    }
+    this.ranglistenService.getTeamwertung(this.anlass, filter, this.kategorie);
+  }
+
+  getRanglistePdfPerVerein() {
+    let filter = "Tu";
+    if (this.tiTu === TiTuEnum.Ti) {
+      filter = "Ti";
+    }
+    this.ranglistenService.getRanglistePdfPerVerein(
+      this.anlass,
+      filter,
+      this.kategorie
+    );
+  }
+  getRanglistePdf() {
+    let filter = "Tu";
+    if (this.tiTu === TiTuEnum.Ti) {
+      filter = "Ti";
+    }
+    this.ranglistenService.getRanglistePdf(
+      this.anlass,
+      filter,
+      this.kategorie,
+      this.maxAuszeichnungen
+    );
+  }
+
   getRangliste() {
     let filter = "Tu";
     if (this.tiTu === TiTuEnum.Ti) {
@@ -97,5 +134,25 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
         this.config = result;
       });
   }
+  getKategorienRaw(anlass: IAnlass): KategorieEnum[] {
+    return anlass.getKategorienRaw().slice(1);
+  }
+
+  kategorieSelected(kategorie: MatSelect): void {
+    this.kategorie = kategorie.value;
+    this.getRangliste();
+    this.getConfig();
+  }
+
+  tiTuSelected(kategorie: MatSelect): void {
+    this.tiTu = kategorie.value;
+    this.getRangliste();
+    this.getConfig();
+  }
+
+  isAlle(): boolean {
+    return this.anlass.tuAnlass && this.anlass.tiAnlass;
+  }
+
   ngOnDestroy() {}
 }

@@ -2,6 +2,7 @@ package org.ztv.anmeldetool.controller;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,14 +42,18 @@ import org.ztv.anmeldetool.models.RanglisteConfiguration;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.output.LauflistenOutput;
+import org.ztv.anmeldetool.output.RanglistenOutput;
 import org.ztv.anmeldetool.service.AnlassService;
 import org.ztv.anmeldetool.service.LauflistenService;
+import org.ztv.anmeldetool.service.OrganisationService;
 import org.ztv.anmeldetool.service.RanglistenService;
+import org.ztv.anmeldetool.service.ServiceException;
 import org.ztv.anmeldetool.service.TeilnehmerAnlassLinkService;
 import org.ztv.anmeldetool.transfer.LauflisteDTO;
 import org.ztv.anmeldetool.transfer.LauflistenEintragDTO;
 import org.ztv.anmeldetool.transfer.RanglisteConfigurationDTO;
 import org.ztv.anmeldetool.transfer.RanglistenEntryDTO;
+import org.ztv.anmeldetool.transfer.TeamwertungDTO;
 import org.ztv.anmeldetool.util.RanglistenConfigurationMapper;
 import org.ztv.anmeldetool.util.TeilnehmerAnlassLinkRanglistenMapper;
 
@@ -62,6 +67,9 @@ public class AnlassController {
 
 	@Autowired
 	AnlassService anlassService;
+
+	@Autowired
+	OrganisationService organisationService;
 
 	@Autowired
 	LauflistenService lauflistenService;
@@ -122,27 +130,223 @@ public class AnlassController {
 			@PathVariable KategorieEnum kategorie,
 			@RequestParam(name = "maxAuszeichnungen") Optional<Integer> maxAuszeichungenOpt) {
 		try {
-			Anlass anlass = anlassService.findAnlassById(anlassId);
-			RanglisteConfiguration ranglistenConfig = ranglistenService.getRanglisteConfiguration(anlass, kategorie,
-					tiTu);
-			List<TeilnehmerAnlassLink> tals = ranglistenService.getTeilnehmerSorted(anlass, kategorie, tiTu);
-
-			int maxAuszeichnungen = ranglistenService.calcMaxAuszeichnungen(tals,
-					ranglistenConfig.getMaxAuszeichnungen());
-			if (maxAuszeichungenOpt.isPresent() && maxAuszeichungenOpt.get() > 0) {
-				maxAuszeichnungen = maxAuszeichungenOpt.get();
-				ranglistenConfig.setMaxAuszeichnungen(maxAuszeichnungen);
-				ranglistenConfig = ranglistenService.saveRanglisteConfiguration(ranglistenConfig);
-			}
-			tals = ranglistenService.createRangliste(tals, maxAuszeichnungen);
-
-			List<RanglistenEntryDTO> ranglistenDTOs = tals.stream().map(tal -> {
-				return talrMapper.fromEntity(tal);
-			}).collect(Collectors.toList());
+			List<RanglistenEntryDTO> ranglistenDTOs = generateRangliste(anlassId, tiTu, kategorie, maxAuszeichungenOpt);
 			return ResponseEntity.ok(ranglistenDTOs);
 		} catch (Exception ex) {
 			log.error("Unable to query LauflisteDTO: ", ex);
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to query LauflisteDTO: ", ex);
+		}
+	}
+
+	private List<RanglistenEntryDTO> getRanglistenPerVereinDtos(UUID anlassId, TiTuEnum tiTu, KategorieEnum kategorie)
+			throws ServiceException {
+		Anlass anlass = anlassService.findAnlassById(anlassId);
+		List<TeilnehmerAnlassLink> tals = ranglistenService.getRanglistePerVerein(anlass, tiTu, kategorie);
+
+		List<RanglistenEntryDTO> ranglistenDTOs = tals.stream().map(tal -> {
+			return talrMapper.fromEntity(tal);
+		}).collect(Collectors.toList());
+		return ranglistenDTOs;
+	}
+
+	@GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}/vereine")
+	public ResponseEntity<List<RanglistenEntryDTO>> getRanglistePerVerein(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable UUID anlassId, @PathVariable TiTuEnum tiTu,
+			@PathVariable KategorieEnum kategorie) {
+		try {
+			List<RanglistenEntryDTO> ranglistenDTOs = getRanglistenPerVereinDtos(anlassId, tiTu, kategorie);
+			return ResponseEntity.ok(ranglistenDTOs);
+		} catch (Exception ex) {
+			log.error("Unable to query Ranglisten per Verein: ", ex);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+					"Unable to query Ranglisten per Verein: ", ex);
+		}
+	}
+
+	@GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}/vereine", produces = "application/pdf")
+	public void getRanglistePerVereinPdf(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable UUID anlassId, @PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie) {
+		try {
+			List<RanglistenEntryDTO> ranglistenDTOs = getRanglistenPerVereinDtos(anlassId, tiTu, kategorie);
+
+			response.addHeader("Content-Disposition",
+					"attachment; filename=Ranglisten-Per-Verein-" + kategorie + ".pdf");
+			response.addHeader("Content-Type", "application/pdf");
+			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+
+			RanglistenOutput.createRanglistePerVerein(response, ranglistenDTOs);
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+					"Unable to query Ranglisten per Verein: ", ex);
+		}
+	}
+
+	@GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}/vereine", produces = "text/csv;charset=UTF-8")
+	public ResponseEntity<List<RanglistenEntryDTO>> getRanglistePerVereinCsv(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable UUID anlassId, @PathVariable TiTuEnum tiTu,
+			@PathVariable KategorieEnum kategorie) {
+		try {
+			List<RanglistenEntryDTO> ranglistenDTOs = getRanglistenPerVereinDtos(anlassId, tiTu, kategorie);
+
+			return ResponseEntity.ok(ranglistenDTOs);
+		} catch (Exception ex) {
+			log.error("Unable to query Ranglisten per Verein: ", ex);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+					"Unable to query Ranglisten per Verein: ", ex);
+		}
+	}
+
+	@GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}/teamwertung", produces = "application/pdf")
+	public void getTeamwertungPdf(HttpServletRequest request, HttpServletResponse response, @PathVariable UUID anlassId,
+			@PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie) {
+		try {
+			List<RanglistenEntryDTO> ranglistenDTOs = getRanglistenPerVereinDtos(anlassId, tiTu, kategorie);
+			List<TeamwertungDTO> twList = this.ranglistenService.getTeamwertung(kategorie, ranglistenDTOs);
+			response.addHeader("Content-Disposition", "attachment; filename=Teamwertung-" + kategorie + ".pdf");
+			response.addHeader("Content-Type", "application/pdf");
+			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+
+			RanglistenOutput.createTeamwertung(response, twList, kategorie);
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+					"Unable to query Ranglisten per Verein: ", ex);
+		}
+	}
+
+	private List<RanglistenEntryDTO> generateRangliste(UUID anlassId, TiTuEnum tiTu, KategorieEnum kategorie,
+			Optional<Integer> maxAuszeichungenOpt) throws ServiceException {
+		Anlass anlass = anlassService.findAnlassById(anlassId);
+		RanglisteConfiguration ranglistenConfig = ranglistenService.getRanglisteConfiguration(anlass, kategorie, tiTu);
+		List<TeilnehmerAnlassLink> tals = ranglistenService.getTeilnehmerSorted(anlass, kategorie, tiTu);
+
+		int maxAuszeichnungen = ranglistenService.calcMaxAuszeichnungen(tals, ranglistenConfig.getMaxAuszeichnungen());
+		if (maxAuszeichungenOpt.isPresent() && maxAuszeichungenOpt.get() > 0) {
+			maxAuszeichnungen = maxAuszeichungenOpt.get();
+			ranglistenConfig.setMaxAuszeichnungen(maxAuszeichnungen);
+			ranglistenConfig = ranglistenService.saveRanglisteConfiguration(ranglistenConfig);
+		}
+		tals = ranglistenService.createRangliste(tals, maxAuszeichnungen);
+
+		List<RanglistenEntryDTO> ranglistenDTOs = tals.stream().map(tal -> {
+			ranglistenService.saveNotenblatt(tal.getNotenblatt());
+			return talrMapper.fromEntity(tal);
+		}).collect(Collectors.toList());
+
+		ranglistenDTOs = sortByGeraet(ranglistenDTOs);
+		return ranglistenDTOs;
+
+	}
+
+	private List<RanglistenEntryDTO> sortByGeraet(List<RanglistenEntryDTO> ranglistenDTOs) {
+		// Reck
+		ranglistenDTOs = ranglistenDTOs.stream()
+				.sorted(Comparator.comparing(dto -> dto.getNoteReck(), Comparator.reverseOrder()))
+				.collect(Collectors.toList());
+
+		int rang = 0;
+		int pos = 0;
+		float currentNote = 0.0f;
+		for (RanglistenEntryDTO dto : ranglistenDTOs) {
+			pos++;
+			if (dto.getNoteReck() != currentNote) {
+				rang = pos;
+				currentNote = dto.getNoteReck();
+			}
+			dto.setRangReck(rang);
+		}
+		// Boden
+		ranglistenDTOs = ranglistenDTOs.stream()
+				.sorted(Comparator.comparing(dto -> dto.getNoteBoden(), Comparator.reverseOrder()))
+				.collect(Collectors.toList());
+
+		rang = 0;
+		pos = 0;
+		currentNote = 0.0f;
+		for (RanglistenEntryDTO dto : ranglistenDTOs) {
+			pos++;
+			if (dto.getNoteBoden() != currentNote) {
+				rang = pos;
+				currentNote = dto.getNoteBoden();
+			}
+			dto.setRangBoden(rang);
+		}
+		// Ring
+		ranglistenDTOs = ranglistenDTOs.stream()
+				.sorted(Comparator.comparing(dto -> dto.getNoteSchaukelringe(), Comparator.reverseOrder()))
+				.collect(Collectors.toList());
+
+		rang = 0;
+		pos = 0;
+		currentNote = 0.0f;
+		for (RanglistenEntryDTO dto : ranglistenDTOs) {
+			pos++;
+			if (dto.getNoteSchaukelringe() != currentNote) {
+				rang = pos;
+				currentNote = dto.getNoteSchaukelringe();
+			}
+			dto.setRangSchaukelringe(rang);
+		}
+		// Sprung
+		ranglistenDTOs = ranglistenDTOs.stream()
+				.sorted(Comparator.comparing(dto -> dto.getNoteZaehlbar(), Comparator.reverseOrder()))
+				.collect(Collectors.toList());
+
+		rang = 0;
+		pos = 0;
+		currentNote = 0.0f;
+		for (RanglistenEntryDTO dto : ranglistenDTOs) {
+			pos++;
+			if (dto.getNoteZaehlbar() != currentNote) {
+				rang = pos;
+				currentNote = dto.getNoteZaehlbar();
+			}
+			dto.setRangSprung(rang);
+		}
+		// Barren
+		ranglistenDTOs = ranglistenDTOs.stream()
+				.sorted(Comparator.comparing(dto -> dto.getNoteBarren(), Comparator.reverseOrder()))
+				.collect(Collectors.toList());
+
+		rang = 0;
+		pos = 0;
+		currentNote = 0.0f;
+		for (RanglistenEntryDTO dto : ranglistenDTOs) {
+			pos++;
+			if (dto.getNoteBarren() != currentNote) {
+				rang = pos;
+				currentNote = dto.getNoteBarren();
+			}
+			dto.setRangBarren(rang);
+		}
+
+		ranglistenDTOs = ranglistenDTOs.stream()
+				.sorted(Comparator.comparing(dto -> dto.getRang(), Comparator.naturalOrder()))
+				.collect(Collectors.toList());
+		return ranglistenDTOs;
+	}
+
+	@GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}", produces = "application/pdf")
+	public void getRanglistenPdf(HttpServletRequest request, HttpServletResponse response, @PathVariable UUID anlassId,
+			@PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie,
+			@RequestParam(name = "maxAuszeichnungen") Optional<Integer> maxAuszeichungenOpt) {
+		try {
+			List<RanglistenEntryDTO> ranglistenDTOs = generateRangliste(anlassId, tiTu, kategorie, maxAuszeichungenOpt);
+
+			response.addHeader("Content-Disposition", "attachment; filename=Lauflisten-" + kategorie + ".pdf");
+			response.addHeader("Content-Type", "application/pdf");
+			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+			// Regel für Sprung Durchschnitt
+			boolean averageSprung = kategorie.equals(KategorieEnum.K6) || kategorie.equals(KategorieEnum.K7);
+			RanglistenOutput.createRangliste(response, ranglistenDTOs, tiTu == TiTuEnum.Ti ? false : true,
+					averageSprung);
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Lauflisten: ", ex);
 		}
 	}
 
@@ -222,37 +426,6 @@ public class AnlassController {
 		} catch (Exception ex) {
 			log.error("Unable to query Abteilungen: ", ex);
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to query Abteilungen: ", ex);
-		}
-	}
-
-	@GetMapping(value = "/{anlassId}/lauflisten/{kategorie}/{abteilung}/{anlage}", produces = "application/pdf")
-	public void getLauflistenPdf(HttpServletRequest request, HttpServletResponse response, @PathVariable UUID anlassId,
-			@PathVariable KategorieEnum kategorie, @PathVariable AbteilungEnum abteilung,
-			@PathVariable AnlageEnum anlage) {
-		try {
-			Anlass anlass = anlassService.findAnlassById(anlassId);
-
-			response.addHeader("Content-Disposition", "attachment; filename=Lauflisten-" + kategorie + ".pdf");
-			response.addHeader("Content-Type", "application/pdf");
-			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
-
-			AnlassLauflisten anlassLauflisten = lauflistenService.generateLauflistenForAnlassAndKategorie(anlass,
-					kategorie, abteilung, anlage);
-			LauflistenOutput.createLaufListe(anlassLauflisten, response);
-			anlassLauflisten.getLauflistenContainer().stream().forEach(container -> {
-				lauflistenService.saveAllLauflisten(container.getGeraeteLauflisten());
-				container.getGeraeteLauflisten().stream().forEach(laufliste -> {
-					laufliste.getEinzelnoten().stream().forEach(einzelnote -> {
-						Einzelnote note = lauflistenService.findEinzelnoteById(einzelnote.getId()).get();
-						note.setStartOrder(einzelnote.getStartOrder());
-						lauflistenService.saveEinzelnote(note);
-						// lauflistenService.saveAllEinzelnoten();
-					});
-				});
-			});
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Lauflisten: ", ex);
 		}
 	}
 
@@ -379,6 +552,37 @@ public class AnlassController {
 			return ResponseEntity.ok(Boolean.TRUE);
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().build();
+		}
+	}
+
+	@GetMapping(value = "/{anlassId}/lauflisten/{kategorie}/{abteilung}/{anlage}", produces = "application/pdf")
+	public void getLauflistenPdf(HttpServletRequest request, HttpServletResponse response, @PathVariable UUID anlassId,
+			@PathVariable KategorieEnum kategorie, @PathVariable AbteilungEnum abteilung,
+			@PathVariable AnlageEnum anlage) {
+		try {
+			Anlass anlass = anlassService.findAnlassById(anlassId);
+
+			response.addHeader("Content-Disposition", "attachment; filename=Lauflisten-" + kategorie + ".pdf");
+			response.addHeader("Content-Type", "application/pdf");
+			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+
+			AnlassLauflisten anlassLauflisten = lauflistenService.generateLauflistenForAnlassAndKategorie(anlass,
+					kategorie, abteilung, anlage);
+			LauflistenOutput.createLaufListe(anlassLauflisten, response);
+			anlassLauflisten.getLauflistenContainer().stream().forEach(container -> {
+				lauflistenService.saveAllLauflisten(container.getGeraeteLauflisten());
+				container.getGeraeteLauflisten().stream().forEach(laufliste -> {
+					laufliste.getEinzelnoten().stream().forEach(einzelnote -> {
+						Einzelnote note = lauflistenService.findEinzelnoteById(einzelnote.getId()).get();
+						note.setStartOrder(einzelnote.getStartOrder());
+						lauflistenService.saveEinzelnote(note);
+						// lauflistenService.saveAllEinzelnoten();
+					});
+				});
+			});
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Lauflisten: ", ex);
 		}
 	}
 

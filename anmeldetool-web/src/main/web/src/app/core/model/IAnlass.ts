@@ -128,6 +128,11 @@ export class IAnlass {
       key === TiTuEnum.Ti.toString() || key === TiTuEnum.Alle.toString();
     return tiAnlass;
   }
+  get alleAnlass(): boolean {
+    const key = TiTuEnum[this.tiTu];
+    const alleAnlass = key === TiTuEnum.Alle.toString();
+    return alleAnlass;
+  }
 
   get brevet1Anlass(): boolean {
     return this.tiefsteKategorie < KategorieEnum.K5;
@@ -160,12 +165,13 @@ export class IAnlass {
     let filtered = Object.values(KategorieEnum).slice(0, 1);
     if (end > k5) {
       filtered = filtered.concat(Object.values(KategorieEnum).slice(start, k5));
-      if (this.tiAnlass) {
+      if (this.tiAnlass || this.alleAnlass) {
         filtered.push(KategorieEnum.K5A);
         filtered.push(KategorieEnum.K5B);
         filtered.push(KategorieEnum.K6);
         filtered.push(KategorieEnum.KD);
-      } else {
+      }
+      if (this.tuAnlass || this.alleAnlass) {
         filtered.push(KategorieEnum.K5);
         filtered.push(KategorieEnum.K6);
         filtered.push(KategorieEnum.KH);

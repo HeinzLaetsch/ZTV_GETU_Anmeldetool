@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import * as FileSaver from "file-saver";
 import { Observable, of, Subject } from "rxjs";
 import { catchError } from "rxjs/operators";
+import { IVerein } from "src/app/verein/verein";
 import { environment } from "src/environments/environment";
 import { AbteilungEnum } from "../../model/AbteilungEnum";
 import { AnlageEnum } from "../../model/AnlageEnum";
@@ -64,6 +65,153 @@ export class RanglistenService {
     return this.http
       .get<IRanglistenEntry[]>(combinedUrl)
       .pipe(catchError(this.handleError<any>("getRangliste")));
+  }
+
+  // "/{anlassId}/ranglisten/{tiTu}/{kategorie}/teamwertung"
+  getTeamwertung(
+    anlass: IAnlass,
+    tiTu: string,
+    kategorie: KategorieEnum
+  ): Observable<string> {
+    const statusResponse = new Subject<string>();
+
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "ranglisten" +
+      "/" +
+      tiTu +
+      "/" +
+      kategorie +
+      "/teamwertung";
+    // console.log("getTeilnehmer called: ", combinedUrl);
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append("Accept", "application/pdf");
+    this.http
+      .get(combinedUrl, {
+        observe: "response",
+        responseType: "blob",
+        headers,
+      })
+      .pipe(
+        catchError(
+          this.handleError<any>("getRanglistePdfperVerein", statusResponse)
+        )
+      )
+      .subscribe((result: HttpResponse<string>) => {
+        const header = result.headers.get("Content-Disposition");
+        const parts = header.split("filename=");
+        this.saveAsFile(result.body, parts[1], "application/pdf");
+        statusResponse.next("Success");
+      });
+    return statusResponse.asObservable();
+  }
+
+  getRanglistePerVerein(
+    anlass: IAnlass,
+    tiTu: string,
+    kategorie: KategorieEnum
+  ): Observable<IRanglistenEntry> {
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "ranglisten" +
+      "/" +
+      tiTu +
+      "/" +
+      kategorie +
+      "/vereine";
+    // console.log("getTeilnehmer called: ", combinedUrl);
+    return this.http
+      .get<IRanglistenEntry[]>(combinedUrl)
+      .pipe(catchError(this.handleError<any>("getRanglistePerVerein")));
+  }
+
+  getRanglistePdfPerVerein(
+    anlass: IAnlass,
+    tiTu: string,
+    kategorie: KategorieEnum
+  ): Observable<string> {
+    const statusResponse = new Subject<string>();
+
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "ranglisten" +
+      "/" +
+      tiTu +
+      "/" +
+      kategorie +
+      "/vereine";
+    // console.log("getTeilnehmer called: ", combinedUrl);
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append("Accept", "application/pdf");
+    this.http
+      .get(combinedUrl, {
+        observe: "response",
+        responseType: "blob",
+        headers,
+      })
+      .pipe(
+        catchError(
+          this.handleError<any>("getRanglistePdfperVerein", statusResponse)
+        )
+      )
+      .subscribe((result: HttpResponse<string>) => {
+        const header = result.headers.get("Content-Disposition");
+        const parts = header.split("filename=");
+        this.saveAsFile(result.body, parts[1], "application/pdf");
+        statusResponse.next("Success");
+      });
+    return statusResponse.asObservable();
+  }
+
+  getRanglistePdf(
+    anlass: IAnlass,
+    tiTu: string,
+    kategorie: KategorieEnum,
+    maxAuszeichnungen: number
+  ): Observable<string> {
+    const statusResponse = new Subject<string>();
+
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "ranglisten" +
+      "/" +
+      tiTu +
+      "/" +
+      kategorie +
+      "?maxAuszeichnungen=" +
+      maxAuszeichnungen;
+
+    // console.log("getTeilnehmer called: ", combinedUrl);
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append("Accept", "application/pdf");
+    this.http
+      .get(combinedUrl, {
+        observe: "response",
+        responseType: "blob",
+        headers,
+      })
+      .pipe(
+        catchError(this.handleError<any>("getRanglistePdf", statusResponse))
+      )
+      .subscribe((result: HttpResponse<string>) => {
+        const header = result.headers.get("Content-Disposition");
+        const parts = header.split("filename=");
+        this.saveAsFile(result.body, parts[1], "application/pdf");
+        statusResponse.next("Success");
+      });
+    return statusResponse.asObservable();
   }
 
   getLauflistenPdf(

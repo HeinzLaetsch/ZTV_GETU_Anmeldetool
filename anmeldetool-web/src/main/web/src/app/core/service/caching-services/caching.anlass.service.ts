@@ -140,6 +140,10 @@ export class CachingAnlassService {
     return this.anlassService.importTeilnehmerForAnlassCsv(anlass, formData);
   }
 
+  getBenutzerForAnlassCsv(anlass: IAnlass): void {
+    this.anlassService.getBenutzerForAnlassCsv(anlass);
+  }
+
   getWertungsrichterForAnlassCsv(anlass: IAnlass): void {
     this.anlassService.getWertungsrichterForAnlassCsv(anlass);
   }

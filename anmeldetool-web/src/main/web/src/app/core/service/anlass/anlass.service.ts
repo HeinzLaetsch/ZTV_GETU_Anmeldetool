@@ -356,6 +356,23 @@ export class AnlassService {
       });
   }
 
+  getBenutzerForAnlassCsv(anlass: IAnlass): void {
+    const combinedUrl = this.url + "/" + anlass.id + "/benutzer/";
+    // console.log("getTeilnehmer called: ", combinedUrl);
+    this.http
+      .get(combinedUrl, { observe: "response", responseType: "text" })
+      .pipe(catchError(this.handleError<string>("getBenutzerForAnlassCsv")))
+      .subscribe((result: HttpResponse<string>) => {
+        const header = result.headers.get("Content-Disposition");
+        const parts = header.split("filename=");
+        this.saveAsFile(
+          result.body,
+          parts[1].replace("%", ""),
+          "text/csv; charset=UTF-8"
+        );
+      });
+  }
+
   getWertungsrichterForAnlassCsv(anlass: IAnlass): void {
     const combinedUrl = this.url + "/" + anlass.id + "/wertungsrichter/";
     // console.log("getTeilnehmer called: ", combinedUrl);

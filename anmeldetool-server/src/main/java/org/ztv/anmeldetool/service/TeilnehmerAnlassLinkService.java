@@ -58,6 +58,15 @@ public class TeilnehmerAnlassLinkService {
 		return teilnahmen;
 	}
 
+	public List<TeilnehmerAnlassLink> findWettkampfTeilnahmenByKategorieOrderByOrganisation(Anlass anlass,
+			KategorieEnum kategorie) throws ServiceException {
+		List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] { MeldeStatusEnum.NICHTGESTARTET,
+				MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG });
+		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository
+				.findByAnlassAndAktivAndKategorieOrderByOrganisation(anlass, true, exclusion, kategorie);
+		return teilnahmen;
+	}
+
 	public List<TeilnehmerAnlassLink> findWettkampfTeilnahmenByKategorie(Anlass anlass, KategorieEnum kategorie)
 			throws ServiceException {
 

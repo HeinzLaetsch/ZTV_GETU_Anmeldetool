@@ -2,6 +2,7 @@ package org.ztv.anmeldetool.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -10,19 +11,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.ztv.anmeldetool.models.Anlass;
+import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.OrganisationAnlassLink;
 import org.ztv.anmeldetool.models.Person;
 import org.ztv.anmeldetool.models.PersonAnlassLink;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
+import org.ztv.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.models.WertungsrichterBrevetEnum;
+import org.ztv.anmeldetool.models.WertungsrichterEinsatz;
 import org.ztv.anmeldetool.repositories.AnlassRepository;
 import org.ztv.anmeldetool.repositories.OrganisationAnlassLinkRepository;
 import org.ztv.anmeldetool.repositories.PersonAnlassLinkRepository;
 import org.ztv.anmeldetool.repositories.PersonenRepository;
 import org.ztv.anmeldetool.repositories.TeilnehmerAnlassLinkRepository;
+import org.ztv.anmeldetool.transfer.AnmeldeKontrolleDTO;
 import org.ztv.anmeldetool.transfer.OrganisationAnlassLinkDTO;
 import org.ztv.anmeldetool.transfer.PersonAnlassLinkDTO;
+import org.ztv.anmeldetool.transfer.VereinsStartDTO;
+import org.ztv.anmeldetool.util.AnlassMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,6 +65,9 @@ public class AnlassService {
 	@Autowired
 	PersonenRepository personRepository;
 
+	@Autowired
+	AnlassMapper anlassMapper;
+
 	public List<Person> getVerfuegbareWertungsrichter(UUID anlassId, UUID orgId, WertungsrichterBrevetEnum brevet) {
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		List<Person> personen = personRepository.findByOrganisationId(organisation.getId());
@@ -82,9 +92,131 @@ public class AnlassService {
 		return verfuegbare;
 	}
 
+	public AnmeldeKontrolleDTO getAnmeldeKontrolle(UUID anlassId) {
+		List<VereinsStartDTO> vereinsStarts = new ArrayList<VereinsStartDTO>();
+		Anlass anlass = findAnlassById(anlassId);
+		AnmeldeKontrolleDTO anlassKontrolle = new AnmeldeKontrolleDTO(anlassMapper.ToDto(anlass), vereinsStarts);
+
+		List<Organisation> orgs = getVereinsStarts(anlassId);
+
+		orgs.stream().forEach(org -> {
+			VereinsStartDTO vereinsStart = new VereinsStartDTO();
+			vereinsStart.setVereinsName(org.getName());
+			List<PersonAnlassLink> eingeteilteWrs1 = getEingeteilteWertungsrichter(anlassId, org.getId(),
+					WertungsrichterBrevetEnum.Brevet_1);
+			vereinsStart.setBr1(eingeteilteWrs1.size());
+			List<PersonAnlassLink> eingeteilteWrs2 = getEingeteilteWertungsrichter(anlassId, org.getId(),
+					WertungsrichterBrevetEnum.Brevet_2);
+			vereinsStart.setBr2(eingeteilteWrs2.size());
+			List<TeilnehmerAnlassLink> tals = getTeilnahmen(anlassId, org.getId());
+			int k1_Ti = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.K1.equals(tal.getKategorie())
+						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setK1_Ti(k1_Ti);
+			int k1_Tu = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.K1.equals(tal.getKategorie())
+						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setK1_Tu(k1_Tu);
+
+			int k2_Ti = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.K2.equals(tal.getKategorie())
+						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setK2_Ti(k2_Ti);
+			int k2_Tu = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.K2.equals(tal.getKategorie())
+						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setK2_Tu(k2_Tu);
+
+			int k3_Ti = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.K3.equals(tal.getKategorie())
+						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setK3_Ti(k3_Ti);
+			int k3_Tu = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.K3.equals(tal.getKategorie())
+						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setK3_Tu(k3_Tu);
+
+			int k4_Ti = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.K4.equals(tal.getKategorie())
+						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setK4_Ti(k4_Ti);
+			int k4_Tu = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.K4.equals(tal.getKategorie())
+						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setK4_Tu(k4_Tu);
+
+			int k5A = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.K5A.equals(tal.getKategorie())
+						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setK5A(k5A);
+			int k5B = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.K5B.equals(tal.getKategorie())
+						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setK5B(k5B);
+			int k5 = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.K5.equals(tal.getKategorie())
+						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setK5(k5);
+
+			int k6_Ti = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.K6.equals(tal.getKategorie())
+						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setK6_Ti(k6_Ti);
+			int k6_Tu = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.K6.equals(tal.getKategorie())
+						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setK6_Tu(k6_Tu);
+
+			int kD = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.KD.equals(tal.getKategorie())
+						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setKD(kD);
+			int kH = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.KH.equals(tal.getKategorie())
+						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setKH(kH);
+
+			int k7_Ti = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.K7.equals(tal.getKategorie())
+						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setK7_Ti(k7_Ti);
+			int k7_Tu = (int) tals.stream().filter(tal -> {
+				return tal.isAktiv() && KategorieEnum.K7.equals(tal.getKategorie())
+						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
+			}).count();
+			vereinsStart.setK7_Tu(k7_Tu);
+
+			vereinsStarts.add(vereinsStart);
+		});
+
+		return anlassKontrolle;
+	}
+
 	public List<PersonAnlassLink> getEingeteilteWertungsrichter(UUID anlassId) {
 		Anlass anlass = this.findAnlassById(anlassId);
 		List<PersonAnlassLink> pals = personAnlassLinkRepository.findByAnlass(anlass);
+		pals.forEach(pal -> {
+			List<WertungsrichterEinsatz> allEinsaetze = pal.getEinsaetze().stream().filter(einsatz -> {
+				return einsatz.isEingesetzt();
+			}).collect(Collectors.toList());
+			pal.setEinsaetze(allEinsaetze);
+		});
 		return pals;
 	}
 
@@ -203,8 +335,11 @@ public class AnlassService {
 		}
 		List<OrganisationAnlassLink> orgLinks = anlass.getOrganisationenLinks();
 		List<Organisation> orgs = orgLinks.stream().map(orgLink -> {
-			return orgLink.getOrganisation();
-		}).collect(Collectors.toList());
+			if (orgLink.isAktiv()) {
+				return orgLink.getOrganisation();
+			}
+			return null;
+		}).filter(Objects::nonNull).collect(Collectors.toList());
 		return orgs;
 	}
 

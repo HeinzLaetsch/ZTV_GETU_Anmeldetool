@@ -73,9 +73,7 @@ public class LauflistenOutput {
 			currentIndex++;
 		}
 		boolean first = true;
-		int geraeteIndex = 0;
 		for (List<Laufliste> gl : geraeteListen) {
-			GeraetEnum geraet = GeraetEnum.values()[geraeteIndex];
 			for (Laufliste ll : gl) {
 				int wechsel = ll.getGeraet().ordinal() - ll.getLauflistenContainer().getStartgeraetOrd() + 1;
 				if (wechsel < 1) {
@@ -86,7 +84,7 @@ public class LauflistenOutput {
 					document.add(aB);
 				}
 				first = false;
-				addLaufliste(document, ll, geraet, wechsel++);
+				addLaufliste(document, ll, wechsel++);
 			}
 		}
 		document.close();
@@ -138,8 +136,7 @@ public class LauflistenOutput {
 		document.close();
 	}
 
-	private static void addLaufliste(Document document, Laufliste laufliste, GeraetEnum geraet, int currentIndex)
-			throws IOException {
+	private static void addLaufliste(Document document, Laufliste laufliste, int currentIndex) throws IOException {
 		PdfFont fontN = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 		PdfFont fontB = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
 
@@ -205,7 +202,7 @@ public class LauflistenOutput {
 		float[] widths2 = { 6.0f, 6.0f, 20.0f, 20.0f, 20.0f, 14.0f, 14.0f };
 		float[] widths = widths1;
 		boolean isSprung = false;
-		if (geraet.equals(GeraetEnum.SPRUNG)) {
+		if (laufliste.getGeraet().equals(GeraetEnum.SPRUNG)) {
 			widths = widths2;
 			isSprung = true;
 		}
@@ -251,7 +248,7 @@ public class LauflistenOutput {
 		Laufliste laufliste = container.getGeraeteLauflisten().stream().filter(liste -> {
 			return liste.getGeraet().equals(geraet);
 		}).collect(Collectors.toList()).get(0);
-		addLaufliste(document, laufliste, geraet, currentIndex);
+		addLaufliste(document, laufliste, currentIndex);
 	}
 
 	private static void addTableHeader(Table table, boolean isSprung) {

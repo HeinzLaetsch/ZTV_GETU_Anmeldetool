@@ -61,6 +61,11 @@ export class EventAdminComponent implements OnInit {
       data: undefined,
     });
   }
+
+  exportBenutzer(): void {
+    this.anlassService.getBenutzerForAnlassCsv(this.anlass);
+  }
+
   exportWertungsrichter(): void {
     this.anlassService.getWertungsrichterForAnlassCsv(this.anlass);
   }

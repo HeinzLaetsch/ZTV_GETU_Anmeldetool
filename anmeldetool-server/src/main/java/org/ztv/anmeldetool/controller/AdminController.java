@@ -1,6 +1,7 @@
 package org.ztv.anmeldetool.controller;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -39,13 +40,17 @@ import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.LoginData;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.OrganisationAnlassLink;
+import org.ztv.anmeldetool.models.OrganisationPersonLink;
 import org.ztv.anmeldetool.models.Person;
 import org.ztv.anmeldetool.models.PersonAnlassLink;
+import org.ztv.anmeldetool.models.RollenEnum;
+import org.ztv.anmeldetool.models.RollenLink;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.models.Wertungsrichter;
 import org.ztv.anmeldetool.models.WertungsrichterBrevetEnum;
 import org.ztv.anmeldetool.models.WertungsrichterEinsatz;
 import org.ztv.anmeldetool.models.WertungsrichterSlot;
+import org.ztv.anmeldetool.output.AnmeldeKontolleOutput;
 import org.ztv.anmeldetool.repositories.PersonAnlassLinkRepository;
 import org.ztv.anmeldetool.service.AnlassService;
 import org.ztv.anmeldetool.service.LoginService;
@@ -59,6 +64,8 @@ import org.ztv.anmeldetool.service.VerbandService;
 import org.ztv.anmeldetool.service.WertungsrichterEinsatzService;
 import org.ztv.anmeldetool.service.WertungsrichterService;
 import org.ztv.anmeldetool.transfer.AnlassDTO;
+import org.ztv.anmeldetool.transfer.AnmeldeKontrolleDTO;
+import org.ztv.anmeldetool.transfer.BenutzerDTO;
 import org.ztv.anmeldetool.transfer.OrganisationAnlassLinkDTO;
 import org.ztv.anmeldetool.transfer.OrganisationDTO;
 import org.ztv.anmeldetool.transfer.PersonAnlassLinkCsvDTO;
@@ -72,6 +79,7 @@ import org.ztv.anmeldetool.transfer.VerbandDTO;
 import org.ztv.anmeldetool.transfer.WertungsrichterDTO;
 import org.ztv.anmeldetool.transfer.WertungsrichterEinsatzDTO;
 import org.ztv.anmeldetool.util.AnlassMapper;
+import org.ztv.anmeldetool.util.BenutzerExport;
 import org.ztv.anmeldetool.util.OrganisationAnlassLinkMapper;
 import org.ztv.anmeldetool.util.OrganisationMapper;
 import org.ztv.anmeldetool.util.PersonAnlassLinkExportImportMapper;
@@ -225,6 +233,79 @@ public class AdminController {
 		} catch (Exception ex) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
 					"Unable to generate Wertungsrichter Export: ", ex);
+		}
+	}
+
+	@GetMapping(value = "/anlaesse/{anlassId}/benutzer/", produces = "text/csv;charset=UTF-8")
+	// @ResponseBody
+	public void getAnmelderUndVerantwortliche(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable UUID anlassId) {
+		try {
+			Anlass anlass = anlassSrv.findAnlassById(anlassId);
+			List<Organisation> orgs = anlassSrv.getVereinsStarts(anlassId);
+
+			List<BenutzerDTO> benutzerList = new ArrayList<BenutzerDTO>();
+			for (Organisation org : orgs) {
+				if (org.isAktiv()) {
+					for (OrganisationPersonLink opl : org.getPersonenLinks()) {
+						BenutzerDTO benutzer = null;
+						for (RollenLink rl : opl.getRollenLink()) {
+							if (rl.isAktiv() && (RollenEnum.ANMELDER.equals(rl.getRolle().getName())
+									|| RollenEnum.VEREINSVERANTWORTLICHER.equals(rl.getRolle().getName()))) {
+								if (benutzer == null) {
+									benutzer = new BenutzerDTO();
+									benutzer.setBenutzername(opl.getPerson().getBenutzername());
+									benutzer.setName(opl.getPerson().getName());
+									benutzer.setVorname(opl.getPerson().getVorname());
+									benutzer.setHandy(opl.getPerson().getHandy());
+									benutzer.setEmail(opl.getPerson().getEmail());
+									benutzer.setVerein(org.getName());
+								}
+								if (RollenEnum.ANMELDER.equals(rl.getRolle().getName())) {
+									benutzer.setAnmelder(true);
+								} else {
+									benutzer.setVerantwortlicher(true);
+								}
+							}
+						}
+						if (benutzer != null) {
+							benutzerList.add(benutzer);
+						}
+					}
+				}
+			}
+
+			String reportName = "Verantwortliche_Anmelder_" + anlass.getAnlassBezeichnung() + "_" + anlass.getOrt();
+
+			response.addHeader("Content-Disposition", "attachment; filename=" + reportName + ".csv");
+			response.addHeader("Content-Type", "text/csv");
+			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+
+			// response.setCharacterEncoding("UTF-8");
+			BenutzerExport.csvWriteToWriter(benutzerList, response);
+
+			// response.addHeader("Content-Length", "");
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Benutzer Export: ",
+					ex);
+		}
+	}
+
+	@GetMapping(value = "/anlaesse/{anlassId}/", produces = "application/pdf")
+	public void getAnmeldeDaten(HttpServletRequest request, HttpServletResponse response, @PathVariable UUID anlassId) {
+		try {
+			AnmeldeKontrolleDTO anmeldekontrolle = anlassSrv.getAnmeldeKontrolle(anlassId);
+
+			response.addHeader("Content-Disposition",
+					"attachment; filename=Anmeldekontrolle_" + anmeldekontrolle.getAnlass().getOrt() + ".pdf");
+			response.addHeader("Content-Type", "application/pdf");
+			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+
+			AnmeldeKontolleOutput.createAnmeldeKontrolle(response, anmeldekontrolle);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Anmeldekontrolle: ",
+					ex);
 		}
 	}
 

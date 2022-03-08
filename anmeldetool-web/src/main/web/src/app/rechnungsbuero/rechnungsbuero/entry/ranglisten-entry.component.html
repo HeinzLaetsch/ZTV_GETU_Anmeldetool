@@ -15,25 +15,28 @@
     {{ entry.jahrgang }}
   </div>
   <div class="col-base col-1">
-    {{ entry.noteReck }}
+    {{ entry.noteReck | number: "1.2-2" }}
   </div>
   <div class="col-base col-1">
-    {{ entry.noteBoden }}
+    {{ entry.noteBoden | number: "1.2-2" }}
   </div>
   <div class="col-base col-1">
-    {{ entry.noteSchaukelringe }}
+    {{ entry.noteSchaukelringe | number: "1.2-2" }}
   </div>
   <div class="col-base col-1">
-    {{ entry.noteSprung1 }}
+    {{ entry.noteSprung1 | number: "1.2-2" }}
   </div>
   <div class="col-base col-1">
-    {{ entry.noteSprung2 }}
+    {{ entry.noteSprung2 | number: "1.2-2" }}
   </div>
   <div class="col-base col-1">
-    {{ entry.noteZaehlbar }}
+    {{ entry.noteZaehlbar | number: "1.2-2" }}
   </div>
   <div class="col-base col-1">
-    {{ entry.noteBarren }}
+    {{ entry.noteBarren | number: "1.2-2" }}
+  </div>
+  <div class="col-base col-1">
+    {{ entry.gesamtPunktzahl | number: "1.2-2" }}
   </div>
   <div class="col-base col-1 right">
     <span *ngIf="entry.rang === index + 1"> {{ entry.rang }}. </span>
