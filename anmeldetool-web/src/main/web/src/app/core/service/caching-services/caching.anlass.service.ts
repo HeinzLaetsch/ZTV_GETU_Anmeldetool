@@ -123,7 +123,7 @@ export class CachingAnlassService {
     katgorie: KategorieEnum
   ): IAnlassLink[] {
     const teilnahmen = this.getTeilnehmerForAnlass(anlass);
-    const filteredLinks = teilnahmen.anlassLinks.filter((link) => {
+    const filteredLinks = teilnahmen.filter((link) => {
       return link.kategorie === katgorie;
     });
     return filteredLinks;
@@ -148,9 +148,11 @@ export class CachingAnlassService {
     this.anlassService.getWertungsrichterForAnlassCsv(anlass);
   }
 
-  getTeilnehmerForAnlass(anlass: IAnlass): IAnlassLinks {
-    if (this.teilnamen) {
-      return this.teilnamen[anlass.id];
+  getTeilnehmerForAnlass(anlass: IAnlass): IAnlassLink[] {
+    if (this.teilnamen && this.teilnamen[anlass.id].anlassLinks) {
+      return this.teilnamen[anlass.id].anlassLinks.filter((anlassLink) => {
+        return anlassLink.kategorie !== "keine Teilnahme";
+      });
     }
     return undefined;
   }
@@ -177,8 +179,8 @@ export class CachingAnlassService {
     // TODO Lade hier
     if (this.teilnamen) {
       const anlassTeilnahmen = this.getTeilnehmerForAnlass(anlass);
-      if (anlassTeilnahmen && anlassTeilnahmen.anlassLinks) {
-        const links = anlassTeilnahmen.anlassLinks.filter((link) => {
+      if (anlassTeilnahmen) {
+        const links = anlassTeilnahmen.filter((link) => {
           // console.log("Link: ", link.teilnehmerId, ", Teiln: ", teilnehmer.id);
           return link.teilnehmerId === teilnehmer.id;
         });
@@ -328,9 +330,9 @@ export class CachingAnlassService {
 
   public getTeilnahmen(anlass: IAnlass, brevet: number) {
     const teilnahmen = this.getTeilnehmerForAnlass(anlass);
-    if (teilnahmen && teilnahmen.anlassLinks) {
+    if (teilnahmen) {
       if (brevet === 1) {
-        return teilnahmen.anlassLinks.filter((einzel) => {
+        return teilnahmen.filter((einzel) => {
           return (
             einzel.kategorie === KategorieEnum.K1 ||
             einzel.kategorie === KategorieEnum.K2 ||
@@ -339,7 +341,7 @@ export class CachingAnlassService {
           );
         });
       } else {
-        return teilnahmen.anlassLinks.filter((einzel) => {
+        return teilnahmen.filter((einzel) => {
           return (
             einzel.kategorie !== KategorieEnum.K1 &&
             einzel.kategorie !== KategorieEnum.K2 &&

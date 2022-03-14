@@ -93,6 +93,7 @@
         {{ anlass.erfassenVerlaengert | date: "d-MM-y":"GMT+1":"DE-CH" }}
       </div>
     </div>
+    <!--             (dateInput)="addVerlaengerung('input', $event)" -->
     <div *ngIf="!viewOnly" class="row">
       <div class="col border small div-orange">
         <mat-form-field appearance="fill">
@@ -100,7 +101,6 @@
           <input
             matInput
             [matDatepicker]="picker"
-            (dateInput)="addVerlaengerung('input', $event)"
             (dateChange)="addVerlaengerung('change', $event)"
             [formControl]="verlaengerungControl"
           />

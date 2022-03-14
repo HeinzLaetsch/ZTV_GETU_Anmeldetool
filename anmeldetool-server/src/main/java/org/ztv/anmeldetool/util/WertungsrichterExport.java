@@ -37,7 +37,8 @@ public class WertungsrichterExport {
 		strategy.setColumnOrderOnWrite(new LiteralComparator(PersonAnlassLinkCsvDTO.FIELDS_ORDER));
 
 		StatefulBeanToCsv<PersonAnlassLinkCsvDTO> writer = new StatefulBeanToCsvBuilder<PersonAnlassLinkCsvDTO>(
-				responseWriter).withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(';').withOrderedResults(false)
+				responseWriter).withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(';')
+						.withEscapechar(CSVWriter.NO_ESCAPE_CHARACTER).withOrderedResults(true)
 						.withMappingStrategy(strategy).build();
 		writer.write(pals);
 		responseWriter.flush();

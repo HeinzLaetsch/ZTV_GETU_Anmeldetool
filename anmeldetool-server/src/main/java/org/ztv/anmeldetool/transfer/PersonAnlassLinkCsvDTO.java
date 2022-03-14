@@ -6,6 +6,7 @@ import org.ztv.anmeldetool.util.WertungsrichterToCsv;
 
 import com.opencsv.bean.CsvBindAndSplitByName;
 import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,9 +18,10 @@ import lombok.NoArgsConstructor;
 public class PersonAnlassLinkCsvDTO {
 
 	public static final String[] FIELDS_ORDER = { "NAME", "VORNAME", "HANDY", "EMAIL", "VEREIN", "KOMMENTAR",
-			"WR_MELDUNGEN", "BENUTZERNAME" };
+			"WRMELDUNGEN" };
 
-	@CsvBindByName(column = "Benutzername", required = true)
+	// @CsvBindByName(column = "Benutzername", required = true)
+	@CsvIgnore
 	private String benutzername;
 
 	@CsvBindByName(column = "Name", required = true)
@@ -38,7 +40,7 @@ public class PersonAnlassLinkCsvDTO {
 	@CsvBindByName(column = "Kommentar", required = false)
 	private String kommentar;
 
-	@CsvBindByName(column = "WR_Meldungen")
+	@CsvBindByName(column = "WRMeldungen")
 	@CsvBindAndSplitByName(elementType = WertungsrichterEinsatzCsvDTO.class, splitOn = ";+", writeDelimiter = ";", converter = WertungsrichterToCsv.class)
 	private List<WertungsrichterEinsatzCsvDTO> wrMeldungen;
 }

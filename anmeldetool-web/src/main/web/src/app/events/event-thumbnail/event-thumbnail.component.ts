@@ -46,10 +46,9 @@ export class EventThumbnailComponent implements OnInit {
         if (result) {
           const links = this.anlassService.getTeilnehmerForAnlass(this.anlass);
           if (links) {
-            if (links.anlassLinks)
-              this.anzahlTeilnehmer = links.anlassLinks.filter((link) => {
-                return link.kategorie !== KategorieEnum.KEINE_TEILNAHME;
-              }).length;
+            this.anzahlTeilnehmer = links.filter((link) => {
+              return link.kategorie !== KategorieEnum.KEINE_TEILNAHME;
+            }).length;
           }
         }
       });

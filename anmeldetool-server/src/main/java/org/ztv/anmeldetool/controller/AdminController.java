@@ -199,9 +199,9 @@ public class AdminController {
 
 	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}")
 	// @ResponseBody
-	public ResponseEntity<OrganisationAnlassLinkDTO> getVereinStarts(HttpServletRequest request,
+	public ResponseEntity<OrganisationAnlassLinkDTO> getVereinStart(HttpServletRequest request,
 			@PathVariable UUID anlassId, @PathVariable UUID orgId) {
-		OrganisationAnlassLink oalResult = anlassSrv.getVereinStarts(anlassId, orgId);
+		OrganisationAnlassLink oalResult = anlassSrv.getVereinStart(anlassId, orgId);
 		if (oalResult == null) {
 			return ResponseEntity.notFound().build();
 		}

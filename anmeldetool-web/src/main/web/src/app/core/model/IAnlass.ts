@@ -168,14 +168,13 @@ export class IAnlass {
       if (this.tiAnlass || this.alleAnlass) {
         filtered.push(KategorieEnum.K5A);
         filtered.push(KategorieEnum.K5B);
-        filtered.push(KategorieEnum.K6);
         filtered.push(KategorieEnum.KD);
       }
       if (this.tuAnlass || this.alleAnlass) {
         filtered.push(KategorieEnum.K5);
-        filtered.push(KategorieEnum.K6);
         filtered.push(KategorieEnum.KH);
       }
+      filtered.push(KategorieEnum.K6);
       filtered.push(KategorieEnum.K7);
     } else {
       filtered = filtered.concat(

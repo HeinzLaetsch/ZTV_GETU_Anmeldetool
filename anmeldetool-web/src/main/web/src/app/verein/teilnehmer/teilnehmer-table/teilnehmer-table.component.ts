@@ -244,7 +244,20 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     return this.getKategorienRaw(anlass);
   }
   getKategorienRaw(anlass: IAnlass): KategorieEnum[] {
-    return anlass.getKategorienRaw();
+    return anlass.getKategorienRaw().filter((kategorie) => {
+      if (this.tiTu === "Turner") {
+        if (kategorie === "K5A" || kategorie === "K5B" || kategorie === "KD") {
+          return false;
+        }
+        return true;
+      } else {
+        if (kategorie === "K5" || kategorie === "KH") {
+          return false;
+        }
+        return true;
+      }
+    });
+    // return anlass.getKategorienRaw();
   }
   get anzahlTeilnehmer(): number {
     return 0;
@@ -731,25 +744,50 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     );
     const rest = this.checked.slice(colIndex + 1);
     const newIndex = rest.findIndex((element) => element) + colIndex + 1;
-    this.teilnahmenControls[rowIndex][newIndex].setValue(
-      this.teilnahmenControls[rowIndex][colIndex].value
+    if (
+      this.isCopyAllowed(
+        this.anlaesse[newIndex],
+        this.teilnahmenControls[rowIndex][colIndex].value
+      )
+    ) {
+      this.teilnahmenControls[rowIndex][newIndex].setValue(
+        this.teilnahmenControls[rowIndex][colIndex].value
+      );
+      this.updateTeilnahmen(rowIndex, newIndex, false);
+    }
+  }
+  private findIndexOfkategorie(kategorie: KategorieEnum): number {
+    const index = Object.keys(KategorieEnum).findIndex(
+      (key) => key === kategorie
     );
-    this.updateTeilnahmen(rowIndex, newIndex, false);
+    return index;
+  }
+
+  private isCopyAllowed(anlass: IAnlass, kategorie: KategorieEnum) {
+    const anlassIndexTi = this.findIndexOfkategorie(anlass.tiefsteKategorie);
+    const anlassIndexHo = this.findIndexOfkategorie(anlass.hoechsteKategorie);
+    const teilnehmerIndex = this.findIndexOfkategorie(kategorie);
+    if (anlassIndexTi <= teilnehmerIndex && anlassIndexHo >= teilnehmerIndex) {
+      return true;
+    }
+    return false;
   }
   copyAll(event: any, colIndex: any) {
     let rowIndex = 0;
     const rest = this.checked.slice(colIndex + 1);
     const newIndex = rest.findIndex((element) => element) + colIndex + 1;
     this.teilnahmenControls.forEach((anlassCntrLine) => {
-      const anlassIndex = Object.keys(KategorieEnum).findIndex(
-        (key) => key === this.anlaesse[newIndex].tiefsteKategorie
-      );
-      const teilnehmerIndex = Object.keys(KategorieEnum).findIndex(
-        (key) => key === anlassCntrLine[colIndex].value
-      );
-
-      if (anlassIndex <= teilnehmerIndex) {
-        anlassCntrLine[newIndex].setValue(anlassCntrLine[colIndex].value);
+      let index = colIndex;
+      while (
+        anlassCntrLine[colIndex].value === "keine Teilnahme" &&
+        index > 0
+      ) {
+        index--;
+      }
+      if (
+        this.isCopyAllowed(this.anlaesse[newIndex], anlassCntrLine[index].value)
+      ) {
+        anlassCntrLine[newIndex].setValue(anlassCntrLine[index].value);
         this.updateTeilnahmen(rowIndex, newIndex, false);
       }
       rowIndex++;

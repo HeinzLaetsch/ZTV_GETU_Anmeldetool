@@ -116,8 +116,8 @@
   </div>
   <div class="row">
     <div class="col-12">
-      <mat-tab-group mat-align-tabs="start">
-        <mat-tab>
+      <mat-tab-group #tabs mat-align-tabs="start">
+        <mat-tab [disabled]="!isBrevet1Anlass()">
           <ng-template matTabContent>
             <ng-template mat-tab-label
               >Brevet 1
@@ -209,7 +209,7 @@
             </div>
           </ng-template>
         </mat-tab>
-        <mat-tab>
+        <mat-tab [disabled]="!isBrevet2Anlass()">
           <ng-template mat-tab-label
             >Brevet 2
             <img

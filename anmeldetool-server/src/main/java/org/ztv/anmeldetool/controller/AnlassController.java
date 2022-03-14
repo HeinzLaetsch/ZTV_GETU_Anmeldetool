@@ -511,7 +511,8 @@ public class AnlassController {
 		for (Einzelnote einzelnote : einzelnoten) {
 			float note = einzelnote.getNote_1();
 			if (GeraetEnum.SPRUNG.equals(einzelnote.getGeraet())) {
-				if (kategorie.ordinal() > KategorieEnum.K5.ordinal()) {
+				if (kategorie.ordinal() == KategorieEnum.K6.ordinal()
+						|| kategorie.ordinal() == KategorieEnum.K7.ordinal()) {
 					note += einzelnote.getNote_2();
 					note = note / 2;
 				} else {

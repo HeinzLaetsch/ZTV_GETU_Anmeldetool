@@ -3,7 +3,8 @@ import {
   moveItemInArray,
   transferArrayItem,
 } from "@angular/cdk/drag-drop";
-import { Component, OnInit } from "@angular/core";
+import { AfterViewInit, Component, OnInit, ViewChild } from "@angular/core";
+import { MatTabGroup } from "@angular/material/tabs";
 import { ActivatedRoute, Router } from "@angular/router";
 import * as moment from "moment";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
@@ -24,7 +25,9 @@ import { WertungsrichterService } from "src/app/core/service/wertungsrichter.ser
   templateUrl: "./events-detail.component.html",
   styleUrls: ["./events-detail.component.css"],
 })
-export class EventsDetailComponent implements OnInit {
+export class EventsDetailComponent implements OnInit, AfterViewInit {
+  @ViewChild("tabs") tabGroup: MatTabGroup;
+
   anlass: IAnlass;
   orgAnlassLink: IOrganisationAnlassLink;
   assignedWr1s = new Array<IUser>();
@@ -63,7 +66,8 @@ export class EventsDetailComponent implements OnInit {
     this.wertungsrichterService
       .getEingeteilteWertungsrichter(this.anlass, 1)
       .subscribe((assignedWrs) => {
-        this.assignedWr1s = assignedWrs;
+        // this.assignedWr1s = assignedWrs;
+        this.assignedWr1s = this.assignedWr1s.concat(assignedWrs);
         // console.log("has assigned Wrs 1 : ", assignedWrs);
         this.statusBr1 = this.getStatusBr1();
       });
@@ -73,9 +77,20 @@ export class EventsDetailComponent implements OnInit {
         this.assignedWr2s = assignedWrs;
         // console.log("has assigned Wrs 2 : ", assignedWrs);
         this.statusBr2 = this.getStatusBr2();
+        if (this.isBrevet1Anlass() && assignedWrs?.length > 0) {
+          this.assignedWr1s = this.assignedWr1s.concat(assignedWrs);
+          this.useBrevet2 = true;
+        }
       });
     this.getVerfuegbareWertungsrichter(this.wr1s, 1);
     this.getVerfuegbareWertungsrichter(this.wr2s, 2);
+  }
+  ngAfterViewInit(): void {
+    if (this.isBrevet1Anlass()) {
+      this.tabGroup.selectedIndex = 0;
+    } else {
+      this.tabGroup.selectedIndex = 1;
+    }
   }
 
   isViewOnly(): boolean {
@@ -113,11 +128,11 @@ export class EventsDetailComponent implements OnInit {
   }
   isBrevet1Anlass(): boolean {
     // console.log("Brevet 1: ", this.anlass.tiefsteKategorie <= KategorieEnum.K4);
-    return this.anlass.tiefsteKategorie <= KategorieEnum.K4;
+    return this.anlass.brevet1Anlass;
   }
   isBrevet2Anlass(): boolean {
     // console.log("Brevet 2: ", this.anlass.hoechsteKategorie > KategorieEnum.K4);
-    return this.anlass.hoechsteKategorie > KategorieEnum.K4;
+    return this.anlass.brevet2Anlass;
   }
   private getVerfuegbareWertungsrichter(wrs: IUser[], brevet: number) {
     this.anlassService
@@ -127,16 +142,18 @@ export class EventsDetailComponent implements OnInit {
         brevet
       )
       .subscribe((allUser) => {
-        allUser.forEach((user) => wrs.push(user));
-        wrs.sort((a, b) => {
-          if (a.benutzername < b.benutzername) {
-            return -1;
-          }
-          if (a.benutzername > b.benutzername) {
-            return 1;
-          }
-          return 0;
-        });
+        if (allUser) {
+          allUser.forEach((user) => wrs.push(user));
+          wrs.sort((a, b) => {
+            if (a.benutzername < b.benutzername) {
+              return -1;
+            }
+            if (a.benutzername > b.benutzername) {
+              return 1;
+            }
+            return 0;
+          });
+        }
       });
   }
 
@@ -240,12 +257,8 @@ export class EventsDetailComponent implements OnInit {
 
   // TODO check with this.teilnahmenBrevet1 = this.anlassService.getTeilnahmen(this.anlass, 1);
   get anzahlTeilnehmer(): number {
-    if (
-      this.anlassService.getTeilnehmerForAnlass(this.anlass) &&
-      this.anlassService.getTeilnehmerForAnlass(this.anlass).anlassLinks
-    ) {
-      return this.anlassService.getTeilnehmerForAnlass(this.anlass).anlassLinks
-        .length;
+    if (this.anlassService.getTeilnehmerForAnlass(this.anlass)) {
+      return this.anlassService.getTeilnehmerForAnlass(this.anlass).length;
     }
     return 0;
   }

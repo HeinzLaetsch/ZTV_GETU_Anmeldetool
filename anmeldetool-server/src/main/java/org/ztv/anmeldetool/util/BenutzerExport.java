@@ -37,8 +37,8 @@ public class BenutzerExport {
 		strategy.setColumnOrderOnWrite(new LiteralComparator(BenutzerDTO.FIELDS_ORDER));
 
 		StatefulBeanToCsv<BenutzerDTO> writer = new StatefulBeanToCsvBuilder<BenutzerDTO>(responseWriter)
-				.withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(';').withOrderedResults(false)
-				.withMappingStrategy(strategy).build();
+				.withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(';').withOrderedResults(true)
+				.withEscapechar(CSVWriter.NO_ESCAPE_CHARACTER).withMappingStrategy(strategy).build();
 		writer.write(benutzerList);
 		responseWriter.flush();
 		responseWriter.close();

@@ -310,7 +310,7 @@ public class AnlassService {
 		return teilnahmen;
 	}
 
-	public OrganisationAnlassLink getVereinStarts(UUID anlassId, UUID orgId) {
+	public OrganisationAnlassLink getVereinStart(UUID anlassId, UUID orgId) {
 		Anlass anlass = findAnlassById(anlassId);
 		if (anlass == null) {
 			return null;
@@ -321,7 +321,7 @@ public class AnlassService {
 		}
 
 		List<OrganisationAnlassLink> teilnahmen = orgAnlassRepo.findByOrganisationAndAnlass(organisation, anlass);
-		if (teilnahmen != null && teilnahmen.size() == 1) {
+		if (teilnahmen != null && teilnahmen.size() >= 1) {
 			// TODO Check if Date stays
 			return teilnahmen.get(0);
 		}

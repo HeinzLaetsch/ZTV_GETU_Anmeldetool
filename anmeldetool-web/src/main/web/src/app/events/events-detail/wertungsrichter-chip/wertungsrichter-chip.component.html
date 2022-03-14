@@ -21,19 +21,6 @@
       </div>
       <div class="col-2">Brevet {{ wertungsrichter.brevet }}</div>
     </div>
-    <!--div class="row">
-      <div class="col">
-        <mat-checkbox
-          [ngClass]="{
-            'label-green': wertungsrichter.gueltig,
-            'label-red': !wertungsrichter.gueltig
-          }"
-          [(ngModel)]="wertungsrichter.gueltig"
-          [disabled]="true"
-          >Wertungsrichter hat FK</mat-checkbox
-        >
-      </div>
-    </div-->
     <div
       class="row"
       *ngIf="!isAllWertungsrichterList && wertungsrichterUser.pal"
