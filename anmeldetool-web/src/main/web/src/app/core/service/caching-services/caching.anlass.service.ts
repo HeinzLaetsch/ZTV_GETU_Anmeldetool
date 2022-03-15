@@ -148,6 +148,10 @@ export class CachingAnlassService {
     this.anlassService.getWertungsrichterForAnlassCsv(anlass);
   }
 
+  getAnmeldeKontrolleCsv(anlass: IAnlass): void {
+    this.anlassService.getAnmeldeKontrolleCsv(anlass);
+  }
+
   getTeilnehmerForAnlass(anlass: IAnlass): IAnlassLink[] {
     if (this.teilnamen && this.teilnamen[anlass.id].anlassLinks) {
       return this.teilnamen[anlass.id].anlassLinks.filter((anlassLink) => {

@@ -70,6 +70,10 @@ export class EventAdminComponent implements OnInit {
     this.anlassService.getWertungsrichterForAnlassCsv(this.anlass);
   }
 
+  exportAnmeldeKontrolle(): void {
+    this.anlassService.getAnmeldeKontrolleCsv(this.anlass);
+  }
+
   getAbteilungenForAnlass(): void {
     this.ranglistenService
       .getAbteilungenForAnlass(this.anlass, this.selectedKategorie)

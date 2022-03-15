@@ -50,7 +50,6 @@ import org.ztv.anmeldetool.models.Wertungsrichter;
 import org.ztv.anmeldetool.models.WertungsrichterBrevetEnum;
 import org.ztv.anmeldetool.models.WertungsrichterEinsatz;
 import org.ztv.anmeldetool.models.WertungsrichterSlot;
-import org.ztv.anmeldetool.output.AnmeldeKontolleOutput;
 import org.ztv.anmeldetool.repositories.PersonAnlassLinkRepository;
 import org.ztv.anmeldetool.service.AnlassService;
 import org.ztv.anmeldetool.service.LoginService;
@@ -79,6 +78,7 @@ import org.ztv.anmeldetool.transfer.VerbandDTO;
 import org.ztv.anmeldetool.transfer.WertungsrichterDTO;
 import org.ztv.anmeldetool.transfer.WertungsrichterEinsatzDTO;
 import org.ztv.anmeldetool.util.AnlassMapper;
+import org.ztv.anmeldetool.util.AnmeldeKontrolleExport;
 import org.ztv.anmeldetool.util.BenutzerExport;
 import org.ztv.anmeldetool.util.OrganisationAnlassLinkMapper;
 import org.ztv.anmeldetool.util.OrganisationMapper;
@@ -291,17 +291,18 @@ public class AdminController {
 		}
 	}
 
-	@GetMapping(value = "/anlaesse/{anlassId}/", produces = "application/pdf")
-	public void getAnmeldeDaten(HttpServletRequest request, HttpServletResponse response, @PathVariable UUID anlassId) {
+	@GetMapping(value = "/anlaesse/{anlassId}", produces = "text/csv;charset=UTF-8")
+	public void getAnmeldeDatenExport(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable UUID anlassId) {
 		try {
 			AnmeldeKontrolleDTO anmeldekontrolle = anlassSrv.getAnmeldeKontrolle(anlassId);
 
 			response.addHeader("Content-Disposition",
-					"attachment; filename=Anmeldekontrolle_" + anmeldekontrolle.getAnlass().getOrt() + ".pdf");
-			response.addHeader("Content-Type", "application/pdf");
+					"attachment; filename=Anmeldekontrolle_" + anmeldekontrolle.getAnlass().getOrt() + ".csv");
+			response.addHeader("Content-Type", "text/csv");
 			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
 
-			AnmeldeKontolleOutput.createAnmeldeKontrolle(response, anmeldekontrolle);
+			AnmeldeKontrolleExport.csvWriteToWriter(anmeldekontrolle, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Anmeldekontrolle: ",

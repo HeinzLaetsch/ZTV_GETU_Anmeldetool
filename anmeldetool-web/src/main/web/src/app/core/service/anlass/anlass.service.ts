@@ -399,6 +399,22 @@ export class AnlassService {
     return this.http.post<any>(combinedUrl, formData);
   }
 
+  getAnmeldeKontrolleCsv(anlass: IAnlass): void {
+    const combinedUrl = this.url + "/" + anlass.id ;
+    this.http
+      .get(combinedUrl, { observe: "response", responseType: "text" })
+      .pipe(catchError(this.handleError<string>("getAnmeldeKontrolleCsv")))
+      .subscribe((result: HttpResponse<string>) => {
+        const header = result.headers.get("Content-Disposition");
+        const parts = header.split("filename=");
+        this.saveAsFile(
+          result.body,
+          parts[1].replace("%", ""),
+          "text/csv; charset=UTF-8"
+        );
+      });
+  }
+
   private saveAsFile(buffer: any, fileName: string, fileType: string): void {
     const asArray = [buffer];
     const data: Blob = new Blob(asArray, { type: fileType });

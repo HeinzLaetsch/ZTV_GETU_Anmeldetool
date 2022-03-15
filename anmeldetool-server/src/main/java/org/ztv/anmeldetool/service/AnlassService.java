@@ -1,9 +1,11 @@
 package org.ztv.anmeldetool.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -109,98 +111,123 @@ public class AnlassService {
 					WertungsrichterBrevetEnum.Brevet_2);
 			vereinsStart.setBr2(eingeteilteWrs2.size());
 			List<TeilnehmerAnlassLink> tals = getTeilnahmen(anlassId, org.getId());
+			int totalBr = 0;
 			int k1_Ti = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.K1.equals(tal.getKategorie())
 						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setK1_Ti(k1_Ti);
+			totalBr += vereinsStart.getK1_Ti();
 			int k1_Tu = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.K1.equals(tal.getKategorie())
 						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setK1_Tu(k1_Tu);
+			totalBr += vereinsStart.getK1_Tu();
 
 			int k2_Ti = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.K2.equals(tal.getKategorie())
 						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setK2_Ti(k2_Ti);
+			totalBr += vereinsStart.getK2_Ti();
 			int k2_Tu = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.K2.equals(tal.getKategorie())
 						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setK2_Tu(k2_Tu);
+			totalBr += vereinsStart.getK2_Tu();
 
 			int k3_Ti = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.K3.equals(tal.getKategorie())
 						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setK3_Ti(k3_Ti);
+			totalBr += vereinsStart.getK3_Ti();
 			int k3_Tu = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.K3.equals(tal.getKategorie())
 						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setK3_Tu(k3_Tu);
+			totalBr += vereinsStart.getK3_Tu();
 
 			int k4_Ti = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.K4.equals(tal.getKategorie())
 						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setK4_Ti(k4_Ti);
+			totalBr += vereinsStart.getK4_Ti();
 			int k4_Tu = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.K4.equals(tal.getKategorie())
 						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setK4_Tu(k4_Tu);
+			totalBr += vereinsStart.getK4_Tu();
+
+			vereinsStart.setTotal_br1(totalBr);
 
 			int k5A = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.K5A.equals(tal.getKategorie())
 						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setK5A(k5A);
+			totalBr = vereinsStart.getK5A();
 			int k5B = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.K5B.equals(tal.getKategorie())
-						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
+						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setK5B(k5B);
+			totalBr += vereinsStart.getK5B();
 			int k5 = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.K5.equals(tal.getKategorie())
 						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setK5(k5);
+			totalBr += vereinsStart.getK5();
 
 			int k6_Ti = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.K6.equals(tal.getKategorie())
 						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setK6_Ti(k6_Ti);
+			totalBr += vereinsStart.getK6_Ti();
 			int k6_Tu = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.K6.equals(tal.getKategorie())
 						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setK6_Tu(k6_Tu);
+			totalBr += vereinsStart.getK6_Tu();
 
 			int kD = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.KD.equals(tal.getKategorie())
 						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setKD(kD);
+			totalBr += vereinsStart.getKD();
+
 			int kH = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.KH.equals(tal.getKategorie())
 						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setKH(kH);
+			totalBr += vereinsStart.getKH();
 
 			int k7_Ti = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.K7.equals(tal.getKategorie())
 						&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setK7_Ti(k7_Ti);
+			totalBr += vereinsStart.getK7_Ti();
 			int k7_Tu = (int) tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.K7.equals(tal.getKategorie())
 						&& TiTuEnum.Tu.equals(tal.getTeilnehmer().getTiTu());
 			}).count();
 			vereinsStart.setK7_Tu(k7_Tu);
+			totalBr += vereinsStart.getK7_Tu();
+
+			vereinsStart.setTotal_br2(totalBr);
+
+			vereinsStart.setTotal(vereinsStart.getTotal_br1() + vereinsStart.getTotal_br2());
 
 			vereinsStarts.add(vereinsStart);
 		});
@@ -334,8 +361,11 @@ public class AnlassService {
 			return new ArrayList<Organisation>();
 		}
 		List<OrganisationAnlassLink> orgLinks = anlass.getOrganisationenLinks();
+		Set<UUID> ids = new HashSet<UUID>();
 		List<Organisation> orgs = orgLinks.stream().map(orgLink -> {
-			if (orgLink.isAktiv()) {
+			if (orgLink.isAktiv() && !ids.contains(orgLink.getOrganisation().getId())) {
+				log.debug("Verein: {}, {}", orgLink.getOrganisation().getName(), orgLink.getOrganisation().getId());
+				ids.add(orgLink.getOrganisation().getId());
 				return orgLink.getOrganisation();
 			}
 			return null;

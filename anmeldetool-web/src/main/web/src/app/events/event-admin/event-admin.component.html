@@ -76,6 +76,24 @@
   </div>
   <div class="row">
     <div class="col-3">
+      <h2>Anmeldekontrolle Export</h2>
+    </div>
+    <div class="col-sm-2">
+      <button
+        mat-button
+        color="primary"
+        #tooltip="matTooltip"
+        matTooltip="Anmeldekontrolle exportieren"
+        matTooltipPosition="below"
+        matTooltipHideDelay="500"
+        (click)="exportAnmeldeKontrolle()"
+      >
+        Exportieren
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-3">
       <h2>Lauflisten</h2>
     </div>
     <div class="col-1">
