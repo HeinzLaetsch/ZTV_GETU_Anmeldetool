@@ -271,16 +271,20 @@
           Aktion
         </mat-header-cell>
         <mat-cell *matCellDef="let row; let rowIndex = index" class="aktion">
-          <button mat-raised-button class="align-right">
+          <button
+            mat-raised-button
+            [disabled]="disableDelete(rowIndex)"
+            class="align-right"
+            aria-hidden="false"
+            aria-label="Teilnehmer löschen"
+            (click)="delete($event, row, rowIndex)"
+          >
             <mat-icon
               class="material-icons color_gray"
-              aria-hidden="false"
-              aria-label="Teilnehmer löschen"
               #tooltip="matTooltip"
-              matTooltip="Teilnehmer löschen"
+              [matTooltip]="deleteToolTip(rowIndex)"
               matTooltipPosition="below"
               matTooltipHideDelay="100"
-              (click)="delete($event, row, rowIndex)"
               >delete</mat-icon
             >
           </button>

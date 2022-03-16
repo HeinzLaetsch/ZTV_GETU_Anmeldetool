@@ -189,20 +189,6 @@ export class TeilnehmerTableComponent implements AfterViewInit {
               anlass.position = i++;
             });
           }
-
-          /*
-          console.log(
-            "getVereinStart ",
-            anlass.anlassBezeichnung,
-            " , Ti/Tu ",
-            this.tiTu,
-            ", started Result is: ",
-            result,
-            " , checked: ",
-            this.checked.length,
-            " , Anlässe: ",
-            this.anlaesse.length
-          );*/
           this.checked[anlass.position] = result;
           const isLast = currentAnlass++ === this.anlaesse.length - 1;
           this.teilnahmenloader(anlass, isLast);
@@ -586,6 +572,44 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       return false;
     }
     return this.isMutationenDisabled(this.anlaesse[colIndex]);
+  }
+
+  deleteToolTip(rowIndex: number): string {
+    if (this.disableDelete(rowIndex)) {
+      return "Teilnehmer löschen nicht möglich, zuerst ABMELDEN";
+    }
+    return "Teilnehmer löschen";
+  }
+  disableDelete(rowIndex: number): boolean {
+    let teilnahme = true;
+    let colIndex = 0;
+    this.anlaesse.forEach((anlass) => {
+      const nno = anlass.anzeigeStatus.hasStatus(
+        AnzeigeStatusEnum.NOCH_NICHT_OFFEN
+      );
+      const closed = anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.CLOSED);
+      if (!nno && !closed) {
+        const abgemeldet =
+          this.mutationsControls[rowIndex][colIndex].value ===
+          MeldeStatusEnum.ABGEMELDET;
+        const umgemeldet =
+          this.mutationsControls[rowIndex][colIndex].value ===
+          MeldeStatusEnum.UMMELDUNG;
+        if (!abgemeldet && !umgemeldet) {
+          const keinStart =
+            this.teilnahmenControls[rowIndex][colIndex].value ===
+              KategorieEnum.KEINE_TEILNAHME ||
+            this.teilnahmenControls[rowIndex][colIndex].value === undefined;
+          if (keinStart) {
+            teilnahme = teilnahme && true;
+          } else {
+            teilnahme = false;
+          }
+        }
+      }
+      colIndex++;
+    });
+    return !teilnahme;
   }
 
   mustEnableAnlass(colIndex: number): boolean {
