@@ -95,6 +95,9 @@ public class LauflistenContainer extends Base {
 				if (GeraetEnum.UNDEFINED.equals(value)) {
 					continue;
 				}
+				if (TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu()) && GeraetEnum.BARREN.equals(value)) {
+					continue;
+				}
 				Laufliste laufliste;
 				if (!hashListen.containsKey(value)) {
 					laufliste = new Laufliste();

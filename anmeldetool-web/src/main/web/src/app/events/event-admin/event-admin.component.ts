@@ -58,7 +58,7 @@ export class EventAdminComponent implements OnInit {
   }
   importTeilnehmer(): void {
     const dialogRef = this.dialog.open(Upload, {
-      data: undefined,
+      data: this.anlass,
     });
   }
 

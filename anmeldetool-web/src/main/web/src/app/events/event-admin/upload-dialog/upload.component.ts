@@ -36,9 +36,9 @@ export class Upload {
       const formData = new FormData();
 
       formData.append("teilnehmer", file);
-      const alle = this.anlassService.getAnlaesse(TiTuEnum.Alle);
+      // const alle = this.anlassService.getAnlaesse(TiTuEnum.Alle);
       this.anlassService
-        .importTeilnehmerForAnlassCsv(alle[0], formData)
+        .importTeilnehmerForAnlassCsv(this.data, formData)
         .pipe(takeUntil(this._destroy$))
         .subscribe(
           (event) => {
