@@ -45,7 +45,8 @@ public class TeilnehmerExportImport {
 	public static List<TeilnehmerAnlassLinkCsvDTO> csvWriteToWriter(InputStream inputStream) throws IOException {
 		byte[] cachedBody = StreamUtils.copyToByteArray(inputStream);
 		int start = 0;
-		if (cachedBody[0] == 239 && cachedBody[1] == 187 && cachedBody[2] == 191) {
+		if (cachedBody[0] == 239 && cachedBody[1] == 187 && cachedBody[2] == 191
+				|| cachedBody[0] == -17 && cachedBody[1] == -69 && cachedBody[2] == -65) {
 			// int char1 = inputStream.read();
 			// int char2 = inputStream.read();
 			// int char3 = inputStream.read();

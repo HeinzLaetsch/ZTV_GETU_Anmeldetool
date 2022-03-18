@@ -133,8 +133,8 @@ public class AnlassController {
 			List<RanglistenEntryDTO> ranglistenDTOs = generateRangliste(anlassId, tiTu, kategorie, maxAuszeichungenOpt);
 			return ResponseEntity.ok(ranglistenDTOs);
 		} catch (Exception ex) {
-			log.error("Unable to query LauflisteDTO: ", ex);
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to query LauflisteDTO: ", ex);
+			log.error("Unable to query getRangliste: ", ex);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to query getRangliste: ", ex);
 		}
 	}
 
@@ -336,7 +336,8 @@ public class AnlassController {
 		try {
 			List<RanglistenEntryDTO> ranglistenDTOs = generateRangliste(anlassId, tiTu, kategorie, maxAuszeichungenOpt);
 
-			response.addHeader("Content-Disposition", "attachment; filename=Lauflisten-" + kategorie + ".pdf");
+			response.addHeader("Content-Disposition",
+					"attachment; filename=Rangliste-" + kategorie + "-" + tiTu + ".pdf");
 			response.addHeader("Content-Type", "application/pdf");
 			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
 			// Regel für Sprung Durchschnitt
@@ -444,8 +445,9 @@ public class AnlassController {
 			}
 
 			List<LauflisteDTO> listenDTO = alle.stream().map(laufliste -> {
-				return LauflisteDTO.builder().laufliste(laufliste.getKey()).geraet(laufliste.getGeraet())
-						.id(laufliste.getId()).checked(laufliste.isChecked()).erfasst(laufliste.isErfasst()).build();
+				return LauflisteDTO.builder().laufliste(laufliste.getKey()).abteilung(abteilung).anlage(anlage)
+						.geraet(laufliste.getGeraet()).id(laufliste.getId()).erfasst(laufliste.isErfasst())
+						.checked(laufliste.isChecked()).abloesung(laufliste.getAbloesung()).build();
 			}).collect(Collectors.toList());
 			return ResponseEntity.ok(listenDTO);
 		} catch (Exception ex) {

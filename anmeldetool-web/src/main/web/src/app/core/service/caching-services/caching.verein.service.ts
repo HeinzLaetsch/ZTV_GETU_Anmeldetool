@@ -45,18 +45,32 @@ export class CachingVereinService {
           if (strippedB === "ZTV") {
             return -1;
           }
+          strippedA = this.strip(strippedA, "GR ");
+          strippedB = this.strip(strippedB, "GR ");
           strippedA = this.strip(strippedA, "GETU ");
           strippedB = this.strip(strippedB, "GETU ");
           strippedA = this.strip(strippedA, "DTV ");
           strippedB = this.strip(strippedB, "DTV ");
           strippedA = this.strip(strippedA, "STU ");
           strippedB = this.strip(strippedB, "STU ");
+          strippedA = this.strip(strippedA, "TG ");
+          strippedB = this.strip(strippedB, "TG ");
           strippedA = this.strip(strippedA, "TV ");
           strippedB = this.strip(strippedB, "TV ");
+          strippedA = this.strip(strippedA, "GERÄTERIEGE JUGI ");
+          strippedB = this.strip(strippedB, "GERÄTERIEGE JUGI ");
           strippedA = this.strip(strippedA, "GERÄTERIEGE ");
           strippedB = this.strip(strippedB, "GERÄTERIEGE ");
           strippedA = this.strip(strippedA, "TURNVEREIN ");
           strippedB = this.strip(strippedB, "TURNVEREIN ");
+          strippedA = this.strip(strippedA, "TURNSPORT ");
+          strippedB = this.strip(strippedB, "TURNSPORT ");
+          strippedA = this.strip(strippedA, "GERÄTETURNEN ");
+          strippedB = this.strip(strippedB, "GERÄTETURNEN ");
+          strippedA = this.strip(strippedA, "SATUS ");
+          strippedB = this.strip(strippedB, "SATUS ");
+          strippedA = this.strip(strippedA, "NEUE SEKTION ");
+          strippedB = this.strip(strippedB, "NEUE SEKTION ");
 
           if (strippedA < strippedB) {
             return -1;

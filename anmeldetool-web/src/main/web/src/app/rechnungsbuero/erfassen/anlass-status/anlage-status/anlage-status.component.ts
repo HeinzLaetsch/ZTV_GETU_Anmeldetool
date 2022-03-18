@@ -66,15 +66,6 @@ export class AnlageStatusComponent implements OnInit {
             return 1;
           }
           return 0;
-          /*
-          if (a.geraet < b.geraet) {
-            return -1;
-          }
-          if (a.geraet > b.geraet) {
-            return 1;
-          }
-          return 0;
-          */
         });
         this.lauflisten.forEach((laufliste) => {
           this.erfasstLauflisten.push(laufliste.erfasst);

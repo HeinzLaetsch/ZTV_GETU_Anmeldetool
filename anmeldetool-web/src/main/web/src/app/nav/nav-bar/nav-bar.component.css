@@ -4,7 +4,10 @@
 .nav.navbar-nav {
   font-size: 14px;
 }
-
+.dropdown-item {
+  font-size: 12px;
+  padding: 0.05rem 1.5rem;
+}
 #searchForm {
   margin-right: 100px;
 }

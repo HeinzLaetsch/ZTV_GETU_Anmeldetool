@@ -85,12 +85,17 @@ public class LauflistenService {
 			AbteilungEnum abteilung, AnlageEnum anlage) {
 		List<LauflistenContainer> existierende = lauflistenContainerRepo
 				.findByAnlassAndKategorieOrderByStartgeraetAsc(anlass, kategorie);
+		log.debug("Found {} Lauflisten for Anlass {} , Kategorie {} , Abteilung {} , Anlage {}", existierende.size(),
+				anlass.getAnlassBezeichnung(), kategorie.toString(), abteilung.toString(), anlage.toString());
 		existierende = existierende.stream().filter(container -> {
 			if (container.getTeilnehmerAnlassLinks() != null && container.getTeilnehmerAnlassLinks().size() > 0
 					&& container.getTeilnehmerAnlassLinks().get(0).getAbteilung() != null) {
 				if (abteilung.equals(AbteilungEnum.UNDEFINED)
 						|| container.getTeilnehmerAnlassLinks().get(0).getAbteilung().equals(abteilung)) {
-					return true;
+					if (anlage.equals(AnlageEnum.UNDEFINED)
+							|| container.getTeilnehmerAnlassLinks().get(0).getAnlage().equals(anlage)) {
+						return true;
+					}
 				}
 			}
 			return false;
@@ -113,6 +118,8 @@ public class LauflistenService {
 			AnlassLauflisten anlasslaufListen = new AnlassLauflisten();
 			for (TeilnehmerAnlassLink tal : tals) {
 				if (tal.getAbteilung() != null && tal.getAnlage() != null && tal.getStartgeraet() != null
+						&& (abteilung.equals(AbteilungEnum.UNDEFINED) || tal.getAbteilung().equals(abteilung))
+						&& (anlage.equals(AnlageEnum.UNDEFINED) || tal.getAnlage().equals(anlage))
 						&& tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET
 						&& tal.getMeldeStatus() != MeldeStatusEnum.UMMELDUNG) {
 					tal = this.createNotenblatt(tal);
