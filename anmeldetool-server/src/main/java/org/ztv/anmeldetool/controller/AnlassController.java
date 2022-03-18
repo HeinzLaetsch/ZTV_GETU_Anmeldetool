@@ -559,8 +559,10 @@ public class AnlassController {
 	@GetMapping(value = "/{anlassId}/lauflisten/{kategorie}/{abteilung}/{anlage}", produces = "application/pdf")
 	public void getLauflistenPdf(HttpServletRequest request, HttpServletResponse response, @PathVariable UUID anlassId,
 			@PathVariable KategorieEnum kategorie, @PathVariable AbteilungEnum abteilung,
-			@PathVariable AnlageEnum anlage) {
+			@PathVariable AnlageEnum anlage, @RequestParam(name = "onlyTi") Optional<Boolean> optOnlyTi) {
 		try {
+			boolean onlyTi = optOnlyTi.isEmpty() ? false : optOnlyTi.get();
+
 			Anlass anlass = anlassService.findAnlassById(anlassId);
 
 			response.addHeader("Content-Disposition", "attachment; filename=Lauflisten-" + kategorie + ".pdf");
@@ -569,7 +571,7 @@ public class AnlassController {
 
 			AnlassLauflisten anlassLauflisten = lauflistenService.generateLauflistenForAnlassAndKategorie(anlass,
 					kategorie, abteilung, anlage);
-			LauflistenOutput.createLaufListe(anlassLauflisten, response);
+			LauflistenOutput.createLaufListe(anlass, onlyTi, anlassLauflisten, response);
 			anlassLauflisten.getLauflistenContainer().stream().forEach(container -> {
 				lauflistenService.saveAllLauflisten(container.getGeraeteLauflisten());
 				container.getGeraeteLauflisten().stream().forEach(laufliste -> {

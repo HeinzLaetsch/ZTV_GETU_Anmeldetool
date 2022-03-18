@@ -7,6 +7,7 @@ import { AbteilungEnum } from "src/app/core/model/AbteilungEnum";
 import { AnlageEnum } from "src/app/core/model/AnlageEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
+import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
 import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.service";
@@ -24,6 +25,8 @@ export class EventAdminComponent implements OnInit {
 
   message: string;
   hasError: boolean = false;
+  onlyTi = false;
+  hideOnlyTi = false;
 
   abteilungen: AbteilungEnum[];
   selectedAbteilung: AbteilungEnum;
@@ -47,6 +50,9 @@ export class EventAdminComponent implements OnInit {
     const anlassId: string = this.route.snapshot.params.id;
     // console.log("url param: ", anlassId);
     this.anlass = this.anlassService.getAnlassById(anlassId);
+    if (this.anlass.alleAnlass) {
+      this.hideOnlyTi = true;
+    }
     this.kategorien = this.anlass.getKategorienRaw();
   }
 
@@ -152,7 +158,8 @@ export class EventAdminComponent implements OnInit {
         this.anlass,
         this.selectedKategorie,
         this.selectedAbteilung,
-        this.selectedAnlage
+        this.selectedAnlage,
+        this.onlyTi
       )
       .pipe(takeUntil(this.lauflistenPDF$))
       .subscribe((result) => {

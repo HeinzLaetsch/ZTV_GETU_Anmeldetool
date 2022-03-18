@@ -146,10 +146,10 @@ public class RanglistenOutput {
 	}
 
 	private static Table initTable(boolean turner) {
-		Table table = new Table(UnitValue.createPercentArray(AnmeldeKontrolleTableHeaderEventHandler.headerWidths1))
+		Table table = new Table(UnitValue.createPercentArray(TableHeaderEventHandler.headerWidths1))
 				.useAllAvailableWidth();
 		if (turner) {
-			table = new Table(UnitValue.createPercentArray(AnmeldeKontrolleTableHeaderEventHandler.headerWidths2))
+			table = new Table(UnitValue.createPercentArray(TableHeaderEventHandler.headerWidths2))
 					.useAllAvailableWidth();
 		}
 		return table;

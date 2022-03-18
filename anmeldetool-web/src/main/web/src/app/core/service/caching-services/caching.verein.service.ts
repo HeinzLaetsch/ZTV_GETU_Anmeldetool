@@ -24,16 +24,44 @@ export class CachingVereinService {
     return this.loadVereine();
   }
 
+  private strip(org: string, pattern: string) {
+    const hasGetuA = org.indexOf(pattern);
+    if (hasGetuA >= 0) {
+      return org.substring(hasGetuA + pattern.length);
+    }
+    return org;
+  }
   loadVereine(): Observable<boolean> {
     if (!this._loadRunning && !this.loaded) {
       this._loadRunning = true;
       this.vereinService.getVereine().subscribe((vereine) => {
         this.vereine = vereine;
         this.vereine.sort((a, b) => {
-          if (a.name.toUpperCase() < b.name.toUpperCase()) {
+          let strippedA = a.name.toUpperCase();
+          let strippedB = b.name.toUpperCase();
+          if (strippedA === "ZTV") {
+            return 1;
+          }
+          if (strippedB === "ZTV") {
             return -1;
           }
-          if (a.name.toUpperCase() > b.name.toUpperCase()) {
+          strippedA = this.strip(strippedA, "GETU ");
+          strippedB = this.strip(strippedB, "GETU ");
+          strippedA = this.strip(strippedA, "DTV ");
+          strippedB = this.strip(strippedB, "DTV ");
+          strippedA = this.strip(strippedA, "STU ");
+          strippedB = this.strip(strippedB, "STU ");
+          strippedA = this.strip(strippedA, "TV ");
+          strippedB = this.strip(strippedB, "TV ");
+          strippedA = this.strip(strippedA, "GERÄTERIEGE ");
+          strippedB = this.strip(strippedB, "GERÄTERIEGE ");
+          strippedA = this.strip(strippedA, "TURNVEREIN ");
+          strippedB = this.strip(strippedB, "TURNVEREIN ");
+
+          if (strippedA < strippedB) {
+            return -1;
+          }
+          if (strippedA > strippedB) {
             return 1;
           }
           return 0;
@@ -41,8 +69,9 @@ export class CachingVereinService {
         this._loadRunning = false;
         this.loaded = true;
         // console.log("Vereine Loaded");
-        this.vereineLoaded.next(true);
+        // this.vereineLoaded.next(true);
         // console.log("Vereine Loaded 2");
+        this.vereineLoaded.complete();
       });
     } else {
       if (this.loaded) {
@@ -50,10 +79,12 @@ export class CachingVereinService {
         this.vereineLoaded.next(true);
       }
     }
+    /*
     this.vereineLoaded.asObservable().subscribe((result) => {
       // console.log("loadVereine : ", result);
       this.vereineLoaded.complete();
     });
+    */
     return this.vereineLoaded.asObservable();
   }
 

@@ -38,16 +38,28 @@ import { SharedComponentsModule } from "./shared/component/shared.components.mod
 import { LoginDialogComponent } from "./verein/login/login-dialog.component";
 import { NewAnmelderComponent } from "./verein/new-anmelder/new-anmelder.component";
 import { NewVereinComponent } from "./verein/new-verein/new-verein.component";
+import { CachingAnlassService } from "./core/service/caching-services/caching.anlass.service";
 registerLocaleData(localeDeCH, "de-ch");
 registerLocaleData(localeDe, "de");
+
+export function initAnlassservice(
+  anlassService: CachingAnlassService
+): Function {
+  return () =>
+    anlassService
+      .loadAnlaesse()
+      .pipe(tap((value) => console.log("Anlassservice loaded, ", value)));
+}
 
 export function initVereinservice(
   vereinService: CachingVereinService
 ): Function {
   return () =>
-    vereinService
-      .loadVereine()
-      .pipe(tap((value) => console.log("Vereinservice loaded, ", value)));
+    vereinService.loadVereine().pipe(
+      tap((value) => {
+        console.log("Vereinservice loaded, ", value);
+      })
+    );
 }
 
 @NgModule({
@@ -92,6 +104,12 @@ export function initVereinservice(
   ],
   providers: [
     DatePipe,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initAnlassservice,
+      deps: [CachingAnlassService],
+      multi: true,
+    },
     {
       provide: APP_INITIALIZER,
       useFactory: initVereinservice,

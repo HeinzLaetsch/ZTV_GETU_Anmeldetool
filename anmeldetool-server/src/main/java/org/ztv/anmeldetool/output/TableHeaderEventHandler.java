@@ -30,8 +30,8 @@ import com.itextpdf.layout.renderer.DocumentRenderer;
 import com.itextpdf.layout.renderer.TableRenderer;
 
 public class TableHeaderEventHandler implements IEventHandler {
-	public static float[] headerWidths1 = { 5.0f, 15.0f, 15.0f, 5.0f, 20.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f,
-			5.0f };
+	public static float[] headerWidths1 = { 3.0f, 21.0f, 4.0f, 19.5f, 4.0f, 3.0f, 4.0f, 3.0f, 4.0f, 3.0f, 4.0f, 4.0f,
+			4.0f, 3.0f, 4.5f, 3.0f, 2.0f };
 	// 18 Rang, Name und Vorname, Jahrgang, Verein, Reck, Boden RING Sprung Barren
 	// Rang, Ausz
 	public static float[] headerWidths2 = { 3.0f, 21.0f, 4.0f, 19.5f, 4.0f, 3.0f, 4.0f, 3.0f, 4.0f, 3.0f, 4.0f, 4.0f,

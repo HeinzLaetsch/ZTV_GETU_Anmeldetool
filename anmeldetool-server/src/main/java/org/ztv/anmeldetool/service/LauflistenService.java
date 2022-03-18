@@ -116,7 +116,7 @@ public class LauflistenService {
 						&& tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET
 						&& tal.getMeldeStatus() != MeldeStatusEnum.UMMELDUNG) {
 					tal = this.createNotenblatt(tal);
-					anlasslaufListen.createFromTal(tal, abteilung, anlage);
+					anlasslaufListen.createFromTal(anlass.getTiTu(), tal, abteilung, anlage);
 				}
 			}
 			persistLauflisten(anlasslaufListen);

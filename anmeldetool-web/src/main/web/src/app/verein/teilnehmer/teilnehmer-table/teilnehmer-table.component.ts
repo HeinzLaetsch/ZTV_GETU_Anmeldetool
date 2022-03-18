@@ -53,7 +53,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   allDisplayedColumns: string[];
   displayedColumns = ["name", "vorname", "jahrgang", "stvnummer"];
   dataSource: TeilnehmerDataSource;
-  vereine: IVerein[];
+  // vereine: IVerein[];
   anlaesse: IAnlass[];
   // _startsChanges: IStart[];
 
@@ -81,6 +81,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     );
     // this._startsChanges = new Array<IStart>();
 
+    /*
     this.vereinService
       .loadVereine()
       .pipe(takeUntil(this.unsubscribeLoadVereine$))
@@ -92,9 +93,11 @@ export class TeilnehmerTableComponent implements AfterViewInit {
           this.vereine
         );
       });
+      */
   }
 
   private initAll() {
+    /*
     this.anlassService
       .loadAnlaesse()
       .pipe(takeUntil(this.unsubscribeLoadAnlaesse$))
@@ -103,47 +106,45 @@ export class TeilnehmerTableComponent implements AfterViewInit {
         if (!result) {
           return;
         }
-        this.anlaesse = this.anlassService.getAnlaesse(this.tiTu);
-        // console.log("TeilnehmerTableComponent:: ngOnInit: ", this.anlaesse);
-        this.allDisplayedColumns = this.displayedColumns.map((col) => col);
-        this.anlaesse.forEach((anlass) => {
-          this.allDisplayedColumns.push(
-            anlass.anlassBezeichnung +
-              "///" +
-              anlass.tiTu +
-              anlass.tiefsteKategorie
-          );
-          this.allDisplayedColumns.push(
-            anlass.anlassBezeichnung +
-              "///" +
-              anlass.tiTu +
-              anlass.tiefsteKategorie +
-              "Btn"
-          );
-        });
-        if (this.anlaesse.length > 0) {
-          this.allDisplayedColumns.pop();
-        }
-        this.allDisplayedColumns.push("aktion");
+        */
+    this.anlaesse = this.anlassService.getAnlaesse(this.tiTu);
+    // console.log("TeilnehmerTableComponent:: ngOnInit: ", this.anlaesse);
+    this.allDisplayedColumns = this.displayedColumns.map((col) => col);
+    this.anlaesse.forEach((anlass) => {
+      this.allDisplayedColumns.push(
+        anlass.anlassBezeichnung + "///" + anlass.tiTu + anlass.tiefsteKategorie
+      );
+      this.allDisplayedColumns.push(
+        anlass.anlassBezeichnung +
+          "///" +
+          anlass.tiTu +
+          anlass.tiefsteKategorie +
+          "Btn"
+      );
+    });
+    if (this.anlaesse.length > 0) {
+      this.allDisplayedColumns.pop();
+    }
+    this.allDisplayedColumns.push("aktion");
 
-        let anzahlControls = this.pageSize;
-        for (let i = 0; i <= anzahlControls; i++) {
-          const teilnehmerLineControls = new Array<FormControl>();
-          teilnehmerLineControls.push(this.getControl(i, 0));
-          teilnehmerLineControls.push(this.getControl(i, 1));
-          teilnehmerLineControls.push(this.getControl(i, 2));
-          teilnehmerLineControls.push(this.getControl(i, 3));
-          this.teilnehmerControls.push(teilnehmerLineControls);
+    let anzahlControls = this.pageSize;
+    for (let i = 0; i <= anzahlControls; i++) {
+      const teilnehmerLineControls = new Array<FormControl>();
+      teilnehmerLineControls.push(this.getControl(i, 0));
+      teilnehmerLineControls.push(this.getControl(i, 1));
+      teilnehmerLineControls.push(this.getControl(i, 2));
+      teilnehmerLineControls.push(this.getControl(i, 3));
+      this.teilnehmerControls.push(teilnehmerLineControls);
 
-          const lineControls = new Array<FormControl>();
-          this.teilnahmenControls.push(lineControls);
+      const lineControls = new Array<FormControl>();
+      this.teilnahmenControls.push(lineControls);
 
-          const mutationsControls = new Array<FormControl>();
-          this.mutationsControls.push(mutationsControls);
-        }
-        this.loadTeilnehmerPage();
-        this.loadTeilnahmen(true);
-      });
+      const mutationsControls = new Array<FormControl>();
+      this.mutationsControls.push(mutationsControls);
+    }
+    this.loadTeilnehmerPage();
+    this.loadTeilnahmen(true);
+    //});
   }
 
   getStatusClass(anlass: IAnlass): string {

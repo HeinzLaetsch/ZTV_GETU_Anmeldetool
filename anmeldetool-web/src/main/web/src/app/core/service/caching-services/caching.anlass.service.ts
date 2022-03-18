@@ -217,8 +217,9 @@ export class CachingAnlassService {
         });
         this._loadRunning = false;
         this.loaded = true;
-        this.anlaesseLoaded.next(true);
-        // console.log("Anlaesse Loaded");
+        // this.anlaesseLoaded.next(true);
+        this.anlaesseLoaded.complete();
+        console.log("Anlaesse Loaded");
       });
     } else {
       if (this.loaded) {

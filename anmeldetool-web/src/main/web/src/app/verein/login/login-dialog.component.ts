@@ -3,6 +3,7 @@ import { FormControl, Validators } from "@angular/forms";
 import { MatDialogRef } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { Observable, of } from "rxjs";
+import { map, startWith } from "rxjs/operators";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingTeilnehmerService } from "src/app/core/service/caching-services/caching.teilnehmer.service";
 import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
@@ -30,6 +31,8 @@ export class LoginDialogComponent implements OnInit {
   vwUserNameControl = new FormControl("", Validators.required);
   vwPasswordControl = new FormControl("", Validators.required);
 
+  filteredOptions: Observable<IVerein[]>;
+
   constructor(
     public dialogRef: MatDialogRef<LoginDialogComponent>,
     private authService: AuthService,
@@ -43,7 +46,24 @@ export class LoginDialogComponent implements OnInit {
 
   ngOnInit() {
     this.vereine = this.vereinService.getVereine();
+    this.filteredOptions = this.vwVereinControl.valueChanges.pipe(
+      startWith(""),
+      map((value) => (typeof value === "string" ? value : value.name)),
+      map((name) => (name ? this._filter(name) : this.vereine.slice()))
+    );
   }
+  private _filter(name: string): IVerein[] {
+    const filterValue = name.toLowerCase();
+
+    return this.vereine.filter((option) =>
+      option.name.toLowerCase().includes(filterValue)
+    );
+  }
+
+  displayFn(verein: IVerein): string {
+    return verein && verein.name ? verein.name : "";
+  }
+
   login() {
     this.loginError = false;
     // console.log("Login: ", this.vwUserNameControl.value);

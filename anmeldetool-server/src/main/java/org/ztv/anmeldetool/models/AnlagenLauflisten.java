@@ -29,7 +29,7 @@ public class AnlagenLauflisten {
 		return this.abteilungsLaufliste.incrementKey();
 	}
 
-	public AnlagenLauflisten createFromTal(TeilnehmerAnlassLink tal) {
+	public AnlagenLauflisten createFromTal(TiTuEnum titu, TeilnehmerAnlassLink tal) {
 		if (startgeraeteLauflisten == null) {
 			startgeraeteLauflisten = new HashMap<GeraetEnum, LauflistenContainer>();
 		}
@@ -41,7 +41,7 @@ public class AnlagenLauflisten {
 			startgeraeteLauflisten.put(tal.getStartgeraet(), startgeraeteLaufliste);
 			startgeraeteLaufliste.setStartgeraet(tal.getStartgeraet());
 		}
-		startgeraeteLaufliste.createFromTal(tal);
+		startgeraeteLaufliste.createFromTal(titu, tal);
 
 		return this;
 	}

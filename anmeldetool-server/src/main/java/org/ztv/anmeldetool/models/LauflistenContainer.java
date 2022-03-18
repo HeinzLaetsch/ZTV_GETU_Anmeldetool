@@ -83,7 +83,7 @@ public class LauflistenContainer extends Base {
 		return key;
 	}
 
-	public LauflistenContainer createFromTal(TeilnehmerAnlassLink tal) {
+	public LauflistenContainer createFromTal(TiTuEnum titu, TeilnehmerAnlassLink tal) {
 		if (geraeteLauflisten == null) {
 			geraeteLauflisten = new ArrayList<Laufliste>();
 			this.anlass = tal.getAnlass();

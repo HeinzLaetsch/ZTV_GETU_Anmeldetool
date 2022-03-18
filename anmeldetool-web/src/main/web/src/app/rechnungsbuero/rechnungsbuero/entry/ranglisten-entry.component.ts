@@ -17,5 +17,9 @@ export class RanglistenEntryComponent {
   @Input()
   index: number;
 
-  ngOnDestroy() {}
+  ngOnDestroy() { }
+
+  get isTi(): boolean {
+    return this.anlass.tiAnlass;
+  }
 }

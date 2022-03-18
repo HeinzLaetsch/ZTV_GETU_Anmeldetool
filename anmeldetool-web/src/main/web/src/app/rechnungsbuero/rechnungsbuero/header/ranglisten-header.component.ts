@@ -7,4 +7,7 @@ import { IRanglistenEntry } from "src/app/core/model/IRanglistenEntry";
   templateUrl: "./ranglisten-header.component.html",
   styleUrls: ["./ranglisten-header.component.css"],
 })
-export class RanglistenHeaderComponent {}
+export class RanglistenHeaderComponent {
+  @Input()
+  isTi: boolean;
+}

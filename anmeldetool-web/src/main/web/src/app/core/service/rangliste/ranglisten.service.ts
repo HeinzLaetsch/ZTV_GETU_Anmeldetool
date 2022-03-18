@@ -218,7 +218,8 @@ export class RanglistenService {
     anlass: IAnlass,
     kategorie: KategorieEnum,
     abteilung: AbteilungEnum,
-    anlage: AnlageEnum
+    anlage: AnlageEnum,
+    onlyTi: boolean
   ): Observable<string> {
     const statusResponse = new Subject<string>();
 
@@ -233,7 +234,9 @@ export class RanglistenService {
       "/" +
       abteilung +
       "/" +
-      anlage;
+      anlage +
+      "?onlyTi=" +
+      onlyTi;
     // console.log("getTeilnehmer called: ", combinedUrl);
     let headers: HttpHeaders = new HttpHeaders();
     headers = headers.append("Accept", "application/pdf");

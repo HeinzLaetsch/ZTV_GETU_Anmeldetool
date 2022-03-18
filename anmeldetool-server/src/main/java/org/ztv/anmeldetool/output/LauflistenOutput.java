@@ -10,11 +10,13 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dom4j.DocumentException;
+import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.AnlassLauflisten;
 import org.ztv.anmeldetool.models.GeraetEnum;
 import org.ztv.anmeldetool.models.Laufliste;
 import org.ztv.anmeldetool.models.LauflistenContainer;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
+import org.ztv.anmeldetool.models.TiTuEnum;
 
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.font.PdfFont;
@@ -35,8 +37,8 @@ import com.itextpdf.layout.properties.VerticalAlignment;
 
 public class LauflistenOutput {
 
-	public static void createLaufListe(AnlassLauflisten anlassLauflisten, HttpServletResponse response)
-			throws DocumentException, IOException {
+	public static void createLaufListe(Anlass anlass, boolean onlyTi, AnlassLauflisten anlassLauflisten,
+			HttpServletResponse response) throws DocumentException, IOException {
 
 		PdfDocument pdf = new PdfDocument(new PdfWriter(response.getOutputStream()));
 		Document document = new Document(pdf);
@@ -52,11 +54,17 @@ public class LauflistenOutput {
 		List<List<Laufliste>> geraeteListen = new ArrayList<List<Laufliste>>();
 
 		int currentIndex = 0;
-		int korrektur = 1; // wegen Undefined bei Ti == 2
-		int maxGeraete = GeraetEnum.values().length - korrektur;
+		// int korrektur = 1; // wegen Undefined bei Ti == 2
+		int maxGeraete = GeraetEnum.values().length - 1;
+		if (TiTuEnum.Ti.equals(anlass.getTiTu()) || onlyTi) {
+			maxGeraete = GeraetEnum.values().length - 2;
+		}
 
 		for (GeraetEnum geraet : GeraetEnum.values()) {
 			if (geraet.equals(GeraetEnum.UNDEFINED)) {
+				continue;
+			}
+			if (geraet.equals(GeraetEnum.BARREN) && (TiTuEnum.Ti.equals(anlass.getTiTu()) || onlyTi)) {
 				continue;
 			}
 			List<Laufliste> gl = new ArrayList<Laufliste>();

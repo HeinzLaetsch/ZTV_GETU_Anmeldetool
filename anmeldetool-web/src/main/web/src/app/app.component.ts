@@ -42,9 +42,10 @@ export class AnmeldeToolComponent
   fillerNav = Array.from({ length: 10 }, (_, i) => `Nav Item ${i + 1}`);
 
   ngOnInit() {
-    this.vereinService.loadVereine().subscribe((result) => {
+    /*this.vereinService.loadVereine().subscribe((result) => {
       // console.log("AnmeldeToolComponent::ngOnInit 1: ", result);
     });
+    */
   }
 
   ngAfterViewInit(): void {

@@ -32,7 +32,7 @@
   <div class="col-base col-1">
     {{ entry.noteZaehlbar | number: "1.2-2" }}
   </div>
-  <div class="col-base col-1">
+  <div *ngIf="!isTi" class="col-base col-1">
     {{ entry.noteBarren | number: "1.2-2" }}
   </div>
   <div class="col-base col-1">

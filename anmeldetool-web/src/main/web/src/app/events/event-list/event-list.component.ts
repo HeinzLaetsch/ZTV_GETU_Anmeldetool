@@ -23,9 +23,10 @@ export class EventListComponent implements OnInit {
   }
 
   ngOnInit() {
-    // console.log("TeilnehmerTableComponent:: ngOnInit: ", this.anlaesse);
-    // this.events = this.router.snapshot.data.events;
-    // this.events = this.eventService.getEvents().subscribe(events => {this.events = events; });
+    this.anlaesse = this.anlassService.getAnlaesse(TiTuEnum.Alle);
+    this.loaded = true;
+
+    /*
     let localSubscription2: Subscription = undefined;
     localSubscription2 = this.anlassService
       .loadAnlaesse()
@@ -45,6 +46,7 @@ export class EventListComponent implements OnInit {
         this.localAdresseEmitter.emit(true);
       }
     });
+    */
   }
 
   get anlaesseLoaded(): Observable<boolean> {

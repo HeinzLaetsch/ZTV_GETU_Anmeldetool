@@ -17,7 +17,8 @@ public class AnlassLauflisten {
 		return key++;
 	}
 
-	public AnlassLauflisten createFromTal(TeilnehmerAnlassLink tal, AbteilungEnum abteilung, AnlageEnum anlage) {
+	public AnlassLauflisten createFromTal(TiTuEnum titu, TeilnehmerAnlassLink tal, AbteilungEnum abteilung,
+			AnlageEnum anlage) {
 		if (abteilungsLauflisten == null) {
 			abteilungsLauflisten = new HashMap<AbteilungEnum, AbteilungsLaufliste>();
 		}
@@ -29,7 +30,7 @@ public class AnlassLauflisten {
 				abteilungsLaufliste = new AbteilungsLaufliste(this);
 				abteilungsLauflisten.put(tal.getAbteilung(), abteilungsLaufliste);
 			}
-			abteilungsLaufliste.createFromTal(tal, anlage);
+			abteilungsLaufliste.createFromTal(titu, tal, anlage);
 		}
 
 		return this;

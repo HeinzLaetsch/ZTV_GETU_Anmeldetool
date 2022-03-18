@@ -69,45 +69,51 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
     console.log("Slider: ", value);
     this.getRangliste();
   }
-  getTeamwertung() {
+  private getFilter(): string {
     let filter = "Tu";
-    if (this.tiTu === TiTuEnum.Ti) {
-      filter = "Ti";
+    if (this.isAlle()) {
+      filter = this.tiTu;
+    } else {
+      if (this.anlass.tiAnlass) {
+        filter = "Ti";
+      } else {
+        filter = "Tu";
+      }
     }
-    this.ranglistenService.getTeamwertung(this.anlass, filter, this.kategorie);
+    return filter;
+  }
+  getTeamwertung() {
+    this.ranglistenService.getTeamwertung(
+      this.anlass,
+      this.getFilter(),
+      this.kategorie
+    );
   }
 
   getRanglistePdfPerVerein() {
-    let filter = "Tu";
-    if (this.tiTu === TiTuEnum.Ti) {
-      filter = "Ti";
-    }
     this.ranglistenService.getRanglistePdfPerVerein(
       this.anlass,
-      filter,
+      this.getFilter(),
       this.kategorie
     );
   }
   getRanglistePdf() {
-    let filter = "Tu";
-    if (this.tiTu === TiTuEnum.Ti) {
-      filter = "Ti";
-    }
     this.ranglistenService.getRanglistePdf(
       this.anlass,
-      filter,
+      this.getFilter(),
       this.kategorie,
       this.maxAuszeichnungen
     );
   }
 
   getRangliste() {
-    let filter = "Tu";
-    if (this.tiTu === TiTuEnum.Ti) {
-      filter = "Ti";
-    }
     this.ranglistenService
-      .getRangliste(this.anlass, filter, this.kategorie, this.maxAuszeichnungen)
+      .getRangliste(
+        this.anlass,
+        this.getFilter(),
+        this.kategorie,
+        this.maxAuszeichnungen
+      )
       .subscribe((result) => {
         this.ranglistenEntries = result;
         this.ranglistenEntries.sort((a, b) => {
@@ -124,12 +130,8 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
   }
 
   getConfig() {
-    let filter = "Tu";
-    if (this.tiTu === TiTuEnum.Ti) {
-      filter = "Ti";
-    }
     this.ranglistenService
-      .getRanglisteConfiguration(this.anlass, filter, this.kategorie)
+      .getRanglisteConfiguration(this.anlass, this.getFilter(), this.kategorie)
       .subscribe((result) => {
         this.config = result;
       });
@@ -151,7 +153,7 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
   }
 
   isAlle(): boolean {
-    return this.anlass.tuAnlass && this.anlass.tiAnlass;
+    return this.anlass.alleAnlass;
   }
 
   ngOnDestroy() {}
