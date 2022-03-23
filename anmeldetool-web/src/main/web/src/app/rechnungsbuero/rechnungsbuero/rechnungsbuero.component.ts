@@ -6,6 +6,7 @@ import { GeraeteEnum } from "src/app/core/model/GeraeteEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { ILaufliste } from "src/app/core/model/ILaufliste";
 import { ILauflistenEintrag } from "src/app/core/model/ILauflistenEintrag";
+import { ILauflistenStatus } from "src/app/core/model/ILauflistenStatus";
 import { IRanglistenConfiguration } from "src/app/core/model/IRanglistenConfiguration";
 import { IRanglistenEntry } from "src/app/core/model/IRanglistenEntry";
 import { IUser } from "src/app/core/model/IUser";
@@ -29,6 +30,7 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
   ranglistenEntries: IRanglistenEntry[];
   highlighted = false;
   config: IRanglistenConfiguration;
+  lauflistenStatus: ILauflistenStatus;
 
   constructor(
     private authService: AuthService,
@@ -47,8 +49,16 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
     this.tiTu = this.anlass.tiTu;
     this.getRangliste();
     this.getConfig();
+    this.getRanglistenState();
   }
 
+  getRanglistenState() {
+    this.ranglistenService
+      .getRanglistenState(this.anlass, this.getFilter(), this.kategorie)
+      .subscribe((result) => {
+        this.lauflistenStatus = result;
+      });
+  }
   get filterOk(): boolean {
     return !!this.kategorie;
   }
@@ -57,6 +67,16 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
       return this.ranglistenEntries.length;
     }
     return 0;
+  }
+  get label(): string {
+    const labelAsString =
+      "Rang " +
+      this.maxAuszeichnungen +
+      " / " +
+      (this.maxAuszeichnungen / this.ranglistenEntries.length) * 100 +
+      " %";
+    this.ranglistenEntries;
+    return labelAsString;
   }
   get maxAuszeichnungen(): number {
     if (this.config) return this.config.maxAuszeichnungen;
@@ -144,12 +164,14 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
     this.kategorie = kategorie.value;
     this.getRangliste();
     this.getConfig();
+    this.getRanglistenState();
   }
 
   tiTuSelected(kategorie: MatSelect): void {
     this.tiTu = kategorie.value;
     this.getRangliste();
     this.getConfig();
+    this.getRanglistenState();
   }
 
   isAlle(): boolean {

@@ -1,6 +1,38 @@
 <div class="container-fluid">
   <div class="row">
-    <h1>{{ anlass.getCleaned() }}</h1>
+    <div class="col-sm-4">
+      <h1>{{ anlass.getCleaned() }}</h1>
+    </div>
+    <div class="col-sm-1">
+      <h2>Erfasst</h2>
+    </div>
+    <div class="col-sm-1">
+      <img
+        *ngIf="!lauflistenStatus.allErfasst"
+        class="icon"
+        src="assets/images/skype/white-question-mark.png"
+      />
+      <img
+        *ngIf="lauflistenStatus.allErfasst"
+        class="icon"
+        src="assets/images/skype/check-mark.png"
+      />
+    </div>
+    <div class="col-sm-1">
+      <h2>Checked</h2>
+    </div>
+    <div class="col-sm-1">
+      <img
+        *ngIf="!lauflistenStatus.allChecked"
+        class="icon"
+        src="assets/images/skype/white-question-mark.png"
+      />
+      <img
+        *ngIf="lauflistenStatus.allChecked"
+        class="icon"
+        src="assets/images/skype/check-mark.png"
+      />
+    </div>
   </div>
   <div class="row">
     <div class="col-sm-1">
@@ -33,6 +65,7 @@
     </div>
     <div class="col-md-7">
       <mat-slider
+        title="{{ label }}"
         min="0"
         [max]="anzahl"
         [(ngModel)]="maxAuszeichnungen"

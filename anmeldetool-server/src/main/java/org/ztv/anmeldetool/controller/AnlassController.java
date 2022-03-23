@@ -51,6 +51,7 @@ import org.ztv.anmeldetool.service.ServiceException;
 import org.ztv.anmeldetool.service.TeilnehmerAnlassLinkService;
 import org.ztv.anmeldetool.transfer.LauflisteDTO;
 import org.ztv.anmeldetool.transfer.LauflistenEintragDTO;
+import org.ztv.anmeldetool.transfer.LauflistenStatusDTO;
 import org.ztv.anmeldetool.transfer.RanglisteConfigurationDTO;
 import org.ztv.anmeldetool.transfer.RanglistenEntryDTO;
 import org.ztv.anmeldetool.transfer.TeamwertungDTO;
@@ -120,6 +121,22 @@ public class AnlassController {
 		} catch (Exception ex) {
 			log.error("Unable to query RanglistenConfig: ", ex);
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to query RanglistenConfig: ",
+					ex);
+		}
+	}
+
+	@GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}/state")
+	public ResponseEntity<LauflistenStatusDTO> getRanglistenStatus(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable UUID anlassId, @PathVariable TiTuEnum tiTu,
+			@PathVariable KategorieEnum kategorie) {
+		try {
+			Anlass anlass = anlassService.findAnlassById(anlassId);
+			LauflistenStatusDTO lauflistenStatusDto = this.lauflistenService
+					.findLauflistenStatusForAnlassAndKategorie(anlass, kategorie, tiTu);
+			return ResponseEntity.ok(lauflistenStatusDto);
+		} catch (Exception ex) {
+			log.error("Unable to query getRanglistenStatus: ", ex);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to query getRanglistenStatus: ",
 					ex);
 		}
 	}
@@ -486,8 +503,8 @@ public class AnlassController {
 			Einzelnote einzelnote = tal.getNotenblatt().getEinzelnoteForGeraet(laufliste.getGeraet());
 			einzelnote.setNote_1(lauflistenEintragDto.getNote_1());
 			einzelnote.setNote_2(lauflistenEintragDto.getNote_2());
-			if (einzelnote.getNote_1() > 0
-					&& (einzelnote.getNote_2() > 0 || !GeraetEnum.SPRUNG.equals(laufliste.getGeraet()))) {
+			if (einzelnote.getNote_1() >= 0
+					&& ((einzelnote.getNote_2() >= 0) || !GeraetEnum.SPRUNG.equals(laufliste.getGeraet()))) {
 				einzelnote.setErfasst(true);
 			} else {
 				einzelnote.setErfasst(false);
@@ -496,6 +513,11 @@ public class AnlassController {
 			einzelnote = lauflistenService.saveEinzelnote(einzelnote);
 			Notenblatt notenblatt = updateNotenblatt(tal.getNotenblatt(), tal.getKategorie());
 			lauflistenService.saveNotenblatt(notenblatt);
+			if (tal.isDeleted() && !lauflistenEintragDto.isDeleted()) {
+				tal.setDeleted(false);
+				tal.setMeldeStatus(MeldeStatusEnum.STARTET);
+				teilnehmerAnlassLinkService.save(tal);
+			}
 			LauflistenEintragDTO le = LauflistenEintragDTO.builder().id(tal.getId()).laufliste_id(laufliste.getId())
 					.startnummer(tal.getStartnummer()).verein(tal.getOrganisation().getName())
 					.name(tal.getTeilnehmer().getName()).vorname(tal.getTeilnehmer().getVorname())
@@ -567,7 +589,8 @@ public class AnlassController {
 
 			Anlass anlass = anlassService.findAnlassById(anlassId);
 
-			response.addHeader("Content-Disposition", "attachment; filename=Lauflisten-" + kategorie + ".pdf");
+			response.addHeader("Content-Disposition",
+					"attachment; filename=Lauflisten-" + kategorie + "-" + abteilung + "-" + anlage + ".pdf");
 			response.addHeader("Content-Type", "application/pdf");
 			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
 

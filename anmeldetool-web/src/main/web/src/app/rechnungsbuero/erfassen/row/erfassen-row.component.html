@@ -132,6 +132,19 @@
     </div>
     <div *ngIf="eintrag.deleted" class="col-1 centered deleted">
       Notenblatt zurückgezogen
+      <button mat-raised-button tabindex="-1" class="small-button">
+        <mat-icon
+          class="color_gray"
+          aria-hidden="false"
+          aria-label="Note leeren"
+          #tooltip="matTooltip"
+          matTooltip="Note leeren"
+          matTooltipPosition="below"
+          matTooltipHideDelay="100"
+          (click)="leeren()"
+          >clear</mat-icon
+        >
+      </button>
     </div>
   </div>
 </ng-container>

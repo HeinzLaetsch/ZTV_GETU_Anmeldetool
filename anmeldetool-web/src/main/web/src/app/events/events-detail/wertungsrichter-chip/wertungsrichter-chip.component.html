@@ -37,6 +37,7 @@
           [einsatz]="getEinsatzForSlot(slot)"
           [anlass]="anlass"
           (wrEinsatzChange)="wrEinsatzChange($event)"
+          [egalIsAktiv]="egalIsAktiv(slot)"
         >
         </app-wertungsrichter-slot>
         <mat-form-field

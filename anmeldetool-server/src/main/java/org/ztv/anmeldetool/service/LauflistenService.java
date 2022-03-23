@@ -20,10 +20,12 @@ import org.ztv.anmeldetool.models.LauflistenContainer;
 import org.ztv.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.models.Notenblatt;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
+import org.ztv.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.repositories.EinzelnotenRepository;
 import org.ztv.anmeldetool.repositories.LauflistenContainerRepository;
 import org.ztv.anmeldetool.repositories.LauflistenRepository;
 import org.ztv.anmeldetool.repositories.NotenblaetterRepository;
+import org.ztv.anmeldetool.transfer.LauflistenStatusDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -79,6 +81,33 @@ public class LauflistenService {
 
 	public LauflistenContainer saveLaufliste(LauflistenContainer lauflistenContainer) {
 		return lauflistenContainerRepo.save(lauflistenContainer);
+	}
+
+	public LauflistenStatusDTO findLauflistenStatusForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie,
+			TiTuEnum titu) {
+		List<LauflistenContainer> containerList = lauflistenContainerRepo
+				.findByAnlassAndKategorieOrderByStartgeraetAsc(anlass, kategorie);
+		containerList = containerList.stream().filter(container -> {
+			if (container.getTeilnehmerAnlassLinks() != null && container.getTeilnehmerAnlassLinks().size() > 0) {
+				TiTuEnum tiTuLocal = container.getTeilnehmerAnlassLinks().get(0).getTeilnehmer().getTiTu();
+				return titu.equals(tiTuLocal);
+			}
+			return false;
+		}).collect(Collectors.toList());
+		long checkedCount = containerList.stream().filter(container -> {
+			return container.getGeraeteLauflisten().stream().filter(laufliste -> {
+				return !laufliste.isChecked();
+			}).count() == 0;
+		}).count();
+		long erfasstCount = containerList.stream().filter(container -> {
+			return container.getGeraeteLauflisten().stream().filter(laufliste -> {
+				return !laufliste.isErfasst();
+			}).count() == 0;
+		}).count();
+		LauflistenStatusDTO lauflistenStatusDto = new LauflistenStatusDTO();
+		lauflistenStatusDto.setAllChecked(containerList.size() == checkedCount);
+		lauflistenStatusDto.setAllErfasst(containerList.size() == erfasstCount);
+		return lauflistenStatusDto;
 	}
 
 	public List<LauflistenContainer> findLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie,

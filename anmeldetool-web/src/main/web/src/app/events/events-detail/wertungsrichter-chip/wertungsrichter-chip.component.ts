@@ -94,7 +94,21 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
     return einsatz;
   }
 
+  egalIsAktiv(slot: IWertungsrichterSlot): boolean {
+    const egalSlot = this.getEgalSlot();
+    if (egalSlot === undefined || egalSlot.id === slot.id) {
+      return false;
+    }
+    return egalSlot.egalSlot;
+  }
   get wrAnlassLink() {
     return this.wertungsrichterUser.pal;
+  }
+
+  private getEgalSlot(): IWertungsrichterSlot {
+    const egalSlots = this.getSlotsForBrevet().filter((slot) => {
+      return slot.egalSlot;
+    });
+    return egalSlots.length > 0 ? egalSlots[0] : undefined;
   }
 }

@@ -153,7 +153,7 @@ export class CachingAnlassService {
   }
 
   getTeilnehmerForAnlass(anlass: IAnlass): IAnlassLink[] {
-    if (this.teilnamen && this.teilnamen[anlass.id].anlassLinks) {
+    if (this.teilnamen && this.teilnamen[anlass.id]?.anlassLinks) {
       return this.teilnamen[anlass.id].anlassLinks.filter((anlassLink) => {
         return anlassLink.kategorie !== "keine Teilnahme";
       });

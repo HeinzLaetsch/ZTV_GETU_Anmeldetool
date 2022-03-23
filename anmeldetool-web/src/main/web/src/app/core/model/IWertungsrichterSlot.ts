@@ -6,4 +6,5 @@ export interface IWertungsrichterSlot {
   startzeit: Date;
   endzeit: Date;
   beschreibung: string;
+  egalSlot?: boolean;
 }

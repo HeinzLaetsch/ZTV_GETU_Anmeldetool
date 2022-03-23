@@ -45,8 +45,14 @@ export class ErfassenComponent implements OnInit, OnDestroy {
     this.anlass = this.anlassService.getAnlassByOrganisatorId(organisatorId);
     this.routeSubject = this.route.params.subscribe((param) => {
       if (param.function === "erfassen") {
+        if (!this.modeErfassen) {
+          this.searchLaufliste();
+        }
         this.modeErfassen = true;
       } else {
+        if (this.modeErfassen) {
+          this.searchLaufliste();
+        }
         this.modeErfassen = false;
       }
     });
@@ -96,13 +102,50 @@ export class ErfassenComponent implements OnInit, OnDestroy {
     this.ranglistenService
       .updateLaufliste(this.anlass, this.laufliste)
       .subscribe((laufliste) => {
-        this.laufliste = laufliste;
+        this.laufliste.erfasst = laufliste.erfasst;
+        this.laufliste.checked = laufliste.checked;
+
         if (this.modeErfassen) {
           this.erfasstChangedEmitter.emit(laufliste);
         } else {
+          if (!laufliste.checked && !laufliste.erfasst) {
+            this.erfasstChangedEmitter.emit(laufliste);
+          }
           this.checkedChangedEmitter.emit(laufliste);
         }
       });
+  }
+  private checkErfassen(): void {
+    // toBeUpdated.erfasst = entry.erfasst;
+    const notErfasst = this.laufliste.eintraege.filter((eintrag) => {
+      return !eintrag.erfasst && !eintrag.deleted;
+    });
+    if (notErfasst.length === 0) {
+      this.laufliste.erfasst = true;
+      this.updateLaufliste();
+    } else {
+      // TODO handle rollback
+      const old = this.laufliste.erfasst;
+      this.laufliste.erfasst = false;
+      if (old) {
+        this.updateLaufliste();
+      }
+    }
+  }
+  private checkChecked(): void {
+    const notChecked = this.laufliste.eintraege.filter((eintrag) => {
+      return !eintrag.checked && !eintrag.deleted;
+    });
+    if (notChecked.length === 0) {
+      this.laufliste.checked = true;
+      this.updateLaufliste();
+    } else {
+      const old = this.laufliste.checked;
+      this.laufliste.checked = false;
+      if (old) {
+        this.updateLaufliste();
+      }
+    }
   }
   entryChanged(entry: ILauflistenEintrag) {
     const toBeUpdated = this.laufliste.eintraege.filter((eintrag) => {
@@ -110,34 +153,14 @@ export class ErfassenComponent implements OnInit, OnDestroy {
     })[0];
     if (this.modeErfassen) {
       toBeUpdated.erfasst = entry.erfasst;
-      const notErfasst = this.laufliste.eintraege.filter((eintrag) => {
-        return !eintrag.erfasst && !eintrag.deleted;
-      });
-      if (notErfasst.length === 0) {
-        this.laufliste.erfasst = true;
-        this.updateLaufliste();
-      } else {
-        // TODO handle rollback
-        const old = this.laufliste.erfasst;
-        this.laufliste.erfasst = false;
-        if (old) {
-          this.updateLaufliste();
-        }
-      }
+      toBeUpdated.deleted = entry.deleted;
+      this.checkErfassen();
     } else {
       toBeUpdated.checked = entry.checked;
-      const notChecked = this.laufliste.eintraege.filter((eintrag) => {
-        return !eintrag.checked && !eintrag.deleted;
-      });
-      if (notChecked.length === 0) {
-        this.laufliste.checked = true;
-        this.updateLaufliste();
-      } else {
-        const old = this.laufliste.checked;
-        this.laufliste.checked = false;
-        if (old) {
-          this.updateLaufliste();
-        }
+      this.checkChecked();
+      if (!entry.checked && !entry.erfasst) {
+        toBeUpdated.erfasst = entry.erfasst;
+        this.checkErfassen();
       }
     }
   }

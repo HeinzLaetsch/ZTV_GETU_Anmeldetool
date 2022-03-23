@@ -10,6 +10,7 @@ import { AnlageEnum } from "../../model/AnlageEnum";
 import { IAnlass } from "../../model/IAnlass";
 import { ILaufliste } from "../../model/ILaufliste";
 import { ILauflistenEintrag } from "../../model/ILauflistenEintrag";
+import { ILauflistenStatus } from "../../model/ILauflistenStatus";
 import { IRanglistenConfiguration } from "../../model/IRanglistenConfiguration";
 import { IRanglistenEntry } from "../../model/IRanglistenEntry";
 import { KategorieEnum } from "../../model/KategorieEnum";
@@ -42,6 +43,26 @@ export class RanglistenService {
     return this.http
       .get<IRanglistenConfiguration>(combinedUrl)
       .pipe(catchError(this.handleError<any>("getRanglisteConfiguration")));
+  }
+  getRanglistenState(
+    anlass: IAnlass,
+    tiTu: string,
+    kategorie: KategorieEnum
+  ): Observable<ILauflistenStatus> {
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "ranglisten" +
+      "/" +
+      tiTu +
+      "/" +
+      kategorie +
+      "/state";
+    return this.http
+      .get<ILauflistenStatus>(combinedUrl)
+      .pipe(catchError(this.handleError<any>("getRanglistenState")));
   }
 
   getRangliste(

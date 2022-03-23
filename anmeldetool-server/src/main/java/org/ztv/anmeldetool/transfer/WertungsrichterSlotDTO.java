@@ -23,4 +23,6 @@ public class WertungsrichterSlotDTO {
 
 	String beschreibung;
 
+	boolean egalSlot;
+
 }

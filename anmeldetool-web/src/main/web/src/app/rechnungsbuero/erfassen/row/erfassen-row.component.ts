@@ -1,3 +1,4 @@
+import { ValueConverter } from "@angular/compiler/src/render3/view/template";
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FormControl, Validators } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
@@ -26,8 +27,8 @@ export class ErfassenRowComponent implements OnInit {
 
   note_1_Cntr: FormControl;
   note_2_Cntr: FormControl;
-  note_1_correct = true;
-  note_2_correct = true;
+  note_1_correct = false;
+  note_2_correct = false;
 
   constructor(
     private ranglistenService: RanglistenService,
@@ -39,7 +40,7 @@ export class ErfassenRowComponent implements OnInit {
       validators: [
         Validators.required,
         Validators.max(10),
-        Validators.min(3),
+        Validators.min(0),
         Validators.pattern("^[0,1]?[0-9](\\.[0-9]?[0,5]?|$)"),
       ],
     });
@@ -48,14 +49,14 @@ export class ErfassenRowComponent implements OnInit {
       validators: [
         Validators.required,
         Validators.max(10),
-        Validators.min(3),
+        Validators.min(0),
         Validators.pattern("^[0,1]?[0-9](\\.[0-9]?[0,5]?|$)"),
       ],
     });
   }
   ngOnInit(): void {
     if (this.modeErfassen) {
-      this.note_1_Cntr.setValue(this.eintrag.note_1);
+      this.note_1_Cntr.setValue(this.eintrag.note_1, { emitEvent: false });
       if (this.eintrag.erfasst) {
         this.note_1_Cntr.disable();
         this.note_2_Cntr.disable();
@@ -65,14 +66,18 @@ export class ErfassenRowComponent implements OnInit {
       }
       this.note_1_Cntr.valueChanges.subscribe((value) => {
         if (this.eintrag.note_1 !== value) {
-          this.eintrag.note_1 = +value;
+          const corrected = this.addPoint(value);
+          this.note_1_Cntr.setValue(corrected, { emitEvent: false });
+          this.eintrag.note_1 = +corrected;
           this.fireUpdateEvent();
         }
       });
-      this.note_2_Cntr.setValue(this.eintrag.note_2);
+      this.note_2_Cntr.setValue(this.eintrag.note_2, { emitEvent: false });
       this.note_2_Cntr.valueChanges.subscribe((value) => {
         if (this.eintrag.note_2 !== value) {
-          this.eintrag.note_2 = +value;
+          const corrected = this.addPoint(value);
+          this.note_2_Cntr.setValue(corrected, { emitEvent: false });
+          this.eintrag.note_2 = +corrected;
           this.fireUpdateEvent();
         }
       });
@@ -80,29 +85,49 @@ export class ErfassenRowComponent implements OnInit {
       if (this.eintrag.checked) {
         this.note_1_Cntr.disable();
         this.note_2_Cntr.disable();
-        this.note_1_Cntr.setValue(this.eintrag.note_1);
-        this.note_2_Cntr.setValue(this.eintrag.note_2);
+        this.note_1_Cntr.setValue(this.eintrag.note_1, { emitEvent: false });
+        this.note_2_Cntr.setValue(this.eintrag.note_2, { emitEvent: false });
       } else {
         this.note_1_Cntr.enable();
         this.note_2_Cntr.enable();
       }
-      this.note_1_Cntr.valueChanges.subscribe((value) => {
-        // if (this.note_1_Cntr.value !== value) {
+      this.note_1_Cntr.valueChanges.subscribe((value: string) => {
+        this.note_1_Cntr.setValue(this.addPoint(value), { emitEvent: false });
         this.note_1_correct = +this.note_1_Cntr.value === this.eintrag.note_1;
+        if (!this.sprung) {
+          this.note_2_correct = this.note_1_correct;
+        }
         this.fireCheckedEvent();
-        // }
       });
       this.note_2_Cntr.valueChanges.subscribe((value) => {
-        // if (this.note_2_Cntr.value !== value) {
+        this.note_2_Cntr.setValue(this.addPoint(value), { emitEvent: false });
         this.note_2_correct = +this.note_2_Cntr.value === this.eintrag.note_2;
         this.fireCheckedEvent();
-        // }
       });
     }
     if (this.eintrag.deleted) {
-      this.note_1_Cntr.disable();
-      this.note_2_Cntr.disable();
+      if (this.eintrag.note_1 <= 0) {
+        this.note_1_Cntr.disable();
+      }
+      if (this.eintrag.note_2 <= 0) {
+        this.note_2_Cntr.disable();
+      }
     }
+  }
+
+  private addPoint(value: string): string {
+    if (value && value.indexOf(".") === -1) {
+      if (value.indexOf("1") === 0 && value.length > 1) {
+        if (value.length > 2) {
+          value = value.substring(0, 2) + "." + value.substring(2);
+        }
+      } else {
+        if (value.length > 1) {
+          value = value.substring(0, 1) + "." + value.substring(1);
+        }
+      }
+    }
+    return value;
   }
 
   fireCheckedEvent() {
@@ -122,10 +147,7 @@ export class ErfassenRowComponent implements OnInit {
         hasErrors = true;
       }
     }
-    if (hasErrors) {
-      // this.entryChangedEvent.emit(this.eintrag);
-    } else {
-      // this.entryChangedEvent.emit(this.eintrag);
+    if (!hasErrors) {
       this.update();
     }
   }
@@ -202,12 +224,14 @@ export class ErfassenRowComponent implements OnInit {
   }
   leeren() {
     this.eintrag.erfasst = false;
-    this.eintrag.note_1 = 0.0;
-    this.eintrag.note_2 = 0.0;
+    this.eintrag.checked = false;
+    this.eintrag.deleted = false;
+    this.eintrag.note_1 = -1;
+    this.eintrag.note_2 = -1;
     this.note_1_Cntr.enable();
     this.note_2_Cntr.enable();
-    this.note_1_Cntr.setValue(0);
-    this.note_2_Cntr.setValue(0);
+    this.note_1_Cntr.setValue(-1, { emitEvent: false });
+    this.note_2_Cntr.setValue(-1, { emitEvent: false });
     this.update();
   }
   delete() {
@@ -225,6 +249,11 @@ export class ErfassenRowComponent implements OnInit {
         .subscribe((result) => {
           if (result) {
             this.eintrag.deleted = true;
+            this.eintrag.note_1 = -1;
+            this.eintrag.note_2 = -1;
+            this.note_1_Cntr.disable();
+            this.note_2_Cntr.disable();
+            this.update();
             this.toasterInfo();
           } else {
             this.toasterError();

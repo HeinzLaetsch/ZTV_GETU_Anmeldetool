@@ -12,7 +12,7 @@ spring:
     password: ${DB_PASSWORD}
   jpa:
      database-platform: org.hibernate.dialect.PostgreSQLDialect
-     show-sql: "true"
+     show-sql: "false"
      properties:
         hibernate:
            jdbc:
@@ -39,11 +39,11 @@ info:
 logging:
   level:
     org.springframework.cloud: INFO
-    org.springframework.security: DEBUG
+    org.springframework.security: INFO
     org.flywaydb: INFO
     org.springframework.web.cors: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type: WARN
     org.ztv.anmeldetool: DEBUG
 
 management:

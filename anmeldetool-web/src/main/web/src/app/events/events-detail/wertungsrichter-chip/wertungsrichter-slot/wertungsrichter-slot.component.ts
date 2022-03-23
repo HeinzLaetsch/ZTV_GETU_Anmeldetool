@@ -29,6 +29,8 @@ export class WertungsrichterSlotComponent implements OnInit {
   einsatz: IWertungsrichterEinsatz;
   @Input()
   private anlass: IAnlass;
+  @Input()
+  private egalIsAktiv: boolean;
 
   @Output()
   wrEinsatzChange = new EventEmitter<IWertungsrichterEinsatz>();
@@ -43,6 +45,9 @@ export class WertungsrichterSlotComponent implements OnInit {
   }
 
   isCheckboxDisabled() {
+    if (this.egalIsAktiv) {
+      return true;
+    }
     if (
       !this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)
     ) {

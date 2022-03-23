@@ -33,6 +33,14 @@
 .mat-row {
   min-height: 30px;
 }
+.mat-row:nth-child(even) {
+  background-color: var(--ztv-lighter-gray);
+}
+
+.mat-row:nth-child(odd) {
+  background-color: white;
+}
+
 mat-header-cell {
   min-height: 120px;
   max-height: 120px;

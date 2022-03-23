@@ -34,4 +34,6 @@ public class WertungsrichterSlot extends Base {
 	LocalTime end_zeit;
 
 	String beschreibung;
+
+	boolean egalSlot;
 }

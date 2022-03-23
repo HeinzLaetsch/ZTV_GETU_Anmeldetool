@@ -1,19 +1,7 @@
-<!--ng-container *ngIf="anlaesseLoaded | async; else loading"-->
 <h1>ZTV Anlässe</h1>
 <hr />
 <div class="row">
   <div *ngFor="let anlass of anlaesse" class="col-md-auto">
-    <!--(click)="handleThumbnailClick(event.name)"-->
-    <!-- (eventClick)="handleEventClicked($event)"für was-->
     <app-event-thumbnail #thumbnail [anlass]="anlass"></app-event-thumbnail>
-    <!--h3>{{thumbnail.someProperty}}</h3>
-        <button class="bt-btn-primary" (click)="thumbnail.getName()">gets Name</button-->
   </div>
 </div>
-<!--/ng-container-->
-
-<ng-template #loading>
-  <div class="center">
-    <mat-spinner style="margin: 0 auto"></mat-spinner>
-  </div>
-</ng-template>
