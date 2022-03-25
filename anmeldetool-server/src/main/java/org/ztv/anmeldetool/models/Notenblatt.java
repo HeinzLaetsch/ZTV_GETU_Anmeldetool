@@ -40,6 +40,9 @@ public class Notenblatt extends Base {
 	private List<Einzelnote> einzelnoten;
 
 	public Einzelnote getEinzelnoteForGeraet(GeraetEnum geraet) {
+		if (einzelnoten == null) {
+			return new Einzelnote();
+		}
 		Einzelnote einzelnote = einzelnoten.stream().filter(en -> {
 			return en.getGeraet().equals(geraet);
 		}).findFirst().get();

@@ -1,0 +1,1 @@
+CREATE SEQUENCE lauflisten_nummer START 1;

@@ -72,8 +72,8 @@ public class TeilnehmerAnlassLinkService {
 
 		List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] { MeldeStatusEnum.NICHTGESTARTET,
 				MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG });
-		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndAktivAndKategorie(anlass,
-				true, exclusion, kategorie);
+		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndKategorie(anlass,
+				exclusion, kategorie);
 		return teilnahmen;
 	}
 

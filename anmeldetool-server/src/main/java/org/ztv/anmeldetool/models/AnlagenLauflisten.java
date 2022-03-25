@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ztv.anmeldetool.repositories.LauflistenRepository;
+
 import lombok.Getter;
 
 @Getter
@@ -29,7 +31,8 @@ public class AnlagenLauflisten {
 		return this.abteilungsLaufliste.incrementKey();
 	}
 
-	public AnlagenLauflisten createFromTal(TiTuEnum titu, TeilnehmerAnlassLink tal) {
+	public AnlagenLauflisten createFromTal(LauflistenRepository lauflistenRepo, TiTuEnum titu,
+			TeilnehmerAnlassLink tal) {
 		if (startgeraeteLauflisten == null) {
 			startgeraeteLauflisten = new HashMap<GeraetEnum, LauflistenContainer>();
 		}
@@ -41,7 +44,7 @@ public class AnlagenLauflisten {
 			startgeraeteLauflisten.put(tal.getStartgeraet(), startgeraeteLaufliste);
 			startgeraeteLaufliste.setStartgeraet(tal.getStartgeraet());
 		}
-		startgeraeteLaufliste.createFromTal(titu, tal);
+		startgeraeteLaufliste.createFromTal(lauflistenRepo, titu, tal);
 
 		return this;
 	}

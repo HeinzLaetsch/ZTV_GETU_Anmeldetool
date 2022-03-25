@@ -69,6 +69,8 @@ export class ErfassenRowComponent implements OnInit {
           const corrected = this.addPoint(value);
           this.note_1_Cntr.setValue(corrected, { emitEvent: false });
           this.eintrag.note_1 = +corrected;
+          this.note_1_correct = true;
+          this.note_2_correct = true;
           this.fireUpdateEvent();
         }
       });
@@ -78,6 +80,8 @@ export class ErfassenRowComponent implements OnInit {
           const corrected = this.addPoint(value);
           this.note_2_Cntr.setValue(corrected, { emitEvent: false });
           this.eintrag.note_2 = +corrected;
+          this.note_1_correct = true;
+          this.note_2_correct = true;
           this.fireUpdateEvent();
         }
       });
@@ -216,7 +220,7 @@ export class ErfassenRowComponent implements OnInit {
       !note1Status ||
       !note2Status ||
       !this.note_1_correct ||
-      !this.note_2_correct
+      (this.sprung && !this.note_2_correct)
     ) {
       return "errorBg";
     }

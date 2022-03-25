@@ -20,6 +20,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.ztv.anmeldetool.repositories.LauflistenRepository;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -83,7 +85,8 @@ public class LauflistenContainer extends Base {
 		return key;
 	}
 
-	public LauflistenContainer createFromTal(TiTuEnum titu, TeilnehmerAnlassLink tal) {
+	public LauflistenContainer createFromTal(LauflistenRepository lauflistenRepo, TiTuEnum titu,
+			TeilnehmerAnlassLink tal) {
 		if (geraeteLauflisten == null) {
 			geraeteLauflisten = new ArrayList<Laufliste>();
 			this.anlass = tal.getAnlass();
@@ -108,7 +111,7 @@ public class LauflistenContainer extends Base {
 					laufliste.setId(UUID.randomUUID());
 					laufliste.setLauflistenContainer(this);
 					laufliste.setChangeDate(Calendar.getInstance());
-					laufliste.setKey(getKey(laufliste.hashCode()));
+					laufliste.setKey(getKey(lauflistenRepo));
 					geraeteLauflisten.add(laufliste);
 				}
 			}
@@ -137,19 +140,10 @@ public class LauflistenContainer extends Base {
 		});
 	}
 
-	private String getKey(int hashCode) {
-		// max int 2147483647
-		hashCode = Math.abs(hashCode);
-		int quersumme = 0;
-		for (int stelle = 1; stelle <= 10; stelle++) {
-			int rest = hashCode % 10;
-			quersumme += rest;
-			hashCode /= 10;
-		}
-		String key = String.format("%03d", incrementKey()) + String.format("%d", quersumme);
-		if (key.length() > 5) {
-			System.out.println("Help: " + key);
-		}
+	private String getKey(LauflistenRepository lauflistenRepo) {
+		Long sequence = lauflistenRepo.getNextSequence();
+		incrementKey();
+		String key = String.format("%05d", sequence);
 		return key;
 	}
 }

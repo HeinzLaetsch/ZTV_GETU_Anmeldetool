@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -49,7 +50,15 @@ public class TeilnehmerAnlassLink extends Base {
 	@OneToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	@JoinColumn(name = "notenblatt_id", referencedColumnName = "id", nullable = true, insertable = true, updatable = true)
 	@ToString.Exclude
+	@Getter(value = AccessLevel.NONE)
 	private Notenblatt notenblatt;
+
+	public Notenblatt getNotenblatt() {
+		if (this.notenblatt == null) {
+			return new Notenblatt();
+		}
+		return notenblatt;
+	}
 
 	private Integer startnummer;
 

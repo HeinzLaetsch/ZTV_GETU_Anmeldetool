@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.ztv.anmeldetool.repositories.LauflistenRepository;
+
 public class AnlassLauflisten {
 
 	Map<AbteilungEnum, AbteilungsLaufliste> abteilungsLauflisten;
@@ -17,8 +19,8 @@ public class AnlassLauflisten {
 		return key++;
 	}
 
-	public AnlassLauflisten createFromTal(TiTuEnum titu, TeilnehmerAnlassLink tal, AbteilungEnum abteilung,
-			AnlageEnum anlage) {
+	public AnlassLauflisten createFromTal(LauflistenRepository lauflistenRepo, TiTuEnum titu, TeilnehmerAnlassLink tal,
+			AbteilungEnum abteilung, AnlageEnum anlage) {
 		if (abteilungsLauflisten == null) {
 			abteilungsLauflisten = new HashMap<AbteilungEnum, AbteilungsLaufliste>();
 		}
@@ -30,7 +32,7 @@ public class AnlassLauflisten {
 				abteilungsLaufliste = new AbteilungsLaufliste(this);
 				abteilungsLauflisten.put(tal.getAbteilung(), abteilungsLaufliste);
 			}
-			abteilungsLaufliste.createFromTal(titu, tal, anlage);
+			abteilungsLaufliste.createFromTal(lauflistenRepo, titu, tal, anlage);
 		}
 
 		return this;
