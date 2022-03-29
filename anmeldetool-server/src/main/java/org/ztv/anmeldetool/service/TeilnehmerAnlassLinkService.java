@@ -104,19 +104,25 @@ public class TeilnehmerAnlassLinkService {
 	}
 
 	public List<TeilnehmerAnlassLink> findAnlassTeilnahmen(UUID anlassId) throws ServiceException {
+		List<MeldeStatusEnum> exclusion = Arrays
+				.asList(new MeldeStatusEnum[] { MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG });
+
+		return findAnlassTeilnahmen(anlassId, exclusion, true);
+	}
+
+	public List<TeilnehmerAnlassLink> findAnlassTeilnahmen(UUID anlassId, List<MeldeStatusEnum> exclusion,
+			boolean linkStatus) throws ServiceException {
 		Anlass anlass = anlassSrv.findAnlassById(anlassId);
 		if (anlass == null) {
 			throw new ServiceException(this.getClass(),
 					String.format("Could not find Anlass with id: %s", anlassId.toString()));
 		}
-		List<MeldeStatusEnum> exclusion = Arrays
-				.asList(new MeldeStatusEnum[] { MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG });
 
 		List<OrganisationAnlassLink> orgLinks = organisationAnlassLinkRepository.findByAnlassAndAktiv(anlass, true);
 		List<Organisation> orgs = orgLinks.stream().map(oal -> {
 			return oal.getOrganisation();
 		}).collect(Collectors.toList());
-		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndAktiv(anlass, true,
+		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndAktiv(anlass, linkStatus,
 				exclusion, orgs);
 		return teilnahmen;
 	}
@@ -138,6 +144,17 @@ public class TeilnehmerAnlassLinkService {
 		}).collect(Collectors.toList());
 
 		teilnehmerAnlassLinkRepository.saveAll(mustUpdateTal);
+		return tals;
+	}
+
+	public List<TeilnehmerAnlassLink> getMutationenForAnlass(UUID anlassId) throws ServiceException {
+		// MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG
+		List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] { MeldeStatusEnum.STARTET });
+
+		List<TeilnehmerAnlassLink> tals = findAnlassTeilnahmen(anlassId, exclusion, true);
+		tals = tals.stream().filter(tal -> {
+			return tal.getMeldeStatus() != null;
+		}).collect(Collectors.toList());
 		return tals;
 	}
 

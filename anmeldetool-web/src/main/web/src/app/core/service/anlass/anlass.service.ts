@@ -356,6 +356,23 @@ export class AnlassService {
       });
   }
 
+  getMutationenForAnlassCsv(anlass: IAnlass): void {
+    const combinedUrl = this.url + "/" + anlass.id + "/teilnehmer/mutationen";
+    // console.log("getTeilnehmer called: ", combinedUrl);
+    this.http
+      .get(combinedUrl, { observe: "response", responseType: "text" })
+      .pipe(catchError(this.handleError<string>("getMutationenForAnlassCsv")))
+      .subscribe((result: HttpResponse<string>) => {
+        const header = result.headers.get("Content-Disposition");
+        const parts = header.split("filename=");
+        this.saveAsFile(
+          result.body,
+          parts[1].replace("%", ""),
+          "text/csv; charset=UTF-8"
+        );
+      });
+  }
+
   getBenutzerForAnlassCsv(anlass: IAnlass): void {
     const combinedUrl = this.url + "/" + anlass.id + "/benutzer/";
     // console.log("getTeilnehmer called: ", combinedUrl);
@@ -400,7 +417,7 @@ export class AnlassService {
   }
 
   getAnmeldeKontrolleCsv(anlass: IAnlass): void {
-    const combinedUrl = this.url + "/" + anlass.id ;
+    const combinedUrl = this.url + "/" + anlass.id;
     this.http
       .get(combinedUrl, { observe: "response", responseType: "text" })
       .pipe(catchError(this.handleError<string>("getAnmeldeKontrolleCsv")))

@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiHost: "http://localhost:8088",
+  apiHost: "http://www.getu.ztv:8088",
 };

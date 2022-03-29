@@ -6,6 +6,7 @@ import org.ztv.anmeldetool.models.AbteilungEnum;
 import org.ztv.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.models.GeraetEnum;
 import org.ztv.anmeldetool.models.KategorieEnum;
+import org.ztv.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.models.TiTuEnum;
 
 import lombok.AllArgsConstructor;
@@ -41,4 +42,6 @@ public class TeilnehmerAnlassLinkCsvDTO {
 	private GeraetEnum startgeraet;
 
 	private TiTuEnum tiTu;
+
+	private MeldeStatusEnum meldeStatus;
 }

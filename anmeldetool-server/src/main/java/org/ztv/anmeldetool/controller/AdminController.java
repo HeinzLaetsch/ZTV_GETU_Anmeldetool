@@ -310,6 +310,38 @@ public class AdminController {
 		}
 	}
 
+	@GetMapping(value = "/anlaesse/{anlassId}/teilnehmer/mutationen", produces = "text/csv;charset=UTF-8")
+	// @ResponseBody
+	public void getMutationen(HttpServletRequest request, HttpServletResponse response, @PathVariable UUID anlassId) {
+		List<TeilnehmerAnlassLink> tals = null;
+		try {
+			tals = teilnehmerAnlassLinkSrv.getMutationenForAnlass(anlassId);
+			if (tals == null || tals.size() == 0) {
+				return;
+			}
+			List<TeilnehmerAnlassLinkCsvDTO> talsCsv = tals.stream().map(tal -> {
+				return talExImMapper.fromEntity(tal);
+			}).collect(Collectors.toList());
+
+			String reportName = "Mutationen_" + tals.get(0).getAnlass().getAnlassBezeichnung();
+
+			response.addHeader("Content-Disposition", "attachment; filename=" + reportName + ".csv");
+			response.addHeader("Content-Type", "text/csv");
+			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+
+			// response.setCharacterEncoding("UTF-8");
+			TeilnehmerExportImport.csvWriteToWriter(talsCsv, response);
+
+			// response.addHeader("Content-Length", "");
+		} catch (ServiceException ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+					"Unable to generate Teilnehmer Export: ", ex);
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+					"Unable to generate Teilnehmer Export: ", ex);
+		}
+	}
+
 	@GetMapping(value = "/anlaesse/{anlassId}/teilnehmer/", produces = "text/csv;charset=UTF-8")
 	// @ResponseBody
 	public void getTeilnehmer(HttpServletRequest request, HttpServletResponse response, @PathVariable UUID anlassId) {

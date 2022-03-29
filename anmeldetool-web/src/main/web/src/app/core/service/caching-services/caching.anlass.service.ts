@@ -129,6 +129,10 @@ export class CachingAnlassService {
     return filteredLinks;
   }
 
+  getMutationenForAnlassCsv(anlass: IAnlass): void {
+    this.anlassService.getMutationenForAnlassCsv(anlass);
+  }
+
   getTeilnehmerForAnlassCsv(anlass: IAnlass): void {
     this.anlassService.getTeilnehmerForAnlassCsv(anlass);
   }

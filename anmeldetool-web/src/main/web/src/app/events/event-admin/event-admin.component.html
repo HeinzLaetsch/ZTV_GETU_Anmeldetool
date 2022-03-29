@@ -93,6 +93,25 @@
     </div>
   </div>
   <div class="row">
+    <div class="col-3">
+      <h2>Mutationen Export</h2>
+    </div>
+    <div class="col-sm-2">
+      <button
+        mat-button
+        color="primary"
+        #tooltip="matTooltip"
+        matTooltip="Mutationen exportieren"
+        matTooltipPosition="below"
+        matTooltipHideDelay="500"
+        (click)="exportMutationen()"
+      >
+        Exportieren
+      </button>
+    </div>
+  </div>
+
+  <div class="row">
     <div class="col-2">
       <h2>Lauflisten</h2>
     </div>
