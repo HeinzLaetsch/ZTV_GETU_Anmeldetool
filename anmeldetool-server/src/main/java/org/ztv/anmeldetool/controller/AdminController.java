@@ -53,6 +53,7 @@ import org.ztv.anmeldetool.models.WertungsrichterSlot;
 import org.ztv.anmeldetool.repositories.PersonAnlassLinkRepository;
 import org.ztv.anmeldetool.service.AnlassService;
 import org.ztv.anmeldetool.service.LoginService;
+import org.ztv.anmeldetool.service.MailService;
 import org.ztv.anmeldetool.service.OrganisationService;
 import org.ztv.anmeldetool.service.PersonService;
 import org.ztv.anmeldetool.service.RoleService;
@@ -310,6 +311,9 @@ public class AdminController {
 		}
 	}
 
+	@Autowired
+	private MailService mailService;
+
 	@GetMapping(value = "/anlaesse/{anlassId}/teilnehmer/mutationen", produces = "text/csv;charset=UTF-8")
 	// @ResponseBody
 	public void getMutationen(HttpServletRequest request, HttpServletResponse response, @PathVariable UUID anlassId) {
@@ -331,6 +335,10 @@ public class AdminController {
 
 			// response.setCharacterEncoding("UTF-8");
 			TeilnehmerExportImport.csvWriteToWriter(talsCsv, response);
+
+			Person person = this.personSrv.findPersonByBenutzername("heinz.laetsch@gmx.ch");
+
+			this.mailService.sendEmail(person);
 
 			// response.addHeader("Content-Length", "");
 		} catch (ServiceException ex) {
