@@ -94,12 +94,17 @@ public class AnlassService {
 		return verfuegbare;
 	}
 
-	public AnmeldeKontrolleDTO getAnmeldeKontrolle(UUID anlassId) {
+	public AnmeldeKontrolleDTO getAnmeldeKontrolle(UUID anlassId, UUID orgId) {
 		List<VereinsStartDTO> vereinsStarts = new ArrayList<VereinsStartDTO>();
 		Anlass anlass = findAnlassById(anlassId);
 		AnmeldeKontrolleDTO anlassKontrolle = new AnmeldeKontrolleDTO(anlassMapper.ToDto(anlass), vereinsStarts);
 
 		List<Organisation> orgs = getVereinsStarts(anlassId);
+		if (orgId != null) {
+			orgs = orgs.stream().filter(org -> {
+				return org.getId().equals(orgId);
+			}).collect(Collectors.toList());
+		}
 
 		orgs.stream().forEach(org -> {
 			VereinsStartDTO vereinsStart = new VereinsStartDTO();
@@ -325,6 +330,15 @@ public class AnlassService {
 		Organisation organisation = organisationSrv.findOrganisationById(OrgId);
 		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndOrganisation(anlass,
 				organisation);
+		teilnahmen = teilnahmen.stream().filter(link -> {
+			try {
+				String name = link.getTeilnehmer().getName();
+				return true;
+			} catch (Exception ex) {
+				return false;
+			}
+		}).collect(Collectors.toList());
+
 		if (teilnahmen.size() > 0) {
 			log.debug("Teilnehmer {}", teilnahmen.get(0).getKategorie());
 			try {
