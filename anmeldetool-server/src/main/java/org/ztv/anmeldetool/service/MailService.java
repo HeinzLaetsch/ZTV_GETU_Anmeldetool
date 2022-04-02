@@ -35,6 +35,17 @@ public class MailService {
 		return sb.toString();
 	}
 
+	public String geContentFromTemplate(Map<String, Object> model) {
+		StringBuffer content = new StringBuffer();
+		try {
+			content.append(
+					VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, "/templates/email-template.vm", model));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return content.toString();
+	}
+
 	public void sendEmail(Person person) {
 		SimpleMailMessage mail = new SimpleMailMessage();
 		mail.setFrom(username);
