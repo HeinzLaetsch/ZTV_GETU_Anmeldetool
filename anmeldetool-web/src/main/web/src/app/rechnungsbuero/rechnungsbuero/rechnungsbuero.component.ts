@@ -47,7 +47,7 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
     const organisatorId: string = this.route.snapshot.params.id;
     this.anlass = this.anlassService.getAnlassByOrganisatorId(organisatorId);
     this.tiTu = this.anlass.tiTu;
-    this.getRangliste();
+    // this.getRangliste();
     this.getConfig();
     this.getRanglistenState();
   }
@@ -69,6 +69,9 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
     return 0;
   }
   get label(): string {
+    if (!this.ranglistenEntries) {
+      return "? / ?%";
+    }
     const labelAsString =
       "Rang " +
       this.maxAuszeichnungen +
@@ -154,6 +157,7 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
       .getRanglisteConfiguration(this.anlass, this.getFilter(), this.kategorie)
       .subscribe((result) => {
         this.config = result;
+        this.getRangliste();
       });
   }
   getKategorienRaw(anlass: IAnlass): KategorieEnum[] {
@@ -162,14 +166,14 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
 
   kategorieSelected(kategorie: MatSelect): void {
     this.kategorie = kategorie.value;
-    this.getRangliste();
+    //     this.getRangliste();
     this.getConfig();
     this.getRanglistenState();
   }
 
   tiTuSelected(kategorie: MatSelect): void {
     this.tiTu = kategorie.value;
-    this.getRangliste();
+    // this.getRangliste();
     this.getConfig();
     this.getRanglistenState();
   }

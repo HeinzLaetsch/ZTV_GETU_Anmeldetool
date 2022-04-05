@@ -48,11 +48,11 @@ public interface TeilnehmerAnlassLinkRepository extends JpaRepository<Teilnehmer
 
 	Optional<TeilnehmerAnlassLink> findTopByStartnummerNotNullOrderByStartnummerDesc();
 
-	@Query(value = "SELECT DISTINCT tal.abteilung FROM teilnehmer_anlass_link tal WHERE tal.anlass_id = :anlass_id AND tal.aktiv= :aktiv AND tal.kategorie= :kategorie AND tal.abteilung IS NOT NULL", nativeQuery = true)
+	@Query(value = "SELECT DISTINCT tal.abteilung FROM teilnehmer_anlass_link tal WHERE tal.anlass_id = :anlass_id AND tal.aktiv= :aktiv AND tal.kategorie= :kategorie AND tal.abteilung IS NOT NULL ORDER BY tal.abteilung", nativeQuery = true)
 	List<AbteilungEnum> findDistinctByAnlassAndAktivAndKategorie(@Param("anlass_id") UUID anlass_id,
 			@Param("aktiv") boolean aktiv, @Param("kategorie") String kategorie);
 
-	@Query(value = "SELECT DISTINCT tal.anlage FROM teilnehmer_anlass_link tal WHERE tal.anlass_id = :anlass_id AND tal.aktiv= :aktiv AND tal.kategorie= :kategorie AND tal.abteilung= :abteilung AND tal.anlage IS NOT NULL", nativeQuery = true)
+	@Query(value = "SELECT DISTINCT tal.anlage FROM teilnehmer_anlass_link tal WHERE tal.anlass_id = :anlass_id AND tal.aktiv= :aktiv AND tal.kategorie= :kategorie AND tal.abteilung= :abteilung AND tal.anlage IS NOT NULL ORDER BY tal.anlage", nativeQuery = true)
 	List<AnlageEnum> findDistinctByAnlassAndAktivAndKategorieAndAbteilung(@Param("anlass_id") UUID anlass_id,
 			@Param("aktiv") boolean aktiv, @Param("kategorie") String kategorie, @Param("abteilung") String abteilung);
 }

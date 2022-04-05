@@ -7,6 +7,7 @@ import {
 import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute } from "@angular/router";
 import { AuthService } from "./core/service/auth/auth.service";
+import { CachingAnlassService } from "./core/service/caching-services/caching.anlass.service";
 import { CachingVereinService } from "./core/service/caching-services/caching.verein.service";
 import { LoginDialogComponent } from "./verein/login/login-dialog.component";
 import { NewAnmelderComponent } from "./verein/new-anmelder/new-anmelder.component";
@@ -23,16 +24,27 @@ export class AnmeldeToolComponent
 {
   private showPage = 0;
   dialogOpen = false;
+  appBlocked = false;
   _authenticated: boolean;
 
   constructor(
     private authService: AuthService,
     public vereinService: CachingVereinService,
+    private anlassService: CachingAnlassService,
     private router: ActivatedRoute,
     public dialog: MatDialog
-  ) {}
+  ) {
+    const anlass = this.anlassService.findetAnlassStatt();
+    if (anlass) {
+      this.appBlocked = true;
+    }
+  }
   ngAfterContentChecked(): void {
-    if (!this.authService.isAuthenticated() && this._authenticated) {
+    if (
+      !this.appBlocked &&
+      !this.authService.isAuthenticated() &&
+      this._authenticated
+    ) {
       this._authenticated = false;
       console.log("AnmeldeToolComponent::ngAfterContentChecked");
       this.openLoginDialog();
@@ -41,15 +53,10 @@ export class AnmeldeToolComponent
 
   fillerNav = Array.from({ length: 10 }, (_, i) => `Nav Item ${i + 1}`);
 
-  ngOnInit() {
-    /*this.vereinService.loadVereine().subscribe((result) => {
-      // console.log("AnmeldeToolComponent::ngOnInit 1: ", result);
-    });
-    */
-  }
+  ngOnInit() {}
 
   ngAfterViewInit(): void {
-    if (!this.authService.isAuthenticated()) {
+    if (!this.appBlocked && !this.authService.isAuthenticated()) {
       // console.log('AnmeldeToolComponent::ngOnInit 2: ');
       this.openLoginDialog();
     }

@@ -121,10 +121,10 @@ public class RanglistenOutput {
 	}
 
 	public static void createRangliste(HttpServletResponse response, List<RanglistenEntryDTO> ranglistenDTOs,
-			boolean turner, boolean sprungAverage) throws DocumentException, IOException {
+			boolean turner, boolean sprungAverage, String kategorie) throws DocumentException, IOException {
 		PdfDocument pdf = new PdfDocument(new PdfWriter(response.getOutputStream()));
 		Document doc = new Document(pdf);
-		TableHeaderEventHandler thEventHandler = new TableHeaderEventHandler(doc, turner);
+		TableHeaderEventHandler thEventHandler = new TableHeaderEventHandler(doc, turner, kategorie);
 		pdf.addEventHandler(PdfDocumentEvent.END_PAGE, thEventHandler);
 		pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new TextFooterEventHandler(doc));
 
@@ -269,7 +269,9 @@ public class RanglistenOutput {
 					// Therefore null will be set and iText will use the default font - Helvetica
 					.setFont(font).setFontSize(5)
 					// .showTextAligned("this is a header", coordX, headerY, TextAlignment.CENTER)
-					.showTextAligned("Turnverein Kloten", coordX, footerY, TextAlignment.CENTER).close();
+					.showTextAligned("GR Neftenbach, Getu Rorbas-Freienstein, TV Wil ZH", coordX, footerY,
+							TextAlignment.CENTER)
+					.close();
 		}
 
 		public float getTableHeight() {

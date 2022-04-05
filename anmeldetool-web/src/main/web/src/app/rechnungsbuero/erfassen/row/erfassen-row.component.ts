@@ -65,6 +65,7 @@ export class ErfassenRowComponent implements OnInit {
         this.note_2_Cntr.enable();
       }
       this.note_1_Cntr.valueChanges.subscribe((value) => {
+        console.log("On Control Blur , Value: ", this.note_1_Cntr.value);
         if (this.eintrag.note_1 !== value) {
           const corrected = this.addPoint(value);
           this.note_1_Cntr.setValue(corrected, { emitEvent: false });
@@ -118,8 +119,8 @@ export class ErfassenRowComponent implements OnInit {
       }
     }
   }
-
   private addPoint(value: string): string {
+    console.log("addPoint: ", value);
     if (value && value.indexOf(".") === -1) {
       if (value.indexOf("1") === 0 && value.length > 1) {
         if (value.length > 2) {
@@ -232,10 +233,10 @@ export class ErfassenRowComponent implements OnInit {
     this.eintrag.deleted = false;
     this.eintrag.note_1 = -1;
     this.eintrag.note_2 = -1;
-    this.note_1_Cntr.enable();
-    this.note_2_Cntr.enable();
     this.note_1_Cntr.setValue(-1, { emitEvent: false });
     this.note_2_Cntr.setValue(-1, { emitEvent: false });
+    this.note_1_Cntr.enable();
+    this.note_2_Cntr.enable();
     this.update();
   }
   delete() {

@@ -65,4 +65,5 @@ public class AnlassDTO {
 	private boolean startgeraetFix;
 	private boolean abteilungFix;
 	private boolean anlageFix;
+	private boolean toolSperren;
 }

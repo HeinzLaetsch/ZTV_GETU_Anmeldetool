@@ -360,7 +360,7 @@ public class AnlassController {
 			// Regel für Sprung Durchschnitt
 			boolean averageSprung = kategorie.equals(KategorieEnum.K6) || kategorie.equals(KategorieEnum.K7);
 			RanglistenOutput.createRangliste(response, ranglistenDTOs, tiTu == TiTuEnum.Ti ? false : true,
-					averageSprung);
+					averageSprung, kategorie.name());
 
 		} catch (Exception ex) {
 			ex.printStackTrace();

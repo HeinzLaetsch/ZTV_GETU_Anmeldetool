@@ -6,7 +6,7 @@
     <div class="col-sm-1">
       <h2>Erfasst</h2>
     </div>
-    <div class="col-sm-1">
+    <div *ngIf="lauflistenStatus !== undefined" class="col-sm-1">
       <img
         *ngIf="!lauflistenStatus.allErfasst"
         class="icon"
@@ -21,7 +21,7 @@
     <div class="col-sm-1">
       <h2>Checked</h2>
     </div>
-    <div class="col-sm-1">
+    <div *ngIf="lauflistenStatus !== undefined" class="col-sm-1">
       <img
         *ngIf="!lauflistenStatus.allChecked"
         class="icon"

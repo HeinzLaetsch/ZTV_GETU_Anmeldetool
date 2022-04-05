@@ -84,6 +84,7 @@ public class Anlass extends Base {
 	private boolean startgeraetFix = false;
 	private boolean abteilungFix = false;
 	private boolean anlageFix = false;
+	private boolean toolSperren = false;
 
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "anlass")
 	@ToString.Exclude
