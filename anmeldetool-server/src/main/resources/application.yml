@@ -31,8 +31,8 @@ spring:
   mail:
      host: "smtp.office365.com"
      port: 587
-     username: "getu-wettkaempfe-tu@ztv.ch"
-     password: "Cav67716"
+     username: ""
+     password: ""
      properties:
         mail:
            smtp:
