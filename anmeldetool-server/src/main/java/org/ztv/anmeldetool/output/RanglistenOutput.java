@@ -195,7 +195,7 @@ public class RanglistenOutput {
 		} else {
 			printCell(table, "", even);
 		}
-		switch (rang) {
+		switch (dto.getRang()) {
 		case 1:
 			printCell(table, "G", even);
 			break;
