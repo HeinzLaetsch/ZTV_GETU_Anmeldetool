@@ -11,4 +11,14 @@ public class AnmeldeKontrolleDTO {
 
 	List<VereinsStartDTO> vereinsStart;
 
+	OrganisationDTO organisator;
+
+	public String getDetailAnlassName() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(anlass.getAnlassBezeichnung().replace("%", ""));
+		sb.append(" in ");
+		sb.append(anlass.getOrt());
+		return sb.toString();
+	}
+
 }

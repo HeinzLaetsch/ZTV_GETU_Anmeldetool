@@ -1,6 +1,7 @@
 package org.ztv.anmeldetool.output;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 
 import org.ztv.anmeldetool.transfer.AnmeldeKontrolleDTO;
 
@@ -32,16 +33,14 @@ import com.itextpdf.layout.renderer.DocumentRenderer;
 import com.itextpdf.layout.renderer.TableRenderer;
 
 public class AnmeldeKontrolleTableHeaderEventHandler implements IEventHandler {
-	public static float[] headerWidths1 = { 5.0f, 15.0f, 15.0f, 5.0f, 20.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f,
-			5.0f };
-	public static float[] headerWidths2 = { 3.0f, 21.0f, 4.0f, 19.5f, 4.0f, 3.0f, 4.0f, 3.0f, 4.0f, 3.0f, 4.0f, 4.0f,
-			4.0f, 3.0f, 4.0f, 3.0f, 4.5f, 3.0f, 2.0f };
+	public static float[] headerWidths = { 14.0f, 14.0f, 14.0f, 14.0f, 14.0f, 30.0f };
 
 	private Table table;
 	private float tableHeight;
 	private Document doc;
 
-	public AnmeldeKontrolleTableHeaderEventHandler(Document doc, AnmeldeKontrolleDTO anmeldeKontrolle) throws IOException {
+	public AnmeldeKontrolleTableHeaderEventHandler(Document doc, AnmeldeKontrolleDTO anmeldeKontrolle)
+			throws IOException {
 		this.doc = doc;
 		initTable(anmeldeKontrolle);
 
@@ -74,60 +73,9 @@ public class AnmeldeKontrolleTableHeaderEventHandler implements IEventHandler {
 		return tableHeight;
 	}
 
-	private static void printCell(Table table, PdfFont fontN, String value, boolean rowspan) throws IOException {
-		printCell(table, fontN, value, rowspan, false);
-	}
-
-	private static void printCell(Table table, PdfFont fontN, String value, boolean rowspan, boolean centered)
-			throws IOException {
-		Cell cell = new Cell();
-		if (rowspan) {
-			cell = new Cell(2, 1);
-		}
-		cell = cell.setVerticalAlignment(VerticalAlignment.BOTTOM);
-
-		Text text = new Text(value).setFont(fontN).setFontSize(7);
-		if (centered) {
-			cell.add(new Paragraph(text).setTextAlignment(TextAlignment.CENTER).setMultipliedLeading(1.2f));
-		} else {
-			cell.add(new Paragraph(text).setMultipliedLeading(1.2f));
-		}
-		table.addCell(cell);
-	}
-
-	private static void printNotenCell(Table table, PdfFont fontN, String value) throws IOException {
-		Cell cell = new Cell();
-		cell = new Cell(2, 2);
-		// cell = cell.setHeight(18);
-		cell = cell.setVerticalAlignment(VerticalAlignment.BOTTOM);
-		Text text = new Text(value).setFont(fontN).setFontSize(7);
-		cell.add(new Paragraph(text).setTextAlignment(TextAlignment.CENTER).setMultipliedLeading(1.2f));
-		table.addCell(cell);
-	}
-
-	private static void printSprungCell(Table table, PdfFont fontN, String value) throws IOException {
-		Cell cell = new Cell();
-		cell = new Cell(1, 4);
-		// cell = cell.setHeight(18);
-		cell = cell.setVerticalAlignment(VerticalAlignment.BOTTOM);
-		Text text = new Text(value).setFont(fontN).setFontSize(7);
-		cell.add(new Paragraph(text).setTextAlignment(TextAlignment.CENTER).setMultipliedLeading(1.2f));
-		table.addCell(cell);
-	}
-
-	private static void printSprungNotenCell(Table table, PdfFont fontN, String value) throws IOException {
-		Cell cell = new Cell();
-		cell = new Cell(1, 2);
-		// cell = cell.setHeight(18);
-		cell = cell.setVerticalAlignment(VerticalAlignment.BOTTOM);
-		Text text = new Text(value).setFont(fontN).setFontSize(7);
-		cell.add(new Paragraph(text).setTextAlignment(TextAlignment.CENTER).setMultipliedLeading(1.2f));
-		table.addCell(cell);
-	}
-
 	private static void printTitelCell(Table table, PdfFont fontN, String value) throws IOException {
 		Cell cell = new Cell();
-		cell = new Cell(1, 19);
+		cell = new Cell(1, headerWidths.length);
 		// cell = cell.setHeight(18);
 		cell = cell.setVerticalAlignment(VerticalAlignment.TOP);
 		cell.setBorder(Border.NO_BORDER);
@@ -136,46 +84,66 @@ public class AnmeldeKontrolleTableHeaderEventHandler implements IEventHandler {
 		table.addCell(cell);
 	}
 
+	private static void printCell(Table table, PdfFont font, String value, boolean leftAlign) throws IOException {
+		Cell cell = new Cell();
+		// cell.setBorderTop(new SolidBorder(ColorConstants.LIGHT_GRAY, 1.0f));
+		// cell.setBorderBottom(new SolidBorder(ColorConstants.LIGHT_GRAY, 1.0f));
+		cell.setBorder(Border.NO_BORDER);
+		Text text = new Text(value).setFont(font).setFontSize(7);
+		cell.add(new Paragraph(text).setMultipliedLeading(1.25f));
+		if (leftAlign) {
+			cell = cell.setTextAlignment(TextAlignment.LEFT);
+		} else {
+			cell = cell.setTextAlignment(TextAlignment.RIGHT);
+		}
+		table.addCell(cell);
+	}
+
 	private void initTable(AnmeldeKontrolleDTO anmeldeKontrolle) throws IOException {
 		PdfFont fontN = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+		PdfFont fontB = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
 
-		table = new Table(UnitValue.createPercentArray(headerWidths1)).useAllAvailableWidth();
-		if (anmeldeKontrolle.getAnlass().getTiTu().isTurner()) {
-			table = new Table(UnitValue.createPercentArray(headerWidths2)).useAllAvailableWidth();
-		}
+		table = new Table(UnitValue.createPercentArray(headerWidths)).useAllAvailableWidth();
 
-		printTitelCell(table, fontN, "Zürcher Kantonaler Frühlingswettkampf Turner in Kloten");
+		printTitelCell(table, fontN, "Anmeldung");
 
-		printCell(table, fontN, "", true);
+		printTitelCell(table, fontN, anmeldeKontrolle.getDetailAnlassName());
 
-		printCell(table, fontN, "Name und Vorname", true);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-		printCell(table, fontN, "Jg", true);
+		printCell(table, fontN, "von:", false);
+		printCell(table, fontB, anmeldeKontrolle.getAnlass().getStartDatum().format(formatter), true);
 
-		printCell(table, fontN, "Verein", true);
+		printCell(table, fontN, "bis:", false);
+		printCell(table, fontB, anmeldeKontrolle.getAnlass().getEndDatum().format(formatter), true);
 
-		printNotenCell(table, fontN, "Reck");
+		printCell(table, fontN, "", false);
+		printCell(table, fontN, "", false);
 
-		printNotenCell(table, fontN, "Boden");
+		printCell(table, fontN, "Geschlecht:", false);
+		printCell(table, fontB, anmeldeKontrolle.getAnlass().getTiTu().name(), true);
 
-		printNotenCell(table, fontN, "Ring");
+		printCell(table, fontN, "", false);
+		printCell(table, fontN, "", false);
+		printCell(table, fontN, "", false);
+		printCell(table, fontN, "", false);
 
-		printSprungCell(table, fontN, "Sprung");
+		printCell(table, fontN, "Startberechtigt:", false);
+		printCell(table, fontB, anmeldeKontrolle.getAnlass().getTiefsteKategorie().name(), true);
 
-		// printNotenCell(table, fontN, "Zählb.");
+		printCell(table, fontN, "bis:", false);
+		printCell(table, fontB, anmeldeKontrolle.getAnlass().getHoechsteKategorie().name(), true);
 
-		if (anmeldeKontrolle.getAnlass().getTiTu().isTurner()) {
-			printNotenCell(table, fontN, "Barren");
-		}
-		printCell(table, fontN, "Total", true);
+		printCell(table, fontN, "", false);
+		printCell(table, fontN, "", false);
 
-		printCell(table, fontN, "", true);
+		printCell(table, fontN, "Ort:", false);
+		printCell(table, fontB, anmeldeKontrolle.getAnlass().getOrt(), true);
 
-		printCell(table, fontN, "", true);
+		printCell(table, fontN, "Halle:", false);
+		printCell(table, fontB, anmeldeKontrolle.getAnlass().getHalle(), true);
 
-		// 2. Zeile
-		printCell(table, fontN, "1", false, true);
-		printCell(table, fontN, "2", false, true);
-		printSprungNotenCell(table, fontN, "Zählbar");
+		printCell(table, fontN, "Organisator:", false);
+		printCell(table, fontB, anmeldeKontrolle.getOrganisator().getName(), true);
 	}
 }

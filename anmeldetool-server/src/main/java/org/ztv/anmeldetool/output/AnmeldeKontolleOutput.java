@@ -1,16 +1,17 @@
 package org.ztv.anmeldetool.output;
 
 import java.io.IOException;
-
-import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
+import java.util.List;
 
 import org.dom4j.DocumentException;
+import org.ztv.anmeldetool.models.KategorieEnum;
+import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
+import org.ztv.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.transfer.AnmeldeKontrolleDTO;
-import org.ztv.anmeldetool.transfer.RanglistenEntryDTO;
 import org.ztv.anmeldetool.transfer.VereinsStartDTO;
 
 import com.itextpdf.io.font.constants.StandardFonts;
-import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.events.Event;
 import com.itextpdf.kernel.events.IEventHandler;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
@@ -21,129 +22,141 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
-import com.itextpdf.layout.borders.SolidBorder;
+import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
+import com.itextpdf.layout.properties.VerticalAlignment;
 
 // https://github.com/itext/i7js-examples/tree/develop/src/main/java/com/itextpdf/samples/sandbox/events
 public class AnmeldeKontolleOutput {
 
-	public static void createAnmeldeKontrolle(HttpServletResponse response, AnmeldeKontrolleDTO anmeldeKontrolle)
+	public static float[] headerWidths = { 5.0f, 20.0f, 20.0f, 5.0f, 10.0f, 10.0f, 20.0f, 10.0f };
+
+	public static void createAnmeldeKontrolle(OutputStream out, AnmeldeKontrolleDTO anmeldeKontrolle)
 			throws DocumentException, IOException {
-		PdfDocument pdf = new PdfDocument(new PdfWriter(response.getOutputStream()));
+		PdfFont fontN = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+		PdfFont fontB = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+
+		PdfDocument pdf = new PdfDocument(new PdfWriter(out));
 		Document doc = new Document(pdf);
-		AnmeldeKontrolleTableHeaderEventHandler thEventHandler = new AnmeldeKontrolleTableHeaderEventHandler(doc,
+		AnmeldeKontrolleTableHeaderEventHandler headerEventHandler = new AnmeldeKontrolleTableHeaderEventHandler(doc,
 				anmeldeKontrolle);
-		pdf.addEventHandler(PdfDocumentEvent.END_PAGE, thEventHandler);
-		pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new TextFooterEventHandler(doc));
+		// Momentan kein Handler für den
+		pdf.addEventHandler(PdfDocumentEvent.END_PAGE, headerEventHandler);
+		// pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new
+		// TextFooterEventHandler(doc));
 
 		// Calculate top margin to be sure that the table will fit the margin.
-		float topMargin = 36 + thEventHandler.getTableHeight();
+		float topMargin = 36 + headerEventHandler.getTableHeight();
 		doc.setMargins(topMargin, 30, 36, 30);
 
-		Table table = initTable(anmeldeKontrolle);
-		int rang = 0;
-		for (VereinsStartDTO dto : anmeldeKontrolle.getVereinsStart()) {
-			// createRow(table, ++rang, dto, turner, sprungAverage);
-		}
+		// Text text = new Text("Text: ").setFont(fontN).setFontSize(12);
+		// doc.add(new Paragraph(text));
+
+		VereinsStartDTO dto = anmeldeKontrolle.getVereinsStart().get(0);
+
+		Table table = initTable(fontB);
+		fillTable(table, fontN, fontB, KategorieEnum.K1, TiTuEnum.Ti, dto.getTals_K1_Ti());
+		fillTable(table, fontN, fontB, KategorieEnum.K1, TiTuEnum.Tu, dto.getTals_K1_Tu());
+		fillTable(table, fontN, fontB, KategorieEnum.K2, TiTuEnum.Ti, dto.getTals_K2_Ti());
+		fillTable(table, fontN, fontB, KategorieEnum.K2, TiTuEnum.Tu, dto.getTals_K2_Tu());
+		fillTable(table, fontN, fontB, KategorieEnum.K3, TiTuEnum.Ti, dto.getTals_K3_Ti());
+		fillTable(table, fontN, fontB, KategorieEnum.K3, TiTuEnum.Tu, dto.getTals_K3_Tu());
+		fillTable(table, fontN, fontB, KategorieEnum.K4, TiTuEnum.Ti, dto.getTals_K4_Ti());
+		fillTable(table, fontN, fontB, KategorieEnum.K4, TiTuEnum.Tu, dto.getTals_K4_Tu());
+		fillTable(table, fontN, fontB, KategorieEnum.K5B, TiTuEnum.Ti, dto.getTals_K5B());
+		fillTable(table, fontN, fontB, KategorieEnum.K5A, TiTuEnum.Ti, dto.getTals_K5A());
+		fillTable(table, fontN, fontB, KategorieEnum.K5, TiTuEnum.Tu, dto.getTals_K5());
+		fillTable(table, fontN, fontB, KategorieEnum.K6, TiTuEnum.Ti, dto.getTals_K6_Ti());
+		fillTable(table, fontN, fontB, KategorieEnum.K6, TiTuEnum.Tu, dto.getTals_K6_Tu());
+		fillTable(table, fontN, fontB, KategorieEnum.KD, TiTuEnum.Ti, dto.getTals_KD());
+		fillTable(table, fontN, fontB, KategorieEnum.KH, TiTuEnum.Tu, dto.getTals_KH());
+		fillTable(table, fontN, fontB, KategorieEnum.K7, TiTuEnum.Ti, dto.getTals_K7_Ti());
+		fillTable(table, fontN, fontB, KategorieEnum.K7, TiTuEnum.Tu, dto.getTals_K7_Tu());
+
 		doc.add(table);
 
 		doc.close();
 	}
 
-	private static Table initTable(AnmeldeKontrolleDTO anmeldeKontrolle) {
-		Table table = new Table(UnitValue.createPercentArray(AnmeldeKontrolleTableHeaderEventHandler.headerWidths1))
-				.useAllAvailableWidth();
-		if (anmeldeKontrolle.getAnlass().getTiTu().isTurner()) {
-			table = new Table(UnitValue.createPercentArray(AnmeldeKontrolleTableHeaderEventHandler.headerWidths2))
-					.useAllAvailableWidth();
+	private static void fillTable(Table table, PdfFont fontN, PdfFont fontB, KategorieEnum kategorie, TiTuEnum titu,
+			List<TeilnehmerAnlassLink> tals) throws IOException {
+		if (tals == null || tals.isEmpty()) {
+			return;
 		}
+		printTitelCell(table, fontB, "Kategorie ", kategorie, titu);
+		printCell(table, fontB, "Startnr.", true);
+		printCell(table, fontB, "Name", true);
+		printCell(table, fontB, "Vorname", true);
+		printCell(table, fontB, "Jahrgang", true);
+		printCell(table, fontB, "Abteilung", true);
+		printCell(table, fontB, "Anlage", true);
+		printCell(table, fontB, "Startgerät", true);
+		printCell(table, fontB, "Status", true);
+		for (TeilnehmerAnlassLink tal : tals) {
+			printCell(table, fontN, tal.getStartnummer().toString(), true);
+			printCell(table, fontN, tal.getTeilnehmer().getName(), true);
+			printCell(table, fontN, tal.getTeilnehmer().getVorname(), true);
+			printCell(table, fontN, String.format("%d", tal.getTeilnehmer().getJahrgang()), true);
+			printCell(table, fontN, String.format("%d", tal.getAbteilung().ordinal() + 1), true);
+			printCell(table, fontN, String.format("%d", tal.getAnlage().ordinal() + 1), true);
+			printCell(table, fontN, tal.getStartgeraet().name(), true);
+			printCell(table, fontN, tal.getMeldeStatus().text, true);
+		}
+	}
+
+	private static Table initTable(PdfFont font) throws IOException {
+		Table table = new Table(UnitValue.createPercentArray(headerWidths)).useAllAvailableWidth();
 		return table;
 	}
 
-	private static void createRow(Table table, int rang, RanglistenEntryDTO dto, boolean turner, boolean sprungAverage)
-			throws IOException {
-		boolean even = rang % 2 == 0;
-		if (rang == dto.getRang()) {
-			printCell(table, String.format("%d", dto.getRang()), false, even);
-		} else {
-			printCell(table, "", even);
-		}
-		printCell(table, dto.getName() + " " + dto.getVorname(), even);
-		// printCell(table, );
-		printCell(table, String.format("%d", dto.getJahrgang()), false, even);
-		printCell(table, dto.getVerein(), even);
-		printCell(table, String.format("%.2f", dto.getNoteReck()), false, even);
-		printCell(table, String.format("%d", dto.getRangReck()), false, even);
-		printCell(table, String.format("%.2f", dto.getNoteBoden()), false, even);
-		printCell(table, String.format("%d", dto.getRangBoden()), false, even);
-		printCell(table, String.format("%.2f", dto.getNoteSchaukelringe()), false, even);
-		printCell(table, String.format("%d", dto.getRangSchaukelringe()), false, even);
-		printCell(table, String.format("%.2f", dto.getNoteSprung1()), false, even);
-		printCell(table, String.format("%.2f", dto.getNoteSprung2()), false, even);
-		if (sprungAverage) {
-			printCell(table, String.format("%.3f", dto.getNoteZaehlbar()), false, even);
-		} else {
-			printCell(table, String.format("%.2f", dto.getNoteZaehlbar()), false, even);
-		}
-		printCell(table, String.format("%d", dto.getRangSprung()), false, even);
-		if (turner) {
-			printCell(table, String.format("%.2f", dto.getNoteBarren()), false, even);
-			printCell(table, String.format("%d", dto.getRangBarren()), false, even);
-		}
-		if (sprungAverage) {
-			printCell(table, String.format("%.3f", dto.getGesamtPunktzahl()), false, even);
-		} else {
-			printCell(table, String.format("%.2f", dto.getGesamtPunktzahl()), false, even);
-		}
-		if (rang == dto.getRang()) {
-			printCell(table, String.format("%d", dto.getRang()), false, even);
-		} else {
-			printCell(table, "", even);
-		}
-		switch (rang) {
-		case 1:
-			printCell(table, "G", even);
-			break;
-		case 2:
-			printCell(table, "S", even);
-			break;
-		case 3:
-			printCell(table, "B", even);
-			break;
-		default:
-			if (dto.isAuszeichnung()) {
-				printCell(table, "*", even);
-			} else {
-				printCell(table, "", even);
-			}
-		}
-	}
-
-	private static void printCell(Table table, String value, boolean even) throws IOException {
-		printCell(table, value, true, even);
-	}
-
-	private static void printCell(Table table, String value, boolean leftAlign, boolean even) throws IOException {
-		PdfFont fontN = PdfFontFactory.createFont(StandardFonts.HELVETICA);
-
+	private static void printCell(Table table, PdfFont font, String value, boolean leftAlign) throws IOException {
 		Cell cell = new Cell();
-		cell.setBorderTop(new SolidBorder(ColorConstants.LIGHT_GRAY, 1.0f));
-		cell.setBorderBottom(new SolidBorder(ColorConstants.LIGHT_GRAY, 1.0f));
-		Text text = new Text(value).setFont(fontN).setFontSize(7);
+		// cell.setBorderTop(new SolidBorder(ColorConstants.LIGHT_GRAY, 1.0f));
+		// cell.setBorderBottom(new SolidBorder(ColorConstants.LIGHT_GRAY, 1.0f));
+		cell.setBorder(Border.NO_BORDER);
+		Text text = new Text(value).setFont(font).setFontSize(7);
 		cell.add(new Paragraph(text).setMultipliedLeading(1.25f));
 		if (leftAlign) {
 			cell = cell.setTextAlignment(TextAlignment.LEFT);
 		} else {
 			cell = cell.setTextAlignment(TextAlignment.RIGHT);
 		}
-		if (even) {
-			cell.setBackgroundColor(ColorConstants.LIGHT_GRAY, 0.2f);
-		}
+		table.addCell(cell);
+	}
+
+	private static void printTitelCell(Table table, PdfFont font, String value, KategorieEnum kategorie, TiTuEnum titu)
+			throws IOException {
+		Cell cell = new Cell();
+		cell = new Cell(1, 3);
+		cell = cell.setVerticalAlignment(VerticalAlignment.BOTTOM);
+		cell.setBorder(Border.NO_BORDER);
+		Text text = new Text(value).setFont(font).setFontSize(12);
+		// cell.add(new
+		// Paragraph(text).setTextAlignment(TextAlignment.CENTER).setMultipliedLeading(1.2f));
+		cell.add(new Paragraph(text).setMultipliedLeading(2.2f));
+		table.addCell(cell);
+
+		cell = new Cell(1, 2);
+		cell = cell.setVerticalAlignment(VerticalAlignment.BOTTOM);
+		cell.setBorder(Border.NO_BORDER);
+		text = new Text(kategorie.name()).setFont(font).setFontSize(12);
+		// cell.add(new
+		// Paragraph(text).setTextAlignment(TextAlignment.CENTER).setMultipliedLeading(1.2f));
+		cell.add(new Paragraph(text).setMultipliedLeading(2.2f));
+		table.addCell(cell);
+
+		cell = new Cell(1, 3);
+		cell = cell.setVerticalAlignment(VerticalAlignment.BOTTOM);
+		cell.setBorder(Border.NO_BORDER);
+		text = new Text(titu.name()).setFont(font).setFontSize(12);
+		// cell.add(new
+		// Paragraph(text).setTextAlignment(TextAlignment.CENTER).setMultipliedLeading(1.2f));
+		cell.add(new Paragraph(text).setMultipliedLeading(2.2f));
 		table.addCell(cell);
 	}
 

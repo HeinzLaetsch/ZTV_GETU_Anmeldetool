@@ -29,6 +29,13 @@ spring:
         adjust-dates-to-context-time-zone: true
      # time-zone: "Europe/Zurich"
      time-zone: "UTC"
+  mail:
+     host: "smtp.office365.com"
+     port: 587
+     username:  ${MAIL_USER}
+     password: ${MAIL_PASSWORD}
+     templates:
+        path: "mail-templates"
 # this info may be accessed via actuator
 info:
   app:
