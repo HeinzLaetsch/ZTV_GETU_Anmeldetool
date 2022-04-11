@@ -61,8 +61,8 @@ public class RanglistenOutput {
 		doc.close();
 	}
 
-	public static void createRanglistePerVerein(HttpServletResponse response, List<RanglistenEntryDTO> ranglistenDTOs)
-			throws DocumentException, IOException {
+	public static void createRanglistePerVerein(HttpServletResponse response, List<RanglistenEntryDTO> ranglistenDTOs,
+			KategorieEnum kategorie) throws DocumentException, IOException {
 		PdfDocument pdf = new PdfDocument(new PdfWriter(response.getOutputStream()));
 		Document doc = new Document(pdf);
 		PdfFont fontN = PdfFontFactory.createFont(StandardFonts.HELVETICA);
@@ -72,7 +72,7 @@ public class RanglistenOutput {
 		doc.setMargins(36, 36, 36, 36);
 		int pos = 0;
 		while (pos != -1) {
-			pos = printVereinRangliste(doc, fontB, fontN, ranglistenDTOs, pos);
+			pos = printVereinRangliste(doc, fontB, fontN, ranglistenDTOs, pos, kategorie);
 			if (pos != -1) {
 				AreaBreak aB = new AreaBreak();
 				doc.add(aB);
@@ -82,13 +82,13 @@ public class RanglistenOutput {
 	}
 
 	private static int printVereinRangliste(Document doc, PdfFont fontB, PdfFont fontN,
-			List<RanglistenEntryDTO> ranglistenDTOs, int pos) {
+			List<RanglistenEntryDTO> ranglistenDTOs, int pos, KategorieEnum kategorie) {
 		if (pos >= ranglistenDTOs.size()) {
 			return -1;
 		}
 		int auszeichnungen = 0;
 		String verein = ranglistenDTOs.get(pos).getVerein();
-		Text vereinText = new Text("Verein: " + verein).setFont(fontB).setFontSize(16);
+		Text vereinText = new Text("Verein: " + verein + " " + kategorie.name()).setFont(fontB).setFontSize(16);
 		doc.add(new Paragraph(vereinText));
 		while (pos < ranglistenDTOs.size() && verein.equals(ranglistenDTOs.get(pos).getVerein())) {
 			if (printRow(doc, fontB, fontN, ranglistenDTOs.get(pos++))) {
@@ -108,7 +108,8 @@ public class RanglistenOutput {
 			ausz = "*";
 		}
 		String name_vorname = String.format("%03d", ranglistenDTO.getRang()) + "  " + ausz + " "
-				+ ranglistenDTO.getName() + " " + ranglistenDTO.getVorname();
+				+ ranglistenDTO.getName() + " " + ranglistenDTO.getVorname() + "  "
+				+ String.format("%2.3f", ranglistenDTO.getGesamtPunktzahl());
 		Text text = new Text(name_vorname).setFontSize(12);
 		if (ranglistenDTO.getRang() < 4) {
 			text = text.setFont(fontB);

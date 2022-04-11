@@ -191,7 +191,7 @@ public class AnlassController {
 			response.addHeader("Content-Type", "application/pdf");
 			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
 
-			RanglistenOutput.createRanglistePerVerein(response, ranglistenDTOs);
+			RanglistenOutput.createRanglistePerVerein(response, ranglistenDTOs, kategorie);
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
