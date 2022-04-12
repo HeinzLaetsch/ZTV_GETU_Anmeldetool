@@ -31,10 +31,10 @@ spring:
   mail:
      host: "smtp.office365.com"
      port: 587
-     # username: "getu-wettkaempfe-tu@ztv.ch"
-     # password: "Cav67716"
      templates:
         path: "mail-templates"
+     username: ""
+     password: ""
      properties:
         mail:
            smtp:

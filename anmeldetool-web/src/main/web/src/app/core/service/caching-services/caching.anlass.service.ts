@@ -43,6 +43,15 @@ export class CachingAnlassService {
     this.anlaesseLoaded = new BehaviorSubject<boolean>(undefined);
     this.teilnahmenLoaded = new BehaviorSubject<boolean>(false);
   }
+
+  findetAnlassStatt(): IAnlass {
+    if (this.anlaesse) {
+      return this.anlaesse.find((anlass) => {
+        return anlass.toolSperren;
+      });
+    }
+    return undefined;
+  }
   reset(): Observable<boolean> {
     this.loaded = false;
     return this.loadAnlaesse();

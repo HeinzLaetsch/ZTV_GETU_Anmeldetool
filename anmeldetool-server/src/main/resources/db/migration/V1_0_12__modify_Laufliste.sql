@@ -1,0 +1,1 @@
+ALTER TABLE LAUFLISTEN_CONTAINER ALTER COLUMN kategorie TYPE character varying(3);

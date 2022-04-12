@@ -46,10 +46,21 @@ public class RanglistenService {
 				teamwertung.setVerein(entry.getVerein());
 				teamwertungen.put(entry.getVerein(), teamwertung);
 			}
-			teamwertung.setAnzahlResultate(teamwertung.getAnzahlResultate() + 1);
-			teamwertung.setGesamtPunktzahl(teamwertung.getGesamtPunktzahl() + entry.getGesamtPunktzahl());
+			if ((teamwertung.getAnzahlResultate() <= 3 && kategorie.ordinal() <= KategorieEnum.K4.ordinal())
+					|| (teamwertung.getAnzahlResultate() <= 2 && kategorie.ordinal() > KategorieEnum.K4.ordinal())) {
+				teamwertung.setAnzahlResultate(teamwertung.getAnzahlResultate() + 1);
+				teamwertung.setGesamtPunktzahl(teamwertung.getGesamtPunktzahl() + entry.getGesamtPunktzahl());
+			}
 		}
-		List<TeamwertungDTO> result = teamwertungen.values().stream()
+		List<TeamwertungDTO> result1 = teamwertungen.values().stream().filter(tw -> {
+			if (kategorie.ordinal() <= KategorieEnum.K4.ordinal()) {
+				return tw.getAnzahlResultate() == 4;
+			} else {
+				return tw.getAnzahlResultate() == 3;
+			}
+		}).collect(Collectors.toList());
+
+		List<TeamwertungDTO> result = result1.stream()
 				.sorted(Comparator.comparing(tw -> tw.getGesamtPunktzahl(), Comparator.reverseOrder()))
 				.collect(Collectors.toList());
 		int rang = 0;

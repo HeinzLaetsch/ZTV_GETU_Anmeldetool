@@ -1,4 +1,3 @@
-import { THIS_EXPR } from "@angular/compiler/src/output/output_ast";
 import {
   Component,
   EventEmitter,
@@ -55,6 +54,7 @@ export class AnlassStatusComponent implements OnInit {
     return this.kategorien;
   }
 
+  /*
   getAbteilungen(kategorie: KategorieEnum): AbteilungEnum[] {
     const index = this.kategorien.indexOf(kategorie);
     if (this.abteilungen[index]) {
@@ -62,7 +62,7 @@ export class AnlassStatusComponent implements OnInit {
     }
     return [];
   }
-
+*/
   lauflisteSelected(laufliste: ILaufliste): void {
     this.lauflisteSelectedEvent.emit(laufliste);
   }

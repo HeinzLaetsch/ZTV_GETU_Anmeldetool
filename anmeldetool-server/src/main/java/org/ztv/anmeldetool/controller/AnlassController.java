@@ -191,7 +191,7 @@ public class AnlassController {
 			response.addHeader("Content-Type", "application/pdf");
 			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
 
-			RanglistenOutput.createRanglistePerVerein(response, ranglistenDTOs);
+			RanglistenOutput.createRanglistePerVerein(response, ranglistenDTOs, kategorie);
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -360,7 +360,7 @@ public class AnlassController {
 			// Regel für Sprung Durchschnitt
 			boolean averageSprung = kategorie.equals(KategorieEnum.K6) || kategorie.equals(KategorieEnum.K7);
 			RanglistenOutput.createRangliste(response, ranglistenDTOs, tiTu == TiTuEnum.Ti ? false : true,
-					averageSprung);
+					averageSprung, kategorie.name());
 
 		} catch (Exception ex) {
 			ex.printStackTrace();

@@ -18,6 +18,7 @@ export class IAnlass {
   abteilungFix?: boolean;
   anlageFix?: boolean;
   startgeraetFix?: boolean;
+  toolSperren?: boolean;
 
   getCleaned(): string {
     return this.anlassBezeichnung.replace("%", "");

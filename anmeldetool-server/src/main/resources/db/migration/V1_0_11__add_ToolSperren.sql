@@ -1,0 +1,2 @@
+ALTER TABLE ANLASS ADD TOOL_SPERREN BOOLEAN default false;
+update ANLASS set TOOL_SPERREN='false';

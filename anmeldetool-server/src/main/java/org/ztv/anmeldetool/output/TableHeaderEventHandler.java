@@ -30,20 +30,20 @@ import com.itextpdf.layout.renderer.DocumentRenderer;
 import com.itextpdf.layout.renderer.TableRenderer;
 
 public class TableHeaderEventHandler implements IEventHandler {
-	public static float[] headerWidths1 = { 3.0f, 21.0f, 4.0f, 19.5f, 4.0f, 3.0f, 4.0f, 3.0f, 4.0f, 3.0f, 4.0f, 4.0f,
-			4.0f, 3.0f, 4.5f, 3.0f, 2.0f };
+	public static float[] headerWidths1 = { 3.0f, 19.9f, 4.2f, 19.5f, 4.15f, 3.0f, 4.15f, 3.0f, 4.15f, 3.0f, 4.15f,
+			4.15f, 4.15f, 3.0f, 4.5f, 3.0f, 2.0f };
 	// 18 Rang, Name und Vorname, Jahrgang, Verein, Reck, Boden RING Sprung Barren
 	// Rang, Ausz
-	public static float[] headerWidths2 = { 3.0f, 21.0f, 4.0f, 19.5f, 4.0f, 3.0f, 4.0f, 3.0f, 4.0f, 3.0f, 4.0f, 4.0f,
-			4.0f, 3.0f, 4.0f, 3.0f, 4.5f, 3.0f, 2.0f };
+	public static float[] headerWidths2 = { 3.0f, 18.9f, 4.2f, 19.35f, 4.15f, 3.0f, 4.15f, 3.0f, 4.15f, 3.0f, 4.15f,
+			4.15f, 4.15f, 3.0f, 4.15f, 3.0f, 4.5f, 3.0f, 2.0f };
 
 	private Table table;
 	private float tableHeight;
 	private Document doc;
 
-	public TableHeaderEventHandler(Document doc, boolean turner) throws IOException {
+	public TableHeaderEventHandler(Document doc, boolean turner, String kategorie) throws IOException {
 		this.doc = doc;
-		initTable(turner);
+		initTable(turner, kategorie);
 
 		TableRenderer renderer = (TableRenderer) table.createRendererSubTree();
 		renderer.setParent(new DocumentRenderer(doc));
@@ -125,18 +125,32 @@ public class TableHeaderEventHandler implements IEventHandler {
 		table.addCell(cell);
 	}
 
-	private static void printTitelCell(Table table, PdfFont fontN, String value) throws IOException {
+	private static void printTitelCell(Table table, PdfFont fontN, String value, String kategorie, boolean turner)
+			throws IOException {
 		Cell cell = new Cell();
-		cell = new Cell(1, 19);
+		if (turner) {
+			cell = new Cell(1, 17);
+		} else {
+			cell = new Cell(1, 15);
+		}
 		// cell = cell.setHeight(18);
 		cell = cell.setVerticalAlignment(VerticalAlignment.TOP);
 		cell.setBorder(Border.NO_BORDER);
 		Text text = new Text(value).setFont(fontN).setFontSize(14);
 		cell.add(new Paragraph(text).setTextAlignment(TextAlignment.CENTER).setMultipliedLeading(1.2f));
 		table.addCell(cell);
+
+		cell = new Cell(1, 2);
+		// cell = cell.setHeight(18);
+		cell = cell.setVerticalAlignment(VerticalAlignment.TOP);
+		cell.setBorder(Border.NO_BORDER);
+		text = new Text(kategorie).setFont(fontN).setFontSize(14);
+		cell.add(new Paragraph(text).setTextAlignment(TextAlignment.RIGHT).setMultipliedLeading(1.2f));
+
+		table.addCell(cell);
 	}
 
-	private void initTable(boolean turner) throws IOException {
+	private void initTable(boolean turner, String kategorie) throws IOException {
 		PdfFont fontN = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 
 		table = new Table(UnitValue.createPercentArray(headerWidths1)).useAllAvailableWidth();
@@ -144,7 +158,7 @@ public class TableHeaderEventHandler implements IEventHandler {
 			table = new Table(UnitValue.createPercentArray(headerWidths2)).useAllAvailableWidth();
 		}
 
-		printTitelCell(table, fontN, "Zürcher Kantonaler Frühlingswettkampf Turner in Kloten");
+		printTitelCell(table, fontN, "Zürcher Kantonaler Frühlingswettkampf Turnerinnen in Rafz", kategorie, turner);
 
 		printCell(table, fontN, "", true);
 

@@ -1,16 +1,13 @@
-<!--ng-container *ngIf="vereineLoaded | async; else loading"-->
 <app-nav-bar></app-nav-bar>
 <ng-container *ngIf="authenticated; else login">
   <router-outlet></router-outlet>
 </ng-container>
-<!--/ng-container-->
 
 <ng-template #login>
-  <div *ngIf="dialogOpen" class="overlay"></div>
-</ng-template>
-
-<!--ng-template #loading>
-  <div class="center">
-    <mat-spinner style="margin: 0 auto"></mat-spinner>
+  <div *ngIf="dialogOpen && !appBlocked" class="overlay"></div>
+  <div *ngIf="!dialogOpen && appBlocked" class="overlay">
+    <h1 class="center">
+      Das AnmeldeTool ist gesperrt !!! Im Moment findet ein Wettkampf statt.
+    </h1>
   </div>
-</ng-template-->
+</ng-template>
