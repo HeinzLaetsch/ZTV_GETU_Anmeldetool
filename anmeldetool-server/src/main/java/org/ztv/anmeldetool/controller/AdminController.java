@@ -1,23 +1,18 @@
 package org.ztv.anmeldetool.controller;
 
-import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.activation.DataSource;
-import javax.mail.util.ByteArrayDataSource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -55,12 +50,11 @@ import org.ztv.anmeldetool.models.Wertungsrichter;
 import org.ztv.anmeldetool.models.WertungsrichterBrevetEnum;
 import org.ztv.anmeldetool.models.WertungsrichterEinsatz;
 import org.ztv.anmeldetool.models.WertungsrichterSlot;
-import org.ztv.anmeldetool.output.AnmeldeKontolleOutput;
+import org.ztv.anmeldetool.output.AnmeldeKontrolleOutput;
+import org.ztv.anmeldetool.output.WertungsrichterOutput;
 import org.ztv.anmeldetool.repositories.PersonAnlassLinkRepository;
 import org.ztv.anmeldetool.service.AnlassService;
-import org.ztv.anmeldetool.service.EmailService;
 import org.ztv.anmeldetool.service.LoginService;
-import org.ztv.anmeldetool.service.MailerService;
 import org.ztv.anmeldetool.service.OrganisationService;
 import org.ztv.anmeldetool.service.PersonService;
 import org.ztv.anmeldetool.service.RoleService;
@@ -318,42 +312,11 @@ public class AdminController {
 		}
 	}
 
-	@Value("${spring.mail.username}")
-	private String sender;
-
-	@Autowired
-	private EmailService mailService;
-
-	@Autowired
-	MailerService mailerService;
-
 	@GetMapping(value = "/anlaesse/{anlassId}/teilnehmer/mutationen", produces = "text/csv;charset=UTF-8")
 	// @ResponseBody
 	public void getMutationen(HttpServletRequest request, HttpServletResponse response, @PathVariable UUID anlassId) {
 		List<TeilnehmerAnlassLink> tals = null;
 		try {
-
-			Person person = this.personSrv.findPersonByBenutzername("heinz.laetsch@gmx.ch");
-
-			AnmeldeKontrolleDTO anmeldeKontrolle = anlassSrv.getAnmeldeKontrolle(anlassId,
-					person.getOrganisationenLinks().iterator().next().getOrganisation().getId());
-			Map<String, Object> templateModel = mailerService.getAnmeldeDaten(anmeldeKontrolle,
-					person.getOrganisationenLinks().iterator().next().getOrganisation());
-
-			// Map<String, Object> templateModel = new HashMap();
-			templateModel.put("recipientName", person.getEmail());
-			templateModel.put("text", "AnmeldeKontrolle Daten");
-			templateModel.put("senderName", sender);
-
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			AnmeldeKontolleOutput.createAnmeldeKontrolle(out, anmeldeKontrolle);
-
-			ByteArrayDataSource source = new ByteArrayDataSource(out.toByteArray(), "application/pdf");
-			DataSource[] sources = new ByteArrayDataSource[] { source };
-
-			this.mailService.sendMessage(person, templateModel.get("subject").toString(), "anmelde-status.html",
-					templateModel, sources);
-
 			tals = teilnehmerAnlassLinkSrv.getMutationenForAnlass(anlassId);
 			if (tals == null || tals.size() == 0) {
 				return;
@@ -479,6 +442,52 @@ public class AdminController {
 			return getNotFound();
 		}
 		return ResponseEntity.ok(linksDto);
+	}
+
+	@GetMapping(value = "/anlaesse/{anlassId}/organisationen/{orgId}/anmeldekontrolle/", produces = "application/pdf")
+	public void getAnmeldeKontrollePDF(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable UUID anlassId, @PathVariable UUID orgId) {
+		try {
+			AnmeldeKontrolleDTO anmeldeKontrolle = anlassSrv.getAnmeldeKontrolle(anlassId, orgId);
+
+			response.addHeader("Content-Disposition",
+					"attachment; filename=Anmeldekontrolle-" + anmeldeKontrolle.getAnlass().getAnlassBezeichnung() + "-"
+							+ anmeldeKontrolle.getOrganisator().getName() + ".pdf");
+			response.addHeader("Content-Type", "application/pdf");
+			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+
+			// Teilnehmer
+			AnmeldeKontrolleOutput.createAnmeldeKontrolle(response.getOutputStream(), anmeldeKontrolle);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Anmeldekontrolle: ",
+					ex);
+		}
+	}
+
+	@GetMapping(value = "/anlaesse/{anlassId}/organisationen/{orgId}/wertungsrichterkontrolle/", produces = "application/pdf")
+	public void getWertungsrichterKontrollePDF(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable UUID anlassId, @PathVariable UUID orgId) {
+		try {
+			AnmeldeKontrolleDTO anmeldeKontrolle = anlassSrv.getAnmeldeKontrolle(anlassId, orgId);
+			List<PersonAnlassLink> palBr1 = anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId,
+					WertungsrichterBrevetEnum.Brevet_1);
+			List<PersonAnlassLink> palBr2 = anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId,
+					WertungsrichterBrevetEnum.Brevet_2);
+
+			response.addHeader("Content-Disposition",
+					"attachment; filename=Wertungsrichter-Einsätze-"
+							+ anmeldeKontrolle.getAnlass().getAnlassBezeichnung() + "-"
+							+ anmeldeKontrolle.getOrganisator().getName() + ".pdf");
+			response.addHeader("Content-Type", "application/pdf");
+			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+
+			WertungsrichterOutput.createWertungsrichter(response.getOutputStream(), anmeldeKontrolle, palBr1, palBr2);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Anmeldekontrolle: ",
+					ex);
+		}
 	}
 
 	@PatchMapping("/anlaesse/{anlassId}/organisationen/{orgId}/teilnehmer/{teilnehmerId}")

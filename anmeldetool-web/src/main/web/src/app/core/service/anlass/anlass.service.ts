@@ -1,7 +1,7 @@
-import { HttpClient, HttpResponse } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import * as FileSaver from "file-saver";
-import { Observable, of } from "rxjs";
+import { Observable, of, Subject } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
 import { environment } from "src/environments/environment";
@@ -430,6 +430,85 @@ export class AnlassService {
           "text/csv; charset=UTF-8"
         );
       });
+  }
+
+  getVereinAnmeldeKontrollePdf(
+    anlass: IAnlass,
+    verein: IVerein
+  ): Observable<string> {
+    const statusResponse = new Subject<string>();
+
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "organisationen" +
+      "/" +
+      verein?.id +
+      "/anmeldekontrolle/";
+
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append("Accept", "application/pdf");
+    this.http
+      .get(combinedUrl, {
+        observe: "response",
+        responseType: "blob",
+        headers,
+      })
+      .pipe(
+        catchError(
+          this.handleError<any>("getVereinAnmeldeKontrollePdf", statusResponse)
+        )
+      )
+      .subscribe((result: HttpResponse<string>) => {
+        const header = result.headers.get("Content-Disposition");
+        const parts = header.split("filename=");
+        this.saveAsFile(result.body, parts[1], "application/pdf");
+        statusResponse.next("Success");
+      });
+    return statusResponse.asObservable();
+  }
+
+  getVereinWertungsrichterKontrollePdf(
+    anlass: IAnlass,
+    verein: IVerein
+  ): Observable<string> {
+    const statusResponse = new Subject<string>();
+
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "organisationen" +
+      "/" +
+      verein?.id +
+      "/wertungsrichterkontrolle/";
+
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append("Accept", "application/pdf");
+    this.http
+      .get(combinedUrl, {
+        observe: "response",
+        responseType: "blob",
+        headers,
+      })
+      .pipe(
+        catchError(
+          this.handleError<any>(
+            "getVereinWertungsrichterKontrollePdf",
+            statusResponse
+          )
+        )
+      )
+      .subscribe((result: HttpResponse<string>) => {
+        const header = result.headers.get("Content-Disposition");
+        const parts = header.split("filename=");
+        this.saveAsFile(result.body, parts[1], "application/pdf");
+        statusResponse.next("Success");
+      });
+    return statusResponse.asObservable();
   }
 
   private saveAsFile(buffer: any, fileName: string, fileType: string): void {

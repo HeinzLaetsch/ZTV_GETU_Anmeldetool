@@ -32,7 +32,7 @@ import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
 
 // https://github.com/itext/i7js-examples/tree/develop/src/main/java/com/itextpdf/samples/sandbox/events
-public class AnmeldeKontolleOutput {
+public class AnmeldeKontrolleOutput {
 
 	public static float[] headerWidths = { 5.0f, 20.0f, 20.0f, 5.0f, 10.0f, 10.0f, 20.0f, 10.0f };
 
@@ -47,8 +47,7 @@ public class AnmeldeKontolleOutput {
 				anmeldeKontrolle);
 		// Momentan kein Handler für den
 		pdf.addEventHandler(PdfDocumentEvent.END_PAGE, headerEventHandler);
-		// pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new
-		// TextFooterEventHandler(doc));
+		pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new TextFooterEventHandler(doc));
 
 		// Calculate top margin to be sure that the table will fit the margin.
 		float topMargin = 36 + headerEventHandler.getTableHeight();
@@ -95,7 +94,7 @@ public class AnmeldeKontolleOutput {
 		printCell(table, fontB, "Jahrgang", true);
 		printCell(table, fontB, "Abteilung", true);
 		printCell(table, fontB, "Anlage", true);
-		printCell(table, fontB, "Startgerät", true);
+		printCell(table, fontB, "Startgerät (provisorisch)", true);
 		printCell(table, fontB, "Status", true);
 		for (TeilnehmerAnlassLink tal : tals) {
 			printCell(table, fontN, tal.getStartnummer().toString(), true);
@@ -192,7 +191,9 @@ public class AnmeldeKontolleOutput {
 					// Therefore null will be set and iText will use the default font - Helvetica
 					.setFont(font).setFontSize(5)
 					// .showTextAligned("this is a header", coordX, headerY, TextAlignment.CENTER)
-					.showTextAligned("Turnverein Kloten", coordX, footerY, TextAlignment.CENTER).close();
+					.showTextAligned("Anlage und Startgerät sind provisorisch und können bis zum Wettkampf ändern",
+							coordX, footerY, TextAlignment.CENTER)
+					.close();
 		}
 
 		public float getTableHeight() {

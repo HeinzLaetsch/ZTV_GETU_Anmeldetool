@@ -29,4 +29,8 @@ public class OrganisationAnlassLink extends Base {
 	private Anlass anlass;
 
 	private LocalDateTime verlaengerungsDate;
+
+	private boolean reminderMeldeschlussSent;
+	private boolean anmeldeKontrolleSent;
+	private boolean reminderMutationsschlussSent;
 }

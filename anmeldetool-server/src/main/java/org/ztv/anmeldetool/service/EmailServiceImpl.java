@@ -22,9 +22,6 @@ public class EmailServiceImpl implements EmailService {
 	@Value("${spring.mail.username}")
 	private String sender;
 
-	@Value("${spring.mail.templates.path}")
-	private String mailTemplatesPath;
-
 	@Autowired
 	private JavaMailSender emailSender;
 
@@ -44,11 +41,11 @@ public class EmailServiceImpl implements EmailService {
 			if (null != dataSourceArray) {
 				int i = 0;
 				for (DataSource datasource : dataSourceArray) {
-					helper.addAttachment("Attachment_" + i, datasource);
+					helper.addAttachment(datasource.getName() + "_" + i, datasource);
 				}
 			}
 
-			emailSender.send(message);
+			// TODO Enable again emailSender.send(message);
 		} catch (MessagingException e) {
 			e.printStackTrace();
 		}

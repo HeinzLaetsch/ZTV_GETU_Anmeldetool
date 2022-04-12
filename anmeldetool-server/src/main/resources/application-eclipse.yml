@@ -52,6 +52,11 @@ logging:
     org.hibernate.SQL: WARN
     org.hibernate.type: WARN
     org.ztv.anmeldetool: DEBUG
+    
+scheduler:
+   cron:
+      reminder: "0/10 * * * * *"
+   
 
 management:
   endpoints:

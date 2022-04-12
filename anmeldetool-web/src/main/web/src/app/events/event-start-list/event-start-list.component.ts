@@ -52,7 +52,10 @@ export class EventStartListComponent implements OnInit {
   }
 
   print() {
-    this.angWindow.print();
+    // this.angWindow.print();
+    this.anlassService
+      .getVereinAnmeldeKontrollePdf(this.anlass, this.authService.currentVerein)
+      .subscribe((result) => {});
   }
 
   get titel(): string {

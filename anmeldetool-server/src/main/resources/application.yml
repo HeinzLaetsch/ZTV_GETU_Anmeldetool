@@ -58,6 +58,10 @@ logging:
     org.springframework.web.cors: INFO
     org.hibernate.SQL: INFO
 
+scheduler:
+   cron:
+      reminder: "0 0 23 * * *"
+      
 management:
   endpoints:
     web:

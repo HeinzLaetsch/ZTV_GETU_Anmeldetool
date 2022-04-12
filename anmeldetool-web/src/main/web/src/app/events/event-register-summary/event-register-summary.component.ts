@@ -62,6 +62,14 @@ export class EventRegisterSummaryComponent implements OnInit {
   print() {
     this.angWindow.print();
   }
+  printWRs() {
+    this.anlassService
+      .getVereinWertungsrichterKontrollePdf(
+        this.anlass,
+        this.authService.currentVerein
+      )
+      .subscribe((result) => {});
+  }
 
   get titel(): string {
     return (

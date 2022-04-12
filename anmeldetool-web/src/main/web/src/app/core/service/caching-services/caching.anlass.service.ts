@@ -367,4 +367,19 @@ export class CachingAnlassService {
   saveTeilnahme(verein: IVerein, anlassLink: IAnlassLink): Observable<boolean> {
     return this.anlassService.saveTeilnahme(verein, anlassLink);
   }
+  getVereinAnmeldeKontrollePdf(
+    anlass: IAnlass,
+    verein: IVerein
+  ): Observable<string> {
+    return this.anlassService.getVereinAnmeldeKontrollePdf(anlass, verein);
+  }
+  getVereinWertungsrichterKontrollePdf(
+    anlass: IAnlass,
+    verein: IVerein
+  ): Observable<string> {
+    return this.anlassService.getVereinWertungsrichterKontrollePdf(
+      anlass,
+      verein
+    );
+  }
 }
