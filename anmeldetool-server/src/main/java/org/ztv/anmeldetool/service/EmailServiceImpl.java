@@ -22,6 +22,12 @@ public class EmailServiceImpl implements EmailService {
 	@Value("${spring.mail.username}")
 	private String sender;
 
+	@Value("${spring.mail.simulateemail}")
+	private String simulateEmail;
+
+	@Value("${spring.mail.simulate}")
+	private boolean simulate;
+
 	@Autowired
 	private JavaMailSender emailSender;
 
@@ -39,13 +45,13 @@ public class EmailServiceImpl implements EmailService {
 			MimeMessageHelper helper = generateHtmlMessage(message, to, subject, mailTemplate, templateModel);
 
 			if (null != dataSourceArray) {
-				int i = 0;
+				int i = 1;
 				for (DataSource datasource : dataSourceArray) {
 					helper.addAttachment(datasource.getName() + "_" + i, datasource);
 				}
 			}
 
-			// TODO Enable again emailSender.send(message);
+			emailSender.send(message);
 		} catch (MessagingException e) {
 			e.printStackTrace();
 		}
@@ -64,7 +70,11 @@ public class EmailServiceImpl implements EmailService {
 
 		MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 		helper.setFrom(sender);
-		helper.setTo(to.getEmail());
+		if (simulate) {
+			helper.setTo(simulateEmail);
+		} else {
+			helper.setTo(to.getEmail());
+		}
 		helper.setSubject(subject);
 		helper.setText(getHtmlBody(mailTemplate, templateModel), true);
 		helper.addInline("attachment.png", resourceFile);

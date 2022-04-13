@@ -41,6 +41,9 @@ spring:
               auth: "true"
               starttls:
                  enable: "true"
+     simulate:  "TRUE"
+     simulateemail: "heinz.laetsch@gmx.ch"
+     
   thymeleaf:
       prefix: "classpath:/mail-templates/" 
 # this info may be accessed via actuator
@@ -59,8 +62,16 @@ logging:
     org.hibernate.SQL: INFO
 
 scheduler:
-   cron:
-      reminder: "0 0 23 * * *"
+   reminder:
+      cron: "0/10 0 * * * *"
+      daysbefore: 3
+   closed:
+      cron: "0/10 0 * * * *"
+      daysafter: 1
+   mutationen:
+      cron: "0/10 * * * * *"
+      daysbefore: 3
+
       
 management:
   endpoints:

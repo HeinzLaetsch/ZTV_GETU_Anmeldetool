@@ -41,9 +41,4 @@ public class PersonAnlassLink extends Base {
 			CascadeType.MERGE })
 	@ToString.Exclude
 	private List<WertungsrichterEinsatz> einsaetze;
-
-	private boolean reminderMeldeschlussSent;
-	private boolean anmeldeKontrolleSent;
-	private boolean reminderMutationsschlussSent;
-
 }

@@ -36,6 +36,9 @@ spring:
      password: ${MAIL_PASSWORD}
      templates:
         path: "mail-templates"
+     simulate:  "TRUE"
+     simulateemail: "heinz.laetsch@gmx.ch"
+     
 # this info may be accessed via actuator
 info:
   app:
@@ -54,10 +57,16 @@ logging:
     org.ztv.anmeldetool: DEBUG
     
 scheduler:
-   cron:
-      reminder: "0/10 * * * * *"
-   
-
+   reminder:
+      cron: "0/10 0 * * * *"
+      daysbefore: 3
+   closed:
+      cron: "0/10 0 * * * *"
+      daysafter: 1
+   mutationen:
+      cron: "0/10 * * * * *"
+      daysbefore: 3
+      
 management:
   endpoints:
     web:

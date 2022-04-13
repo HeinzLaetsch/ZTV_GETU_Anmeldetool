@@ -1,18 +1,19 @@
 package org.ztv.anmeldetool.repositories;
 
+import java.util.List;
 import java.util.UUID;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.ztv.anmeldetool.models.Verband;
 
 @Repository
-public interface VerbandsRepository extends CrudRepository<Verband, UUID> {
+public interface VerbandsRepository extends JpaRepository<Verband, UUID> {
 
 	Iterable<Verband> findAllByAktivOrderByVerband(boolean aktiv);
 
 	Iterable<Verband> findAllByAktiv(boolean aktiv);
 
-	Iterable<Verband> findByVerband(String verbandAbkz);
-	
+	List<Verband> findByVerband(String verbandAbkz);
+
 }

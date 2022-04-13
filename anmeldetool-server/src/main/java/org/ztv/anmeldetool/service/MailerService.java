@@ -1,6 +1,5 @@
 package org.ztv.anmeldetool.service;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +15,8 @@ public class MailerService {
 	@Autowired
 	AnlassService anlassSrv;
 
-	public Map<String, Object> getAnmeldeDaten(AnmeldeKontrolleDTO anmeldeKontrolle, Organisation organisation) {
+	public Map<String, Object> getAnmeldeDaten(AnmeldeKontrolleDTO anmeldeKontrolle, Organisation organisation,
+			String subject) {
 
 		// AnmeldeKontrolleDTO anmeldeKontrolle =
 		// anlassSrv.getAnmeldeKontrolle(anlass.getId(), organisation.getId());
@@ -35,14 +35,11 @@ public class MailerService {
 		String art = anmeldeKontrolle.getAnlass().getStartDatum().equals(anmeldeKontrolle.getAnlass().getEndDatum())
 				? "den "
 				: "die ";
+		art = " : ";
 		templateModel.put("vereinsname", organisation.getName());
-		if (anmeldeKontrolle.getAnlass().getErfassenGeschlossen().isAfter(LocalDateTime.now())) {
-			templateModel.put("titel", "Stand Anmeldung für " + art + anlassName);
-			templateModel.put("subject", "Stand Anmeldung für " + art + anlassName);
-		} else {
-			templateModel.put("titel", "Anmeldebestätigung für " + art + anlassName);
-			templateModel.put("subject", "Anmeldebestätigung für " + art + anlassName);
-		}
+
+		templateModel.put("titel", subject + " für " + art + anlassName);
+		templateModel.put("subject", subject + " für " + art + anlassName);
 
 		templateModel.put("anzahlBr1", vereinsStart.getBr1());
 		templateModel.put("anzahlBr2", vereinsStart.getBr2());

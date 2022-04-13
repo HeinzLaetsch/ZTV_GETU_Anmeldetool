@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.dom4j.DocumentException;
 import org.ztv.anmeldetool.models.KategorieEnum;
+import org.ztv.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.transfer.AnmeldeKontrolleDTO;
@@ -56,28 +57,30 @@ public class AnmeldeKontrolleOutput {
 		// Text text = new Text("Text: ").setFont(fontN).setFontSize(12);
 		// doc.add(new Paragraph(text));
 
-		VereinsStartDTO dto = anmeldeKontrolle.getVereinsStart().get(0);
+		if (anmeldeKontrolle.getVereinsStart() != null && anmeldeKontrolle.getVereinsStart().size() > 0) {
+			VereinsStartDTO dto = anmeldeKontrolle.getVereinsStart().get(0);
 
-		Table table = initTable(fontB);
-		fillTable(table, fontN, fontB, KategorieEnum.K1, TiTuEnum.Ti, dto.getTals_K1_Ti());
-		fillTable(table, fontN, fontB, KategorieEnum.K1, TiTuEnum.Tu, dto.getTals_K1_Tu());
-		fillTable(table, fontN, fontB, KategorieEnum.K2, TiTuEnum.Ti, dto.getTals_K2_Ti());
-		fillTable(table, fontN, fontB, KategorieEnum.K2, TiTuEnum.Tu, dto.getTals_K2_Tu());
-		fillTable(table, fontN, fontB, KategorieEnum.K3, TiTuEnum.Ti, dto.getTals_K3_Ti());
-		fillTable(table, fontN, fontB, KategorieEnum.K3, TiTuEnum.Tu, dto.getTals_K3_Tu());
-		fillTable(table, fontN, fontB, KategorieEnum.K4, TiTuEnum.Ti, dto.getTals_K4_Ti());
-		fillTable(table, fontN, fontB, KategorieEnum.K4, TiTuEnum.Tu, dto.getTals_K4_Tu());
-		fillTable(table, fontN, fontB, KategorieEnum.K5B, TiTuEnum.Ti, dto.getTals_K5B());
-		fillTable(table, fontN, fontB, KategorieEnum.K5A, TiTuEnum.Ti, dto.getTals_K5A());
-		fillTable(table, fontN, fontB, KategorieEnum.K5, TiTuEnum.Tu, dto.getTals_K5());
-		fillTable(table, fontN, fontB, KategorieEnum.K6, TiTuEnum.Ti, dto.getTals_K6_Ti());
-		fillTable(table, fontN, fontB, KategorieEnum.K6, TiTuEnum.Tu, dto.getTals_K6_Tu());
-		fillTable(table, fontN, fontB, KategorieEnum.KD, TiTuEnum.Ti, dto.getTals_KD());
-		fillTable(table, fontN, fontB, KategorieEnum.KH, TiTuEnum.Tu, dto.getTals_KH());
-		fillTable(table, fontN, fontB, KategorieEnum.K7, TiTuEnum.Ti, dto.getTals_K7_Ti());
-		fillTable(table, fontN, fontB, KategorieEnum.K7, TiTuEnum.Tu, dto.getTals_K7_Tu());
+			Table table = initTable(fontB);
+			fillTable(table, fontN, fontB, KategorieEnum.K1, TiTuEnum.Ti, dto.getTals_K1_Ti());
+			fillTable(table, fontN, fontB, KategorieEnum.K1, TiTuEnum.Tu, dto.getTals_K1_Tu());
+			fillTable(table, fontN, fontB, KategorieEnum.K2, TiTuEnum.Ti, dto.getTals_K2_Ti());
+			fillTable(table, fontN, fontB, KategorieEnum.K2, TiTuEnum.Tu, dto.getTals_K2_Tu());
+			fillTable(table, fontN, fontB, KategorieEnum.K3, TiTuEnum.Ti, dto.getTals_K3_Ti());
+			fillTable(table, fontN, fontB, KategorieEnum.K3, TiTuEnum.Tu, dto.getTals_K3_Tu());
+			fillTable(table, fontN, fontB, KategorieEnum.K4, TiTuEnum.Ti, dto.getTals_K4_Ti());
+			fillTable(table, fontN, fontB, KategorieEnum.K4, TiTuEnum.Tu, dto.getTals_K4_Tu());
+			fillTable(table, fontN, fontB, KategorieEnum.K5B, TiTuEnum.Ti, dto.getTals_K5B());
+			fillTable(table, fontN, fontB, KategorieEnum.K5A, TiTuEnum.Ti, dto.getTals_K5A());
+			fillTable(table, fontN, fontB, KategorieEnum.K5, TiTuEnum.Tu, dto.getTals_K5());
+			fillTable(table, fontN, fontB, KategorieEnum.K6, TiTuEnum.Ti, dto.getTals_K6_Ti());
+			fillTable(table, fontN, fontB, KategorieEnum.K6, TiTuEnum.Tu, dto.getTals_K6_Tu());
+			fillTable(table, fontN, fontB, KategorieEnum.KD, TiTuEnum.Ti, dto.getTals_KD());
+			fillTable(table, fontN, fontB, KategorieEnum.KH, TiTuEnum.Tu, dto.getTals_KH());
+			fillTable(table, fontN, fontB, KategorieEnum.K7, TiTuEnum.Ti, dto.getTals_K7_Ti());
+			fillTable(table, fontN, fontB, KategorieEnum.K7, TiTuEnum.Tu, dto.getTals_K7_Tu());
 
-		doc.add(table);
+			doc.add(table);
+		}
 
 		doc.close();
 	}
@@ -97,14 +100,38 @@ public class AnmeldeKontrolleOutput {
 		printCell(table, fontB, "Startgerät (provisorisch)", true);
 		printCell(table, fontB, "Status", true);
 		for (TeilnehmerAnlassLink tal : tals) {
-			printCell(table, fontN, tal.getStartnummer().toString(), true);
-			printCell(table, fontN, tal.getTeilnehmer().getName(), true);
-			printCell(table, fontN, tal.getTeilnehmer().getVorname(), true);
-			printCell(table, fontN, String.format("%d", tal.getTeilnehmer().getJahrgang()), true);
-			printCell(table, fontN, String.format("%d", tal.getAbteilung().ordinal() + 1), true);
-			printCell(table, fontN, String.format("%d", tal.getAnlage().ordinal() + 1), true);
-			printCell(table, fontN, tal.getStartgeraet().name(), true);
-			printCell(table, fontN, tal.getMeldeStatus().text, true);
+			try {
+				if (tal.getStartnummer() != null) {
+					printCell(table, fontN, tal.getStartnummer().toString(), true);
+				} else {
+					printCell(table, fontN, "", true);
+				}
+				printCell(table, fontN, tal.getTeilnehmer().getName(), true);
+				printCell(table, fontN, tal.getTeilnehmer().getVorname(), true);
+				printCell(table, fontN, String.format("%d", tal.getTeilnehmer().getJahrgang()), true);
+				if (tal.getAbteilung() != null && tal.getAnlass().isAbteilungFix()) {
+					printCell(table, fontN, String.format("%d", tal.getAbteilung().ordinal() + 1), true);
+				} else {
+					printCell(table, fontN, "", true);
+				}
+				if (tal.getAnlage() != null && tal.getAnlass().isAnlageFix()) {
+					printCell(table, fontN, String.format("%d", tal.getAnlage().ordinal() + 1), true);
+				} else {
+					printCell(table, fontN, "", true);
+				}
+				if (tal.getStartgeraet() != null && tal.getAnlass().isStartgeraetFix()) {
+					printCell(table, fontN, tal.getStartgeraet().name(), true);
+				} else {
+					printCell(table, fontN, "", true);
+				}
+				if (tal.getMeldeStatus() != null) {
+					printCell(table, fontN, tal.getMeldeStatus().text, true);
+				} else {
+					printCell(table, fontN, MeldeStatusEnum.STARTET.name(), true);
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 

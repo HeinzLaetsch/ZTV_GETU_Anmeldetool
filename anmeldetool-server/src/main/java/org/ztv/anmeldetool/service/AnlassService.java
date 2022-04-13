@@ -407,7 +407,8 @@ public class AnlassService {
 		Set<UUID> ids = new HashSet<UUID>();
 		List<Organisation> orgs = orgLinks.stream().map(orgLink -> {
 			if (orgLink.isAktiv() && !ids.contains(orgLink.getOrganisation().getId())) {
-				log.debug("Verein: {}, {}", orgLink.getOrganisation().getName(), orgLink.getOrganisation().getId());
+				// log.debug("Verein: {}, {}", orgLink.getOrganisation().getName(),
+				// orgLink.getOrganisation().getId());
 				ids.add(orgLink.getOrganisation().getId());
 				return orgLink.getOrganisation();
 			}
@@ -448,6 +449,10 @@ public class AnlassService {
 		organisationAnlassLink = orgAnlassRepo.save(organisationAnlassLink);
 
 		return organisationAnlassLink;
+	}
+
+	public Anlass save(Anlass anlass) {
+		return anlassRepo.save(anlass);
 	}
 
 }

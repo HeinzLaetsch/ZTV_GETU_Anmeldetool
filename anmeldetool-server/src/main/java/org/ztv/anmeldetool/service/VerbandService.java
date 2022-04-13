@@ -2,6 +2,7 @@ package org.ztv.anmeldetool.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,10 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 @Service("verbandService")
 @Slf4j
 public class VerbandService {
-	
+
 	@Autowired
 	VerbandsRepository verbandRepo;
-	
+
 	public Verband getVerband(UUID verbandId) {
 		Optional<Verband> verbandOpt = verbandRepo.findById(verbandId);
 		if (verbandOpt.isPresent()) {
@@ -29,12 +30,17 @@ public class VerbandService {
 		return null;
 	}
 
+	public Verband findByVerbandsKuerzel(String verbandAbkz) {
+		List<Verband> verbaende = verbandRepo.findByVerband(verbandAbkz);
+		return verbaende.get(0);
+	}
+
 	public ResponseEntity<Collection<VerbandDTO>> findByVerband(String verbandAbkz) {
 		Iterable<Verband> verbaende = verbandRepo.findByVerband(verbandAbkz);
 		Collection<VerbandDTO> verbaendeDTO = new ArrayList<VerbandDTO>();
 		for (Verband verband : verbaende) {
 			VerbandDTO verbandDTO = VerbandDTO.builder().id(verband.getId()).verband(verband.getVerband())
-				.verband_long(verband.getVerbandLong()).build();
+					.verband_long(verband.getVerbandLong()).build();
 			verbaendeDTO.add(verbandDTO);
 		}
 		return ResponseEntity.ok(verbaendeDTO);
