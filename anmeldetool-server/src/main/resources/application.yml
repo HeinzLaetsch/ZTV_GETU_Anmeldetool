@@ -63,13 +63,13 @@ logging:
 
 scheduler:
    reminder:
-      cron: "0/10 0 * * * *"
+      cron: "0 0 1 * * *"
       daysbefore: 3
    closed:
-      cron: "0/10 0 * * * *"
+      cron: "0 0 2 * * *"
       daysafter: 1
    mutationen:
-      cron: "0/10 * * * * *"
+      cron: "0 0 3 * * *"
       daysbefore: 3
 
       

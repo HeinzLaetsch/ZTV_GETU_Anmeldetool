@@ -123,6 +123,7 @@ public class RanglistenService {
 		tals = tals.stream().sorted(
 				Comparator.comparing(tal -> tal.getNotenblatt().getGesamtPunktzahl(), Comparator.reverseOrder()))
 				.collect(Collectors.toList());
+
 		return tals;
 	}
 

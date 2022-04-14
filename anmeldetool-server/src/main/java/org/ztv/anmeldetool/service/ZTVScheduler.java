@@ -160,7 +160,7 @@ public class ZTVScheduler {
 		filteredAnlaesse.forEach(anlass -> {
 			anlass.getOrganisationenLinks().forEach(oal -> {
 				Organisation org = oal.getOrganisation();
-				if (!oal.isAnmeldeKontrolleSent()) {
+				if (oal.isAktiv() && !oal.isAnmeldeKontrolleSent()) {
 					boolean error = sendMailToOrg(anlass, org, subject);
 					if (!error) {
 						oal.setAnmeldeKontrolleSent(true);
@@ -176,7 +176,7 @@ public class ZTVScheduler {
 		filteredAnlaesse.forEach(anlass -> {
 			anlass.getOrganisationenLinks().forEach(oal -> {
 				Organisation org = oal.getOrganisation();
-				if (!oal.isReminderMutationsschlussSent()) {
+				if (oal.isAktiv() && !oal.isReminderMutationsschlussSent()) {
 					boolean error = sendMailToOrg(anlass, org, subject);
 					if (!error) {
 						oal.setReminderMutationsschlussSent(true);

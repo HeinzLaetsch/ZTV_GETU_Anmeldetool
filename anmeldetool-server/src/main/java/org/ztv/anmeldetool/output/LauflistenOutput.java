@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -15,6 +16,7 @@ import org.ztv.anmeldetool.models.AnlassLauflisten;
 import org.ztv.anmeldetool.models.GeraetEnum;
 import org.ztv.anmeldetool.models.Laufliste;
 import org.ztv.anmeldetool.models.LauflistenContainer;
+import org.ztv.anmeldetool.models.PrintableLaufliste;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.models.TiTuEnum;
 
@@ -80,68 +82,51 @@ public class LauflistenOutput {
 			}
 			currentIndex++;
 		}
-		boolean first = true;
+		// boolean first = true;
+		List<PrintableLaufliste> pl = new ArrayList<PrintableLaufliste>();
 		for (List<Laufliste> gl : geraeteListen) {
 			for (Laufliste ll : gl) {
 				int wechsel = ll.getGeraet().ordinal() - ll.getLauflistenContainer().getStartgeraetOrd() + 1;
 				if (wechsel < 1) {
 					wechsel += maxGeraete;
 				}
-				if (!first) {
+				/*
+				 * if (!first) { AreaBreak aB = new AreaBreak(); document.add(aB); } first =
+				 * false;
+				 */
+				// addLaufliste(document, ll, wechsel++);
+				PrintableLaufliste printable = new PrintableLaufliste(ll, wechsel++);
+				pl.add(printable);
+			}
+		}
+		pl.sort((PrintableLaufliste pl1, PrintableLaufliste pl2) -> {
+			if (pl1.getLaufliste().getGeraet().ordinal() > pl2.getLaufliste().getGeraet().ordinal()) {
+				return 1;
+			}
+			if (pl1.getLaufliste().getGeraet().ordinal() == pl2.getLaufliste().getGeraet().ordinal()) {
+				if (pl1.getWechsel() > pl2.getWechsel()) {
+					return 1;
+				}
+				return -1;
+			} else {
+				return -1;
+			}
+		});
+		AtomicBoolean first = new AtomicBoolean(true);
+		pl.forEach(printable -> {
+			try {
+				if (!first.get()) {
 					AreaBreak aB = new AreaBreak();
 					document.add(aB);
 				}
-				first = false;
-				addLaufliste(document, ll, wechsel++);
+				addLaufliste(document, printable.getLaufliste(), printable.getWechsel());
+				first.set(false);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		}
+		});
 		document.close();
-	}
 
-	public static void createLaufListeAlt(AnlassLauflisten anlassLauflisten, HttpServletResponse response)
-			throws DocumentException, IOException {
-
-		PdfDocument pdf = new PdfDocument(new PdfWriter(response.getOutputStream()));
-		Document document = new Document(pdf);
-
-		boolean first = true;
-		int currentIndex = 0;
-		for (GeraetEnum geraet : GeraetEnum.values()) {
-			if (geraet.equals(GeraetEnum.UNDEFINED)) {
-				continue;
-			}
-			List<LauflistenContainer> lc = anlassLauflisten.getLauflistenContainer();
-			int wechsel = 1;
-			for (int index = currentIndex; index >= 0; index--) {
-				if (lc.size() <= index) {
-					wechsel++;
-					continue;
-				}
-
-				int startgeraeteIndex = lc.get(index).getStartgeraet().ordinal();
-				if (startgeraeteIndex <= geraet.ordinal()) {
-					if (!first) {
-						AreaBreak aB = new AreaBreak();
-						document.add(aB);
-					}
-					first = false;
-					addContainer(document, lc.get(index), geraet, wechsel++);
-				}
-			}
-			for (int index = lc.size() - 1; index >= 0; index--) {
-				int startgeraeteIndex = lc.get(index).getStartgeraet().ordinal();
-				if (startgeraeteIndex > geraet.ordinal()) {
-					if (!first) {
-						AreaBreak aB = new AreaBreak();
-						document.add(aB);
-					}
-					first = false;
-					addContainer(document, lc.get(index), geraet, wechsel++);
-				}
-			}
-			currentIndex++;
-		}
-		document.close();
 	}
 
 	private static void addLaufliste(Document document, Laufliste laufliste, int currentIndex) throws IOException {
