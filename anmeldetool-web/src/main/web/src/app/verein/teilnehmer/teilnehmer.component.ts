@@ -49,11 +49,11 @@ export class TeilnehmerComponent implements OnInit {
     // console.log("ProfileComponent::ngOnInit: ", this.authService.currentUser);
     this.currentUser = this.authService.currentUser;
     this._vereinsUser = this.userService.getUser();
-    /*
-    this.teilnehmerService.loadTeilnehmer(this.authService.currentVerein).subscribe(result => {
-      console.log('TeilnehmerComponent::ngOnInit 1: ', result);
-    });;
-    */
+    this.teilnehmerService
+      .loadTeilnehmer(this.authService.currentVerein)
+      .subscribe((result) => {
+        console.log("TeilnehmerComponent::ngOnInit 1: ", result);
+      });
   }
   @HostListener("window:beforeunload", ["$event"])
   unloadNotification($event: any) {

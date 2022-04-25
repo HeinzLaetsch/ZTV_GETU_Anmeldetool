@@ -158,11 +158,14 @@ export class NewVereinComponent implements OnInit {
                         self.userService.reset().subscribe((result) => {
                           // console.log("Login UserService loaded");
                         });
+                        // TODO check if preload is realy neccessary
+                        /*
                         self.teilnehmerService
                           .loadTeilnehmer(self.verein)
                           .subscribe((result) => {
                             // console.log("Login teilnehmerService loaded");
                           });
+                          */
                       },
                       error(msg) {
                         console.log("Error: ", msg);

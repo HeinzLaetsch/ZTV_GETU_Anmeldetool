@@ -286,14 +286,17 @@ export class CachingAnlassService {
 
   neuAnmeldungErlaubt(anlass: IAnlass): boolean {
     const anlassLinks: IAnlassLinks = this.teilnamen[anlass.id];
-    const anzahlUmmeldungen = anlassLinks.anlassLinks.filter((link) => {
-      const isUmmeldung = link.meldeStatus === MeldeStatusEnum.UMMELDUNG;
-      return isUmmeldung;
-    }).length;
-    const neuMeldungen = anlassLinks.anlassLinks.filter((link) => {
-      return link.meldeStatus === MeldeStatusEnum.NEUMELDUNG;
-    }).length;
-    return anzahlUmmeldungen > neuMeldungen;
+    if (anlassLinks) {
+      const anzahlUmmeldungen = anlassLinks.anlassLinks.filter((link) => {
+        const isUmmeldung = link.meldeStatus === MeldeStatusEnum.UMMELDUNG;
+        return isUmmeldung;
+      }).length;
+      const neuMeldungen = anlassLinks.anlassLinks.filter((link) => {
+        return link.meldeStatus === MeldeStatusEnum.NEUMELDUNG;
+      }).length;
+      return anzahlUmmeldungen > neuMeldungen;
+    }
+    return false;
   }
   neuAnmeldungErlaubtKategorie(
     anlass: IAnlass,

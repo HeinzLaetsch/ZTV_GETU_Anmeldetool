@@ -1,8 +1,5 @@
-<!--div
-  class="container-fluid"
-  *ngIf="isTeilnehmerLoaded >= 0 | async; else loading"
--->
-<div class="container-fluid">
+<div class="container-fluid" *ngIf="isTeilnehmerLoaded | async; else loading">
+  <!-- div class="container-fluid"-->
   <h3 class="label">Teilnehmer {{ verein.name }}</h3>
 
   <mat-tab-group mat-align-tabs="start" #tabs>

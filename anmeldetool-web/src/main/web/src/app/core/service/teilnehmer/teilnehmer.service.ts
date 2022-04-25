@@ -23,13 +23,11 @@ export class TeilnehmerService {
 
   getTeilnehmer(
     verein: IVerein,
-    filter = "",
-    sortDirection = "asc",
     pageIndex = 0,
     pageSize = 3
   ): Observable<ITeilnehmer[]> {
     // console.log("getTeilnehmer called");
-    this.updateCount(verein, filter);
+    this.updateCount(verein);
     const combinedUrl =
       this.url +
       verein.id +
@@ -39,7 +37,7 @@ export class TeilnehmerService {
       pageSize;
     return this.http
       .get<ITeilnehmer[]>(combinedUrl)
-      .pipe(catchError(this.handleError<ITeilnehmer[]>("getAnlaesse", [])));
+      .pipe(catchError(this.handleError<ITeilnehmer[]>("getTeilnehmer", [])));
   }
 
   reset() {
@@ -48,7 +46,7 @@ export class TeilnehmerService {
   get anzahlTeilnehmer() {
     return this._anzahlTeilnehmer;
   }
-  updateCount(verein: IVerein, filter = "") {
+  updateCount(verein: IVerein) {
     const combinedUrl = this.url + verein.id + "/teilnehmer/count";
     this.http
       .get<number>(combinedUrl)

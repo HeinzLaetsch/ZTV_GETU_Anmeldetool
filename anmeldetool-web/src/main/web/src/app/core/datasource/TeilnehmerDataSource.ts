@@ -57,17 +57,19 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     this.loadTeilnehmerSub = this.teilnehmerService
       .loadTeilnehmer(this.verein)
       .subscribe((result) => {
-        // console.log("Load Teilnehmer: ", result);
-        const loadedTeilnehmer = this.teilnehmerService.getTeilnehmer(
-          filter,
-          this.sortValue,
-          tiTu,
-          this.paginator,
-          undefined
-        );
-        this.teilnehmerSubject.next(loadedTeilnehmer);
-        this.paginator.length =
-          this.teilnehmerService.getTiTuTeilnehmer(tiTu).length;
+        if (result) {
+          // console.log("Load Teilnehmer: ", result);
+          const loadedTeilnehmer = this.teilnehmerService.getTeilnehmer(
+            filter,
+            this.sortValue,
+            tiTu,
+            this.paginator,
+            undefined
+          );
+          this.teilnehmerSubject.next(loadedTeilnehmer);
+          this.paginator.length =
+            this.teilnehmerService.getTiTuTeilnehmer(tiTu).length;
+        }
       });
     return this.teilnehmerSubject.asObservable();
     /*

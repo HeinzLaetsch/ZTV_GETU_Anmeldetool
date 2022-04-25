@@ -2,6 +2,7 @@ package org.ztv.anmeldetool.util;
 
 import java.util.UUID;
 
+import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.Teilnehmer;
 import org.ztv.anmeldetool.transfer.TeilnehmerDTO;
@@ -18,11 +19,11 @@ public class TeilnehmerHelper {
 				.dirty(teilnehmer.isDirty()).stvNummer(teilnehmer.getStvNummer()).build();
 	}
 
-	public static TeilnehmerDTO createTeilnehmerDTO(Teilnehmer teilnehmer, UUID orgId) {
+	public static TeilnehmerDTO createTeilnehmerDTO(Teilnehmer teilnehmer, UUID orgId, KategorieEnum letzteKategorie) {
 		return TeilnehmerDTO.builder().id(teilnehmer.getId()).name(teilnehmer.getName())
 				.vorname(teilnehmer.getVorname()).organisationid(orgId).jahrgang(teilnehmer.getJahrgang())
 				.tiTu(teilnehmer.getTiTu()).aktiv(teilnehmer.isAktiv()).dirty(teilnehmer.isDirty())
-				.stvNummer(teilnehmer.getStvNummer()).build();
+				.stvNummer(teilnehmer.getStvNummer()).letzteKategorie(letzteKategorie).build();
 	}
 
 	public static Teilnehmer createTeilnehmer(TeilnehmerDTO teilnehmerDTO) {

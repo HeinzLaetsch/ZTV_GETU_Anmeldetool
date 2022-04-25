@@ -11,4 +11,5 @@ export interface ITeilnehmer {
   dirty?: boolean;
   teilnahmen?: IAnlassLinks;
   onlyCreated?: boolean;
+  letzteKategorie?: string;
 }

@@ -2,6 +2,7 @@ package org.ztv.anmeldetool.transfer;
 
 import java.util.UUID;
 
+import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.TiTuEnum;
 
 import lombok.Builder;
@@ -45,4 +46,6 @@ public class TeilnehmerDTO {
 	private boolean aktiv;
 
 	private boolean dirty;
+
+	private KategorieEnum letzteKategorie;
 }

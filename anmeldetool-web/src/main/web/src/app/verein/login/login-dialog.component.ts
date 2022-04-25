@@ -83,11 +83,14 @@ export class LoginDialogComponent implements OnInit {
             self.userService.loadUser().subscribe((result) => {
               // TODO register Error
             });
+            // TODO check if preload is realy neccessary
+            /*
             self.teilnehmerService
               .loadTeilnehmer(self.vwVereinControl.value)
               .subscribe((result) => {
                 // TODO register Error
               });
+              */
           },
           (error) => {
             this.loginError = true;

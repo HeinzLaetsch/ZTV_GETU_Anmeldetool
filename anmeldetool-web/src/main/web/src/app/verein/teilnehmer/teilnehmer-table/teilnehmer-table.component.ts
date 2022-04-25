@@ -203,7 +203,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       .subscribe((results) => {
         this.initAll();
       });
-    this.paginator.firstPage();
+    this.paginator.lastPage();
   }
 
   get isTeilnahmenLoaded(): Observable<boolean> {

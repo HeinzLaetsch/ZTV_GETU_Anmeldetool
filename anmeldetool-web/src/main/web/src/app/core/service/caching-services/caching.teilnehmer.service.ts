@@ -70,7 +70,7 @@ export class CachingTeilnehmerService {
       this._loadRunning = true;
       // verein: IVerein, filter = '',  sortDirection = 'asc', pageIndex = 0, pageSize = 3
       this.teilnehmerService
-        .getTeilnehmer(verein, "", "asc", 0, 150)
+        .getTeilnehmer(verein, 0, 150)
         .subscribe((teilnehmer) => {
           this.teilnehmer = teilnehmer;
           // this.orgUsers = users;
@@ -173,9 +173,24 @@ export class CachingTeilnehmerService {
   }
 
   private sortBySort(tituFiltered: ITeilnehmer[], sort: Sort): ITeilnehmer[] {
+    const kategories = Object.keys(KategorieEnum);
     if (!sort) {
       this.oldSort = sort;
-      return tituFiltered;
+      this.sortedTeilnehmer = tituFiltered.sort((a, b) => {
+        if (a.onlyCreated) {
+          return 1;
+        }
+        const isEqual = this.compare(
+          kategories.indexOf(a.letzteKategorie),
+          kategories.indexOf(b.letzteKategorie),
+          true
+        );
+        if (isEqual === 0) {
+          return this.compare(a.name, b.name, true);
+        }
+        return isEqual;
+      });
+      return this.sortedTeilnehmer;
     }
     if (this.oldSort === sort) {
       return this.sortedTeilnehmer;
@@ -184,7 +199,6 @@ export class CachingTeilnehmerService {
     console.log("Sort: ", sort.active);
     const isAsc = sort.direction === "asc";
     const anlass = this.anlassService.getAnlassById(sort.active);
-    const kategories = Object.keys(KategorieEnum);
     this.sortedTeilnehmer = tituFiltered.sort((a, b) => {
       switch (sort.active) {
         case "name":
@@ -221,6 +235,9 @@ export class CachingTeilnehmerService {
   }
 
   private compare(a: number | string, b: number | string, isAsc: boolean) {
+    if (a === b) {
+      return 0;
+    }
     return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
   }
   public getTeilnehmerForAnlass(anlass: IAnlass) {

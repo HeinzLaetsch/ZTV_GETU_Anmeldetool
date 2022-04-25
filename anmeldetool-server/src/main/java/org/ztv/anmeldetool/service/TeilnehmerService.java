@@ -22,6 +22,7 @@ import org.ztv.anmeldetool.repositories.TeilnehmerAnlassLinkRepository;
 import org.ztv.anmeldetool.repositories.TeilnehmerRepository;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerDTO;
+import org.ztv.anmeldetool.util.TeilnehmerAnlassLinkMapper;
 import org.ztv.anmeldetool.util.TeilnehmerHelper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,9 @@ public class TeilnehmerService {
 	@Autowired
 	TeilnehmerAnlassLinkRepository teilnehmerAnlassLinkRepository;
 
+	@Autowired
+	TeilnehmerAnlassLinkMapper talMapper;
+
 	public ResponseEntity<Integer> countTeilnehmerByOrganisation(UUID orgId) {
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		if (organisation == null) {
@@ -59,7 +63,19 @@ public class TeilnehmerService {
 		Collection<Teilnehmer> teilnehmerListe = teilnehmerRepository.findByOrganisation(organisation, pageable);
 		List<TeilnehmerDTO> teilnehmerDTOs = new ArrayList<TeilnehmerDTO>();
 		for (Teilnehmer teilnehmer : teilnehmerListe) {
-			teilnehmerDTOs.add(TeilnehmerHelper.createTeilnehmerDTO(teilnehmer, orgId));
+			List<TeilnehmerAnlassLink> tals = teilnehmerAnlassLinkRepository.findByTeilnehmer(teilnehmer);
+			Optional<TeilnehmerAnlassLink> res = tals.stream().max((tal1, tal2) -> {
+				if (KategorieEnum.KEIN_START.equals(tal1.getKategorie())) {
+					return -1;
+				}
+				return tal1.getKategorie().compareTo(tal2.getKategorie());
+			});
+			KategorieEnum letzteKategorie = null;
+			if (res.isPresent()) {
+				letzteKategorie = res.get().getKategorie();
+			}
+			TeilnehmerDTO teilnehmerDTO = TeilnehmerHelper.createTeilnehmerDTO(teilnehmer, orgId, letzteKategorie);
+			teilnehmerDTOs.add(teilnehmerDTO);
 		}
 		return ResponseEntity.ok(teilnehmerDTOs);
 	}
