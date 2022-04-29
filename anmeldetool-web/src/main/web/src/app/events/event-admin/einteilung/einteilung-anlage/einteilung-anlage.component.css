@@ -1,0 +1,12 @@
+.mat-expansion-panel-body {
+  padding: 0 !important;
+}
+.mat-expansion-panel-content {
+  font-size: 12px !important;
+}
+.anlagen-body {
+  color: var(--ztv-black);
+  font-weight: 400;
+  font-size: 0.8em;
+  padding: 0.3em;
+}

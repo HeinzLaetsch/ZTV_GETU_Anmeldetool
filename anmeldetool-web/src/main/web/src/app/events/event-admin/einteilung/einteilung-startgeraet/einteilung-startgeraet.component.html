@@ -1,0 +1,124 @@
+<ng-container *ngIf="loaded$ | async as obs; else loading">
+  <mat-expansion-panel *ngIf="teilnahmeStatistic.totalStartende > 0">
+    <mat-expansion-panel-header>
+      <mat-panel-title> {{ startgeraet }} </mat-panel-title>
+      <mat-panel-description>
+        Startende <span class="zahl">{{ teilnahmeStatistic.totalStartende }}</span>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <ng-template matExpansionPanelContent>
+      <table mat-table [dataSource]="startende" class="mat-elevation-z8">
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef class="w_15">Name</th>
+          <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+        </ng-container>
+
+        <!-- Vorname Column -->
+        <ng-container matColumnDef="vorname">
+          <th mat-header-cell *matHeaderCellDef class="w_15">Vorname</th>
+          <td mat-cell *matCellDef="let element">{{ element.vorname }}</td>
+        </ng-container>
+
+        <!-- Verein Column -->
+        <ng-container matColumnDef="verein">
+          <th mat-header-cell *matHeaderCellDef class="w_15">Verein</th>
+          <td mat-cell *matCellDef="let element">{{ element.verein }}</td>
+        </ng-container>
+
+        <!-- TiTu Column -->
+        <ng-container matColumnDef="tiTu" class="w_10">
+          <th mat-header-cell *matHeaderCellDef>Ti / Tu</th>
+          <td mat-cell *matCellDef="let element">{{ element.tiTu }}</td>
+        </ng-container>
+
+        <!-- Abteilung Column -->
+        <ng-container matColumnDef="abteilung" class="w_15">
+          <th mat-header-cell *matHeaderCellDef>Abteilung</th>
+          <td mat-cell *matCellDef="let element; let rowIndex = index">
+            <mat-select
+              type="text"
+              aria-label="Anlage"
+              matInput
+              [formControl]="abteilungenControls[rowIndex]"
+              (selectionChange)="change(rowIndex, 0)"
+              [compareWith]="compareWith"
+            >
+              <mat-option
+                *ngFor="let option of alleAbteilungen"
+                [value]="option"
+              >
+                {{ option }}
+              </mat-option>
+            </mat-select>
+          </td>
+        </ng-container>
+
+        <!-- Anlagen Column -->
+        <ng-container matColumnDef="anlage" class="w_15">
+          <th mat-header-cell *matHeaderCellDef>Anlage</th>
+          <td mat-cell *matCellDef="let element; let rowIndex = index">
+            <mat-select
+              type="text"
+              aria-label="Anlage"
+              matInput
+              [formControl]="anlageControls[rowIndex]"
+              (selectionChange)="change(rowIndex, 1)"
+              [compareWith]="compareWith"
+            >
+              <mat-option *ngFor="let option of alleAnlagen" [value]="option">
+                {{ option }}
+              </mat-option>
+            </mat-select>
+          </td>
+        </ng-container>
+
+        <!-- Startgeraet Column -->
+        <ng-container matColumnDef="startgeraet" class="w_15">
+          <th mat-header-cell *matHeaderCellDef>Startgeraet</th>
+          <td mat-cell *matCellDef="let element; let rowIndex = index">
+            <mat-select
+              type="text"
+              aria-label="Startgeraet"
+              matInput
+              [formControl]="startgeraeteControls[rowIndex]"
+              (selectionChange)="change(rowIndex, 2)"
+              [compareWith]="compareWith"
+            >
+              <mat-option
+                *ngFor="let option of alleStartgeraete"
+                [value]="option"
+              >
+                {{ option }}
+              </mat-option>
+            </mat-select>
+          </td>
+        </ng-container>
+
+        <!-- Abmelden Column -->
+        <ng-container matColumnDef="abmelden" class="w_10">
+          <th mat-header-cell *matHeaderCellDef>Abmelden</th>
+          <td mat-cell *matCellDef="let element; let rowIndex = index">
+            <button mat-raised-button (click)="abmelden(rowIndex)">
+              <mat-icon
+                class="material-icons color_gray"
+                aria-hidden="false"
+                aria-label="Abmelden"
+                #tooltip="matTooltip"
+                matTooltip="Teilnehmer abmelden"
+                matTooltipPosition="below"
+                matTooltipHideDelay="100"
+                >delete</mat-icon
+              >
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </ng-template>
+  </mat-expansion-panel>
+</ng-container>
+
+<ng-template #loading>Loading...</ng-template>

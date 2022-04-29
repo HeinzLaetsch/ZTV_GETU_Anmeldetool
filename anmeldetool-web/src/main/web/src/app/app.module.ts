@@ -20,6 +20,8 @@ import { Page404Component } from "./error/page404/page404.component";
 import {
   CreateEventComponent,
   EventAdminComponent,
+  EinteilungComponent,
+  EinteilungKategorieComponent,
   EventListComponent,
   EventRegisterSummaryComponent,
   EventsDatesComponent,
@@ -39,6 +41,9 @@ import { LoginDialogComponent } from "./verein/login/login-dialog.component";
 import { NewAnmelderComponent } from "./verein/new-anmelder/new-anmelder.component";
 import { NewVereinComponent } from "./verein/new-verein/new-verein.component";
 import { CachingAnlassService } from "./core/service/caching-services/caching.anlass.service";
+import { EinteilungAbteilungComponent } from "./events/event-admin/einteilung/einteilung-abteilung/einteilung-abteilung.component";
+import { EinteilungAnlageComponent } from "./events/event-admin/einteilung/einteilung-anlage/einteilung-anlage.component";
+import { EinteilungStartgeraetComponent } from "./events/event-admin/einteilung/einteilung-startgeraet/einteilung-startgeraet.component";
 registerLocaleData(localeDeCH, "de-ch");
 registerLocaleData(localeDe, "de");
 
@@ -79,6 +84,11 @@ export function initVereinservice(
     EventStartListRowComponent,
     EventStartListHeaderComponent,
     EventAdminComponent,
+    EinteilungComponent,
+    EinteilungKategorieComponent,
+    EinteilungAbteilungComponent,
+    EinteilungAnlageComponent,
+    EinteilungStartgeraetComponent,
     Page404Component,
     NewAnmelderComponent,
     NewVereinComponent,

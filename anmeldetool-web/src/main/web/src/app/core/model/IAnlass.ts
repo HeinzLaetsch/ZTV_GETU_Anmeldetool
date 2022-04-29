@@ -1,5 +1,6 @@
 import * as moment from "moment";
 import { Anzeigestatus, AnzeigeStatusEnum } from "./AnzeigeStatusEnum";
+import { GeraeteEnum } from "./GeraeteEnum";
 import { IWertungsrichterSlot } from "./IWertungsrichterSlot";
 import { KategorieEnum } from "./KategorieEnum";
 import { TiTuEnum } from "./TiTuEnum";
@@ -152,6 +153,19 @@ export class IAnlass {
   constructor() {
     this.anzeigeStatus = new Anzeigestatus();
   }
+
+  getStartgeraete(): GeraeteEnum[] {
+    const startgeraete = new Array<GeraeteEnum>();
+    startgeraete.push(GeraeteEnum.RECK);
+    startgeraete.push(GeraeteEnum.BODEN);
+    startgeraete.push(GeraeteEnum.SCHAUKELRINGE);
+    startgeraete.push(GeraeteEnum.SPRUNG);
+    if (!this.tiAnlass) {
+      startgeraete.push(GeraeteEnum.BARREN);
+    }
+    return startgeraete;
+  }
+
   getKategorienRaw(): KategorieEnum[] {
     let k5 = Object.keys(KategorieEnum).findIndex(
       (key) => key === KategorieEnum.K5
@@ -166,13 +180,15 @@ export class IAnlass {
     let filtered = Object.values(KategorieEnum).slice(0, 1);
     if (end > k5) {
       filtered = filtered.concat(Object.values(KategorieEnum).slice(start, k5));
+      if (this.tuAnlass || this.alleAnlass) {
+        filtered.push(KategorieEnum.K5);
+      }
       if (this.tiAnlass || this.alleAnlass) {
         filtered.push(KategorieEnum.K5A);
         filtered.push(KategorieEnum.K5B);
         filtered.push(KategorieEnum.KD);
       }
       if (this.tuAnlass || this.alleAnlass) {
-        filtered.push(KategorieEnum.K5);
         filtered.push(KategorieEnum.KH);
       }
       filtered.push(KategorieEnum.K6);

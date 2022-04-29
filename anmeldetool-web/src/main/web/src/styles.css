@@ -1,6 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 :root {
   --ztv-blue: #488dd6;
+  --ztv-light-blue: rgba(72,141,214, 0.5);
+  --ztv-lighter-blue: rgba(72, 141, 214, 0.25);
   --ztv-white: #ffff;
   --ztv-black: rgba(0, 0, 0, 0.78);
   --ztv-lighter-gray: rgba(220, 220, 220, 0.98);
@@ -136,4 +138,8 @@ body,
 .small {
   font-size: 0.7rem;
   font-weight: 300;
+}
+.zahl {
+  text-align: right;
+  width: 40px;
 }

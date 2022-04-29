@@ -1,0 +1,33 @@
+<mat-form-field class="form-field" appearance="fill">
+  <mat-label>Suche</mat-label>
+  <input matInput type="text" [(ngModel)]="search" />
+  <button
+    *ngIf="search"
+    matSuffix
+    mat-icon-button
+    aria-label="Clear"
+    (click)="clear()"
+  >
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-form-field>
+<button mat-raised-button (click)="executeSearch(search)">
+  <mat-icon
+    class="material-icons color_gray"
+    aria-hidden="false"
+    aria-label="Suchen"
+    >search</mat-icon
+  >
+</button>
+
+<mat-accordion *ngIf="loaded$ | async as obs; else loading">
+  <app-einteilung-kategorie
+    *ngFor="let kategorie of getKategorien()"
+    [anlass]="anlass"
+    [kategorie]="kategorie"
+    [refreshEmitter]="refreshEmitter"
+    [search]="search"
+  ></app-einteilung-kategorie>
+</mat-accordion>
+
+<ng-template #loading>Loading...</ng-template>

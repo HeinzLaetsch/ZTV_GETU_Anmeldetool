@@ -5,12 +5,18 @@ import { Observable, of, Subject } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
 import { environment } from "src/environments/environment";
+import { AbteilungEnum } from "../../model/AbteilungEnum";
+import { AnlageEnum } from "../../model/AnlageEnum";
+import { GeraeteEnum } from "../../model/GeraeteEnum";
 import { IAnlass } from "../../model/IAnlass";
 import { IAnlassLink } from "../../model/IAnlassLink";
 import { IOrganisationAnlassLink } from "../../model/IOrganisationAnlassLink";
 import { IPersonAnlassLink } from "../../model/IPersonAnlassLink";
+import { ITeilnahmeStatistic } from "../../model/ITeilnahmeStatistic";
+import { ITeilnehmerStart } from "../../model/ITeilnehmerStart";
 import { IUser } from "../../model/IUser";
 import { IWertungsrichterEinsatz } from "../../model/IWertungsrichterEinsatz";
+import { KategorieEnum } from "../../model/KategorieEnum";
 
 @Injectable({
   providedIn: "root",
@@ -336,6 +342,81 @@ export class AnlassService {
     return this.http
       .get<IAnlassLink[]>(combinedUrl)
       .pipe(catchError(this.handleError<IAnlassLink[]>("getTeilnehmer", [])));
+  }
+
+  updateStartgeraet(
+    anlass: IAnlass,
+    teilnehmerStart: ITeilnehmerStart
+  ): Observable<boolean> {
+    let combinedUrl = this.url + "/" + anlass.id + "/teilnehmer/";
+    return this.http
+      .patch<boolean>(combinedUrl, teilnehmerStart)
+      .pipe(catchError(this.handleError<boolean>("updateStartgeraet")));
+  }
+
+  getByStartgeraet(
+    anlass: IAnlass,
+    kategorie: KategorieEnum,
+    abteilung: AbteilungEnum,
+    anlage: AnlageEnum,
+    geraet: GeraeteEnum,
+    search: string
+  ): Observable<ITeilnehmerStart[]> {
+    let combinedUrl =
+      this.url +
+      "/" +
+      anlass.id +
+      "/teilnehmer/" +
+      kategorie +
+      "/" +
+      abteilung +
+      "/" +
+      anlage +
+      "/" +
+      geraet.toLocaleUpperCase();
+    if (search) {
+      combinedUrl += "?search=" + search;
+    }
+
+    return this.http
+      .get<ITeilnehmerStart[]>(combinedUrl)
+      .pipe(
+        catchError(this.handleError<ITeilnehmerStart[]>("getByStartgeraet"))
+      );
+  }
+
+  getTeilnahmeStatistic(
+    anlass: IAnlass,
+    kategorie: KategorieEnum,
+    abteilung: AbteilungEnum,
+    anlage: AnlageEnum,
+    geraet: GeraeteEnum,
+    search: string
+  ): Observable<ITeilnahmeStatistic> {
+    let combinedUrl = this.url + "/" + anlass.id + "/teilnehmer/statistic";
+    if (kategorie) {
+      combinedUrl = combinedUrl + "/" + kategorie;
+      if (abteilung) {
+        combinedUrl = combinedUrl + "/" + abteilung;
+        if (anlage) {
+          combinedUrl = combinedUrl + "/" + anlage;
+          if (geraet) {
+            combinedUrl = combinedUrl + "/" + geraet.toLocaleUpperCase();
+          }
+        }
+      }
+    }
+    if (search) {
+      combinedUrl += "?search=" + search;
+    }
+    // console.log("getTeilnehmer called: ", combinedUrl);
+    return this.http
+      .get<ITeilnahmeStatistic>(combinedUrl)
+      .pipe(
+        catchError(
+          this.handleError<ITeilnahmeStatistic>("getTeilnahmeStatistic")
+        )
+      );
   }
 
   // /anlaesse/{anlassId}/organisationen/{orgId}/teilnehmer/

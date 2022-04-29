@@ -2,6 +2,7 @@ package org.ztv.anmeldetool.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.ztv.anmeldetool.models.AbteilungEnum;
 import org.ztv.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.models.Anlass;
+import org.ztv.anmeldetool.models.GeraetEnum;
 import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.models.Organisation;
@@ -21,7 +23,9 @@ import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.repositories.OrganisationAnlassLinkRepository;
 import org.ztv.anmeldetool.repositories.TeilnehmerAnlassLinkRepository;
 import org.ztv.anmeldetool.repositories.TeilnehmerRepository;
+import org.ztv.anmeldetool.transfer.TeilnahmeStatisticDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkCsvDTO;
+import org.ztv.anmeldetool.transfer.TeilnehmerStartDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -147,6 +151,88 @@ public class TeilnehmerAnlassLinkService {
 		return tals;
 	}
 
+	private List<TeilnehmerAnlassLink> getTeilnehmerAnlassLinks(UUID anlassId, KategorieEnum kategorie,
+			AbteilungEnum abteilung, AnlageEnum anlage, GeraetEnum geraet) throws ServiceException {
+
+		Anlass anlass = anlassSrv.findAnlassById(anlassId);
+
+		if (anlass == null) {
+			throw new ServiceException(this.getClass(),
+					String.format("Could not find Anlass with id: %s", anlassId.toString()));
+		}
+
+		List<TeilnehmerAnlassLink> tals = this.teilnehmerAnlassLinkRepository.findByAnlass(anlass, kategorie, abteilung,
+				anlage, geraet);
+		return tals;
+	}
+
+	public List<TeilnehmerStartDTO> getTeilnehmerForStartgeraet(UUID anlassId, KategorieEnum kategorie,
+			AbteilungEnum abteilung, AnlageEnum anlage, GeraetEnum geraet, Optional<String> search)
+			throws ServiceException {
+		List<TeilnehmerAnlassLink> tals = getTeilnehmerAnlassLinks(anlassId, kategorie, abteilung, anlage, geraet);
+
+		tals = tals.stream().filter(tal -> {
+			return tal.getMeldeStatus() == null || MeldeStatusEnum.STARTET.equals(tal.getMeldeStatus())
+					|| MeldeStatusEnum.NEUMELDUNG.equals(tal.getMeldeStatus());
+		}).collect(Collectors.toList());
+
+		if (search.isPresent()) {
+			tals = tals.stream().filter(tal -> {
+				return tal.getTeilnehmer().getName().contains(search.get());
+			}).collect(Collectors.toList());
+		}
+		List<TeilnehmerStartDTO> tss = tals.stream().map(tal -> {
+			return TeilnehmerStartDTO.builder().id(tal.getId()).name(tal.getTeilnehmer().getName())
+					.vorname(tal.getTeilnehmer().getVorname()).verein(tal.getOrganisation().getName())
+					.tiTu(tal.getTeilnehmer().getTiTu()).kategorie(tal.getKategorie()).abteilung(tal.getAbteilung())
+					.anlage(tal.getAnlage()).startgeraet(tal.getStartgeraet()).meldeStatus(tal.getMeldeStatus())
+					.build();
+		}).collect(Collectors.toList());
+		Collections.sort(tss);
+		return tss;
+	}
+
+	public TeilnahmeStatisticDTO getStatisticForAnlass(UUID anlassId, KategorieEnum kategorie, AbteilungEnum abteilung,
+			AnlageEnum anlage, GeraetEnum geraet, Optional<String> search) throws ServiceException {
+		TeilnahmeStatisticDTO teilnahmeStatstic = new TeilnahmeStatisticDTO();
+		List<TeilnehmerAnlassLink> tals = getTeilnehmerAnlassLinks(anlassId, kategorie, abteilung, anlage, geraet);
+		if (search.isPresent()) {
+			tals = tals.stream().filter(tal -> {
+				return tal.getTeilnehmer().getName().contains(search.get());
+			}).collect(Collectors.toList());
+		}
+
+		for (TeilnehmerAnlassLink tal : tals) {
+			if (tal.getMeldeStatus() == null) {
+				teilnahmeStatstic.incStartet();
+			} else {
+				switch (tal.getMeldeStatus()) {
+				case STARTET:
+					teilnahmeStatstic.incStartet();
+					break;
+				case NEUMELDUNG:
+					teilnahmeStatstic.incNeumeldung();
+					break;
+				case ABGEMELDET:
+					teilnahmeStatstic.incAbgemeldet();
+					break;
+				case UMMELDUNG:
+					teilnahmeStatstic.incUmmeldung();
+					break;
+				case VERLETZT:
+					teilnahmeStatstic.incVerletzt();
+					break;
+				case NICHTGESTARTET:
+					teilnahmeStatstic.incNichtGestartet();
+					break;
+				default:
+					teilnahmeStatstic.incStartet();
+				}
+			}
+		}
+		return teilnahmeStatstic;
+	}
+
 	public List<TeilnehmerAnlassLink> getMutationenForAnlass(UUID anlassId) throws ServiceException {
 		// MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG
 		List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] { MeldeStatusEnum.STARTET });
@@ -188,5 +274,18 @@ public class TeilnehmerAnlassLinkService {
 			throw new ServiceException(this.getClass(), "Updated fehlgeschlagen");
 		}
 		return counter;
+	}
+
+	public void updateAnlassTeilnahme(TeilnehmerStartDTO tsDTO) throws ServiceException {
+		Optional<TeilnehmerAnlassLink> optTal = teilnehmerAnlassLinkRepository.findById(tsDTO.getId());
+		if (optTal.isEmpty()) {
+			throw new ServiceException(this.getClass(), "Updated fehlgeschlagen, entity not found");
+		}
+		TeilnehmerAnlassLink tal = optTal.get();
+		tal.setAbteilung(tsDTO.getAbteilung());
+		tal.setAnlage(tsDTO.getAnlage());
+		tal.setStartgeraet(tsDTO.getStartgeraet());
+		tal.setMeldeStatus(tsDTO.getMeldeStatus());
+		teilnehmerAnlassLinkRepository.save(tal);
 	}
 }

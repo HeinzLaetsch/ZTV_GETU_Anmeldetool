@@ -1,0 +1,42 @@
+.mat-expansion-panel-body {
+  padding: 0 !important;
+}
+.mat-expansion-panel-content {
+  font-size: 12px !important;
+}
+.anlagen-body {
+  color: var(--ztv-black);
+  font-weight: 400;
+  font-size: 0.8em;
+  padding: 0.3em;
+}
+
+.w_15 {
+  min-width: 15%;
+}
+.w_10 {
+  min-width: 10%;
+}
+
+.mat-row:nth-child(even) {
+  background-color: var(--ztv-lighter-gray);
+}
+.mat-table {
+  overflow: auto;
+  max-height: 70vh;
+  width: 100%;
+}
+
+th.mat-header-cell {
+  background-color: var(--ztv-light-gray);
+}
+
+tr.mat-header-row {
+  height: 28px !important;
+}
+tr.mat-row {
+  height: 26px !important;
+}
+.mat-raised-button {
+  line-height: 26px !important;
+}

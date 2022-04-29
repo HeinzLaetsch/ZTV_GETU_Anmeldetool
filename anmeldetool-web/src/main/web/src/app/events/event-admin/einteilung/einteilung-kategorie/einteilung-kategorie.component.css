@@ -1,0 +1,22 @@
+mat-expansion-panel-header {
+  background-color: var(--ztv-lighter-blue);
+  height: 24px !important;
+}
+.mat-expansion-panel-header-title {
+  min-width: 100px;
+  max-width: 100px;
+}
+mat-expansion-panel-header.mat-expanded {
+  background-color: var(--ztv-light-blue);
+  height: 24px !important;
+}
+.mat-expansion-panel-body {
+  padding: 0 !important;
+}
+.kategorie-title {
+  color: var(--ztv-black);
+  font-weight: 400;
+  font-size: 0.8em;
+  padding: 0.3em;
+}
+

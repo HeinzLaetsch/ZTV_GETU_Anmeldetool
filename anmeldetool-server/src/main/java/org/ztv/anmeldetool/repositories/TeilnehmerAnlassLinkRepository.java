@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.ztv.anmeldetool.models.AbteilungEnum;
 import org.ztv.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.models.Anlass;
+import org.ztv.anmeldetool.models.GeraetEnum;
 import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.models.Organisation;
@@ -43,6 +44,10 @@ public interface TeilnehmerAnlassLinkRepository extends JpaRepository<Teilnehmer
 	@Query("SELECT tal FROM TeilnehmerAnlassLink tal WHERE tal.anlass = :anlass AND tal.aktiv= :aktiv AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL) AND tal.kategorie!='KEIN_START' AND tal.organisation IN (:orgs)")
 	List<TeilnehmerAnlassLink> findByAnlassAndAktiv(Anlass anlass, boolean aktiv, List<MeldeStatusEnum> exclusion,
 			List<Organisation> orgs);
+
+	@Query("SELECT tal FROM TeilnehmerAnlassLink tal WHERE tal.anlass = :anlass AND tal.aktiv= true AND tal.kategorie <> 'KEIN_START' AND (:kategorie is null or tal.kategorie = :kategorie) AND (:abteilung is null or tal.abteilung = :abteilung) AND (:anlage is null or tal.anlage = :anlage) AND (:geraet is null or tal.startgeraet = :geraet)")
+	List<TeilnehmerAnlassLink> findByAnlass(Anlass anlass, KategorieEnum kategorie, AbteilungEnum abteilung,
+			AnlageEnum anlage, GeraetEnum geraet);
 
 	List<TeilnehmerAnlassLink> findByAnlassAndOrganisation(Anlass anlass, Organisation organisation);
 

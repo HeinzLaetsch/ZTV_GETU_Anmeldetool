@@ -36,7 +36,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.ztv.anmeldetool.models.AbteilungEnum;
+import org.ztv.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.models.Anlass;
+import org.ztv.anmeldetool.models.GeraetEnum;
+import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.LoginData;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.OrganisationAnlassLink;
@@ -73,9 +77,11 @@ import org.ztv.anmeldetool.transfer.PersonAnlassLinkCsvDTO;
 import org.ztv.anmeldetool.transfer.PersonAnlassLinkDTO;
 import org.ztv.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.transfer.RolleDTO;
+import org.ztv.anmeldetool.transfer.TeilnahmeStatisticDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkCsvDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerDTO;
+import org.ztv.anmeldetool.transfer.TeilnehmerStartDTO;
 import org.ztv.anmeldetool.transfer.VerbandDTO;
 import org.ztv.anmeldetool.transfer.WertungsrichterDTO;
 import org.ztv.anmeldetool.transfer.WertungsrichterEinsatzDTO;
@@ -309,6 +315,131 @@ public class AdminController {
 			ex.printStackTrace();
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Anmeldekontrolle: ",
 					ex);
+		}
+	}
+
+	@PatchMapping(value = "/anlaesse/{anlassId}/teilnehmer")
+	public ResponseEntity updateAnlassStart(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable UUID anlassId, @RequestBody TeilnehmerStartDTO ts) {
+
+		try {
+			teilnehmerAnlassLinkSrv.updateAnlassTeilnahme(ts);
+			return ResponseEntity.ok().build();
+		} catch (ServiceException ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to update Anlassstart: ", ex);
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to update Anlassstart: ", ex);
+		}
+	}
+
+	@GetMapping(value = "/anlaesse/{anlassId}/teilnehmer/statistic")
+	public ResponseEntity<TeilnahmeStatisticDTO> getAnlassStatistic(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable UUID anlassId,
+			@RequestParam(name = "search") Optional<String> search) {
+
+		try {
+			TeilnahmeStatisticDTO teilnehmerStatistic = teilnehmerAnlassLinkSrv.getStatisticForAnlass(anlassId, null,
+					null, null, null, search);
+			return ResponseEntity.ok(teilnehmerStatistic);
+		} catch (ServiceException ex) {
+			ex.printStackTrace();
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to get Anlass Statistic: ", ex);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to get Anlass Statistic: ", ex);
+		}
+	}
+
+	@GetMapping(value = "/anlaesse/{anlassId}/teilnehmer/statistic/{kategorie}")
+	public ResponseEntity<TeilnahmeStatisticDTO> getAnlassStatistic(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable UUID anlassId,
+			@PathVariable(required = false) KategorieEnum kategorie,
+			@RequestParam(name = "search") Optional<String> search) {
+
+		try {
+			TeilnahmeStatisticDTO teilnehmerStatistic = teilnehmerAnlassLinkSrv.getStatisticForAnlass(anlassId,
+					kategorie, null, null, null, search);
+			return ResponseEntity.ok(teilnehmerStatistic);
+		} catch (ServiceException ex) {
+			ex.printStackTrace();
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to get Anlass Statistic: ", ex);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to get Anlass Statistic: ", ex);
+		}
+	}
+
+	@GetMapping(value = "/anlaesse/{anlassId}/teilnehmer/statistic/{kategorie}/{abteilung}")
+	public ResponseEntity<TeilnahmeStatisticDTO> getAnlassStatistic(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable UUID anlassId,
+			@PathVariable(required = false) KategorieEnum kategorie,
+			@PathVariable(required = false) AbteilungEnum abteilung,
+			@RequestParam(name = "search") Optional<String> search) {
+
+		try {
+			TeilnahmeStatisticDTO teilnehmerStatistic = teilnehmerAnlassLinkSrv.getStatisticForAnlass(anlassId,
+					kategorie, abteilung, null, null, search);
+			return ResponseEntity.ok(teilnehmerStatistic);
+		} catch (ServiceException ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to get Anlass Statistic: ", ex);
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to get Anlass Statistic: ", ex);
+		}
+	}
+
+	@GetMapping(value = "/anlaesse/{anlassId}/teilnehmer/statistic/{kategorie}/{abteilung}/{anlage}")
+	public ResponseEntity<TeilnahmeStatisticDTO> getAnlassStatistic(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable UUID anlassId,
+			@PathVariable(required = false) KategorieEnum kategorie,
+			@PathVariable(required = false) AbteilungEnum abteilung, @PathVariable(required = false) AnlageEnum anlage,
+			@RequestParam(name = "search") Optional<String> search) {
+
+		try {
+			TeilnahmeStatisticDTO teilnehmerStatistic = teilnehmerAnlassLinkSrv.getStatisticForAnlass(anlassId,
+					kategorie, abteilung, anlage, null, search);
+			return ResponseEntity.ok(teilnehmerStatistic);
+		} catch (ServiceException ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to get Anlass Statistic: ", ex);
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to get Anlass Statistic: ", ex);
+		}
+	}
+
+	@GetMapping(value = "/anlaesse/{anlassId}/teilnehmer/statistic/{kategorie}/{abteilung}/{anlage}/{geraet}")
+	public ResponseEntity<TeilnahmeStatisticDTO> getAnlassStatistic(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable UUID anlassId,
+			@PathVariable(required = false) KategorieEnum kategorie,
+			@PathVariable(required = false) AbteilungEnum abteilung, @PathVariable(required = false) AnlageEnum anlage,
+			@PathVariable(required = false) GeraetEnum geraet, @RequestParam(name = "search") Optional<String> search) {
+
+		try {
+			TeilnahmeStatisticDTO teilnehmerStatistic = teilnehmerAnlassLinkSrv.getStatisticForAnlass(anlassId,
+					kategorie, abteilung, anlage, geraet, search);
+			return ResponseEntity.ok(teilnehmerStatistic);
+		} catch (ServiceException ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to get Anlass Statistic: ", ex);
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to get Anlass Statistic: ", ex);
+		}
+	}
+
+	@GetMapping(value = "/anlaesse/{anlassId}/teilnehmer/{kategorie}/{abteilung}/{anlage}/{geraet}")
+	public ResponseEntity<List<TeilnehmerStartDTO>> getByStartgeraet(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable UUID anlassId,
+			@PathVariable(required = false) KategorieEnum kategorie,
+			@PathVariable(required = false) AbteilungEnum abteilung, @PathVariable(required = false) AnlageEnum anlage,
+			@PathVariable(required = false) GeraetEnum geraet, @RequestParam(name = "search") Optional<String> search) {
+
+		try {
+			List<TeilnehmerStartDTO> teilnehmer = teilnehmerAnlassLinkSrv.getTeilnehmerForStartgeraet(anlassId,
+					kategorie, abteilung, anlage, geraet, search);
+			return ResponseEntity.ok(teilnehmer);
+		} catch (ServiceException ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+					"Unable to get Teilnehmer by Startgeraet: ", ex);
+		} catch (Exception ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+					"Unable to get Teilnehmer by Startgeraet: ", ex);
 		}
 	}
 

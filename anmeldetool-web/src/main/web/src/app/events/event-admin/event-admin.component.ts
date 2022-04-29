@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, EventEmitter, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subject } from "rxjs";
@@ -6,8 +6,8 @@ import { takeUntil } from "rxjs/operators";
 import { AbteilungEnum } from "src/app/core/model/AbteilungEnum";
 import { AnlageEnum } from "src/app/core/model/AnlageEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
+import { ITeilnahmeStatistic } from "src/app/core/model/ITeilnahmeStatistic";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
 import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.service";
@@ -37,6 +37,12 @@ export class EventAdminComponent implements OnInit {
   anlagen: AnlageEnum[];
   selectedAnlage: AnlageEnum;
 
+  teilnahmeStatistic: ITeilnahmeStatistic;
+
+  refreshEmitter = new EventEmitter<string>();
+
+  loaded$: Subject<boolean>;
+
   constructor(
     private router: Router,
     public dialog: MatDialog,
@@ -44,7 +50,9 @@ export class EventAdminComponent implements OnInit {
     public authService: AuthService,
     private anlassService: CachingAnlassService,
     private ranglistenService: RanglistenService
-  ) {}
+  ) {
+    this.loaded$ = new Subject();
+  }
 
   ngOnInit() {
     const anlassId: string = this.route.snapshot.params.id;
@@ -54,12 +62,25 @@ export class EventAdminComponent implements OnInit {
       this.hideOnlyTi = true;
     }
     this.kategorien = this.anlass.getKategorienRaw();
+    this.anlassService
+      .getTeilnahmeStatistic(
+        this.anlass,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      )
+      .subscribe((statistic) => {
+        this.teilnahmeStatistic = statistic;
+        this.loaded$.next(true);
+      });
   }
 
   get administrator(): boolean {
     return this.authService.isAdministrator();
   }
-  
+
   exportMutationen(): void {
     this.anlassService.getMutationenForAnlassCsv(this.anlass);
   }
@@ -178,5 +199,9 @@ export class EventAdminComponent implements OnInit {
         }
         this.lauflistenPDF$.next();
       });
+  }
+
+  refreshEinteilung(): void {
+    this.refreshEmitter.emit(undefined);
   }
 }

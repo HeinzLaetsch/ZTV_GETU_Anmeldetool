@@ -1,12 +1,17 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { IVerein } from "src/app/verein/verein";
+import { AbteilungEnum } from "../../model/AbteilungEnum";
+import { AnlageEnum } from "../../model/AnlageEnum";
+import { GeraeteEnum } from "../../model/GeraeteEnum";
 import { IAnlass } from "../../model/IAnlass";
 import { IAnlassLink } from "../../model/IAnlassLink";
 import { IAnlassLinks } from "../../model/IAnlassLinks";
 import { IOrganisationAnlassLink } from "../../model/IOrganisationAnlassLink";
 import { IPersonAnlassLink } from "../../model/IPersonAnlassLink";
+import { ITeilnahmeStatistic } from "../../model/ITeilnahmeStatistic";
 import { ITeilnehmer } from "../../model/ITeilnehmer";
+import { ITeilnehmerStart } from "../../model/ITeilnehmerStart";
 import { IUser } from "../../model/IUser";
 import { IWertungsrichterEinsatz } from "../../model/IWertungsrichterEinsatz";
 import { KategorieEnum } from "../../model/KategorieEnum";
@@ -165,6 +170,46 @@ export class CachingAnlassService {
     this.anlassService.getAnmeldeKontrolleCsv(anlass);
   }
 
+  getTeilnahmeStatistic(
+    anlass: IAnlass,
+    kategorie: KategorieEnum,
+    abteilung: AbteilungEnum,
+    anlage: AnlageEnum,
+    geraet: GeraeteEnum,
+    search: string
+  ): Observable<ITeilnahmeStatistic> {
+    return this.anlassService.getTeilnahmeStatistic(
+      anlass,
+      kategorie,
+      abteilung,
+      anlage,
+      geraet,
+      search
+    );
+  }
+  getByStartgeraet(
+    anlass: IAnlass,
+    kategorie: KategorieEnum,
+    abteilung: AbteilungEnum,
+    anlage: AnlageEnum,
+    geraet: GeraeteEnum,
+    search: string
+  ): Observable<ITeilnehmerStart[]> {
+    return this.anlassService.getByStartgeraet(
+      anlass,
+      kategorie,
+      abteilung,
+      anlage,
+      geraet,
+      search
+    );
+  }
+  updateStartgeraet(
+    anlass: IAnlass,
+    teilnehmerStart: ITeilnehmerStart
+  ): Observable<boolean> {
+    return this.anlassService.updateStartgeraet(anlass, teilnehmerStart);
+  }
   getTeilnehmerForAnlass(anlass: IAnlass): IAnlassLink[] {
     if (this.teilnamen && this.teilnamen[anlass.id]?.anlassLinks) {
       return this.teilnamen[anlass.id].anlassLinks.filter((anlassLink) => {
