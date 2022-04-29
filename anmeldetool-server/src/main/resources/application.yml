@@ -8,8 +8,8 @@ spring:
   flyway:
     locations: ["classpath:/db/migration"]
     clean-on-validation-error: true
-    # username: postgres
-    # password: getu@ztv
+    username: postgres
+    password: getu@ztv
 
   jpa:
      database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -21,8 +21,8 @@ spring:
               
   datasource:
     url: jdbc:postgresql://db:5432/getuwettkaempfe
-    # username: postgres
-    # password: getu@ztv
+    username: postgres
+    password: getu@ztv
   jackson:
      deserialization:
         adjust-dates-to-context-time-zone: true
@@ -33,15 +33,15 @@ spring:
      port: 587
      templates:
         path: "mail-templates"
-     username: ""
-     password: ""
+     username: "getu-wettkaempfe-tu@ztv.ch"
+     password: "Cav67716"
      properties:
         mail:
            smtp:
               auth: "true"
               starttls:
                  enable: "true"
-     simulate:  "TRUE"
+     simulate:  "false"
      simulateemail: "heinz.laetsch@gmx.ch"
      
   thymeleaf:

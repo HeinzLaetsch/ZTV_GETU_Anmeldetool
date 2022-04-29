@@ -595,7 +595,7 @@ public class AnlassController {
 			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
 
 			AnlassLauflisten anlassLauflisten = lauflistenService.generateLauflistenForAnlassAndKategorie(anlass,
-					kategorie, abteilung, anlage);
+					kategorie, abteilung, anlage, onlyTi);
 			LauflistenOutput.createLaufListe(anlass, onlyTi, anlassLauflisten, response);
 			anlassLauflisten.getLauflistenContainer().stream().forEach(container -> {
 				lauflistenService.saveAllLauflisten(container.getGeraeteLauflisten());

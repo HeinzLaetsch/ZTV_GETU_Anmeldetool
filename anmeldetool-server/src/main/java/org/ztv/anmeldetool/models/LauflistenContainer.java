@@ -2,12 +2,10 @@ package org.ztv.anmeldetool.models;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -70,10 +68,8 @@ public class LauflistenContainer extends Base {
 	}
 
 	public List<TeilnehmerAnlassLink> getTeilnehmerAnlassLinksOrdered() {
-		return this.teilnehmerAnlassLinks.stream()
-				.sorted(Comparator.comparing(TeilnehmerAnlassLink::getOrganisation, (o1, o2) -> {
-					return o2.compareTo(o1);
-				})).collect(Collectors.toList());
+		this.teilnehmerAnlassLinks.sort(TeilnehmerAnlassLink::compareByVereinThenName);
+		return this.teilnehmerAnlassLinks;
 	}
 
 	public int getStartgeraetOrd() {
@@ -98,7 +94,7 @@ public class LauflistenContainer extends Base {
 				if (GeraetEnum.UNDEFINED.equals(value)) {
 					continue;
 				}
-				if (TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu()) && GeraetEnum.BARREN.equals(value)) {
+				if (TiTuEnum.Ti.equals(titu) && GeraetEnum.BARREN.equals(value)) {
 					continue;
 				}
 				Laufliste laufliste;

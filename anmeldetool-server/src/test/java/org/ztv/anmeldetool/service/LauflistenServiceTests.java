@@ -18,7 +18,6 @@ import org.ztv.anmeldetool.models.AnlassLauflisten;
 import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.LauflistenContainer;
 import org.ztv.anmeldetool.repositories.AnlassRepository;
-import org.ztv.anmeldetool.service.LauflistenService;
 
 @SpringBootTest
 @ActiveProfiles("eclipse")
@@ -62,7 +61,7 @@ public class LauflistenServiceTests {
 	public void testGenerateLauflistenForAnlassAndKategorie() throws Exception {
 		Iterable<Anlass> iterable = anlassRepo.findAll();
 		AnlassLauflisten anlassContainer = lauflistenService.generateLauflistenForAnlassAndKategorie(
-				iterable.iterator().next(), KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1);
+				iterable.iterator().next(), KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1, false);
 		assertThat(anlassContainer).isNotNull();
 		assertThat(anlassContainer.getLauflistenContainer().size()).isEqualTo(5);
 	}

@@ -36,7 +36,7 @@ spring:
      password: ${MAIL_PASSWORD}
      templates:
         path: "mail-templates"
-     simulate:  "TRUE"
+     simulate:  "true"
      simulateemail: "heinz.laetsch@gmx.ch"
      
 # this info may be accessed via actuator
@@ -58,10 +58,10 @@ logging:
     
 scheduler:
    reminder:
-      cron: "0/10 0 * * * *"
+      cron: "0/10 * * * * *"
       daysbefore: 3
    closed:
-      cron: "0/10 0 * * * *"
+      cron: "0/10 * * * * *"
       daysafter: 1
    mutationen:
       cron: "0/10 * * * * *"

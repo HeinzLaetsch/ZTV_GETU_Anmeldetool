@@ -133,7 +133,7 @@ public class LauflistenService {
 	}
 
 	public AnlassLauflisten generateLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie,
-			AbteilungEnum abteilung, AnlageEnum anlage) throws ServiceException {
+			AbteilungEnum abteilung, AnlageEnum anlage, boolean tiOnly) throws ServiceException {
 
 		List<LauflistenContainer> existierende = findLauflistenForAnlassAndKategorie(anlass, kategorie, abteilung,
 				anlage);
@@ -152,9 +152,14 @@ public class LauflistenService {
 						&& tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET
 						&& tal.getMeldeStatus() != MeldeStatusEnum.UMMELDUNG) {
 					tal = this.createNotenblatt(tal);
-					anlasslaufListen.createFromTal(lauflistenRepo, anlass.getTiTu(), tal, abteilung, anlage);
+					TiTuEnum titu = anlass.getTiTu();
+					if (tiOnly) {
+						titu = TiTuEnum.Ti;
+					}
+					anlasslaufListen.createFromTal(lauflistenRepo, titu, tal, abteilung, anlage);
 				}
 			}
+			// anlasslaufListen.getLauflistenContainer().get(0).getTeilnehmerAnlassLinks();
 			persistLauflisten(anlasslaufListen);
 			return anlasslaufListen;
 		} catch (Exception ex) {
