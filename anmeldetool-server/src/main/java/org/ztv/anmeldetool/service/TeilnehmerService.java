@@ -192,7 +192,7 @@ public class TeilnehmerService {
 		teilnehmerAnlassLink.setOrganisation(teilnehmerOptional.get().getOrganisation());
 		teilnehmerAnlassLink.setTeilnehmer(teilnehmerOptional.get());
 		teilnehmerAnlassLink.setAktiv(true);
-		if (KategorieEnum.KEIN_START.toString().equals(tal.getKategorie())) {
+		if (KategorieEnum.KEIN_START.equals(tal.getKategorie())) {
 			teilnehmerAnlassLink.setAktiv(false);
 		} else {
 			teilnehmerAnlassLink.setAktiv(true);

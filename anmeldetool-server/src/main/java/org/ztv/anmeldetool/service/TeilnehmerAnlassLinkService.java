@@ -20,6 +20,7 @@ import org.ztv.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.OrganisationAnlassLink;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
+import org.ztv.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.repositories.OrganisationAnlassLinkRepository;
 import org.ztv.anmeldetool.repositories.TeilnehmerAnlassLinkRepository;
 import org.ztv.anmeldetool.repositories.TeilnehmerRepository;
@@ -62,22 +63,22 @@ public class TeilnehmerAnlassLinkService {
 		return teilnahmen;
 	}
 
-	public List<TeilnehmerAnlassLink> findWettkampfTeilnahmenByKategorieOrderByOrganisation(Anlass anlass,
-			KategorieEnum kategorie) throws ServiceException {
+	public List<TeilnehmerAnlassLink> findWettkampfTeilnahmenByKategorieAndTiTuOrderByOrganisation(Anlass anlass,
+			KategorieEnum kategorie, TiTuEnum tiTu) throws ServiceException {
 		List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] { MeldeStatusEnum.NICHTGESTARTET,
 				MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG });
 		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository
-				.findByAnlassAndAktivAndKategorieOrderByOrganisation(anlass, true, exclusion, kategorie);
+				.findByAnlassAndAktivAndKategorieAndTiTuOrderByOrganisation(anlass, true, exclusion, kategorie, tiTu);
 		return teilnahmen;
 	}
 
-	public List<TeilnehmerAnlassLink> findWettkampfTeilnahmenByKategorie(Anlass anlass, KategorieEnum kategorie)
-			throws ServiceException {
+	public List<TeilnehmerAnlassLink> findWettkampfTeilnahmenByKategorieAndTiTu(Anlass anlass, KategorieEnum kategorie,
+			TiTuEnum tiTu) throws ServiceException {
 
 		List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] { MeldeStatusEnum.NICHTGESTARTET,
 				MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG });
-		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndKategorie(anlass,
-				exclusion, kategorie);
+		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndKategorieAndTiTu(anlass,
+				exclusion, kategorie, tiTu);
 		return teilnahmen;
 	}
 

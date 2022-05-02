@@ -17,6 +17,7 @@ import org.ztv.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.Teilnehmer;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
+import org.ztv.anmeldetool.models.TiTuEnum;
 
 @Repository
 public interface TeilnehmerAnlassLinkRepository extends JpaRepository<TeilnehmerAnlassLink, UUID> {
@@ -28,18 +29,18 @@ public interface TeilnehmerAnlassLinkRepository extends JpaRepository<Teilnehmer
 
 	List<TeilnehmerAnlassLink> findByTeilnehmer(Teilnehmer teilnehmer);
 
-	@Query("SELECT tal FROM TeilnehmerAnlassLink tal WHERE tal.anlass = :anlass AND tal.kategorie= :kategorie "
+	@Query("SELECT tal FROM TeilnehmerAnlassLink tal JOIN tal.teilnehmer teilnehmer WHERE tal.anlass = :anlass AND tal.kategorie= :kategorie AND teilnehmer.tiTu= :tiTu "
 			+ "AND tal.aktiv= :aktiv AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL) ORDER BY tal.organisation, tal.notenblatt.rang")
-	List<TeilnehmerAnlassLink> findByAnlassAndAktivAndKategorieOrderByOrganisation(Anlass anlass, boolean aktiv,
-			List<MeldeStatusEnum> exclusion, KategorieEnum kategorie);
+	List<TeilnehmerAnlassLink> findByAnlassAndAktivAndKategorieAndTiTuOrderByOrganisation(Anlass anlass, boolean aktiv,
+			List<MeldeStatusEnum> exclusion, KategorieEnum kategorie, TiTuEnum tiTu);
 
 	@Query("SELECT tal FROM TeilnehmerAnlassLink tal WHERE tal.anlass = :anlass AND tal.kategorie= :kategorie AND tal.aktiv= :aktiv AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL)")
 	List<TeilnehmerAnlassLink> findByAnlassAndAktivAndKategorie(Anlass anlass, boolean aktiv,
 			List<MeldeStatusEnum> exclusion, KategorieEnum kategorie);
 
-	@Query("SELECT tal FROM TeilnehmerAnlassLink tal WHERE tal.anlass = :anlass AND tal.kategorie= :kategorie AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL)")
-	List<TeilnehmerAnlassLink> findByAnlassAndKategorie(Anlass anlass, List<MeldeStatusEnum> exclusion,
-			KategorieEnum kategorie);
+	@Query("SELECT tal FROM TeilnehmerAnlassLink tal WHERE tal.anlass = :anlass AND tal.kategorie= :kategorie AND tal.teilnehmer.tiTu= :tiTu AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL)")
+	List<TeilnehmerAnlassLink> findByAnlassAndKategorieAndTiTu(Anlass anlass, List<MeldeStatusEnum> exclusion,
+			KategorieEnum kategorie, TiTuEnum tiTu);
 
 	@Query("SELECT tal FROM TeilnehmerAnlassLink tal WHERE tal.anlass = :anlass AND tal.aktiv= :aktiv AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL) AND tal.kategorie!='KEIN_START' AND tal.organisation IN (:orgs)")
 	List<TeilnehmerAnlassLink> findByAnlassAndAktiv(Anlass anlass, boolean aktiv, List<MeldeStatusEnum> exclusion,

@@ -78,7 +78,7 @@ export class EinteilungAnlageComponent implements OnInit {
   }
 
   get startgeraete(): GeraeteEnum[] {
-    const geraete = this.anlass.getStartgeraete();
-    return geraete;
+    const startgeraete = this.anlass.getStartgeraete();
+    return startgeraete;
   }
 }

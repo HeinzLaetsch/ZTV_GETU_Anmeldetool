@@ -159,7 +159,8 @@ export class EinteilungStartgeraetComponent implements OnInit {
   }
 
   get alleStartgeraete(): GeraeteEnum[] {
-    return this.anlass.getStartgeraete();
+    const startgeraete = this.anlass.getStartgeraete();
+    return startgeraete;
   }
   get anlageControls(): FormControl[] {
     return this.anlageControls_;

@@ -160,7 +160,7 @@ export class IAnlass {
     startgeraete.push(GeraeteEnum.BODEN);
     startgeraete.push(GeraeteEnum.SCHAUKELRINGE);
     startgeraete.push(GeraeteEnum.SPRUNG);
-    if (!this.tiAnlass) {
+    if (this.tuAnlass) {
       startgeraete.push(GeraeteEnum.BARREN);
     }
     return startgeraete;

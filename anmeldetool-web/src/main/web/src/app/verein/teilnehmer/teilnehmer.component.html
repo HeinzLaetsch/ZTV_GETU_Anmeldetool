@@ -1,4 +1,7 @@
-<div class="container-fluid" *ngIf="isTeilnehmerLoaded | async; else loading">
+<div
+  class="container-fluid"
+  *ngIf="(isTeilnehmerLoaded | async) >= 0; else loading"
+>
   <!-- div class="container-fluid"-->
   <h3 class="label">Teilnehmer {{ verein.name }}</h3>
 

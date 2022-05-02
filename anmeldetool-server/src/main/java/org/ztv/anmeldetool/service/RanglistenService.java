@@ -85,8 +85,8 @@ public class RanglistenService {
 
 	public List<TeilnehmerAnlassLink> getRanglistePerVerein(Anlass anlass, TiTuEnum tiTu, KategorieEnum kategorie)
 			throws ServiceException {
-		List<TeilnehmerAnlassLink> tals = talService.findWettkampfTeilnahmenByKategorieOrderByOrganisation(anlass,
-				kategorie);
+		List<TeilnehmerAnlassLink> tals = talService
+				.findWettkampfTeilnahmenByKategorieAndTiTuOrderByOrganisation(anlass, kategorie, tiTu);
 		/*
 		 * tals = tals.stream().sorted( Comparator.comparing(tal ->
 		 * tal.getNotenblatt().getGesamtPunktzahl(), Comparator.reverseOrder()))
@@ -118,7 +118,7 @@ public class RanglistenService {
 
 	public List<TeilnehmerAnlassLink> getTeilnehmerSorted(Anlass anlass, KategorieEnum kategorie, TiTuEnum titu)
 			throws ServiceException {
-		List<TeilnehmerAnlassLink> tals = talService.findWettkampfTeilnahmenByKategorie(anlass, kategorie);
+		List<TeilnehmerAnlassLink> tals = talService.findWettkampfTeilnahmenByKategorieAndTiTu(anlass, kategorie, titu);
 
 		tals = tals.stream().sorted(
 				Comparator.comparing(tal -> tal.getNotenblatt().getGesamtPunktzahl(), Comparator.reverseOrder()))

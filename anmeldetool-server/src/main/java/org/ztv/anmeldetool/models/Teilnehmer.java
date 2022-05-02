@@ -1,6 +1,8 @@
 package org.ztv.anmeldetool.models;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -25,6 +27,7 @@ public class Teilnehmer extends Base {
 
 	private int jahrgang;
 
+	@Enumerated(EnumType.STRING)
 	private TiTuEnum tiTu;
 
 	private boolean dirty;
