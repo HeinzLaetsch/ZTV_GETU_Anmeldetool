@@ -1,6 +1,5 @@
 import { Component, Input } from "@angular/core";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { IRanglistenEntry } from "src/app/core/model/IRanglistenEntry";
+import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 
 @Component({
   selector: "app-ranglisten-header",
@@ -9,5 +8,10 @@ import { IRanglistenEntry } from "src/app/core/model/IRanglistenEntry";
 })
 export class RanglistenHeaderComponent {
   @Input()
-  isTi: boolean;
+  tiTu: TiTuEnum;
+
+  get isTu(): boolean {
+    const res = TiTuEnum.Tu === this.tiTu;
+    return res;
+  }
 }

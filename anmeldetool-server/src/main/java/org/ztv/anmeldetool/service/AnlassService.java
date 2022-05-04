@@ -1,6 +1,7 @@
 package org.ztv.anmeldetool.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.KategorieEnum;
+import org.ztv.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.OrganisationAnlassLink;
 import org.ztv.anmeldetool.models.Person;
@@ -120,7 +122,7 @@ public class AnlassService {
 			List<PersonAnlassLink> eingeteilteWrs2 = getEingeteilteWertungsrichter(anlassId, org.getId(),
 					WertungsrichterBrevetEnum.Brevet_2);
 			vereinsStart.setBr2(eingeteilteWrs2.size());
-			List<TeilnehmerAnlassLink> tals = getTeilnahmen(anlassId, org.getId());
+			List<TeilnehmerAnlassLink> tals = getTeilnahmen(anlassId, org.getId(), true);
 			int totalBr = 0;
 			List<TeilnehmerAnlassLink> fTal = tals.stream().filter(tal -> {
 				return tal.isAktiv() && KategorieEnum.K1.equals(tal.getKategorie())
@@ -354,11 +356,18 @@ public class AnlassService {
 		return anlaesse;
 	}
 
-	public List<TeilnehmerAnlassLink> getTeilnahmen(UUID anlassId, UUID OrgId) {
+	public List<TeilnehmerAnlassLink> getTeilnahmen(UUID anlassId, UUID OrgId, boolean exclude) {
 		Anlass anlass = this.findAnlassById(anlassId);
 		Organisation organisation = organisationSrv.findOrganisationById(OrgId);
-		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndOrganisation(anlass,
-				organisation);
+		List<TeilnehmerAnlassLink> teilnahmen = null;
+		if (exclude) {
+			List<MeldeStatusEnum> exclusion = Arrays
+					.asList(new MeldeStatusEnum[] { MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG });
+			teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndOrganisationExclude(anlass, organisation,
+					exclusion);
+		} else {
+			teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndOrganisation(anlass, organisation);
+		}
 		teilnahmen = teilnahmen.stream().filter(link -> {
 			try {
 				String name = link.getTeilnehmer().getName();

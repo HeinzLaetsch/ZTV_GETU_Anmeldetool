@@ -95,7 +95,10 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
   private getFilter(): string {
     let filter = "Tu";
     if (this.isAlle()) {
-      filter = this.tiTu;
+      filter = "Ti";
+      if (TiTuEnum.Tu === this.tiTu) {
+        filter = "Tu";
+      }
     } else {
       if (this.anlass.tiAnlass) {
         filter = "Ti";
@@ -139,16 +142,18 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
       )
       .subscribe((result) => {
         this.ranglistenEntries = result;
-        this.ranglistenEntries.sort((a, b) => {
-          if (a.rang < b.rang) {
-            return -1;
-          }
-          if (a.rang > b.rang) {
-            return 1;
-          }
-          // Da noch Namen vergleichen ?
-          return 0;
-        });
+        if (result) {
+          this.ranglistenEntries.sort((a, b) => {
+            if (a.rang < b.rang) {
+              return -1;
+            }
+            if (a.rang > b.rang) {
+              return 1;
+            }
+            // Da noch Namen vergleichen ?
+            return 0;
+          });
+        }
       });
   }
 
@@ -172,8 +177,10 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
   }
 
   tiTuSelected(kategorie: MatSelect): void {
-    this.tiTu = kategorie.value;
+    this.tiTu = TiTuEnum[kategorie.value];
     // this.getRangliste();
+    const b1 = TiTuEnum.Tu === this.tiTu;
+    const b2 = TiTuEnum.Ti === this.tiTu;
     this.getConfig();
     this.getRanglistenState();
   }

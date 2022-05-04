@@ -1,6 +1,7 @@
 import { Component, Input } from "@angular/core";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IRanglistenEntry } from "src/app/core/model/IRanglistenEntry";
+import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 
 @Component({
   selector: "app-ranglisten-entry",
@@ -16,10 +17,14 @@ export class RanglistenEntryComponent {
   highlighted: boolean;
   @Input()
   index: number;
+  @Input()
+  tiTu: TiTuEnum;
+  ngOnDestroy() {}
 
-  ngOnDestroy() { }
-
-  get isTi(): boolean {
-    return this.anlass.tiAnlass;
+  get isTu(): boolean {
+    // const s1 = this.tiTu.toString();
+    // const s2 = TiTuEnum.Tu.toString();
+    const res = TiTuEnum.Tu === this.tiTu;
+    return res;
   }
 }

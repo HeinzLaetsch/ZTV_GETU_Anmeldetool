@@ -30,8 +30,6 @@ spring:
      # time-zone: "Europe/Zurich"
      time-zone: "UTC"
   mail:
-     host: "smtp.office365.com"
-     port: 587
      username:  ${MAIL_USER}
      password: ${MAIL_PASSWORD}
      templates:

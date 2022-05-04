@@ -114,12 +114,13 @@
       </button>
     </div>
   </div>
-  <app-ranglisten-header [isTi]="anlass.tiAnlass"></app-ranglisten-header>
+  <app-ranglisten-header [tiTu]="tiTu"></app-ranglisten-header>
   <app-ranglisten-entry
     [anlass]="anlass"
     [entry]="entry"
     [highlighted]="highlighted"
     [index]="i"
+    [tiTu]="tiTu"
     *ngFor="let entry of ranglistenEntries; index as i"
   ></app-ranglisten-entry>
 </div>

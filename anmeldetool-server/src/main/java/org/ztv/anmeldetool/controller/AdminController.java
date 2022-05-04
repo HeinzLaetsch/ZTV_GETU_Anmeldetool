@@ -565,7 +565,7 @@ public class AdminController {
 	@GetMapping("/anlaesse/{anlassId}/organisationen/{orgId}/teilnehmer/")
 	public ResponseEntity<Collection<TeilnehmerAnlassLinkDTO>> getTeilnehmer(HttpServletRequest request,
 			@PathVariable UUID anlassId, @PathVariable UUID orgId) {
-		List<TeilnehmerAnlassLink> links = anlassSrv.getTeilnahmen(anlassId, orgId);
+		List<TeilnehmerAnlassLink> links = anlassSrv.getTeilnahmen(anlassId, orgId, false);
 		List<TeilnehmerAnlassLinkDTO> linksDto = links.stream().map(link -> {
 			return teilnehmerAnlassMapper.toDto(link);
 		}).collect(Collectors.toList());

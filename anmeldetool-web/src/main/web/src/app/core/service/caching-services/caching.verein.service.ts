@@ -57,6 +57,8 @@ export class CachingVereinService {
           strippedB = this.strip(strippedB, "TG ");
           strippedA = this.strip(strippedA, "TV ");
           strippedB = this.strip(strippedB, "TV ");
+          strippedA = this.strip(strippedA, "TSV ");
+          strippedB = this.strip(strippedB, "TSV ");
           strippedA = this.strip(strippedA, "GERÄTERIEGE JUGI ");
           strippedB = this.strip(strippedB, "GERÄTERIEGE JUGI ");
           strippedA = this.strip(strippedA, "GERÄTERIEGE ");

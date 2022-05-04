@@ -52,6 +52,10 @@ public interface TeilnehmerAnlassLinkRepository extends JpaRepository<Teilnehmer
 
 	List<TeilnehmerAnlassLink> findByAnlassAndOrganisation(Anlass anlass, Organisation organisation);
 
+	@Query("SELECT tal FROM TeilnehmerAnlassLink tal WHERE tal.anlass = :anlass AND tal.organisation = :organisation AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL)")
+	List<TeilnehmerAnlassLink> findByAnlassAndOrganisationExclude(Anlass anlass, Organisation organisation,
+			List<MeldeStatusEnum> exclusion);
+
 	Optional<TeilnehmerAnlassLink> findTopByStartnummerNotNullOrderByStartnummerDesc();
 
 	@Query(value = "SELECT DISTINCT tal.abteilung FROM teilnehmer_anlass_link tal WHERE tal.anlass_id = :anlass_id AND tal.aktiv= :aktiv AND tal.kategorie= :kategorie AND tal.abteilung IS NOT NULL ORDER BY tal.abteilung", nativeQuery = true)
