@@ -29,12 +29,15 @@ spring:
      time-zone: "Europe/Zurich"   
      # time-zone: "UTC"
   mail:
-     host: "smtp.office365.com"
+     # host: "smtp.office365.com"
+     host: "mail.gmx.net"
      port: 587
      templates:
         path: "mail-templates"
-     username: "getu-wettkaempfe-tu@ztv.ch"
-     password: "Cav67716"
+     # username: "getu-wettkaempfe-tu@ztv.ch"
+     username: "heinz.laetsch@gmx.ch"
+     # password: "Cav67716" # win123Paratech
+     password: "gmx32Paratech"
      properties:
         mail:
            smtp:

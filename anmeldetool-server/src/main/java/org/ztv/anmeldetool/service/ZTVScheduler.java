@@ -3,6 +3,7 @@ package org.ztv.anmeldetool.service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -83,7 +84,7 @@ public class ZTVScheduler {
 			return erfassenNotClosed && isDaysBefore;
 		}).collect(Collectors.toList());
 
-		sendReminderMailIfNeeded(filteredAnlaesse, "Stand der Anmeldung");
+		sendReminderMailIfNeeded(filteredAnlaesse, "Stand der Anmeldung", "Meldeschluss ist");
 	}
 
 	@Transactional(value = TxType.REQUIRES_NEW)
@@ -100,7 +101,7 @@ public class ZTVScheduler {
 			return aenderungenNotClosed && isDaysAfter;
 		}).collect(Collectors.toList());
 
-		sendClosedMailIfNeeded(filteredAnlaesse, "Anmeldebestätigung");
+		sendClosedMailIfNeeded(filteredAnlaesse, "Anmeldebestätigung", "Meldeschluss war");
 	}
 
 	@Transactional(value = TxType.REQUIRES_NEW)
@@ -118,15 +119,15 @@ public class ZTVScheduler {
 			return isMuationenNotClosed && erfassenClosed && isDaysBefore;
 		}).collect(Collectors.toList());
 
-		sendMutationMailIfNeeded(filteredAnlaesse, "Mutationsschluss");
+		sendMutationMailIfNeeded(filteredAnlaesse, "Mutationsschluss", "Mutationen möglich bis");
 	}
 
-	private void sendReminderMailIfNeeded(List<Anlass> filteredAnlaesse, String subject) {
+	private void sendReminderMailIfNeeded(List<Anlass> filteredAnlaesse, String subject, String datumText) {
 		filteredAnlaesse.forEach(anlass -> {
 			if (!anlass.isReminderMeldeschlussSent()) {
 				List<Organisation> allZHOrgs = orgSrv.getAllZuercherOrganisationen();
 				allZHOrgs.forEach(org -> {
-					sendMailToOrg(anlass, org, subject);
+					sendMailToOrg(anlass, org, subject, anlass.getErfassenGeschlossen(), datumText);
 				});
 				anlass.setReminderMeldeschlussSent(true);
 				anlassSrv.save(anlass);
@@ -135,7 +136,8 @@ public class ZTVScheduler {
 
 	}
 
-	private boolean sendMailToOrg(Anlass anlass, Organisation org, String subject) {
+	private boolean sendMailToOrg(Anlass anlass, Organisation org, String subject, LocalDateTime datum,
+			String datumText) {
 		Stream<OrganisationPersonLink> oplStream = org.getPersonenLinks().stream().filter(pl -> {
 			return pl.getRollenLink().stream().filter(rolle -> {
 				log.debug("Name : {}", pl.getPerson().getBenutzername());
@@ -148,20 +150,20 @@ public class ZTVScheduler {
 			// Person person =
 			// this.personSrv.findPersonByBenutzername("heinz.laetsch@gmx.ch");
 			log.debug("Sende Mail an: {} / {}", opl.getOrganisation().getName(), opl.getPerson().getEmail());
-			if (!sendAnmeldeKontrolleMail(anlass, org, opl.getPerson(), subject)) {
+			if (!sendAnmeldeKontrolleMail(anlass, org, opl.getPerson(), subject, datum, datumText)) {
 				error.set(true);
 			}
 		});
 		return error.get();
 	}
 
-	private void sendClosedMailIfNeeded(List<Anlass> filteredAnlaesse, String subject) {
+	private void sendClosedMailIfNeeded(List<Anlass> filteredAnlaesse, String subject, String datumText) {
 
 		filteredAnlaesse.forEach(anlass -> {
 			anlass.getOrganisationenLinks().forEach(oal -> {
 				Organisation org = oal.getOrganisation();
 				if (oal.isAktiv() && !oal.isAnmeldeKontrolleSent()) {
-					boolean error = sendMailToOrg(anlass, org, subject);
+					boolean error = sendMailToOrg(anlass, org, subject, anlass.getErfassenGeschlossen(), datumText);
 					if (!error) {
 						oal.setAnmeldeKontrolleSent(true);
 						oalRepo.save(oal);
@@ -171,13 +173,14 @@ public class ZTVScheduler {
 		});
 	}
 
-	private void sendMutationMailIfNeeded(List<Anlass> filteredAnlaesse, String subject) {
+	private void sendMutationMailIfNeeded(List<Anlass> filteredAnlaesse, String subject, String datumText) {
 
 		filteredAnlaesse.forEach(anlass -> {
 			anlass.getOrganisationenLinks().forEach(oal -> {
 				Organisation org = oal.getOrganisation();
 				if (oal.isAktiv() && !oal.isReminderMutationsschlussSent()) {
-					boolean error = sendMailToOrg(anlass, org, subject);
+					boolean error = sendMailToOrg(anlass, org, subject, anlass.getAenderungenInKategorieGeschlossen(),
+							datumText);
 					if (!error) {
 						oal.setReminderMutationsschlussSent(true);
 						oalRepo.save(oal);
@@ -187,7 +190,8 @@ public class ZTVScheduler {
 		});
 	}
 
-	private boolean sendAnmeldeKontrolleMail(Anlass anlass, Organisation org, Person person, String subject) {
+	private boolean sendAnmeldeKontrolleMail(Anlass anlass, Organisation org, Person person, String subject,
+			LocalDateTime datum, String datumText) {
 		List<PersonAnlassLink> palBr1 = anlassSrv.getEingeteilteWertungsrichter(anlass.getId(), org.getId(),
 				WertungsrichterBrevetEnum.Brevet_1);
 		List<PersonAnlassLink> palBr2 = anlassSrv.getEingeteilteWertungsrichter(anlass.getId(), org.getId(),
@@ -200,6 +204,9 @@ public class ZTVScheduler {
 		templateModel.put("recipientName", person.getEmail());
 		templateModel.put("text", "AnmeldeKontrolle Daten");
 		templateModel.put("senderName", sender);
+		DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+		templateModel.put("datum", datum.format(formatters));
+		templateModel.put("datumText", datumText);
 
 		// Teilnehmer
 		ByteArrayOutputStream outAnmeldekontrolle = new ByteArrayOutputStream();
