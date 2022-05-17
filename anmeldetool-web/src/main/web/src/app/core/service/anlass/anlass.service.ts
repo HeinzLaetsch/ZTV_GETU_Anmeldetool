@@ -310,6 +310,13 @@ export class AnlassService {
       );
   }
 
+  updateAnlass(anlass: IAnlass): Observable<IAnlass> {
+    const combinedUrl = this.url + "/" + anlass.id;
+    return this.http
+      .put<IAnlass>(combinedUrl, anlass)
+      .pipe(catchError(this.handleError<IAnlass>("updateAnlass")));
+  }
+
   saveTeilnahme(verein: IVerein, anlassLink: IAnlassLink): Observable<boolean> {
     console.log("Service save Teilnahme: ", anlassLink);
     const combinedUrl =
@@ -373,7 +380,7 @@ export class AnlassService {
       "/" +
       anlage +
       "/" +
-      geraet.toLocaleUpperCase();
+      geraet?.toLocaleUpperCase();
     if (search) {
       combinedUrl += "?search=" + search;
     }
@@ -401,7 +408,7 @@ export class AnlassService {
         if (anlage) {
           combinedUrl = combinedUrl + "/" + anlage;
           if (geraet) {
-            combinedUrl = combinedUrl + "/" + geraet.toLocaleUpperCase();
+            combinedUrl = combinedUrl + "/" + geraet?.toLocaleUpperCase();
           }
         }
       }

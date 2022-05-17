@@ -35,6 +35,8 @@ export class EinteilungKategorieComponent implements OnInit {
   abteilungen: AbteilungEnum[];
 
   teilnahmeStatistic: ITeilnahmeStatistic;
+  teilnahmeStatisticNotAssigned: ITeilnahmeStatistic;
+
   private statisticLoaded = false;
   private otherLoaded = false;
 
@@ -45,6 +47,9 @@ export class EinteilungKategorieComponent implements OnInit {
     this.loaded$ = new Subject();
   }
 
+  get UNDEFINED(): AbteilungEnum {
+    return AbteilungEnum.UNDEFINED;
+  }
   ngOnInit() {
     this.ranglistenService
       .getAbteilungenForAnlass(this.anlass, this.kategorie)
@@ -70,6 +75,18 @@ export class EinteilungKategorieComponent implements OnInit {
           this.loaded$.next(true);
         }
         this.statisticLoaded = true;
+      });
+    this.anlassService
+      .getTeilnahmeStatistic(
+        this.anlass,
+        this.kategorie,
+        AbteilungEnum.UNDEFINED,
+        undefined,
+        undefined,
+        this.search
+      )
+      .subscribe((statistic) => {
+        this.teilnahmeStatisticNotAssigned = statistic;
       });
     this.refreshEmitter.subscribe((search) => {
       console.log("EinteilungKategorieComponent, Refresh Kategorie: ", search);

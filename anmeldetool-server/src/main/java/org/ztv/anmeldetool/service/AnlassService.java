@@ -76,6 +76,10 @@ public class AnlassService {
 	@Autowired
 	OrganisationMapper orgMapper;
 
+	public Anlass updateAnlass(Anlass anlass) {
+		return this.anlassRepo.save(anlass);
+	}
+
 	public List<Person> getVerfuegbareWertungsrichter(UUID anlassId, UUID orgId, WertungsrichterBrevetEnum brevet) {
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		List<Person> personen = personRepository.findByOrganisationId(organisation.getId());
@@ -103,7 +107,7 @@ public class AnlassService {
 	public AnmeldeKontrolleDTO getAnmeldeKontrolle(UUID anlassId, UUID orgId) {
 		List<VereinsStartDTO> vereinsStarts = new ArrayList<VereinsStartDTO>();
 		Anlass anlass = findAnlassById(anlassId);
-		AnmeldeKontrolleDTO anlassKontrolle = new AnmeldeKontrolleDTO(anlassMapper.ToDto(anlass), vereinsStarts,
+		AnmeldeKontrolleDTO anlassKontrolle = new AnmeldeKontrolleDTO(anlassMapper.toDto(anlass), vereinsStarts,
 				orgMapper.ToDto(anlass.getOrganisator()));
 
 		List<Organisation> orgs = getVereinsStarts(anlassId);

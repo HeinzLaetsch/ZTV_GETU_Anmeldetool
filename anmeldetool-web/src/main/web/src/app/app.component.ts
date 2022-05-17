@@ -6,6 +6,7 @@ import {
 } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute } from "@angular/router";
+import { IAnlass } from "./core/model/IAnlass";
 import { AuthService } from "./core/service/auth/auth.service";
 import { CachingAnlassService } from "./core/service/caching-services/caching.anlass.service";
 import { CachingVereinService } from "./core/service/caching-services/caching.verein.service";
@@ -26,6 +27,7 @@ export class AnmeldeToolComponent
   dialogOpen = false;
   appBlocked = false;
   _authenticated: boolean;
+  anlass: IAnlass;
 
   constructor(
     private authService: AuthService,
@@ -34,8 +36,8 @@ export class AnmeldeToolComponent
     private router: ActivatedRoute,
     public dialog: MatDialog
   ) {
-    const anlass = this.anlassService.findetAnlassStatt();
-    if (anlass) {
+    this.anlass = this.anlassService.findetAnlassStatt();
+    if (this.anlass) {
       this.appBlocked = true;
     }
   }
@@ -60,6 +62,16 @@ export class AnmeldeToolComponent
       // console.log('AnmeldeToolComponent::ngOnInit 2: ');
       this.openLoginDialog();
     }
+  }
+
+  get administrator(): boolean {
+    return this.authService.isAdministrator();
+  }
+
+  toolSperrenClicked(event: any): void {
+    this.anlassService
+      .updateAnlass(this.anlass)
+      .subscribe((anlass) => (this.anlass = anlass));
   }
 
   openLoginDialog() {

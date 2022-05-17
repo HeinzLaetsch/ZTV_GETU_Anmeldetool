@@ -15,7 +15,17 @@
         [abteilung]="abteilung"
         [refreshEmitter]="refreshEmitter"
         [search]="search"
+        [expanded]="abteilungen?.length === 1"
       ></app-einteilung-abteilung>
+      <app-einteilung-startgeraet
+        [anlass]="anlass"
+        [kategorie]="kategorie"
+        [abteilung]="UNDEFINED"
+        [anlage]=""
+        [startgeraet]=""
+        [refreshEmitter]="refreshEmitter"
+        [search]="search"
+      ></app-einteilung-startgeraet>
     </ng-template>
   </mat-expansion-panel>
 </ng-container>

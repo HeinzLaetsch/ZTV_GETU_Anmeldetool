@@ -235,6 +235,48 @@ export class RanglistenService {
     return statusResponse.asObservable();
   }
 
+  getRanglisteCsv(
+    anlass: IAnlass,
+    tiTu: string,
+    kategorie: KategorieEnum,
+    maxAuszeichnungen: number
+  ): Observable<string> {
+    const statusResponse = new Subject<string>();
+
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "ranglisten" +
+      "/" +
+      tiTu +
+      "/" +
+      kategorie +
+      "?maxAuszeichnungen=" +
+      maxAuszeichnungen;
+
+    // console.log("getTeilnehmer called: ", combinedUrl);
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append("Accept", "text/csv;charset=UTF-8");
+    this.http
+      .get(combinedUrl, {
+        observe: "response",
+        responseType: "blob",
+        headers,
+      })
+      .pipe(
+        catchError(this.handleError<any>("getRanglisteCSV", statusResponse))
+      )
+      .subscribe((result: HttpResponse<string>) => {
+        const header = result.headers.get("Content-Disposition");
+        const parts = header.split("filename=");
+        this.saveAsFile(result.body, parts[1], "text/csv");
+        statusResponse.next("Success");
+      });
+    return statusResponse.asObservable();
+  }
+
   getLauflistenPdf(
     anlass: IAnlass,
     kategorie: KategorieEnum,

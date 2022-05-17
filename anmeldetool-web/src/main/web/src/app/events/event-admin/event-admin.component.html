@@ -1,282 +1,294 @@
-<mat-tab-group *ngIf="administrator" mat-align-tabs="start">
-  <mat-tab label="Exports/Imports">
-    <div class="container-lg">
-      <div class="row">
-        <div class="col-9">
-          <h1>{{ anlass.getCleaned() + " " + anlass.ort }}</h1>
-        </div>
-        <div class="col-sm-3">
-          <h1>{{ anlass.tiTu }}</h1>
-        </div>
+<div *ngIf="administrator; else elseBlock">
+  <div class="container-lg">
+    <div class="row">
+      <div class="col-7">
+        <h1>{{ anlass.getCleaned() + " " + anlass.ort }}</h1>
       </div>
-      <div class="row" *ngIf="loaded$ | async as obs; else loading">
-        <div class="col-1">Total Startende</div>
-        <div class="col-1">
-          {{ teilnahmeStatistic.totalStartende }}
-        </div>
-        <div class="col-1">Total Abgemeldet</div>
-        <div class="col-1">
-          {{ teilnahmeStatistic.totalZurueckgezogen }}
-        </div>
-        <div class="col-1">Um / Neugemeldet</div>
-        <div class="col-1">
-          {{ teilnahmeStatistic.ummeldung }}/{{ teilnahmeStatistic.neumeldung }}
-        </div>
-        <div class="col-1">Abgemeldet</div>
-        <div class="col-1">
-          {{ teilnahmeStatistic.abgemeldet }}
-        </div>
-        <div class="col-1">Verletzt</div>
-        <div class="col-1">
-          {{ teilnahmeStatistic.verletzt }}
-        </div>
-        <div class="col-1">Nicht gestartet</div>
-        <div class="col-1">
-          {{ teilnahmeStatistic.nichtGestartet }}
-        </div>
+      <div class="col-sm-1">
+        <h1>{{ anlass.tiTu }}</h1>
       </div>
+      <div class="col-sm-4">
+        <mat-checkbox
+          [(ngModel)]="anlass.toolSperren"
+          (ngModelChange)="toolSperrenClicked($event)"
+          >Tool sperren
+        </mat-checkbox>
+      </div>
+    </div>
+  </div>
+  <mat-tab-group *ngIf="administrator" mat-align-tabs="start">
+    <mat-tab label="Exports/Imports">
+      <div class="container-lg">
+        <div class="row" *ngIf="loaded$ | async as obs; else loading">
+          <div class="col-1">Total Startende</div>
+          <div class="col-1">
+            {{ teilnahmeStatistic.totalStartende }}
+          </div>
+          <div class="col-1">Total Abgemeldet</div>
+          <div class="col-1">
+            {{ teilnahmeStatistic.totalZurueckgezogen }}
+          </div>
+          <div class="col-1">Um / Neugemeldet</div>
+          <div class="col-1">
+            {{ teilnahmeStatistic.ummeldung }}/{{
+              teilnahmeStatistic.neumeldung
+            }}
+          </div>
+          <div class="col-1">Abgemeldet</div>
+          <div class="col-1">
+            {{ teilnahmeStatistic.abgemeldet }}
+          </div>
+          <div class="col-1">Verletzt</div>
+          <div class="col-1">
+            {{ teilnahmeStatistic.verletzt }}
+          </div>
+          <div class="col-1">Nicht gestartet</div>
+          <div class="col-1">
+            {{ teilnahmeStatistic.nichtGestartet }}
+          </div>
+        </div>
 
-      <div class="row">
-        <div class="col-3">
-          <h2>Teilnehmer Import / Export</h2>
+        <div class="row">
+          <div class="col-3">
+            <h2>Teilnehmer Import / Export</h2>
+          </div>
+          <div class="col-sm-2">
+            <button
+              mat-button
+              color="primary"
+              #tooltip="matTooltip"
+              matTooltip="Teilnehmer exportieren"
+              matTooltipPosition="below"
+              matTooltipHideDelay="500"
+              (click)="exportTeilnehmer()"
+            >
+              Exportieren
+            </button>
+          </div>
+          <div class="col-sm-2">
+            <button
+              mat-button
+              color="primary"
+              #tooltip="matTooltip"
+              matTooltip="Teilnehmer importieren"
+              matTooltipPosition="below"
+              matTooltipHideDelay="500"
+              (click)="importTeilnehmer()"
+            >
+              Importieren
+            </button>
+          </div>
         </div>
-        <div class="col-sm-2">
-          <button
-            mat-button
-            color="primary"
-            #tooltip="matTooltip"
-            matTooltip="Teilnehmer exportieren"
-            matTooltipPosition="below"
-            matTooltipHideDelay="500"
-            (click)="exportTeilnehmer()"
-          >
-            Exportieren
-          </button>
+        <div class="row">
+          <div class="col-3">
+            <h2>Wertungsrichter Export</h2>
+          </div>
+          <div class="col-sm-2">
+            <button
+              mat-button
+              color="primary"
+              #tooltip="matTooltip"
+              matTooltip="Wertungsrichter exportieren"
+              matTooltipPosition="below"
+              matTooltipHideDelay="500"
+              (click)="exportWertungsrichter()"
+            >
+              Exportieren
+            </button>
+          </div>
         </div>
-        <div class="col-sm-2">
-          <button
-            mat-button
-            color="primary"
-            #tooltip="matTooltip"
-            matTooltip="Teilnehmer importieren"
-            matTooltipPosition="below"
-            matTooltipHideDelay="500"
-            (click)="importTeilnehmer()"
-          >
-            Importieren
-          </button>
+        <div class="row">
+          <div class="col-3">
+            <h2>Benutzer Export</h2>
+          </div>
+          <div class="col-sm-2">
+            <button
+              mat-button
+              color="primary"
+              #tooltip="matTooltip"
+              matTooltip="Benutzer exportieren"
+              matTooltipPosition="below"
+              matTooltipHideDelay="500"
+              (click)="exportBenutzer()"
+            >
+              Exportieren
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-3">
-          <h2>Wertungsrichter Export</h2>
+        <div class="row">
+          <div class="col-3">
+            <h2>Anmeldekontrolle Export</h2>
+          </div>
+          <div class="col-sm-2">
+            <button
+              mat-button
+              color="primary"
+              #tooltip="matTooltip"
+              matTooltip="Anmeldekontrolle exportieren"
+              matTooltipPosition="below"
+              matTooltipHideDelay="500"
+              (click)="exportAnmeldeKontrolle()"
+            >
+              Exportieren
+            </button>
+          </div>
         </div>
-        <div class="col-sm-2">
-          <button
-            mat-button
-            color="primary"
-            #tooltip="matTooltip"
-            matTooltip="Wertungsrichter exportieren"
-            matTooltipPosition="below"
-            matTooltipHideDelay="500"
-            (click)="exportWertungsrichter()"
-          >
-            Exportieren
-          </button>
+        <div class="row">
+          <div class="col-3">
+            <h2>Mutationen Export</h2>
+          </div>
+          <div class="col-sm-2">
+            <button
+              mat-button
+              color="primary"
+              #tooltip="matTooltip"
+              matTooltip="Mutationen exportieren"
+              matTooltipPosition="below"
+              matTooltipHideDelay="500"
+              (click)="exportMutationen()"
+            >
+              Exportieren
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-3">
-          <h2>Benutzer Export</h2>
-        </div>
-        <div class="col-sm-2">
-          <button
-            mat-button
-            color="primary"
-            #tooltip="matTooltip"
-            matTooltip="Benutzer exportieren"
-            matTooltipPosition="below"
-            matTooltipHideDelay="500"
-            (click)="exportBenutzer()"
-          >
-            Exportieren
-          </button>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-3">
-          <h2>Anmeldekontrolle Export</h2>
-        </div>
-        <div class="col-sm-2">
-          <button
-            mat-button
-            color="primary"
-            #tooltip="matTooltip"
-            matTooltip="Anmeldekontrolle exportieren"
-            matTooltipPosition="below"
-            matTooltipHideDelay="500"
-            (click)="exportAnmeldeKontrolle()"
-          >
-            Exportieren
-          </button>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-3">
-          <h2>Mutationen Export</h2>
-        </div>
-        <div class="col-sm-2">
-          <button
-            mat-button
-            color="primary"
-            #tooltip="matTooltip"
-            matTooltip="Mutationen exportieren"
-            matTooltipPosition="below"
-            matTooltipHideDelay="500"
-            (click)="exportMutationen()"
-          >
-            Exportieren
-          </button>
-        </div>
-      </div>
 
-      <div class="row">
-        <div class="col-2">
-          <h2>Lauflisten</h2>
-        </div>
-        <div class="col-10">
-          <div class="row">
-            <div class="col-2">
-              <mat-form-field appearance="fill">
-                <mat-label>Kategorie</mat-label>
-                <mat-select
-                  type="text"
-                  placeholder="-"
-                  aria-label="Kategorie"
-                  matInput
-                  (ngModelChange)="changeKategorie($event)"
-                  [ngModel]="selectedKategorie"
-                >
-                  <mat-option
-                    *ngFor="let option of kategorien"
-                    [value]="option"
+        <div class="row">
+          <div class="col-2">
+            <h2>Lauflisten</h2>
+          </div>
+          <div class="col-10">
+            <div class="row">
+              <div class="col-2">
+                <mat-form-field appearance="fill">
+                  <mat-label>Kategorie</mat-label>
+                  <mat-select
+                    type="text"
+                    placeholder="-"
+                    aria-label="Kategorie"
+                    matInput
+                    (ngModelChange)="changeKategorie($event)"
+                    [ngModel]="selectedKategorie"
                   >
-                    {{ option }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
+                    <mat-option
+                      *ngFor="let option of kategorien"
+                      [value]="option"
+                    >
+                      {{ option }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
 
-            <div class="col-3">
-              <mat-form-field appearance="fill">
-                <mat-label>Abteilung</mat-label>
-                <mat-select
-                  type="text"
-                  placeholder="-"
-                  aria-label="Abteilung"
-                  matInput
-                  (ngModelChange)="changeAbteilung($event)"
-                  [ngModel]="selectedAbteilung"
-                >
-                  <mat-option
-                    *ngFor="let option of abteilungen"
-                    [value]="option"
+              <div class="col-3">
+                <mat-form-field appearance="fill">
+                  <mat-label>Abteilung</mat-label>
+                  <mat-select
+                    type="text"
+                    placeholder="-"
+                    aria-label="Abteilung"
+                    matInput
+                    (ngModelChange)="changeAbteilung($event)"
+                    [ngModel]="selectedAbteilung"
                   >
-                    {{ option }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-            <div class="col-2">
-              <mat-form-field appearance="fill">
-                <mat-label>Anlage</mat-label>
-                <mat-select
-                  type="text"
-                  placeholder="-"
-                  aria-label="Anlage"
-                  matInput
-                  (ngModelChange)="changeAnlage($event)"
-                  [ngModel]="selectedAnlage"
+                    <mat-option
+                      *ngFor="let option of abteilungen"
+                      [value]="option"
+                    >
+                      {{ option }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-2">
+                <mat-form-field appearance="fill">
+                  <mat-label>Anlage</mat-label>
+                  <mat-select
+                    type="text"
+                    placeholder="-"
+                    aria-label="Anlage"
+                    matInput
+                    (ngModelChange)="changeAnlage($event)"
+                    [ngModel]="selectedAnlage"
+                  >
+                    <mat-option *ngFor="let option of anlagen" [value]="option">
+                      {{ option }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-sm-2">
+                <button
+                  mat-button
+                  color="primary"
+                  #tooltip="matTooltip"
+                  matTooltip="Lauflisten löschen"
+                  matTooltipPosition="below"
+                  matTooltipHideDelay="500"
+                  (click)="lauflistenLoeschen()"
+                  [disabled]="isButtonsDisabled"
                 >
-                  <mat-option *ngFor="let option of anlagen" [value]="option">
-                    {{ option }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-            <div class="col-sm-2">
-              <button
-                mat-button
-                color="primary"
-                #tooltip="matTooltip"
-                matTooltip="Lauflisten löschen"
-                matTooltipPosition="below"
-                matTooltipHideDelay="500"
-                (click)="lauflistenLoeschen()"
-                [disabled]="isButtonsDisabled"
-              >
-                Lauflisten löschen
-              </button>
-            </div>
-            <div class="col-sm-1 move-checkbox">
-              <mat-checkbox
-                *ngIf="hideOnlyTi"
-                [(ngModel)]="onlyTi"
-                [disabled]="isButtonsDisabled"
-                >nur Ti
-              </mat-checkbox>
-            </div>
-            <div class="col-sm-2">
-              <button
-                mat-button
-                color="primary"
-                #tooltip="matTooltip"
-                matTooltip="Lauflisten als PDF"
-                matTooltipPosition="below"
-                matTooltipHideDelay="500"
-                (click)="lauflistenPDF()"
-                [disabled]="isButtonsDisabled"
-              >
-                Lauflisten PDF
-              </button>
+                  Lauflisten löschen
+                </button>
+              </div>
+              <div class="col-sm-1 move-checkbox">
+                <mat-checkbox
+                  *ngIf="hideOnlyTi"
+                  [(ngModel)]="onlyTi"
+                  [disabled]="isButtonsDisabled"
+                  >nur Ti
+                </mat-checkbox>
+              </div>
+              <div class="col-sm-2">
+                <button
+                  mat-button
+                  color="primary"
+                  #tooltip="matTooltip"
+                  matTooltip="Lauflisten als PDF"
+                  matTooltipPosition="below"
+                  matTooltipHideDelay="500"
+                  (click)="lauflistenPDF()"
+                  [disabled]="isButtonsDisabled"
+                >
+                  Lauflisten PDF
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="row" *ngIf="message">
-        <div class="col" *ngIf="!hasError">
-          <em class="success">
-            {{ message }}
-          </em>
+        <div class="row" *ngIf="message">
+          <div class="col" *ngIf="!hasError">
+            <em class="success">
+              {{ message }}
+            </em>
+          </div>
+          <div class="col" *ngIf="hasError">
+            <em class="error">
+              {{ message }}
+            </em>
+          </div>
         </div>
-        <div class="col" *ngIf="hasError">
-          <em class="error">
-            {{ message }}
-          </em>
+      </div>
+    </mat-tab>
+    <mat-tab label="Einteilung">
+      <div class="row">
+        <div class="col-sm-3">
+          <h2>Einteilung</h2>
+        </div>
+        <div class="col-sm-9">
+          <button mat-button color="primary" (click)="refreshEinteilung()">
+            Refresh Einteilung
+          </button>
         </div>
       </div>
-    </div>
-  </mat-tab>
-  <mat-tab label="Einteilung">
-    <div class="row">
-      <div class="col-sm-3">
-        <h2>Einteilung</h2>
+      <div class="row">
+        <div class="col-sm-12">
+          <app-einteilung [anlass]="anlass" [refreshEmitter]="refreshEmitter">
+          </app-einteilung>
+        </div>
       </div>
-      <div class="col-sm-9">
-        <button mat-button color="primary" (click)="refreshEinteilung()">
-          Refresh Einteilung
-        </button>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-12">
-        <app-einteilung [anlass]="anlass" [refreshEmitter]="refreshEmitter">
-        </app-einteilung>
-      </div>
-    </div>
-  </mat-tab>
-</mat-tab-group>
-
-<ng-template #elseBlock>Zugriff verweigert</ng-template>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+<ng-template #elseBlock><h1>Zugriff verweigert</h1></ng-template>
 
 <ng-template #loading>Loading...</ng-template>

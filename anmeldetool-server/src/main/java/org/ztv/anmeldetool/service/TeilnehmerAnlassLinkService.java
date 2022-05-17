@@ -82,7 +82,7 @@ public class TeilnehmerAnlassLinkService {
 		return teilnahmen;
 	}
 
-	public List<AnlageEnum> findAbteilungenByKategorieAndAbteilung(Anlass anlass, KategorieEnum kategorie,
+	public List<AnlageEnum> findAnlagenByKategorieAndAbteilung(Anlass anlass, KategorieEnum kategorie,
 			AbteilungEnum abteilung) throws ServiceException {
 
 		UUID anlass_id = anlass.getId();
@@ -161,9 +161,15 @@ public class TeilnehmerAnlassLinkService {
 			throw new ServiceException(this.getClass(),
 					String.format("Could not find Anlass with id: %s", anlassId.toString()));
 		}
-
-		List<TeilnehmerAnlassLink> tals = this.teilnehmerAnlassLinkRepository.findByAnlass(anlass, kategorie, abteilung,
-				anlage, geraet);
+		List<TeilnehmerAnlassLink> tals = null;
+		if (AbteilungEnum.UNDEFINED.equals(abteilung)) {
+			tals = this.teilnehmerAnlassLinkRepository.findByAnlass(anlass, kategorie, null, null, null);
+			tals = tals.stream().filter(tal -> {
+				return tal.getAbteilung() == null;
+			}).collect(Collectors.toList());
+		} else {
+			tals = this.teilnehmerAnlassLinkRepository.findByAnlass(anlass, kategorie, abteilung, anlage, geraet);
+		}
 		return tals;
 	}
 

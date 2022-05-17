@@ -53,16 +53,16 @@ logging:
     org.hibernate.SQL: WARN
     org.hibernate.type: WARN
     org.ztv.anmeldetool: DEBUG
-    
+# Sec Min Hours Day_of_Month Month Day_of_week Year    
 scheduler:
    reminder:
-      cron: "0/10 1 * * * *"
+      cron: "0/10 1 * * 12 *"
       daysbefore: 3
    closed:
-      cron: "0/10 1 * * * *"
+      cron: "0/10 1 * * 12 *"
       daysafter: 1
    mutationen:
-      cron: "0/10 1 * * * *"
+      cron: "0/10 1 * * 12 *"
       daysbefore: 3
       
 management:

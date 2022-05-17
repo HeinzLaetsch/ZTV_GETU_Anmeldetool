@@ -33,6 +33,8 @@ export class EinteilungAnlageComponent implements OnInit {
   refreshEmitter: EventEmitter<string>;
   @Input()
   search: string;
+  @Input()
+  expanded: boolean;
 
   teilnahmeStatistic: ITeilnahmeStatistic;
 

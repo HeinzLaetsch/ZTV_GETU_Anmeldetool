@@ -30,12 +30,12 @@ import com.itextpdf.layout.renderer.DocumentRenderer;
 import com.itextpdf.layout.renderer.TableRenderer;
 
 public class TableHeaderEventHandler implements IEventHandler {
-	public static float[] headerWidths1 = { 3.0f, 19.9f, 4.2f, 19.5f, 4.15f, 3.0f, 4.15f, 3.0f, 4.15f, 3.0f, 4.15f,
-			4.15f, 4.15f, 3.0f, 4.5f, 3.0f, 2.0f };
+	public static float[] headerWidths1 = { 3.6f, 19.6f, 4.2f, 19.6f, 4.5f, 3.6f, 4.5f, 3.6f, 4.5f, 3.6f, 4.5f, 4.5f,
+			4.5f, 3.6f, 5.0f, 3.6f, 3.0f };
 	// 18 Rang, Name und Vorname, Jahrgang, Verein, Reck, Boden RING Sprung Barren
 	// Rang, Ausz
-	public static float[] headerWidths2 = { 3.0f, 18.9f, 4.2f, 19.35f, 4.15f, 3.0f, 4.15f, 3.0f, 4.15f, 3.0f, 4.15f,
-			4.15f, 4.15f, 3.0f, 4.15f, 3.0f, 4.5f, 3.0f, 2.0f };
+	public static float[] headerWidths2 = { 3.0f, 18.55f, 4.05f, 18.55f, 4.25f, 3.0f, 4.25f, 3.0f, 4.25f, 3.0f, 4.25f,
+			4.25f, 4.25f, 3.0f, 4.25f, 3.0f, 5.0f, 3.0f, 3.0f };
 
 	private Table table;
 	private float tableHeight;
@@ -89,8 +89,10 @@ public class TableHeaderEventHandler implements IEventHandler {
 		Text text = new Text(value).setFont(fontN).setFontSize(7);
 		if (centered) {
 			cell.add(new Paragraph(text).setTextAlignment(TextAlignment.CENTER).setMultipliedLeading(1.2f));
+			// cell.add(new Paragraph(text).setTextAlignment(TextAlignment.CENTER));
 		} else {
 			cell.add(new Paragraph(text).setMultipliedLeading(1.2f));
+			// cell.add(new Paragraph(text));
 		}
 		table.addCell(cell);
 	}
@@ -102,6 +104,7 @@ public class TableHeaderEventHandler implements IEventHandler {
 		cell = cell.setVerticalAlignment(VerticalAlignment.BOTTOM);
 		Text text = new Text(value).setFont(fontN).setFontSize(7);
 		cell.add(new Paragraph(text).setTextAlignment(TextAlignment.CENTER).setMultipliedLeading(1.2f));
+		// cell.add(new Paragraph(text).setTextAlignment(TextAlignment.CENTER));
 		table.addCell(cell);
 	}
 
@@ -112,6 +115,7 @@ public class TableHeaderEventHandler implements IEventHandler {
 		cell = cell.setVerticalAlignment(VerticalAlignment.BOTTOM);
 		Text text = new Text(value).setFont(fontN).setFontSize(7);
 		cell.add(new Paragraph(text).setTextAlignment(TextAlignment.CENTER).setMultipliedLeading(1.2f));
+		// cell.add(new Paragraph(text).setTextAlignment(TextAlignment.CENTER));
 		table.addCell(cell);
 	}
 
@@ -122,6 +126,7 @@ public class TableHeaderEventHandler implements IEventHandler {
 		cell = cell.setVerticalAlignment(VerticalAlignment.BOTTOM);
 		Text text = new Text(value).setFont(fontN).setFontSize(7);
 		cell.add(new Paragraph(text).setTextAlignment(TextAlignment.CENTER).setMultipliedLeading(1.2f));
+		// cell.add(new Paragraph(text).setTextAlignment(TextAlignment.CENTER));
 		table.addCell(cell);
 	}
 
@@ -152,19 +157,19 @@ public class TableHeaderEventHandler implements IEventHandler {
 
 	private void initTable(boolean turner, String kategorie) throws IOException {
 		PdfFont fontN = PdfFontFactory.createFont(StandardFonts.HELVETICA);
-
-		table = new Table(UnitValue.createPercentArray(headerWidths1)).useAllAvailableWidth();
+		UnitValue[] values = UnitValue.createPercentArray(headerWidths1);
+		table = new Table(values).useAllAvailableWidth();
 		if (turner) {
 			table = new Table(UnitValue.createPercentArray(headerWidths2)).useAllAvailableWidth();
 		}
 
-		printTitelCell(table, fontN, "Zürcher Kantonaler Frühlingswettkampf Turnerinnen in Rafz", kategorie, turner);
+		printTitelCell(table, fontN, "Zürcher Kantonaler Gerätewettkampf K1-K4 im Stammertal", kategorie, turner);
 
 		printCell(table, fontN, "", true);
 
 		printCell(table, fontN, "Name und Vorname", true);
 
-		printCell(table, fontN, "Jg", true);
+		printCell(table, fontN, "Jg", true, true);
 
 		printCell(table, fontN, "Verein", true);
 
@@ -190,6 +195,6 @@ public class TableHeaderEventHandler implements IEventHandler {
 		// 2. Zeile
 		printCell(table, fontN, "1", false, true);
 		printCell(table, fontN, "2", false, true);
-		printSprungNotenCell(table, fontN, "Zählbar");
+		printSprungNotenCell(table, fontN, "Note");
 	}
 }

@@ -63,7 +63,7 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <div class="col-md-7">
+    <div class="col-md-6">
       <mat-slider
         title="{{ label }}"
         min="0"
@@ -85,6 +85,19 @@
         tabindex="-1"
       >
         PDF generieren
+      </button>
+    </div>
+    <div class="col-sm-1">
+      <button
+        mat-button
+        type="button"
+        color="primary"
+        aria-label="Rangliste als CSV"
+        (click)="getRanglisteCsv()"
+        [disabled]="!filterOk"
+        tabindex="-1"
+      >
+        CSV generieren
       </button>
     </div>
     <div class="col-sm-1">

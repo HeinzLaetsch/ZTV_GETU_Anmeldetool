@@ -1,6 +1,9 @@
 package org.ztv.anmeldetool.output;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +20,7 @@ import com.itextpdf.kernel.events.IEventHandler;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -30,6 +34,14 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
+import com.opencsv.CSVWriter;
+import com.opencsv.bean.HeaderColumnNameMappingStrategy;
+import com.opencsv.bean.HeaderColumnNameMappingStrategyBuilder;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.bean.comparator.LiteralComparator;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 // https://github.com/itext/i7js-examples/tree/develop/src/main/java/com/itextpdf/samples/sandbox/events
 public class RanglistenOutput {
@@ -37,6 +49,7 @@ public class RanglistenOutput {
 	public static void createTeamwertung(HttpServletResponse response, List<TeamwertungDTO> twDTOs,
 			KategorieEnum kategorie) throws DocumentException, IOException {
 		PdfDocument pdf = new PdfDocument(new PdfWriter(response.getOutputStream()));
+		// Document doc = new Document(pdf, PageSize.A4);
 		Document doc = new Document(pdf);
 		PdfFont fontN = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 		PdfFont fontB = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
@@ -124,14 +137,14 @@ public class RanglistenOutput {
 	public static void createRangliste(HttpServletResponse response, List<RanglistenEntryDTO> ranglistenDTOs,
 			boolean turner, boolean sprungAverage, String kategorie) throws DocumentException, IOException {
 		PdfDocument pdf = new PdfDocument(new PdfWriter(response.getOutputStream()));
-		Document doc = new Document(pdf);
+		Document doc = new Document(pdf, PageSize.A4);
 		TableHeaderEventHandler thEventHandler = new TableHeaderEventHandler(doc, turner, kategorie);
 		pdf.addEventHandler(PdfDocumentEvent.END_PAGE, thEventHandler);
 		pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new TextFooterEventHandler(doc));
 
 		// Calculate top margin to be sure that the table will fit the margin.
 		float topMargin = 36 + thEventHandler.getTableHeight();
-		doc.setMargins(topMargin, 30, 36, 30);
+		doc.setMargins(topMargin, 30, 20, 30);
 
 		Table table = initTable(turner);
 		int rang = 0;
@@ -144,6 +157,30 @@ public class RanglistenOutput {
 		doc.add(table);
 
 		doc.close();
+	}
+
+	public static void csvWriteToWriter(HttpServletResponse response, List<RanglistenEntryDTO> ranglistenDTOs,
+			boolean turner, boolean sprungAverage, String kategorie)
+			throws CsvDataTypeMismatchException, CsvRequiredFieldEmptyException, IOException {
+
+		final byte[] bom = new byte[] { (byte) 239, (byte) 187, (byte) 191 };
+		OutputStream os = response.getOutputStream();
+		os.write(bom);
+		os.write(bom);
+
+		final PrintWriter responseWriter = new PrintWriter(new OutputStreamWriter(os, "UTF-8"));
+
+		HeaderColumnNameMappingStrategy<RanglistenEntryDTO> strategy = new HeaderColumnNameMappingStrategyBuilder<RanglistenEntryDTO>()
+				.build();
+		strategy.setType(RanglistenEntryDTO.class);
+		strategy.setColumnOrderOnWrite(new LiteralComparator(RanglistenEntryDTO.FIELDS_ORDER));
+
+		StatefulBeanToCsv<RanglistenEntryDTO> writer = new StatefulBeanToCsvBuilder<RanglistenEntryDTO>(responseWriter)
+				.withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(';').withMappingStrategy(strategy)
+				.withOrderedResults(true).build();
+		writer.write(ranglistenDTOs);
+		responseWriter.flush();
+		responseWriter.close();
 	}
 
 	private static Table initTable(boolean turner) {
@@ -226,7 +263,8 @@ public class RanglistenOutput {
 		cell.setBorderTop(new SolidBorder(ColorConstants.LIGHT_GRAY, 1.0f));
 		cell.setBorderBottom(new SolidBorder(ColorConstants.LIGHT_GRAY, 1.0f));
 		Text text = new Text(value).setFont(fontN).setFontSize(7);
-		cell.add(new Paragraph(text).setMultipliedLeading(1.25f));
+		cell.add(new Paragraph(text).setMultipliedLeading(1.0f));
+		// cell.add(new Paragraph(text));
 		if (leftAlign) {
 			cell = cell.setTextAlignment(TextAlignment.LEFT);
 		} else {
@@ -270,9 +308,7 @@ public class RanglistenOutput {
 					// Therefore null will be set and iText will use the default font - Helvetica
 					.setFont(font).setFontSize(5)
 					// .showTextAligned("this is a header", coordX, headerY, TextAlignment.CENTER)
-					.showTextAligned("GR Neftenbach, Getu Rorbas-Freienstein, TV Wil ZH", coordX, footerY,
-							TextAlignment.CENTER)
-					.close();
+					.showTextAligned("Jugend TV Stammertal", coordX, footerY, TextAlignment.CENTER).close();
 		}
 
 		public float getTableHeight() {

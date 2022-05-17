@@ -35,6 +35,8 @@ export class EinteilungAbteilungComponent implements OnInit {
   search: string;
   @Input()
   refreshEmitter: EventEmitter<string>;
+  @Input()
+  expanded: boolean;
 
   anlagen: AnlageEnum[];
 

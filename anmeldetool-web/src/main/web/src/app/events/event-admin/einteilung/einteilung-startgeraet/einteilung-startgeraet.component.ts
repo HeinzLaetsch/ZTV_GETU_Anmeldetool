@@ -38,6 +38,8 @@ export class EinteilungStartgeraetComponent implements OnInit {
   refreshEmitter: EventEmitter<string>;
   @Input()
   search: string;
+  @Input()
+  expanded: boolean;
 
   loaded$: Subject<boolean>;
 
@@ -110,17 +112,19 @@ export class EinteilungStartgeraetComponent implements OnInit {
       .subscribe((startende) => {
         this.startende = startende;
         this.startgeraeteControls_.slice(0, 0);
-        this.startende.forEach((start) => {
-          let control = new FormControl();
-          control.setValue(start.startgeraet);
-          this.startgeraeteControls_.push(control);
-          control = new FormControl();
-          control.setValue(start.anlage);
-          this.anlageControls_.push(control);
-          control = new FormControl();
-          control.setValue(start.abteilung);
-          this.abteilungenControls_.push(control);
-        });
+        if (this.startende) {
+          this.startende.forEach((start) => {
+            let control = new FormControl();
+            control.setValue(start.startgeraet);
+            this.startgeraeteControls_.push(control);
+            control = new FormControl();
+            control.setValue(start.anlage);
+            this.anlageControls_.push(control);
+            control = new FormControl();
+            control.setValue(start.abteilung);
+            this.abteilungenControls_.push(control);
+          });
+        }
         this.startsLoaded = true;
         if (this.statisticLoaded) {
           this.loaded$.next(true);

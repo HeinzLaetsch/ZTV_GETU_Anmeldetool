@@ -1,9 +1,13 @@
 <ng-container *ngIf="loaded$ | async as obs; else loading">
-  <mat-expansion-panel *ngIf="teilnahmeStatistic.totalStartende > 0">
+  <mat-expansion-panel
+    *ngIf="teilnahmeStatistic.totalStartende > 0"
+    [expanded]="expanded"
+  >
     <mat-expansion-panel-header>
       <mat-panel-title> {{ abteilung }} </mat-panel-title>
       <mat-panel-description>
-        Startende  <span class="zahl">{{ teilnahmeStatistic.totalStartende }}</span>
+        Startende
+        <span class="zahl">{{ teilnahmeStatistic.totalStartende }}</span>
       </mat-panel-description>
     </mat-expansion-panel-header>
     <ng-template matExpansionPanelContent>
@@ -15,6 +19,7 @@
         [anlage]="anlage"
         [refreshEmitter]="refreshEmitter"
         [search]="search"
+        [expanded]="anlagen?.length === 1"
       ></app-einteilung-anlage>
     </ng-template>
   </mat-expansion-panel>

@@ -204,4 +204,10 @@ export class EventAdminComponent implements OnInit {
   refreshEinteilung(): void {
     this.refreshEmitter.emit(undefined);
   }
+
+  toolSperrenClicked(event: any): void {
+    this.anlassService
+      .updateAnlass(this.anlass)
+      .subscribe((anlass) => (this.anlass = anlass));
+  }
 }

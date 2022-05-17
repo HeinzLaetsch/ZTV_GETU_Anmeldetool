@@ -368,6 +368,30 @@ public class AnlassController {
 		}
 	}
 
+	@GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}", produces = "text/csv;charset=UTF-8")
+	public void getRanglistenCsv(HttpServletRequest request, HttpServletResponse response, @PathVariable UUID anlassId,
+			@PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie,
+			@RequestParam(name = "maxAuszeichnungen") Optional<Integer> maxAuszeichungenOpt) {
+		try {
+			List<RanglistenEntryDTO> ranglistenDTOs = generateRangliste(anlassId, tiTu, kategorie, maxAuszeichungenOpt);
+
+			String reportName = "Rangliste_" + kategorie.name() + "_" + tiTu.name();
+
+			response.addHeader("Content-Disposition", "attachment; filename=" + reportName + ".csv");
+			response.addHeader("Content-Type", "text/csv");
+			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+
+			// Regel für Sprung Durchschnitt
+			boolean averageSprung = kategorie.equals(KategorieEnum.K6) || kategorie.equals(KategorieEnum.K7);
+			RanglistenOutput.csvWriteToWriter(response, ranglistenDTOs, tiTu == TiTuEnum.Ti ? false : true,
+					averageSprung, kategorie.name());
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Lauflisten: ", ex);
+		}
+	}
+
 	@DeleteMapping("/{anlassId}/lauflisten/{kategorie}/{abteilung}/{anlage}")
 	public ResponseEntity<?> deleteLauflisten(HttpServletRequest request, @PathVariable UUID anlassId,
 			@PathVariable KategorieEnum kategorie, @PathVariable AbteilungEnum abteilung,
@@ -425,8 +449,8 @@ public class AnlassController {
 			@PathVariable UUID anlassId, @PathVariable KategorieEnum kategorie, @PathVariable AbteilungEnum abteilung) {
 		try {
 			Anlass anlass = anlassService.findAnlassById(anlassId);
-			List<AnlageEnum> anlagen = teilnehmerAnlassLinkService.findAbteilungenByKategorieAndAbteilung(anlass,
-					kategorie, abteilung);
+			List<AnlageEnum> anlagen = teilnehmerAnlassLinkService.findAnlagenByKategorieAndAbteilung(anlass, kategorie,
+					abteilung);
 			return ResponseEntity.ok(anlagen);
 		} catch (Exception ex) {
 			log.error("Unable to query Anlagen: ", ex);

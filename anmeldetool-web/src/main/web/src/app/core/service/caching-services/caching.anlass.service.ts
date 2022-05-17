@@ -124,6 +124,9 @@ export class CachingAnlassService {
       user
     );
   }
+  updateAnlass(anlass: IAnlass): Observable<IAnlass> {
+    return this.anlassService.updateAnlass(anlass);
+  }
 
   getVereinStart(
     anlass: IAnlass,

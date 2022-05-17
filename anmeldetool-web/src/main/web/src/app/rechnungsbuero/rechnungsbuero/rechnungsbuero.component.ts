@@ -123,8 +123,18 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
       this.kategorie
     );
   }
+
   getRanglistePdf() {
     this.ranglistenService.getRanglistePdf(
+      this.anlass,
+      this.getFilter(),
+      this.kategorie,
+      this.maxAuszeichnungen
+    );
+  }
+
+  getRanglisteCsv() {
+    this.ranglistenService.getRanglisteCsv(
       this.anlass,
       this.getFilter(),
       this.kategorie,
