@@ -160,7 +160,7 @@ export class AuthService {
   }
 
   hasRole(roleName: string): boolean {
-    const rollen = this.currentUser.rollen.filter(
+    const rollen = this.currentUser?.rollen?.filter(
       (role) => role.name === roleName.toUpperCase()
     );
     // console.log('Rollen: ' , rollen, ' , Name: ', roleName);
@@ -201,13 +201,17 @@ export class AuthService {
   }
 
   isRechnungsbuero(): boolean {
-    if (this.isAdministrator()) {
-      return true;
-    }
     if (this.isAuthenticated()) return this.hasRole("RECHNUNGSBUERO");
     else return false;
   }
+  isSekretariat(): boolean {
+    if (this.isAuthenticated()) return this.hasRole("SEKRETARIAT");
+    else return false;
+  }
 
+  isAnlassUser(): boolean {
+    return this.isRechnungsbuero() || this.isSekretariat();
+  }
   private handleError<T>(operation = "operation", result?: T) {
     return (error: any): Observable<T> => {
       console.error(error);

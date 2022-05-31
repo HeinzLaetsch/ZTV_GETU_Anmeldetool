@@ -37,6 +37,8 @@ public class Anlass extends Base {
 	@ToString.Exclude
 	private Organisation organisator;
 
+	private String ranglistenFooter;
+
 	private String iban;
 
 	private String zuGunsten;

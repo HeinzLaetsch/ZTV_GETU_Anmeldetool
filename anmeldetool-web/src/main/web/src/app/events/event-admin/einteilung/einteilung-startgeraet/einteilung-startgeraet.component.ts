@@ -189,7 +189,7 @@ export class EinteilungStartgeraetComponent implements OnInit {
     return abteilungen;
   }
   compareWith(value1, value2) {
-    if (value1.toUpperCase() === value2.toUpperCase()) {
+    if (value1 && value2 && value1.toUpperCase() === value2.toUpperCase()) {
       return value1;
     } else {
       return "";
@@ -198,7 +198,11 @@ export class EinteilungStartgeraetComponent implements OnInit {
   abmelden(rowIndex: number): void {
     console.log("Abmelden von ", this.startende[rowIndex].name);
     this.startende[rowIndex].meldeStatus =
-      MeldeStatusEnum.ABGEMELDET.toString().toUpperCase();
+      MeldeStatusEnum.ABGEMELDET_3.toString().toUpperCase();
+    if (!this.anlass.aenderungenNichtMehrErlaubt) {
+      this.startende[rowIndex].meldeStatus =
+        MeldeStatusEnum.ABGEMELDET_1.toString().toUpperCase();
+    }
     this.anlassService
       .updateStartgeraet(this.anlass, this.startende[rowIndex])
       .subscribe(() => {});

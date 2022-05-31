@@ -19,10 +19,19 @@ export class EventRouteActivatorService {
     if (route.params.id) {
       eventExists = !!this.anlassService.getAnlassById(route.params.id);
     }
-    // console.log('canActivate ', eventExists);
-    const isAllowed =
-      this.authService.isAdministrator() ||
-      this.authService.isVereinsAnmmelder();
+    // Admin darf alles
+    let isAllowed = this.authService.isAdministrator();
+    if (route.data.roles?.length > 0) {
+      route.data.roles.forEach((element) => {
+        if (this.authService.hasRole(element)) {
+          isAllowed = true;
+        }
+      });
+    } else {
+      isAllowed =
+        this.authService.isAdministrator() ||
+        this.authService.isVereinsAnmmelder();
+    }
     if (!eventExists || !isAllowed) {
       this.router.navigate(["/page404"]);
     }

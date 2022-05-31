@@ -9,6 +9,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dom4j.DocumentException;
+import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.transfer.RanglistenEntryDTO;
 import org.ztv.anmeldetool.transfer.TeamwertungDTO;
@@ -134,16 +135,17 @@ public class RanglistenOutput {
 		return auszeichnung;
 	}
 
-	public static void createRangliste(HttpServletResponse response, List<RanglistenEntryDTO> ranglistenDTOs,
-			boolean turner, boolean sprungAverage, String kategorie) throws DocumentException, IOException {
+	public static void createRangliste(HttpServletResponse response, Anlass anlass,
+			List<RanglistenEntryDTO> ranglistenDTOs, boolean turner, boolean sprungAverage, String kategorie)
+			throws DocumentException, IOException {
 		PdfDocument pdf = new PdfDocument(new PdfWriter(response.getOutputStream()));
 		Document doc = new Document(pdf, PageSize.A4);
-		TableHeaderEventHandler thEventHandler = new TableHeaderEventHandler(doc, turner, kategorie);
+		TableHeaderEventHandler thEventHandler = new TableHeaderEventHandler(doc, anlass, turner, kategorie);
 		pdf.addEventHandler(PdfDocumentEvent.END_PAGE, thEventHandler);
-		pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new TextFooterEventHandler(doc));
+		pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new TextFooterEventHandler(doc, anlass));
 
 		// Calculate top margin to be sure that the table will fit the margin.
-		float topMargin = 36 + thEventHandler.getTableHeight();
+		float topMargin = 20 + thEventHandler.getTableHeight();
 		doc.setMargins(topMargin, 30, 20, 30);
 
 		Table table = initTable(turner);
@@ -214,7 +216,7 @@ public class RanglistenOutput {
 		printCell(table, String.format("%.2f", dto.getNoteSprung1()), false, even);
 		printCell(table, String.format("%.2f", dto.getNoteSprung2()), false, even);
 		if (sprungAverage) {
-			printCell(table, String.format("%.3f", dto.getNoteZaehlbar()), false, even);
+			printCell(table, String.format("%.2f", dto.getNoteZaehlbar()), false, even);
 		} else {
 			printCell(table, String.format("%.2f", dto.getNoteZaehlbar()), false, even);
 		}
@@ -224,7 +226,7 @@ public class RanglistenOutput {
 			printCell(table, String.format("%d", dto.getRangBarren()), false, even);
 		}
 		if (sprungAverage) {
-			printCell(table, String.format("%.3f", dto.getGesamtPunktzahl()), false, even);
+			printCell(table, String.format("%.2f", dto.getGesamtPunktzahl()), false, even);
 		} else {
 			printCell(table, String.format("%.2f", dto.getGesamtPunktzahl()), false, even);
 		}
@@ -280,9 +282,11 @@ public class RanglistenOutput {
 		private Table table;
 		private float tableHeight;
 		private Document doc;
+		private Anlass anlass;
 
-		public TextFooterEventHandler(Document doc) {
+		public TextFooterEventHandler(Document doc, Anlass anlass) {
 			this.doc = doc;
+			this.anlass = anlass;
 		}
 
 		@Override
@@ -300,7 +304,7 @@ public class RanglistenOutput {
 			float coordX = ((pageSize.getLeft() + doc.getLeftMargin()) + (pageSize.getRight() - doc.getRightMargin()))
 					/ 2;
 			float headerY = pageSize.getTop() - doc.getTopMargin() + 10;
-			float footerY = doc.getBottomMargin();
+			float footerY = doc.getBottomMargin() - 5;
 
 			Canvas canvas = new Canvas(docEvent.getPage(), pageSize);
 			canvas
@@ -308,7 +312,7 @@ public class RanglistenOutput {
 					// Therefore null will be set and iText will use the default font - Helvetica
 					.setFont(font).setFontSize(5)
 					// .showTextAligned("this is a header", coordX, headerY, TextAlignment.CENTER)
-					.showTextAligned("Jugend TV Stammertal", coordX, footerY, TextAlignment.CENTER).close();
+					.showTextAligned(anlass.getRanglistenFooter(), coordX, footerY, TextAlignment.CENTER).close();
 		}
 
 		public float getTableHeight() {

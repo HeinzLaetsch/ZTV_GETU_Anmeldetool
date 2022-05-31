@@ -149,7 +149,9 @@ public class LauflistenService {
 				if (tal.getAbteilung() != null && tal.getAnlage() != null && tal.getStartgeraet() != null
 						&& (abteilung.equals(AbteilungEnum.UNDEFINED) || tal.getAbteilung().equals(abteilung))
 						&& (anlage.equals(AnlageEnum.UNDEFINED) || tal.getAnlage().equals(anlage))
-						&& tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET
+						&& tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET_1
+						&& tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET_2
+						&& tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET_3
 						&& tal.getMeldeStatus() != MeldeStatusEnum.UMMELDUNG) {
 					tal = this.createNotenblatt(tal);
 					TiTuEnum titu = anlass.getTiTu();

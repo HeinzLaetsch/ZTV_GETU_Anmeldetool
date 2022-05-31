@@ -4,7 +4,9 @@ export interface ITeilnahmeStatistic {
   totalZurueckgezogen: number;
   startet: number;
   neumeldung: number;
-  abgemeldet: number;
+  abgemeldet_1: number;
+  abgemeldet_2: number;
+  abgemeldet_3: number;
   ummeldung: number;
   verletzt: number;
   nichtGestartet: number;

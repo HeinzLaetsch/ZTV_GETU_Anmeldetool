@@ -164,6 +164,12 @@ export class ErfassenRowComponent implements OnInit {
         if (eintrag) {
           this.eintrag = eintrag;
           this.entryChangedEvent.emit(this.eintrag);
+          if (this.eintrag.note_1 !== -1) {
+            this.note_1_Cntr.disable({ emitEvent: false });
+            if (this.sprung) {
+              this.note_2_Cntr.disable({ emitEvent: false });
+            }
+          }
         }
       });
   }

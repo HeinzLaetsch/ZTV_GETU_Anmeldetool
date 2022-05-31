@@ -359,7 +359,8 @@ public class AnlassController {
 			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
 			// Regel für Sprung Durchschnitt
 			boolean averageSprung = kategorie.equals(KategorieEnum.K6) || kategorie.equals(KategorieEnum.K7);
-			RanglistenOutput.createRangliste(response, ranglistenDTOs, tiTu == TiTuEnum.Ti ? false : true,
+			Anlass anlass = anlassService.findAnlassById(anlassId);
+			RanglistenOutput.createRangliste(response, anlass, ranglistenDTOs, tiTu == TiTuEnum.Ti ? false : true,
 					averageSprung, kategorie.name());
 
 		} catch (Exception ex) {

@@ -74,7 +74,7 @@ export class ErfassenComponent implements OnInit, OnDestroy {
   }
 
   searchLaufliste() {
-    // console.log("Suche: ", this.search);
+    console.log("Suche: ", this.search);
     this.ranglistenService
       .searchLauflisteByKey(this.anlass, this.search)
       .subscribe((laufliste) => {

@@ -9,7 +9,9 @@ public class TeilnahmeStatisticDTO {
 	int totalZurueckgezogen;
 	int startet;
 	int neumeldung;
-	int abgemeldet;
+	int abgemeldet_1;
+	int abgemeldet_2;
+	int abgemeldet_3;
 	int ummeldung;
 	int verletzt;
 	int nichtGestartet;
@@ -32,8 +34,20 @@ public class TeilnahmeStatisticDTO {
 		this.total++;
 	}
 
-	public void incAbgemeldet() {
-		this.abgemeldet++;
+	public void incAbgemeldet_1() {
+		this.abgemeldet_1++;
+		this.totalZurueckgezogen++;
+		this.total++;
+	}
+
+	public void incAbgemeldet_2() {
+		this.abgemeldet_2++;
+		this.totalZurueckgezogen++;
+		this.total++;
+	}
+
+	public void incAbgemeldet_3() {
+		this.abgemeldet_2++;
 		this.totalZurueckgezogen++;
 		this.total++;
 	}

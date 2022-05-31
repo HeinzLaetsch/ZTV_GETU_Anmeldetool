@@ -1,6 +1,9 @@
 package org.ztv.anmeldetool.output;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
+
+import org.ztv.anmeldetool.models.Anlass;
 
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.events.Event;
@@ -40,9 +43,11 @@ public class TableHeaderEventHandler implements IEventHandler {
 	private Table table;
 	private float tableHeight;
 	private Document doc;
+	private Anlass anlass;
 
-	public TableHeaderEventHandler(Document doc, boolean turner, String kategorie) throws IOException {
+	public TableHeaderEventHandler(Document doc, Anlass anlass, boolean turner, String kategorie) throws IOException {
 		this.doc = doc;
+		this.anlass = anlass;
 		initTable(turner, kategorie);
 
 		TableRenderer renderer = (TableRenderer) table.createRendererSubTree();
@@ -130,28 +135,50 @@ public class TableHeaderEventHandler implements IEventHandler {
 		table.addCell(cell);
 	}
 
-	private static void printTitelCell(Table table, PdfFont fontN, String value, String kategorie, boolean turner)
+	private static void printTitelCell(Table table, PdfFont fontN, Anlass anlass, String kategorie, boolean turner)
 			throws IOException {
-		Cell cell = new Cell();
+		Cell cell = null;
 		if (turner) {
-			cell = new Cell(1, 17);
+			cell = new Cell(2, 15);
 		} else {
-			cell = new Cell(1, 15);
+			cell = new Cell(2, 13);
 		}
 		// cell = cell.setHeight(18);
-		cell = cell.setVerticalAlignment(VerticalAlignment.TOP);
+		cell = cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
 		cell.setBorder(Border.NO_BORDER);
-		Text text = new Text(value).setFont(fontN).setFontSize(14);
-		cell.add(new Paragraph(text).setTextAlignment(TextAlignment.CENTER).setMultipliedLeading(1.2f));
+		Text text = new Text(anlass.getAnlassBezeichnung()).setFont(fontN).setFontSize(13);
+		Text textOrt = new Text(" in " + anlass.getOrt()).setFont(fontN).setFontSize(13);
+		DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
+		String start = anlass.getStartDate().format(formatters);
+		String end = anlass.getEndDate().format(formatters);
+		Text textDate = null;
+		if (anlass.getStartDate().equals(anlass.getEndDate())) {
+			textDate = new Text(" , " + start).setFont(fontN).setFontSize(13);
+		} else {
+			textDate = new Text(" , " + start + " bis " + end).setFont(fontN).setFontSize(13);
+		}
+		cell.add(new Paragraph(text).add(textOrt).add(textDate).setTextAlignment(TextAlignment.CENTER)
+				.setMultipliedLeading(1.2f));
 		table.addCell(cell);
 
-		cell = new Cell(1, 2);
+		cell = new Cell(1, 4);
 		// cell = cell.setHeight(18);
 		cell = cell.setVerticalAlignment(VerticalAlignment.TOP);
 		cell.setBorder(Border.NO_BORDER);
 		text = new Text(kategorie).setFont(fontN).setFontSize(14);
-		cell.add(new Paragraph(text).setTextAlignment(TextAlignment.RIGHT).setMultipliedLeading(1.2f));
+		cell.add(new Paragraph(text).setTextAlignment(TextAlignment.RIGHT).setMultipliedLeading(0.0f));
+		table.addCell(cell);
 
+		cell = new Cell(1, 4);
+		cell = cell.setVerticalAlignment(VerticalAlignment.BOTTOM);
+		cell.setBorder(Border.NO_BORDER);
+		if (turner) {
+			text = new Text("Turner").setFont(fontN).setFontSize(10);
+		} else {
+			text = new Text("Turnerinnen").setFont(fontN).setFontSize(10);
+		}
+		cell.add(new Paragraph(text).setTextAlignment(TextAlignment.RIGHT).setMultipliedLeading(0.5f));
 		table.addCell(cell);
 	}
 
@@ -163,7 +190,7 @@ public class TableHeaderEventHandler implements IEventHandler {
 			table = new Table(UnitValue.createPercentArray(headerWidths2)).useAllAvailableWidth();
 		}
 
-		printTitelCell(table, fontN, "Zürcher Kantonaler Gerätewettkampf K1-K4 im Stammertal", kategorie, turner);
+		printTitelCell(table, fontN, anlass, kategorie, turner);
 
 		printCell(table, fontN, "", true);
 
@@ -195,6 +222,6 @@ public class TableHeaderEventHandler implements IEventHandler {
 		// 2. Zeile
 		printCell(table, fontN, "1", false, true);
 		printCell(table, fontN, "2", false, true);
-		printSprungNotenCell(table, fontN, "Note");
+		printSprungNotenCell(table, fontN, "Endnote");
 	}
 }

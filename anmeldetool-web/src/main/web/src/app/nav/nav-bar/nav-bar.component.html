@@ -1,7 +1,7 @@
 <!-- https://getbootstrap.com/docs/4.0/components/navbar/ -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="collapse navbar-collapse show" id="navbarCollapse">
-    <ul class="nav navbar-nav">
+    <ul class="nav navbar-nav" *ngIf="!authService.isAnlassUser()">
       <li class="nav-item active">
         <a
           [routerLink]="['/anlass']"
@@ -14,7 +14,10 @@
     </ul>
     <div class="navbar-header navbar-right">
       <ul class="nav navbar-nav">
-        <li class="nav-item dropdown" *ngIf="authService.isAdministrator()">
+        <li
+          class="nav-item dropdown"
+          *ngIf="authService.isAdministrator() || authService.isSekretariat()"
+        >
           <a
             class="nav-link dropdown-toggle"
             href="#"
@@ -39,7 +42,7 @@
           <!--a *ngIf="!authService.isAuthenticated()" [routerLink]="['user/login']">Login</a-->
           <a
             *ngIf="
-              authService.isAuthenticated() ||
+              (authService.isAuthenticated() && !authService.isAnlassUser()) ||
               (authService.isAdministrator() && authService.currentVerein)
             "
             [routerLink]="['teilnehmer']"
@@ -49,7 +52,10 @@
         </li>
         <li
           class="nav-item dropdown"
-          *ngIf="authService.isRechnungsbuero() && authService.currentVerein"
+          *ngIf="
+            (authService.isAdministrator() || authService.isRechnungsbuero()) &&
+            authService.currentVerein
+          "
         >
           <a
             class="nav-link dropdown-toggle"
@@ -83,6 +89,7 @@
           <a
             *ngIf="
               authService.isAuthenticated() ||
+              authService.isRechnungsbuero() ||
               (authService.isAdministrator() && authService.currentVerein)
             "
             [routerLink]="['user/user']"

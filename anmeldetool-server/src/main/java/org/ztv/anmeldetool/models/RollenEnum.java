@@ -3,8 +3,7 @@ package org.ztv.anmeldetool.models;
 public enum RollenEnum {
 	BENUTZER("Basis Rolle", false, true), ADMINISTRATOR("Administrator", false),
 	VEREINSVERANTWORTLICHER("Kann den Verein verwalten"), ANMELDER("Darf Wettkämpfe anmelden"),
-	WERTUNGSRICHTER("Wertungsrichter"), RECHNUNGSBUERO("Rechnungsbüro", false),;
-	// , SEKRETARIAT("Sekretariat")
+	WERTUNGSRICHTER("Wertungsrichter"), RECHNUNGSBUERO("Rechnungsbüro", false), SEKRETARIAT("Sekretariat", false);
 
 	private boolean publicAssignable;
 

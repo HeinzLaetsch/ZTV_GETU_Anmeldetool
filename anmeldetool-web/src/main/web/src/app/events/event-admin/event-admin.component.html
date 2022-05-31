@@ -1,4 +1,4 @@
-<div *ngIf="administrator; else elseBlock">
+<div *ngIf="administrator || sekretariat; else elseBlock">
   <div class="container-lg">
     <div class="row">
       <div class="col-7">
@@ -16,7 +16,7 @@
       </div>
     </div>
   </div>
-  <mat-tab-group *ngIf="administrator" mat-align-tabs="start">
+  <mat-tab-group *ngIf="administrator  || sekretariat" mat-align-tabs="start">
     <mat-tab label="Exports/Imports">
       <div class="container-lg">
         <div class="row" *ngIf="loaded$ | async as obs; else loading">
@@ -36,7 +36,9 @@
           </div>
           <div class="col-1">Abgemeldet</div>
           <div class="col-1">
-            {{ teilnahmeStatistic.abgemeldet }}
+            {{ teilnahmeStatistic.abgemeldet_1 }} /
+            {{ teilnahmeStatistic.abgemeldet_2 }} /
+            {{ teilnahmeStatistic.abgemeldet_3 }}
           </div>
           <div class="col-1">Verletzt</div>
           <div class="col-1">

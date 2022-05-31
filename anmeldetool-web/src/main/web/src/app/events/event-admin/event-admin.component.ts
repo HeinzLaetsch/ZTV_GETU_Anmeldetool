@@ -81,6 +81,10 @@ export class EventAdminComponent implements OnInit {
     return this.authService.isAdministrator();
   }
 
+  get sekretariat(): boolean {
+    return this.authService.isSekretariat();
+  }
+
   exportMutationen(): void {
     this.anlassService.getMutationenForAnlassCsv(this.anlass);
   }

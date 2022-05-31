@@ -55,9 +55,9 @@ public class TeilnehmerAnlassLinkService {
 
 	public List<TeilnehmerAnlassLink> findAnlassTeilnahmenByKategorie(Anlass anlass, KategorieEnum kategorie)
 			throws ServiceException {
-
-		List<MeldeStatusEnum> exclusion = Arrays
-				.asList(new MeldeStatusEnum[] { MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG });
+		// TODO check if Verein startet
+		List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] { MeldeStatusEnum.ABGEMELDET_1,
+				MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.UMMELDUNG });
 		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndAktivAndKategorie(anlass,
 				true, exclusion, kategorie);
 		return teilnahmen;
@@ -65,8 +65,9 @@ public class TeilnehmerAnlassLinkService {
 
 	public List<TeilnehmerAnlassLink> findWettkampfTeilnahmenByKategorieAndTiTuOrderByOrganisation(Anlass anlass,
 			KategorieEnum kategorie, TiTuEnum tiTu) throws ServiceException {
-		List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] { MeldeStatusEnum.NICHTGESTARTET,
-				MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG });
+		List<MeldeStatusEnum> exclusion = Arrays
+				.asList(new MeldeStatusEnum[] { MeldeStatusEnum.NICHTGESTARTET, MeldeStatusEnum.ABGEMELDET_1,
+						MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.UMMELDUNG });
 		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository
 				.findByAnlassAndAktivAndKategorieAndTiTuOrderByOrganisation(anlass, true, exclusion, kategorie, tiTu);
 		return teilnahmen;
@@ -75,8 +76,9 @@ public class TeilnehmerAnlassLinkService {
 	public List<TeilnehmerAnlassLink> findWettkampfTeilnahmenByKategorieAndTiTu(Anlass anlass, KategorieEnum kategorie,
 			TiTuEnum tiTu) throws ServiceException {
 
-		List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] { MeldeStatusEnum.NICHTGESTARTET,
-				MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG });
+		List<MeldeStatusEnum> exclusion = Arrays
+				.asList(new MeldeStatusEnum[] { MeldeStatusEnum.NICHTGESTARTET, MeldeStatusEnum.ABGEMELDET_1,
+						MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.UMMELDUNG });
 		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndKategorieAndTiTu(anlass,
 				exclusion, kategorie, tiTu);
 		return teilnahmen;
@@ -109,8 +111,8 @@ public class TeilnehmerAnlassLinkService {
 	}
 
 	public List<TeilnehmerAnlassLink> findAnlassTeilnahmen(UUID anlassId) throws ServiceException {
-		List<MeldeStatusEnum> exclusion = Arrays
-				.asList(new MeldeStatusEnum[] { MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG });
+		List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] { MeldeStatusEnum.ABGEMELDET_1,
+				MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.UMMELDUNG });
 
 		return findAnlassTeilnahmen(anlassId, exclusion, true);
 	}
@@ -220,8 +222,14 @@ public class TeilnehmerAnlassLinkService {
 				case NEUMELDUNG:
 					teilnahmeStatstic.incNeumeldung();
 					break;
-				case ABGEMELDET:
-					teilnahmeStatstic.incAbgemeldet();
+				case ABGEMELDET_1:
+					teilnahmeStatstic.incAbgemeldet_1();
+					break;
+				case ABGEMELDET_2:
+					teilnahmeStatstic.incAbgemeldet_2();
+					break;
+				case ABGEMELDET_3:
+					teilnahmeStatstic.incAbgemeldet_3();
 					break;
 				case UMMELDUNG:
 					teilnahmeStatstic.incUmmeldung();
