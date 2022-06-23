@@ -11,6 +11,8 @@ import { TiTuEnum } from "../../model/TiTuEnum";
 import { TeilnehmerService } from "../teilnehmer/teilnehmer.service";
 import { CachingAnlassService } from "./caching.anlass.service";
 
+import { Platform } from "@angular/cdk/platform";
+
 @Injectable({
   providedIn: "root",
 })
@@ -37,13 +39,14 @@ export class CachingTeilnehmerService {
 
   constructor(
     private teilnehmerService: TeilnehmerService,
-    private anlassService: CachingAnlassService
+    private anlassService: CachingAnlassService,
+    private platform: Platform
   ) {
     this.teilnehmerLoaded = new BehaviorSubject<number>(undefined);
     // this.teilnehmerLoaded = new Subject<number>();
   }
-  reset(verein: IVerein): Observable<boolean[]> {
-    this.loaded = false;
+  reset(verein: IVerein, loaded: boolean): Observable<boolean[]> {
+    this.loaded = loaded;
     this.dirty = false;
     this.valid = true;
     const observables = new Array<Observable<boolean>>();
@@ -55,6 +58,12 @@ export class CachingTeilnehmerService {
     if (observables.length === 0) {
       return of([true]);
     } else {
+      console.log("Size: " + this.teilnehmer.length);
+      this.teilnehmer = this.teilnehmer.filter((teilnehmer) => {
+        console.log("Flag: " + !teilnehmer.onlyCreated);
+        return !teilnehmer.onlyCreated;
+      });
+      console.log("Size: " + this.teilnehmer.length);
       return forkJoin(observables);
     }
     // return this.loadTeilnehmer(verein);
@@ -178,7 +187,11 @@ export class CachingTeilnehmerService {
       this.oldSort = sort;
       this.sortedTeilnehmer = tituFiltered.sort((a, b) => {
         if (a.onlyCreated) {
-          return 1;
+          if (this.platform.FIREFOX) {
+            return 1;
+          } else {
+            return -1;
+          }
         }
         const isEqual = this.compare(
           kategories.indexOf(a.letzteKategorie),

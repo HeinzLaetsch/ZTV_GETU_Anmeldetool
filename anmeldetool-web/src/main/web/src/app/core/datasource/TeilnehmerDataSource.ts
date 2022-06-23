@@ -291,7 +291,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
 
   reset(verein: IVerein): Observable<any> {
     // console.log("Reset");
-    return this.teilnehmerService.reset(verein);
+    return this.teilnehmerService.reset(verein, true);
   }
 
   add(verein: IVerein, titu: TiTuEnum): Observable<ITeilnehmer> {

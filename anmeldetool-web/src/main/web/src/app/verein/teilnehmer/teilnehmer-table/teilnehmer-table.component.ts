@@ -201,9 +201,10 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     this.dataSource
       .reset(this.authService.currentVerein)
       .subscribe((results) => {
-        this.initAll();
+        // this.paginator.firstPage();
+        // this.initAll();
+        this.applyFilter(undefined);
       });
-    this.paginator.lastPage();
   }
 
   get isTeilnahmenLoaded(): Observable<boolean> {
@@ -285,7 +286,8 @@ export class TeilnehmerTableComponent implements AfterViewInit {
           console.log("Teilnehmer added: ", teilnehmer);
           this.paginator.length =
             this.teilnehmerService.getTiTuTeilnehmer(titu).length;
-          this.paginator.lastPage();
+          // this.paginator.lastPage();
+          this.paginator.firstPage();
           this.loadTeilnehmerPage();
         });
     }

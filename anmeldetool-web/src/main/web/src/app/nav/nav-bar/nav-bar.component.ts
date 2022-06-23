@@ -39,7 +39,7 @@ export class NavBarComponent implements OnInit {
     this.authService.selectVerein(verein);
     this.userService.reset();
     this.anlassService.reset();
-    this.teilnehmerService.reset(oldSelectedVerein);
+    this.teilnehmerService.reset(oldSelectedVerein, false);
     this.teilnehmerService.loadTeilnehmer(verein);
     this.router.navigate(["/"]);
   }
