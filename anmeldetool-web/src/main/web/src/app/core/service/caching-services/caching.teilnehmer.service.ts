@@ -58,12 +58,9 @@ export class CachingTeilnehmerService {
     if (observables.length === 0) {
       return of([true]);
     } else {
-      console.log("Size: " + this.teilnehmer.length);
       this.teilnehmer = this.teilnehmer.filter((teilnehmer) => {
-        console.log("Flag: " + !teilnehmer.onlyCreated);
         return !teilnehmer.onlyCreated;
       });
-      console.log("Size: " + this.teilnehmer.length);
       return forkJoin(observables);
     }
     // return this.loadTeilnehmer(verein);

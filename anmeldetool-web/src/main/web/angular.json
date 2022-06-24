@@ -163,6 +163,30 @@
           }
         },
         "e2e": {
+          "builder": "@cypress/schematic:cypress",
+          "options": {
+            "devServerTarget": "at-app:serve",
+            "watch": true,
+            "headless": false
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "at-app:serve:development"
+            }
+          }
+        },
+       "cypress-run": {
+          "builder": "@cypress/schematic:cypress",
+          "options": {
+            "devServerTarget": "at-app:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "at-app:serve:development"
+            }
+          }
+        },
+        "e2eProtractor": {
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
@@ -170,7 +194,7 @@
           },
           "configurations": {
             "production": {
-              "devServerTarget": "at-app:serve:production"
+              "devServerTarget": "at-app:serve:development"
             }
           }
         }

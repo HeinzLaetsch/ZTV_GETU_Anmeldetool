@@ -36,7 +36,6 @@ export class TeilnehmerComponent implements OnInit {
   teilnehmerTableTu: TeilnehmerTableComponent;
 
   constructor(
-    private formBuilder: FormBuilder,
     private authService: AuthService,
     private userService: CachingUserService,
     private teilnehmerService: CachingTeilnehmerService,
@@ -52,7 +51,7 @@ export class TeilnehmerComponent implements OnInit {
     this.teilnehmerService
       .loadTeilnehmer(this.authService.currentVerein)
       .subscribe((result) => {
-        console.log("TeilnehmerComponent::ngOnInit 1: ", result);
+        // console.log("TeilnehmerComponent::ngOnInit 1: ", result);
       });
   }
   @HostListener("window:beforeunload", ["$event"])
@@ -81,7 +80,7 @@ export class TeilnehmerComponent implements OnInit {
     // console.log('TeilnehmerComponent::isTeilnehmerLoaded')
     return this.teilnehmerService.isTeilnehmerLoaded().pipe(
       tap((evt) => {
-        console.info("Evt: ", evt);
+        // console.info("Evt: ", evt);
       })
     );
   }
