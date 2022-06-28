@@ -272,7 +272,7 @@ public class TeilnehmerAnlassLinkService {
 		int counter = 0;
 		for (TeilnehmerAnlassLinkCsvDTO talDto : talsDto) {
 			for (TeilnehmerAnlassLink tal : tals) {
-				if (tal.getStartnummer().compareTo(talDto.getStartnummer()) == 0
+				if (tal.getStartnummer() != null && (tal.getStartnummer().compareTo(talDto.getStartnummer()) == 0)
 						&& talDto.getTeilnehmerId().equals(tal.getTeilnehmer().getId())) {
 					tal.setAbteilung(talDto.getAbteilung());
 					tal.setAnlage(talDto.getAnlage());

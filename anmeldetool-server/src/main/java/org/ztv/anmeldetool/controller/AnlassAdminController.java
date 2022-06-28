@@ -682,6 +682,9 @@ public class AnlassAdminController {
 		if (pal.getEinsaetze() == null || pal.getEinsaetze().isEmpty()) {
 			if (pal.getAnlass().getWertungsrichterSlots() != null) {
 				List<WertungsrichterSlot> slots = pal.getAnlass().getWertungsrichterSlots().stream().filter(slot -> {
+					if (pal.getAnlass().getHoechsteKategorie().isJugend()) {
+						return true;
+					}
 					return pal.getPerson().getWertungsrichter().getBrevet() == slot.getBrevet();
 				}).collect(Collectors.toList());
 

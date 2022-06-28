@@ -39,7 +39,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
   teilnahmenBrevet2: IAnlassLink[];
   statusBr1: WertungsrichterStatusEnum;
   statusBr2: WertungsrichterStatusEnum;
-  useBrevet2: boolean;
+  useBrevet2: boolean = false;
 
   constructor(
     public authService: AuthService,

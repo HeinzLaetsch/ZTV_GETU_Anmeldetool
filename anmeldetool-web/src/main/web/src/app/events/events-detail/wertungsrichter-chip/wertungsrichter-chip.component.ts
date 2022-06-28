@@ -32,6 +32,8 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
   wertungsrichterUser: IUser;
   @Input()
   anlass: IAnlass;
+  @Input()
+  useBrevet2: boolean;
   @Output()
   wertungsrichterUserChange = new EventEmitter<IUser>();
 
@@ -78,9 +80,13 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
       });
   }
   getSlotsForBrevet(): IWertungsrichterSlot[] {
-    const slots = this.anlass.wertungsrichterSlots.filter(
-      (slot) => slot.brevet === this.wertungsrichter.brevet
-    );
+    const slots = this.anlass.wertungsrichterSlots.filter((slot) => {
+      if (this.useBrevet2) {
+        return slot.brevet === 1;
+      } else {
+        return slot.brevet === this.wertungsrichter.brevet;
+      }
+    });
     return slots;
   }
 

@@ -55,7 +55,7 @@ fi;
 #### START THE BACKUPS ####
 ###########################
 
-
+## "`date +\%Y-\%m-\%d_\%H_\%M`/"
 FINAL_BACKUP_DIR=$BACKUP_DIR"`date +\%Y-\%m-\%d`/"
 
 echo "Making backup directory in $FINAL_BACKUP_DIR"

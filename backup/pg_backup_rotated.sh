@@ -60,7 +60,8 @@ fi;
 function perform_backups()
 {
 	SUFFIX=$1
-	FINAL_BACKUP_DIR=$BACKUP_DIR"`date +\%Y-\%m-\%d`$SUFFIX/"
+	## _\%H_\&M
+	FINAL_BACKUP_DIR=$BACKUP_DIR"`date +\%Y-\%m-\%d_\%H_\&M`$SUFFIX/"
 
 	echo "Making backup directory in $FINAL_BACKUP_DIR"
 

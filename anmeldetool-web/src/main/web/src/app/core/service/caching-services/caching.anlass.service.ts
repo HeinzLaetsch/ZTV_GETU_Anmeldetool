@@ -357,7 +357,9 @@ export class CachingAnlassService {
       return sameKat && isUmmeldung;
     }).length;
     const neuMeldungen = anlassLinks.anlassLinks.filter((link) => {
-      return link.meldeStatus === MeldeStatusEnum.NEUMELDUNG;
+      const sameKat = link.kategorie === kategorie;
+      const isNeumeldung = link.meldeStatus === MeldeStatusEnum.NEUMELDUNG;
+      return sameKat && isNeumeldung;
     }).length;
     return anzahlUmmeldungen > neuMeldungen;
   }
