@@ -9,6 +9,8 @@ import { TeilnehmerRoutes } from "./teilnehmer.routes";
 import { TeilnehmerTableComponent } from "./teilnehmer/teilnehmer-table/teilnehmer-table.component";
 import { HasChangesComponent } from "./teilnehmer/guards/has-changes.component";
 import { DeleteUser } from "./teilnehmer/teilnehmer-table/delete-dialog/delete-user.component";
+import { TeilnehmerGridComponent } from "./teilnehmer/teilnehmer-grid/teilnehmer-grid";
+import { AgGridModule } from "ag-grid-angular";
 
 @NgModule({
   declarations: [
@@ -16,12 +18,14 @@ import { DeleteUser } from "./teilnehmer/teilnehmer-table/delete-dialog/delete-u
     TeilnehmerTableComponent,
     HasChangesComponent,
     DeleteUser,
+    TeilnehmerGridComponent,
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
+    AgGridModule.withComponents([]),
     SharedComponentsModule,
     RouterModule.forChild(TeilnehmerRoutes),
   ],

@@ -1,0 +1,15 @@
+<!-- Button to clear selection -->
+<button (click)="clearSelection()">Clear Selection</button>
+<!-- AG Grid Angular Component -->
+<ag-grid-angular
+  style="width: 100%; height: 80%"
+  class="ag-theme-alpine"
+  [columnDefs]="columnDefs"
+  [defaultColDef]="defaultColDef"
+  [rowData]="rowData$ | async"
+  [rowSelection]="'multiple'"
+  [animateRows]="true"
+  (gridReady)="onGridReady($event)"
+  (cellClicked)="onCellClicked($event)"
+></ag-grid-angular>
+<h3>End Grid</h3>

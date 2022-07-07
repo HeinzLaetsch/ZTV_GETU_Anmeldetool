@@ -44,7 +44,7 @@ import { CachingAnlassService } from "./core/service/caching-services/caching.an
 import { EinteilungAbteilungComponent } from "./events/event-admin/einteilung/einteilung-abteilung/einteilung-abteilung.component";
 import { EinteilungAnlageComponent } from "./events/event-admin/einteilung/einteilung-anlage/einteilung-anlage.component";
 import { EinteilungStartgeraetComponent } from "./events/event-admin/einteilung/einteilung-startgeraet/einteilung-startgeraet.component";
-import { AgGridModule } from "@ag-grid-community/angular";
+
 registerLocaleData(localeDeCH, "de-ch");
 registerLocaleData(localeDe, "de");
 
@@ -107,7 +107,6 @@ export function initVereinservice(
     MaterialModule,
     ServiceModule,
     SharedComponentsModule,
-    AgGridModule,
     ToastrModule.forRoot({
       timeOut: 10000,
       positionClass: "toast-center-center",

@@ -24,7 +24,7 @@ export class TeilnehmerService {
   getTeilnehmer(
     verein: IVerein,
     pageIndex = 0,
-    pageSize = 3
+    pageSize = 150
   ): Observable<ITeilnehmer[]> {
     // console.log("getTeilnehmer called");
     this.updateCount(verein);
