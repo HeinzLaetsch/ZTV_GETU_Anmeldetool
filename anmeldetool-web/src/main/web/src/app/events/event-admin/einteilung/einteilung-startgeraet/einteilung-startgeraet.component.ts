@@ -5,7 +5,7 @@ import {
   OnInit,
   ViewEncapsulation,
 } from "@angular/core";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import { Subject } from "rxjs";
 import { AbteilungEnum } from "src/app/core/model/AbteilungEnum";
 import { AnlageEnum } from "src/app/core/model/AnlageEnum";
@@ -61,9 +61,9 @@ export class EinteilungStartgeraetComponent implements OnInit {
     "abmelden",
   ];
 
-  startgeraeteControls_ = new Array<FormControl>();
-  anlageControls_ = new Array<FormControl>();
-  abteilungenControls_ = new Array<FormControl>();
+  startgeraeteControls_ = new Array<UntypedFormControl>();
+  anlageControls_ = new Array<UntypedFormControl>();
+  abteilungenControls_ = new Array<UntypedFormControl>();
 
   constructor(private anlassService: CachingAnlassService) {
     this.loaded$ = new Subject();
@@ -114,13 +114,13 @@ export class EinteilungStartgeraetComponent implements OnInit {
         this.startgeraeteControls_.slice(0, 0);
         if (this.startende) {
           this.startende.forEach((start) => {
-            let control = new FormControl();
+            let control = new UntypedFormControl();
             control.setValue(start.startgeraet);
             this.startgeraeteControls_.push(control);
-            control = new FormControl();
+            control = new UntypedFormControl();
             control.setValue(start.anlage);
             this.anlageControls_.push(control);
-            control = new FormControl();
+            control = new UntypedFormControl();
             control.setValue(start.abteilung);
             this.abteilungenControls_.push(control);
           });
@@ -132,7 +132,7 @@ export class EinteilungStartgeraetComponent implements OnInit {
       });
   }
 
-  get startgeraeteControls(): FormControl[] {
+  get startgeraeteControls(): UntypedFormControl[] {
     return this.startgeraeteControls_;
   }
   change(rowIndex: any, colIndex: any) {
@@ -166,10 +166,10 @@ export class EinteilungStartgeraetComponent implements OnInit {
     const startgeraete = this.anlass.getStartgeraete();
     return startgeraete;
   }
-  get anlageControls(): FormControl[] {
+  get anlageControls(): UntypedFormControl[] {
     return this.anlageControls_;
   }
-  get abteilungenControls(): FormControl[] {
+  get abteilungenControls(): UntypedFormControl[] {
     return this.abteilungenControls_;
   }
   get alleAnlagen(): AnlageEnum[] {

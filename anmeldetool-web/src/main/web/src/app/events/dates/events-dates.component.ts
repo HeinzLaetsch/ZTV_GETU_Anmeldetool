@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { FormControl, FormGroup } from "@angular/forms";
+import { UntypedFormControl, UntypedFormGroup } from "@angular/forms";
 import { MatDatepickerInputEvent } from "@angular/material/datepicker";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
@@ -16,12 +16,12 @@ export class EventsDatesComponent implements OnInit {
   @Output()
   verlaengertChange: EventEmitter<Date>;
 
-  verlaengerungGroup: FormGroup;
-  verlaengerungControl: FormControl;
+  verlaengerungGroup: UntypedFormGroup;
+  verlaengerungControl: UntypedFormControl;
 
   constructor() {
     // this.verlaengerungGroup = new FormGroup({
-    this.verlaengerungControl = new FormControl();
+    this.verlaengerungControl = new UntypedFormControl();
     // });
     this.verlaengertChange = new EventEmitter<Date>();
   }

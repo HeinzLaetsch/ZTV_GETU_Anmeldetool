@@ -13,8 +13,8 @@ import {
 import {
   AbstractControl,
   ControlValueAccessor,
-  FormBuilder,
-  FormGroup,
+  UntypedFormBuilder,
+  UntypedFormGroup,
   NgControl,
   ValidationErrors,
   Validators,
@@ -58,7 +58,7 @@ export class PhoneInput
   @ViewChild("part3") part3Input: HTMLInputElement;
   @ViewChild("part4") part4Input: HTMLInputElement;
 
-  parts: FormGroup;
+  parts: UntypedFormGroup;
   stateChanges = new Subject<void>();
   focused = false;
   touched = false;
@@ -147,7 +147,7 @@ export class PhoneInput
   }
 
   constructor(
-    formBuilder: FormBuilder,
+    formBuilder: UntypedFormBuilder,
     private _focusMonitor: FocusMonitor,
     private _elementRef: ElementRef<HTMLElement>,
     @Optional() @Inject(MAT_FORM_FIELD) public _formField: MatFormField,

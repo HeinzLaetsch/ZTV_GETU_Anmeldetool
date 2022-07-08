@@ -1,10 +1,10 @@
-import { FormGroup, ValidationErrors, ValidatorFn } from "@angular/forms";
+import { UntypedFormGroup, ValidationErrors, ValidatorFn } from "@angular/forms";
 
 export function ConfirmedValidator(
   controlName: string,
   matchingControlName: string
 ): ValidatorFn {
-  return (formGroup: FormGroup): ValidationErrors => {
+  return (formGroup: UntypedFormGroup): ValidationErrors => {
     const control = formGroup.controls[controlName];
 
     const matchingControl = formGroup.controls[matchingControlName];

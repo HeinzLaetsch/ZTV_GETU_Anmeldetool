@@ -1,6 +1,6 @@
 import { ValueConverter } from "@angular/compiler/src/render3/view/template";
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { FormControl, Validators } from "@angular/forms";
+import { UntypedFormControl, Validators } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { ToastrService } from "ngx-toastr";
 import { IAnlass } from "src/app/core/model/IAnlass";
@@ -25,8 +25,8 @@ export class ErfassenRowComponent implements OnInit {
   @Output()
   entryChangedEvent = new EventEmitter<ILauflistenEintrag>();
 
-  note_1_Cntr: FormControl;
-  note_2_Cntr: FormControl;
+  note_1_Cntr: UntypedFormControl;
+  note_2_Cntr: UntypedFormControl;
   note_1_correct = false;
   note_2_correct = false;
 
@@ -35,7 +35,7 @@ export class ErfassenRowComponent implements OnInit {
     public dialog: MatDialog,
     private toastr: ToastrService
   ) {
-    this.note_1_Cntr = new FormControl("", {
+    this.note_1_Cntr = new UntypedFormControl("", {
       updateOn: "blur",
       validators: [
         Validators.required,
@@ -44,7 +44,7 @@ export class ErfassenRowComponent implements OnInit {
         Validators.pattern("^[0,1]?[0-9](\\.[0-9]?[0,5]?|$)"),
       ],
     });
-    this.note_2_Cntr = new FormControl("", {
+    this.note_2_Cntr = new UntypedFormControl("", {
       updateOn: "blur",
       validators: [
         Validators.required,

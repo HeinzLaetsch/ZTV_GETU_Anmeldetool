@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
-import { FormControl, Validators } from "@angular/forms";
+import { UntypedFormControl, Validators } from "@angular/forms";
 import { MatDialogRef } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { Observable, of } from "rxjs";
@@ -27,9 +27,9 @@ export class LoginDialogComponent implements OnInit {
   username: string;
   password: string;
 
-  vwVereinControl = new FormControl("", Validators.required);
-  vwUserNameControl = new FormControl("", Validators.required);
-  vwPasswordControl = new FormControl("", Validators.required);
+  vwVereinControl = new UntypedFormControl("", Validators.required);
+  vwUserNameControl = new UntypedFormControl("", Validators.required);
+  vwPasswordControl = new UntypedFormControl("", Validators.required);
 
   filteredOptions: Observable<IVerein[]>;
 

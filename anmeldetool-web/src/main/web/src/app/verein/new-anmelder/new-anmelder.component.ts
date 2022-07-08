@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { MatDialogRef } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { IRolle } from "src/app/core/model/IRolle";
@@ -17,7 +17,7 @@ import { IVerein } from "../verein";
 export class NewAnmelderComponent implements OnInit {
   //floatLabel = 'Always';
   appearance = "outline";
-  form: FormGroup;
+  form: UntypedFormGroup;
   vereine: IVerein[];
   verein: IVerein = {
     id: "-1",
@@ -52,7 +52,7 @@ export class NewAnmelderComponent implements OnInit {
   errorMessage = undefined;
 
   constructor(
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     public dialogRef: MatDialogRef<NewAnmelderComponent>,
     private authService: AuthService,
     private vereinService: VereinService,

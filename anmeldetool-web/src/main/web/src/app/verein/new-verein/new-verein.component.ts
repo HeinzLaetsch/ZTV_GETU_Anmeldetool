@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { MatDialogRef } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { IVerband } from "src/app/core/model/IVerband";
@@ -20,7 +20,7 @@ import { IVerein } from "../verein";
 export class NewVereinComponent implements OnInit {
   //floatLabel = 'Always';
   appearance = "outline";
-  form: FormGroup;
+  form: UntypedFormGroup;
   verein: IVerein = {
     id: "",
     name: "",
@@ -60,7 +60,7 @@ export class NewVereinComponent implements OnInit {
   errorMessage = undefined;
 
   constructor(
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     public dialogRef: MatDialogRef<NewVereinComponent>,
     private authService: AuthService,
     private vereinService: VereinService,

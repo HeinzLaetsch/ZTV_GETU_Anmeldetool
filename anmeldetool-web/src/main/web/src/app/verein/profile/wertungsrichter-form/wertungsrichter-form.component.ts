@@ -7,7 +7,7 @@ import {
   Output,
   SimpleChanges,
 } from "@angular/core";
-import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormControl, UntypedFormGroup, Validators } from "@angular/forms";
 import { IRolle } from "src/app/core/model/IRolle";
 import { IUser } from "src/app/core/model/IUser";
 import { IWertungsrichter } from "src/app/core/model/IWertungsrichter";
@@ -33,12 +33,12 @@ export class WertungsrichterFormComponent implements OnInit, OnChanges {
 
   userValid: boolean;
 
-  brevetControl = new FormControl("", Validators.required);
-  letzterFkControl = new FormControl("");
-  gueltigControl = new FormControl("");
-  bestaetigtControl = new FormControl("");
+  brevetControl = new UntypedFormControl("", Validators.required);
+  letzterFkControl = new UntypedFormControl("");
+  gueltigControl = new UntypedFormControl("");
+  bestaetigtControl = new UntypedFormControl("");
 
-  form: FormGroup = new FormGroup({
+  form: UntypedFormGroup = new UntypedFormGroup({
     brevetControl: this.brevetControl,
     letzterFkControl: this.letzterFkControl,
     gueltigControl: this.gueltigControl,
