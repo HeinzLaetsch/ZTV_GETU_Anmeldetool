@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 public class RanglistenEntryDTO {
-	public static final String[] FIELDS_ORDER = { "RANG", "NAME", "VORNAME", "JAHRGANG", "VEREIN", "RECK", "BODEN",
-			"RING", "SPRUNG1", "SPRUNG2", "SPRUNG", "BARREN", "TOTAL" };
+	public static final String[] FIELDS_ORDER = { "RANG", "NAME", "VORNAME", "JAHRGANG", "VEREIN", "ABTEILUNG",
+			"ANLAGE", "RECK", "BODEN", "RING", "SPRUNG1", "SPRUNG2", "SPRUNG", "BARREN", "TOTAL" };
 
 	@CsvBindByName(column = "Total")
 	private float gesamtPunktzahl;
@@ -41,5 +41,9 @@ public class RanglistenEntryDTO {
 	private int jahrgang;
 	@CsvBindByName(column = "Verein")
 	private String verein;
+	@CsvBindByName(column = "Abteilung")
+	private String abteilung;
+	@CsvBindByName(column = "Anlage")
+	private String anlage;
 
 }
