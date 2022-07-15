@@ -26,6 +26,8 @@ public abstract class TeilnehmerAnlassLinkRanglistenMapper {
 	@Mapping(source = "teilnehmer.vorname", target = "vorname")
 	@Mapping(source = "teilnehmer.jahrgang", target = "jahrgang")
 	@Mapping(source = "organisation.name", target = "verein")
+	@Mapping(source = "abteilung", target = "abteilung")
+	@Mapping(source = "anlage", target = "anlage")
 	public abstract RanglistenEntryDTO fromEntity(TeilnehmerAnlassLink tal);
 
 	public float getReckNote(Notenblatt notenblatt) {
