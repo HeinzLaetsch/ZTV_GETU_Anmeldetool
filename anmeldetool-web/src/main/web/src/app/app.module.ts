@@ -44,6 +44,9 @@ import { CachingAnlassService } from "./core/service/caching-services/caching.an
 import { EinteilungAbteilungComponent } from "./events/event-admin/einteilung/einteilung-abteilung/einteilung-abteilung.component";
 import { EinteilungAnlageComponent } from "./events/event-admin/einteilung/einteilung-anlage/einteilung-anlage.component";
 import { EinteilungStartgeraetComponent } from "./events/event-admin/einteilung/einteilung-startgeraet/einteilung-startgeraet.component";
+import { NgxsModule } from "@ngxs/store";
+import { NgxsReduxDevtoolsPluginModule } from "@ngxs/devtools-plugin";
+import { NgxsLoggerPluginModule } from "@ngxs/logger-plugin";
 
 registerLocaleData(localeDeCH, "de-ch");
 registerLocaleData(localeDe, "de");
@@ -112,6 +115,9 @@ export function initVereinservice(
       positionClass: "toast-center-center",
       preventDuplicates: true,
     }), // ToastrModule added
+    NgxsModule.forRoot(),
+    NgxsReduxDevtoolsPluginModule.forRoot(),
+    NgxsLoggerPluginModule.forRoot(),
   ],
   providers: [
     DatePipe,

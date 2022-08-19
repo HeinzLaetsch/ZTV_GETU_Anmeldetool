@@ -26,6 +26,7 @@ import { AgGridModule } from "ag-grid-angular";
     ReactiveFormsModule,
     MaterialModule,
     SharedComponentsModule,
+    AgGridModule,
     RouterModule.forChild(TeilnehmerRoutes),
   ],
   providers: [],

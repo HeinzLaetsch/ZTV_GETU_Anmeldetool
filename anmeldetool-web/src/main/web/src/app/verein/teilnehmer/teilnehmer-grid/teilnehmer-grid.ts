@@ -44,6 +44,8 @@ export class TeilnehmerGridComponent {
     private teilnehmerService: TeilnehmerService
   ) {}
 
+  disAllowTab() {}
+
   // Example load data from sever
   onGridReady(params: GridReadyEvent) {
     this.rowData$ = this.teilnehmerService.getTeilnehmer(
