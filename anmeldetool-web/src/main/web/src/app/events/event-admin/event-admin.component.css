@@ -27,7 +27,9 @@ em.success {
 mat-form-field {
   width: 100%;
 }
-
 .move-checkbox {
   top: 5px;
+}
+.row {
+  margin-right: 0px !important;
 }
