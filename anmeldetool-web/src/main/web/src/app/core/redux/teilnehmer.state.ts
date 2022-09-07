@@ -1,6 +1,8 @@
 import { Router } from "@angular/router";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
+import { tap } from "rxjs/operators";
 import { ITeilnehmer } from "../model/ITeilnehmer";
+import { AuthService } from "../service/auth/auth.service";
 import { TeilnehmerService } from "../service/teilnehmer/teilnehmer.service";
 import { GetTeilnehmer } from "./teilnehmer.actions";
 
@@ -17,7 +19,11 @@ export class TeilnehmerStateModel {
   },
 })
 export class TeilnehmerState {
-  constructor(private teilnehmerService: TeilnehmerService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private teilnehmerService: TeilnehmerService,
+    private router: Router
+  ) {}
 
   @Selector()
   static getTeilnehmerList(state: TeilnehmerStateModel) {
@@ -31,18 +37,21 @@ export class TeilnehmerState {
 
   @Action(GetTeilnehmer)
   getTeilnehmer({ getState, setState }: StateContext<TeilnehmerStateModel>) {
-    return this.teilnehmerService.getTeilnehmer.pipe(
-      tap((result) => {
-        const state = getState();
-        setState({
-          ...state,
-          courses: result,
-          areCoursesLoaded: true,
-        });
-      })
-    );
+    return this.teilnehmerService
+      .getTeilnehmer(this.authService.currentVerein)
+      .pipe(
+        tap((result) => {
+          const state = getState();
+          setState({
+            ...state,
+            teilnehmer: result,
+            areTeilnehmerLoaded: true,
+          });
+        })
+      );
   }
 
+  /*
   @Action(DeleteCourse)
   deleteCourse(
     { getState, setState }: StateContext<CourseStateModel>,
@@ -95,4 +104,5 @@ export class TeilnehmerState {
       })
     );
   }
+  */
 }
