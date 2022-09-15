@@ -408,7 +408,7 @@ public class AnlassController {
 	}
 
 	@GetMapping(value = "/{anlassId}/lauflisten")
-	public ResponseEntity<LauflisteDTO> getAnlagen(HttpServletRequest request, HttpServletResponse response,
+	public ResponseEntity<LauflisteDTO> getLaufliste(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable UUID anlassId, @RequestParam(name = "search") String search) {
 		try {
 			Anlass anlass = anlassService.findAnlassById(anlassId);
@@ -526,18 +526,27 @@ public class AnlassController {
 			TeilnehmerAnlassLink tal = talOpt.get();
 			Laufliste laufliste = lauflisteOpt.get();
 			Einzelnote einzelnote = tal.getNotenblatt().getEinzelnoteForGeraet(laufliste.getGeraet());
-			einzelnote.setNote_1(lauflistenEintragDto.getNote_1());
-			einzelnote.setNote_2(lauflistenEintragDto.getNote_2());
-			if (einzelnote.getNote_1() >= 0
-					&& ((einzelnote.getNote_2() >= 0) || !GeraetEnum.SPRUNG.equals(laufliste.getGeraet()))) {
+			if (GeraetEnum.BARREN.equals(laufliste.getGeraet()) && TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu())) {
+				einzelnote.setNote_1(0);
+				einzelnote.setNote_2(0);
 				einzelnote.setErfasst(true);
 			} else {
-				einzelnote.setErfasst(false);
+				einzelnote.setNote_1(lauflistenEintragDto.getNote_1());
+				einzelnote.setNote_2(lauflistenEintragDto.getNote_2());
+				if (einzelnote.getNote_1() >= 0
+						&& ((einzelnote.getNote_2() >= 0) || !GeraetEnum.SPRUNG.equals(laufliste.getGeraet()))) {
+					einzelnote.setErfasst(true);
+				} else {
+					einzelnote.setErfasst(false);
+				}
 			}
 			einzelnote.setChecked(lauflistenEintragDto.isChecked());
 			einzelnote = lauflistenService.saveEinzelnote(einzelnote);
-			Notenblatt notenblatt = updateNotenblatt(tal.getNotenblatt(), tal.getKategorie());
-			lauflistenService.saveNotenblatt(notenblatt);
+			if (!(GeraetEnum.BARREN.equals(laufliste.getGeraet())
+					&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu()))) {
+				Notenblatt notenblatt = updateNotenblatt(tal.getNotenblatt(), tal.getKategorie());
+				lauflistenService.saveNotenblatt(notenblatt);
+			}
 			if (tal.isDeleted() && !lauflistenEintragDto.isDeleted()) {
 				tal.setDeleted(false);
 				tal.setMeldeStatus(MeldeStatusEnum.STARTET);

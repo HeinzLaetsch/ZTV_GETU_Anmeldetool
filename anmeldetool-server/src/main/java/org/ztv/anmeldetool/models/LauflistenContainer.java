@@ -68,7 +68,7 @@ public class LauflistenContainer extends Base {
 	}
 
 	public List<TeilnehmerAnlassLink> getTeilnehmerAnlassLinksOrdered() {
-		this.teilnehmerAnlassLinks.sort(TeilnehmerAnlassLink::compareByVereinThenName);
+		this.teilnehmerAnlassLinks.sort(TeilnehmerAnlassLink::compareByTiTuThenVereinThenName);
 		return this.teilnehmerAnlassLinks;
 	}
 
