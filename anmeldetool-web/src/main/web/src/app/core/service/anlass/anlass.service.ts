@@ -63,7 +63,7 @@ export class AnlassService {
     if (!anlass) {
       return of(undefined);
     }
-    return this.http.get<IUser>(combinedUrl).pipe(
+    return this.http.get<IUser[]>(combinedUrl).pipe(
       catchError((error) => {
         if (error.status === 404) {
           return of(undefined);

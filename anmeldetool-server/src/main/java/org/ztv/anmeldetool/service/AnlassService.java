@@ -393,6 +393,11 @@ public class AnlassService {
 		return teilnahmen;
 	}
 
+	public List<OrganisationAnlassLink> getOrganisationAnlassLinks() {
+		List<OrganisationAnlassLink> teilnahmen = orgAnlassRepo.findAll();
+		return teilnahmen;
+	}
+
 	public OrganisationAnlassLink getVereinStart(UUID anlassId, UUID orgId) {
 		Anlass anlass = findAnlassById(anlassId);
 		if (anlass == null) {

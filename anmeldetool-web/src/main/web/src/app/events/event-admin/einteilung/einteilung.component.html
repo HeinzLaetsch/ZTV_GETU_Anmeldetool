@@ -19,15 +19,13 @@
     >search</mat-icon
   >
 </button>
-
-<mat-accordion *ngIf="loaded$ | async as obs; else loading">
-  <app-einteilung-kategorie
-    *ngFor="let kategorie of getKategorien()"
-    [anlass]="anlass"
-    [kategorie]="kategorie"
-    [refreshEmitter]="refreshEmitter"
-    [search]="search"
-  ></app-einteilung-kategorie>
-</mat-accordion>
-
+  <mat-accordion *ngIf="loaded$ | async as obs; else loading">
+    <app-einteilung-kategorie
+      *ngFor="let kategorie of getKategorien()"
+      [anlass]="anlass"
+      [kategorie]="kategorie"
+      [refreshEmitter]="refreshEmitter"
+      [search]="search"
+    ></app-einteilung-kategorie>
+  </mat-accordion>
 <ng-template #loading>Loading...</ng-template>

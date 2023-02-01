@@ -1,7 +1,13 @@
 import { Component, EventEmitter, OnInit } from "@angular/core";
+import { select, Store } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
+import {
+  AnlassActions,
+  AnlassState,
+  selectAllItems,
+} from "src/app/core/redux/anlass";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
 
 @Component({
@@ -10,43 +16,29 @@ import { CachingAnlassService } from "src/app/core/service/caching-services/cach
   styleUrls: ["./event-list.component.css"],
 })
 export class EventListComponent implements OnInit {
-  anlaesse: IAnlass[];
+  anlaesse: ReadonlyArray<IAnlass>;
+  public anlaesse$!: Observable<ReadonlyArray<IAnlass>>;
   localAdresseEmitter: EventEmitter<boolean>;
   loaded = false;
   localObs: Observable<boolean>;
   // localObs: BehaviorSubject<boolean>;
 
-  constructor(private anlassService: CachingAnlassService) {
+  constructor(
+    private store: Store<AnlassState>,
+    private anlassService: CachingAnlassService
+  ) {
     this.localAdresseEmitter = new EventEmitter();
     this.localObs = this.localAdresseEmitter.asObservable();
+
     // this.localObs = new BehaviorSubject(false);
   }
 
   ngOnInit() {
-    this.anlaesse = this.anlassService.getAnlaesse(TiTuEnum.Alle);
+    this.store.dispatch(AnlassActions.loadAllAnlaesse());
+    this.anlaesse$ = this.store.pipe(select(selectAllItems));
+    this.anlaesse$.subscribe((anlaesse) => (this.anlaesse = anlaesse));
+    // this.anlaesse = this.anlassService.getAnlaesse(TiTuEnum.Alle);
     this.loaded = true;
-
-    /*
-    let localSubscription2: Subscription = undefined;
-    localSubscription2 = this.anlassService
-      .loadAnlaesse()
-      .subscribe((result) => {
-        if (!result) {
-          return;
-        }
-        this.anlaesse = this.anlassService.getAnlaesse(TiTuEnum.Alle);
-        if (localSubscription2) {
-          localSubscription2.unsubscribe();
-        }
-      });
-    this.anlassService.isAnlaesseLoaded().subscribe((result) => {
-      if (result) {
-        // console.log("now loaded");
-        this.loaded = true;
-        this.localAdresseEmitter.emit(true);
-      }
-    });
-    */
   }
 
   get anlaesseLoaded(): Observable<boolean> {

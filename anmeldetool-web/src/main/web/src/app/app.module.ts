@@ -44,9 +44,11 @@ import { CachingAnlassService } from "./core/service/caching-services/caching.an
 import { EinteilungAbteilungComponent } from "./events/event-admin/einteilung/einteilung-abteilung/einteilung-abteilung.component";
 import { EinteilungAnlageComponent } from "./events/event-admin/einteilung/einteilung-anlage/einteilung-anlage.component";
 import { EinteilungStartgeraetComponent } from "./events/event-admin/einteilung/einteilung-startgeraet/einteilung-startgeraet.component";
-import { NgxsModule } from "@ngxs/store";
-import { NgxsReduxDevtoolsPluginModule } from "@ngxs/devtools-plugin";
-import { NgxsLoggerPluginModule } from "@ngxs/logger-plugin";
+import { Store, StoreModule } from "@ngrx/store";
+import { EffectsModule } from "@ngrx/effects";
+import { AnlassEffects } from "./core/redux/anlass/anlass.effects";
+import { reducers, metaReducers, AppState } from "./core/redux";
+import { AnlassActions } from "./core/redux/anlass";
 
 registerLocaleData(localeDeCH, "de-ch");
 registerLocaleData(localeDe, "de");
@@ -115,16 +117,19 @@ export function initVereinservice(
       positionClass: "toast-center-center",
       preventDuplicates: true,
     }), // ToastrModule added
-    NgxsModule.forRoot(),
-    NgxsReduxDevtoolsPluginModule.forRoot(),
-    NgxsLoggerPluginModule.forRoot(),
+    StoreModule.forRoot(reducers, { metaReducers }),
+    EffectsModule.forRoot([AnlassEffects]),
   ],
   providers: [
     DatePipe,
     {
       provide: APP_INITIALIZER,
-      useFactory: initAnlassservice,
-      deps: [CachingAnlassService],
+      useFactory: (store: Store<AppState>) => {
+        return () => {
+          store.dispatch(AnlassActions.loadAllAnlaesse());
+        };
+      },
+      deps: [Store],
       multi: true,
     },
     {

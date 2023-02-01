@@ -71,14 +71,18 @@ public class TeilnehmerAnlassLink extends Base {
 	@Enumerated(EnumType.STRING)
 	private GeraetEnum startgeraet;
 
-	public static int compareByVereinThenName(TeilnehmerAnlassLink tal1, TeilnehmerAnlassLink tal2) {
-		if (tal1.getOrganisation().getName().equals(tal2.getOrganisation().getName())) {
-			if (tal1.getTeilnehmer().getName().equals(tal2.getTeilnehmer().getName())) {
-				return tal1.getTeilnehmer().getVorname().compareTo(tal2.getTeilnehmer().getVorname());
+	public static int compareByTiTuThenVereinThenName(TeilnehmerAnlassLink tal1, TeilnehmerAnlassLink tal2) {
+		if (tal1.getTeilnehmer().getTiTu().equals(tal2.getTeilnehmer().getTiTu())) {
+			if (tal1.getOrganisation().getName().equals(tal2.getOrganisation().getName())) {
+				if (tal1.getTeilnehmer().getName().equals(tal2.getTeilnehmer().getName())) {
+					return tal1.getTeilnehmer().getVorname().compareTo(tal2.getTeilnehmer().getVorname());
+				} else {
+					return tal1.getTeilnehmer().getName().compareTo(tal2.getTeilnehmer().getName());
+				}
 			}
-			return tal1.getTeilnehmer().getName().compareTo(tal2.getTeilnehmer().getName());
-		} else {
 			return tal1.getOrganisation().getName().compareTo(tal2.getOrganisation().getName());
+		} else {
+			return tal1.getTeilnehmer().getTiTu().compareTo(tal2.getTeilnehmer().getTiTu());
 		}
 	}
 }

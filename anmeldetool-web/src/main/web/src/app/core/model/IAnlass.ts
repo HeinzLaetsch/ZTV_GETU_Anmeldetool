@@ -167,7 +167,7 @@ export class IAnlass {
   }
 
   getKategorienRaw(): KategorieEnum[] {
-    let k5 = Object.keys(KategorieEnum).findIndex(
+    const k5Index = Object.keys(KategorieEnum).findIndex(
       (key) => key === KategorieEnum.K5
     );
     const start = Object.keys(KategorieEnum).findIndex(
@@ -178,8 +178,10 @@ export class IAnlass {
     );
     // Keine Teilnahme
     let filtered = Object.values(KategorieEnum).slice(0, 1);
-    if (end > k5) {
-      filtered = filtered.concat(Object.values(KategorieEnum).slice(start, k5));
+    if (end > k5Index) {
+      filtered = filtered.concat(
+        Object.values(KategorieEnum).slice(start, k5Index)
+      );
       if (this.tuAnlass || this.alleAnlass) {
         filtered.push(KategorieEnum.K5);
       }

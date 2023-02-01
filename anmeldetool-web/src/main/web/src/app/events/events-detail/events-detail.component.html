@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" *ngIf="anlass$ | async; else loading">
   <div class="row">
     <div class="col-7">
       <h2>{{ anlass.getCleaned() }}</h2>
@@ -76,38 +76,91 @@
     <div *ngIf="isBrevet2Anlass()" class="col-1">Anzahl</div>
   </div>
   <div class="row">
-    <div *ngIf="isBrevet1Anlass()" class="col-1">
-      K1: {{ getTeilnahmenForKategorieK1().length }}
+    <div
+      *ngIf="isBrevet1Anlass() && getTeilnahmenForKategorieK1() | async; let k1"
+      class="col-1"
+    >
+      K1: {{ k1.length }}
     </div>
-    <div *ngIf="isBrevet1Anlass()" class="col-1">
-      K2: {{ getTeilnahmenForKategorieK2().length }}
+    <div
+      *ngIf="isBrevet1Anlass() && getTeilnahmenForKategorieK2() | async; let k2"
+      class="col-1"
+    >
+      K2: {{ k2.length }}
     </div>
-    <div *ngIf="isBrevet1Anlass()" class="col-1">
-      K3: {{ getTeilnahmenForKategorieK3().length }}
+    <div
+      *ngIf="isBrevet1Anlass() && getTeilnahmenForKategorieK3() | async; let k3"
+      class="col-1"
+    >
+      K3: {{ k3.length }}
     </div>
-    <div *ngIf="isBrevet1Anlass()" class="col-1">
-      K4: {{ getTeilnahmenForKategorieK4().length }}
+    <div
+      *ngIf="isBrevet1Anlass() && getTeilnahmenForKategorieK4() | async; let k4"
+      class="col-1"
+    >
+      K4: {{ k4.length }}
     </div>
-    <div *ngIf="isBrevet2Anlass() && isTuAnlass()" class="col-1">
-      K5: {{ getTeilnahmenForKategorieK5().length }}
+    <div
+      *ngIf="
+        isBrevet2Anlass() && isTuAnlass() && getTeilnahmenForKategorieK5()
+          | async;
+        let k5
+      "
+      class="col-1"
+    >
+      K5: {{ k5.length }}
     </div>
-    <div *ngIf="isBrevet2Anlass() && isTiAnlass()" class="col-1">
-      K5A: {{ getTeilnahmenForKategorieK5A().length }}
+    <div
+      *ngIf="
+        isBrevet2Anlass() && isTiAnlass() && getTeilnahmenForKategorieK5A()
+          | async;
+        let k5A
+      "
+      class="col-1"
+    >
+      K5A: {{ k5A.length }}
     </div>
-    <div *ngIf="isBrevet2Anlass() && isTiAnlass()" class="col-1">
-      K5B: {{ getTeilnahmenForKategorieK5B().length }}
+    <div
+      *ngIf="
+        isBrevet2Anlass() && isTiAnlass() && getTeilnahmenForKategorieK5B()
+          | async;
+        let k5B
+      "
+      class="col-1"
+    >
+      K5B: {{ k5B.length }}
     </div>
-    <div *ngIf="isBrevet2Anlass()" class="col-1">
-      K6: {{ getTeilnahmenForKategorieK6().length }}
+    <div
+      *ngIf="isBrevet2Anlass() && getTeilnahmenForKategorieK6() | async; let k6"
+      class="col-1"
+    >
+      K6: {{ k6.length }}
     </div>
-    <div *ngIf="isBrevet2Anlass() && isTuAnlass()" class="col-1">
-      KH: {{ getTeilnahmenForKategorieKH().length }}
+    <div
+      *ngIf="
+        isBrevet2Anlass() && isTuAnlass() && getTeilnahmenForKategorieKH()
+          | async;
+        let kH
+      "
+      class="col-1"
+    >
+      KH: {{ kH.length }}
     </div>
-    <div *ngIf="isBrevet2Anlass() && isTiAnlass()" class="col-1">
-      KD: {{ getTeilnahmenForKategorieKD().length }}
+    <div
+      *ngIf="
+        isBrevet2Anlass() && isTiAnlass() && getTeilnahmenForKategorieKD()
+          | async;
+        let kD
+      "
+      class="col-1"
+    >
+      KD: {{ kD.length }}
     </div>
-    <div *ngIf="isBrevet2Anlass()" class="col-1">
-      K7: {{ getTeilnahmenForKategorieK7().length }}
+    <div
+      *ngIf="isBrevet2Anlass() && getTeilnahmenForKategorieK7() | async; let k7"
+      class="col-1"
+    >
+      K7: {{ k7.length }}
     </div>
   </div>
 
@@ -308,3 +361,9 @@
     (verlaengertChange)="verlaengertChange($event)"
   ></app-events-dates>
 </div>
+
+<ng-template #loading>
+  <div class="center">
+    <mat-spinner style="margin: 0 auto"></mat-spinner>
+  </div>
+</ng-template>

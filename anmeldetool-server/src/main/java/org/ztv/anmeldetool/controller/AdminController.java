@@ -43,6 +43,7 @@ import org.ztv.anmeldetool.service.TeilnehmerService;
 import org.ztv.anmeldetool.service.VerbandService;
 import org.ztv.anmeldetool.service.WertungsrichterEinsatzService;
 import org.ztv.anmeldetool.service.WertungsrichterService;
+import org.ztv.anmeldetool.transfer.OrganisationAnlassLinkDTO;
 import org.ztv.anmeldetool.transfer.OrganisationDTO;
 import org.ztv.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.transfer.RolleDTO;
@@ -50,6 +51,7 @@ import org.ztv.anmeldetool.transfer.TeilnehmerDTO;
 import org.ztv.anmeldetool.transfer.VerbandDTO;
 import org.ztv.anmeldetool.transfer.WertungsrichterDTO;
 import org.ztv.anmeldetool.util.AnlassMapper;
+import org.ztv.anmeldetool.util.OrganisationAnlassLinkHelper;
 import org.ztv.anmeldetool.util.OrganisationAnlassLinkMapper;
 import org.ztv.anmeldetool.util.OrganisationMapper;
 import org.ztv.anmeldetool.util.PersonAnlassLinkExportImportMapper;
@@ -191,6 +193,12 @@ public class AdminController {
 	public ResponseEntity<Boolean> deleteTeilnehmer(HttpServletRequest request, @PathVariable UUID orgId,
 			@PathVariable UUID teilnehmerId) {
 		return teilnehmerSrv.delete(orgId, teilnehmerId);
+	}
+
+	@GetMapping("/organisationen/{orgId}/starts")
+	public ResponseEntity<Collection<OrganisationAnlassLinkDTO>> getStarts(HttpServletRequest request) {
+		return ResponseEntity
+				.ok(OrganisationAnlassLinkHelper.toDTO(this.oalMapper, anlassSrv.getOrganisationAnlassLinks()));
 	}
 
 	@GetMapping("/verbaende")

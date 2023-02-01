@@ -6,18 +6,34 @@ import {
 import { AfterViewInit, Component, OnInit, ViewChild } from "@angular/core";
 import { MatTabGroup } from "@angular/material/tabs";
 import { ActivatedRoute, Router } from "@angular/router";
+import { select, Store } from "@ngrx/store";
 import * as moment from "moment";
+import { Observable } from "rxjs";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IAnlassLink } from "src/app/core/model/IAnlassLink";
 import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
+import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
 import { IUser } from "src/app/core/model/IUser";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterStatusEnum";
+import { AppState } from "src/app/core/redux";
+import { AnlassActions, selectAnlassForId } from "src/app/core/redux/anlass";
+import {
+  loadAllOalAction,
+  selectOalForKeys,
+  updateVereinsStart,
+} from "src/app/core/redux/organisation-anlass";
+import {
+  getBrevet1Entries,
+  getBrevet2Entries,
+  getTeilnahmenForKategorie,
+  loadAllTeilnahmenAction,
+  selectTeilnehmerForAnlassEntries,
+} from "src/app/core/redux/teilnahme";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
-import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
 import { WertungsrichterService } from "src/app/core/service/wertungsrichter.service";
 
 @Component({
@@ -29,14 +45,23 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
   @ViewChild("tabs") tabGroup: MatTabGroup;
 
   anlass: IAnlass;
+  anlass$: Observable<IAnlass[]>;
+  starts$: Observable<ReadonlyArray<IOrganisationAnlassLink>>;
+  teilnehmer$: Observable<ITeilnehmer[]>;
+  teilnahmenBrevet1$: Observable<ReadonlyArray<IAnlassLink>>;
+  teilnahmenBrevet2$: Observable<ReadonlyArray<IAnlassLink>>;
+
+  starts: Readonly<Array<IOrganisationAnlassLink>>;
   orgAnlassLink: IOrganisationAnlassLink;
   assignedWr1s = new Array<IUser>();
   assignedWr2s = new Array<IUser>();
   wr1s = new Array<IUser>();
   wr2s = new Array<IUser>();
   // _wrEinsaetze: IWertungsrichterEinsatz[];
+  teilnehmer: ITeilnehmer[];
   teilnahmenBrevet1: IAnlassLink[];
   teilnahmenBrevet2: IAnlassLink[];
+
   statusBr1: WertungsrichterStatusEnum;
   statusBr2: WertungsrichterStatusEnum;
   useBrevet2: boolean = false;
@@ -44,7 +69,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
   constructor(
     public authService: AuthService,
     private anlassService: CachingAnlassService,
-    private userService: CachingUserService,
+    private store: Store<AppState>,
     private wertungsrichterService: WertungsrichterService,
     private route: ActivatedRoute,
     private router: Router
@@ -52,16 +77,42 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     const anlassId: string = this.route.snapshot.params.id;
-    // console.log("url param: ", anlassId);
-    this.anlass = this.anlassService.getAnlassById(anlassId);
-    this.anlassService
-      .getVereinStart(this.anlass, this.authService.currentVerein)
-      .subscribe((result) => {
-        this.orgAnlassLink = result;
-        this.anlass.erfassenVerlaengert = result.verlaengerungsDate;
+    this.store.dispatch(loadAllOalAction());
+    this.store.dispatch(loadAllTeilnahmenAction());
+
+    //TODO Sollte nicht nötig sein !!! State wird beim Start geladen
+    this.store.dispatch(AnlassActions.loadAllAnlaesse());
+    this.anlass$ = this.store.pipe(select(selectAnlassForId(anlassId)));
+    this.anlass$.subscribe((anlass) => {
+      this.anlass = anlass[1];
+
+      this.starts$ = this.store.pipe(
+        select(
+          selectOalForKeys(this.authService.currentVerein.id, this.anlass.id)
+        )
+      );
+
+      this.starts$.subscribe((oalLinks) => {
+        if (oalLinks !== undefined && oalLinks.length > 0) {
+          this.orgAnlassLink = oalLinks[1];
+          this.anlass.erfassenVerlaengert =
+            this.orgAnlassLink.verlaengerungsDate;
+        }
       });
-    this.teilnahmenBrevet1 = this.anlassService.getTeilnahmen(this.anlass, 1);
-    this.teilnahmenBrevet2 = this.anlassService.getTeilnahmen(this.anlass, 2);
+
+      this.teilnahmenBrevet1$ = this.store.select(
+        getBrevet1Entries(this.anlass.id)
+      );
+      this.teilnahmenBrevet2$ = this.store.select(
+        getBrevet2Entries(this.anlass.id)
+      );
+      this.teilnehmer$ = this.store.select(
+        selectTeilnehmerForAnlassEntries(this.anlass.id)
+      );
+      this.teilnehmer$.subscribe(
+        (teilnehmer) => (this.teilnehmer = teilnehmer)
+      );
+    });
 
     this.wertungsrichterService
       .getEingeteilteWertungsrichter(this.anlass, 1)
@@ -85,6 +136,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
     this.getVerfuegbareWertungsrichter(this.wr1s, 1);
     this.getVerfuegbareWertungsrichter(this.wr2s, 2);
   }
+
   ngAfterViewInit(): void {
     if (this.isBrevet1Anlass()) {
       this.tabGroup.selectedIndex = 0;
@@ -100,12 +152,17 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
   verlaengertChange(event: Date): void {
     const asMoment = moment(event);
     this.orgAnlassLink.verlaengerungsDate = asMoment.add(1, "h").toDate();
+
+    this.store.dispatch(updateVereinsStart({ payload: this.orgAnlassLink }));
+
+    /*
     this.anlassService
       .updateVereinsStart(this.orgAnlassLink)
       .subscribe((result) => {
         this.anlass.erfassenVerlaengert = result.verlaengerungsDate;
         console.log("verlaengertChange: ", event);
       });
+      */
   }
 
   isStartedCheckboxDisabled(): boolean {
@@ -168,70 +225,59 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
     this.statusBr2 = this.getStatusBr2();
   }
 
-  getTeilnahmenForKategorieK1(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K1
+  getTeilnahmenForKategorieK1(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K1)
     );
   }
-  getTeilnahmenForKategorieK2(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K2
+  getTeilnahmenForKategorieK2(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K2)
     );
   }
-  getTeilnahmenForKategorieK3(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K3
+  getTeilnahmenForKategorieK3(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K3)
     );
   }
-  getTeilnahmenForKategorieK4(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K4
+  getTeilnahmenForKategorieK4(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K4)
     );
   }
-  getTeilnahmenForKategorieK5(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K5
+  getTeilnahmenForKategorieK5(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K5)
     );
   }
-  getTeilnahmenForKategorieK5A(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K5A
+  getTeilnahmenForKategorieK5A(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K5A)
     );
   }
-  getTeilnahmenForKategorieK5B(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K5B
+  getTeilnahmenForKategorieK5B(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K5B)
     );
   }
-  getTeilnahmenForKategorieK6(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K6
+  getTeilnahmenForKategorieK6(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K6)
     );
   }
-  getTeilnahmenForKategorieKD(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.KD
+  getTeilnahmenForKategorieKD(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.KD)
     );
   }
-  getTeilnahmenForKategorieKH(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.KH
+  getTeilnahmenForKategorieKH(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.KH)
     );
   }
-  getTeilnahmenForKategorieK7(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K7
+  getTeilnahmenForKategorieK7(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K7)
     );
   }
 
@@ -257,11 +303,9 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
 
   // TODO check with this.teilnahmenBrevet1 = this.anlassService.getTeilnahmen(this.anlass, 1);
   get anzahlTeilnehmer(): number {
-    if (this.anlassService.getTeilnehmerForAnlass(this.anlass)) {
-      return this.anlassService.getTeilnehmerForAnlass(this.anlass).length;
-    }
-    return 0;
+    return this.teilnehmer.length;
   }
+
   get availableWertungsrichter1(): IUser[] {
     if (this.useBrevet2) {
       return this.wr1s.concat(this.wr2s);
@@ -350,11 +394,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
     console.log("Use Brevet 2: ", this.useBrevet2);
   }
   vereinStartedClicked(check: boolean) {
-    this.anlassService
-      .updateVereinsStart(this.orgAnlassLink)
-      .subscribe((result) => {
-        console.log("Clicked: ", result);
-      });
+    this.store.dispatch(updateVereinsStart({ payload: this.orgAnlassLink }));
   }
 
   handleClickMe(event: PointerEvent) {

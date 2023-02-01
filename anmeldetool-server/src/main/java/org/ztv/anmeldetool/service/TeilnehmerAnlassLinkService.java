@@ -187,7 +187,8 @@ public class TeilnehmerAnlassLinkService {
 
 		if (search.isPresent()) {
 			tals = tals.stream().filter(tal -> {
-				return tal.getTeilnehmer().getName().contains(search.get());
+				return tal.getTeilnehmer().getName().toLowerCase().contains(search.get().toLowerCase())
+						|| tal.getTeilnehmer().getVorname().toLowerCase().contains(search.get().toLowerCase());
 			}).collect(Collectors.toList());
 		}
 		List<TeilnehmerStartDTO> tss = tals.stream().map(tal -> {
@@ -207,7 +208,8 @@ public class TeilnehmerAnlassLinkService {
 		List<TeilnehmerAnlassLink> tals = getTeilnehmerAnlassLinks(anlassId, kategorie, abteilung, anlage, geraet);
 		if (search.isPresent()) {
 			tals = tals.stream().filter(tal -> {
-				return tal.getTeilnehmer().getName().contains(search.get());
+				return tal.getTeilnehmer().getName().toLowerCase().contains(search.get().toLowerCase())
+						|| tal.getTeilnehmer().getVorname().toLowerCase().contains(search.get().toLowerCase());
 			}).collect(Collectors.toList());
 		}
 

@@ -4,6 +4,7 @@ import { Observable, of } from "rxjs";
 import { catchError } from "rxjs/operators";
 import { IVerein } from "src/app/verein/verein";
 import { environment } from "src/environments/environment";
+import { IOrganisationAnlassLink } from "../../model/IOrganisationAnlassLink";
 
 @Injectable({
   providedIn: "root",
@@ -20,6 +21,14 @@ export class VereinService {
     return this.http
       .get<IVerein[]>(this.url)
       .pipe(catchError(this.handleError<IVerein[]>("getVereine", [])));
+  }
+
+  getStarts(): Observable<IOrganisationAnlassLink[]> {
+    return this.http
+      .get<IOrganisationAnlassLink[]>(this.url)
+      .pipe(
+        catchError(this.handleError<IOrganisationAnlassLink[]>("getStarts", []))
+      );
   }
 
   private handleError<T>(operation = "operation", result?: T) {

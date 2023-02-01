@@ -16,7 +16,7 @@
       </div>
     </div>
   </div>
-  <mat-tab-group *ngIf="administrator  || sekretariat" mat-align-tabs="start">
+  <mat-tab-group *ngIf="administrator || sekretariat" mat-align-tabs="start">
     <mat-tab label="Exports/Imports">
       <div class="container-lg">
         <div class="row" *ngIf="loaded$ | async as obs; else loading">

@@ -15,6 +15,7 @@ const routes: Routes = [
   {
     path: "anlass",
     component: EventListComponent,
+    canActivate: [EventRouteActivatorService],
   },
   // {path: 'events', component: EventListComponent, resolve: [{activated: AuthServiceResolverService}, {events: EventListResolverService}]},
   // {path: 'events/new', component: CreateEventComponent, canDeactivate: ['canDeactivateCreateEvent']},
@@ -72,6 +73,8 @@ const routes: Routes = [
       useHash: true,
       relativeLinkResolution: "legacy",
     }),
+    // StoreModule.forFeature(anlassFeatureStateName, anlassReducers),
+    // EffectsModule.forFeature([AnlassEffects]),
   ],
   exports: [RouterModule],
 })

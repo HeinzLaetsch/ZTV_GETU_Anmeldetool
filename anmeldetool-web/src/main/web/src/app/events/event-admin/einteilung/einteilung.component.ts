@@ -65,7 +65,7 @@ export class EinteilungComponent implements OnInit {
         undefined,
         undefined,
         undefined,
-        this.search
+        this.search_
       )
       .subscribe((statistic) => {
         this.teilnahmeStatistic = statistic;
@@ -80,7 +80,7 @@ export class EinteilungComponent implements OnInit {
           undefined,
           undefined,
           undefined,
-          this.search
+          this.search_
         )
         .subscribe((statistic) => {
           this.teilnahmeStatistic = statistic;
