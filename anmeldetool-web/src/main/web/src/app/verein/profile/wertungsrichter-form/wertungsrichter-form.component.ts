@@ -33,10 +33,10 @@ export class WertungsrichterFormComponent implements OnInit, OnChanges {
 
   userValid: boolean;
 
-  brevetControl = new FormControl("", Validators.required);
-  letzterFkControl = new FormControl("");
-  gueltigControl = new FormControl("");
-  bestaetigtControl = new FormControl("");
+  brevetControl = new FormControl(undefined, Validators.required);
+  letzterFkControl = new FormControl(undefined);
+  gueltigControl = new FormControl(undefined);
+  bestaetigtControl = new FormControl(undefined);
 
   form: FormGroup = new FormGroup({
     brevetControl: this.brevetControl,
@@ -52,7 +52,8 @@ export class WertungsrichterFormComponent implements OnInit, OnChanges {
 
     this.form.valueChanges.subscribe((value: any) => {
       if (this.form.dirty && this.brevetControl.dirty) {
-        this.wertungsrichter.brevet = this.brevetControl.value;
+        this.wertungsrichter.brevet = this.brevetControl
+          .value as unknown as number;
         this.wertungsrichterChange.emit(this.wertungsrichter);
       }
     });

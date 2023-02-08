@@ -77,7 +77,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
         this.assignedWr2s = assignedWrs;
         // console.log("has assigned Wrs 2 : ", assignedWrs);
         this.statusBr2 = this.getStatusBr2();
-        if (this.isBrevet1Anlass() && assignedWrs?.length > 0) {
+        if (!this.isBrevet2Anlass() && assignedWrs?.length > 0) {
           this.assignedWr1s = this.assignedWr1s.concat(assignedWrs);
           this.useBrevet2 = true;
         }

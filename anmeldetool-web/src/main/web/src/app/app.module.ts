@@ -7,7 +7,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from "@angular/material/form-field";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
+// import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { ToastrModule } from "ngx-toastr";
 import { tap } from "rxjs/operators";
 import { AppRoutingModule } from "./app-routing.module";
@@ -100,7 +100,7 @@ export function initVereinservice(
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
-    NgbModule,
+    // NgbModule,
     HttpClientModule,
     AppRoutingModule,
     MaterialModule,

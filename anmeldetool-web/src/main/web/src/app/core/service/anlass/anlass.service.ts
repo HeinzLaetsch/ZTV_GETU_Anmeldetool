@@ -28,7 +28,7 @@ export class AnlassService {
   constructor(private http: HttpClient) {}
 
   getAnlaesse(): Observable<IAnlass[]> {
-    // console.log("getAnlaesse called");
+    console.log("getAnlaesse called: " + this.apiHost);
     return this.http.get<IAnlass[]>(this.url).pipe(
       map((anlaesse) => {
         return anlaesse.map((value) => {
@@ -63,7 +63,7 @@ export class AnlassService {
     if (!anlass) {
       return of(undefined);
     }
-    return this.http.get<IUser>(combinedUrl).pipe(
+    return this.http.get<IUser[]>(combinedUrl).pipe(
       catchError((error) => {
         if (error.status === 404) {
           return of(undefined);

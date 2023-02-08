@@ -27,7 +27,7 @@ export class LoginDialogComponent implements OnInit {
   username: string;
   password: string;
 
-  vwVereinControl = new FormControl("", Validators.required);
+  vwVereinControl = new FormControl(undefined, Validators.required);
   vwUserNameControl = new FormControl("", Validators.required);
   vwPasswordControl = new FormControl("", Validators.required);
 
