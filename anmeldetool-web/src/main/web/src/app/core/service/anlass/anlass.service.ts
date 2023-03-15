@@ -10,6 +10,7 @@ import { AnlageEnum } from "../../model/AnlageEnum";
 import { GeraeteEnum } from "../../model/GeraeteEnum";
 import { IAnlass } from "../../model/IAnlass";
 import { IAnlassLink } from "../../model/IAnlassLink";
+import { IAnlassSummary } from "../../model/IAnlassSummary";
 import { IOrganisationAnlassLink } from "../../model/IOrganisationAnlassLink";
 import { IPersonAnlassLink } from "../../model/IPersonAnlassLink";
 import { ITeilnahmeStatistic } from "../../model/ITeilnahmeStatistic";
@@ -40,6 +41,33 @@ export class AnlassService {
       catchError(this.handleError<IAnlass[]>("getAnlaesse", []))
     );
   }
+
+  getAnlassOrganisationSummary(
+    anlass: IAnlass,
+    verein: IVerein
+  ): Observable<IAnlassSummary> {
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "organisationen" +
+      "/" +
+      verein?.id +
+      "/summary";
+    if (!anlass) {
+      return of(undefined);
+    }
+    return this.http.get<IAnlassSummary>(combinedUrl).pipe(
+      catchError((error) => {
+        if (error.status === 404) {
+          return of(undefined);
+        }
+        this.handleError<IAnlassSummary>("getAnlassOrganisationSummary");
+      })
+    );
+  }
+
   getVerfuegbareWertungsrichter(
     anlass: IAnlass,
     verein: IVerein,

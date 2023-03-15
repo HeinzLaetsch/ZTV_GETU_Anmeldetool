@@ -63,6 +63,7 @@ import org.ztv.anmeldetool.service.VerbandService;
 import org.ztv.anmeldetool.service.WertungsrichterEinsatzService;
 import org.ztv.anmeldetool.service.WertungsrichterService;
 import org.ztv.anmeldetool.transfer.AnlassDTO;
+import org.ztv.anmeldetool.transfer.AnlassSummaryDTO;
 import org.ztv.anmeldetool.transfer.AnmeldeKontrolleDTO;
 import org.ztv.anmeldetool.transfer.BenutzerDTO;
 import org.ztv.anmeldetool.transfer.OrganisationAnlassLinkDTO;
@@ -186,6 +187,46 @@ public class AnlassAdminController {
 		} else {
 			return ResponseEntity.ok(anlaesseDTO);
 		}
+	}
+
+	@GetMapping("/{anlassId}/organisationen/{orgId}/summary")
+	// @ResponseBody
+	public ResponseEntity<AnlassSummaryDTO> getAnlassOrganisationSummary(HttpServletRequest request,
+			@PathVariable UUID anlassId, @PathVariable UUID orgId) {
+		OrganisationAnlassLink oalResult = anlassSrv.getVereinStart(anlassId, orgId);
+
+		if (oalResult == null) {
+			AnlassSummaryDTO asDto = AnlassSummaryDTO.builder().anlassId(anlassId).organisationsId(orgId).startet(false)
+					.verlaengerungsDate(null).startendeBr1(0).startendeBr2(0).gemeldeteBr1(0).gemeldeteBr2(0)
+					.br1Ok(true).br2Ok(true).build();
+			return ResponseEntity.ok(asDto);
+		}
+		int startBr1 = 0;
+		int startBr2 = 0;
+		int gemeldeteBr1 = 0;
+		int gemeldeteBr2 = 0;
+		boolean br1Ok = false;
+		boolean br2Ok = false;
+		if (oalResult.isAktiv()) {
+			List<TeilnehmerAnlassLink> links = anlassSrv.getTeilnahmen(anlassId, orgId, false);
+			startBr1 = (int) links.stream().filter(link -> {
+				return link.getKategorie().isJugend();
+			}).count();
+			startBr2 = (int) links.stream().filter(link -> {
+				return !link.getKategorie().isJugend();
+			}).count();
+			List<PersonAnlassLink> pals = anlassSrv.getEingeteilteWertungsrichter(anlassId);
+			gemeldeteBr1 = (int) pals.stream().filter(
+					pal -> pal.getPerson().getWertungsrichter().getBrevet().equals(WertungsrichterBrevetEnum.Brevet_1))
+					.count();
+			gemeldeteBr2 = (int) pals.stream().filter(
+					pal -> pal.getPerson().getWertungsrichter().getBrevet().equals(WertungsrichterBrevetEnum.Brevet_2))
+					.count();
+		}
+		AnlassSummaryDTO asDto = AnlassSummaryDTO.builder().anlassId(anlassId).organisationsId(orgId)
+				.startet(oalResult.isAktiv()).verlaengerungsDate(null).startendeBr1(startBr1).startendeBr2(startBr2)
+				.gemeldeteBr1(gemeldeteBr1).gemeldeteBr2(gemeldeteBr2).br1Ok(br1Ok).br2Ok(br2Ok).build();
+		return ResponseEntity.ok(asDto);
 	}
 
 	@GetMapping("/{anlassId}/organisationen/{orgId}")

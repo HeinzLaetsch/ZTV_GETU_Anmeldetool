@@ -24,7 +24,7 @@ export const AnlassActions = createActionGroup({
   source: "Anlass",
   events: {
     "Load All Anlaesse": emptyProps(),
-    "Load All Anlaesse success": props<{ payload: ReadonlyArray<IAnlass> }>(),
+    "Load All Anlaesse success": props<{ payload: IAnlass[] }>(),
     "Load All Anlaesse error": props<{ error: string }>(),
   },
 });

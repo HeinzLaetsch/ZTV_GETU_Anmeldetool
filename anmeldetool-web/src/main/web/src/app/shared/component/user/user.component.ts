@@ -64,11 +64,16 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
     passwortAendernControl: new UntypedFormControl(false),
     passwortControl: new UntypedFormControl("", Validators.required),
     passwort2Control: new UntypedFormControl("", Validators.required),
-    eMailAdresseControl: new UntypedFormControl({ value: "", disabled: false }, [
-      Validators.required,
-      Validators.email,
-      Validators.pattern("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$"),
-    ]),
+    eMailAdresseControl: new UntypedFormControl(
+      { value: "", disabled: false },
+      [
+        Validators.required,
+        Validators.email,
+        Validators.pattern(
+          "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$"
+        ),
+      ]
+    ),
     mobilNummerControl: new UntypedFormControl(new MyTel("", "", "", "")),
   });
 

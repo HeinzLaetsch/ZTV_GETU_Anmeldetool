@@ -1,7 +1,16 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { Store } from "@ngrx/store";
-import { catchError, exhaustMap, filter, map, of, withLatestFrom } from "rxjs";
+import {
+  catchError,
+  exhaustMap,
+  filter,
+  map,
+  mergeMap,
+  of,
+  switchMap,
+  withLatestFrom,
+} from "rxjs";
 import { IAnlass } from "../../model/IAnlass";
 import { AnlassService } from "../../service/anlass/anlass.service";
 import { AnlassActions } from "./anlass.actions";
@@ -15,6 +24,23 @@ export class AnlassEffects {
     private store: Store
   ) {}
 
+  loadAnlaesse$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(AnlassActions.loadAllAnlaesse),
+      mergeMap((action) => {
+        return this.anlassService.getAnlaesse().pipe(
+          switchMap((anlaesse) => [
+            AnlassActions.loadAllAnlaesseSuccess({ payload: anlaesse }),
+          ]),
+          catchError((error) => {
+            return of(AnlassActions.loadAllAnlaesseError({ error: error }));
+          })
+        );
+      })
+    );
+  });
+
+  /*
   // @Effect()
   loadAnlaesse$ = createEffect(() =>
     this.actions$.pipe(
@@ -33,29 +59,5 @@ export class AnlassEffects {
       )
     )
   );
+  */
 }
-/*
-        ,
-  catchError((error) =>
-      of(AnlassActions.loadAllAnlaesseFailed({ error: error }))
-  )
-    */
-/*
-  fetchMenus$ = createEffect(() =>
-    this.actions$.pipe(
-      // you can pass in multiple actions here that will trigger the same effect
-      ofType(MenusActions.appLoaded.type, MenusActions.addMenuItemSuccess),
-      switchMap(() =>
-        this.apiService.getItems().pipe(
-          map((menuItems) =>
-            MenusActions.fetchMenuSuccess({ menuItems: menuItems })
-          ),
-          catchError((error) =>
-            of(MenusActions.fetchMenuFailed({ error: error }))
-          )
-        )
-      )
-    )
-  );
-}
-*/

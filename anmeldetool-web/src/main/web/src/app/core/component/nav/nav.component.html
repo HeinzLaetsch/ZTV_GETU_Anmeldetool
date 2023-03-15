@@ -1,0 +1,62 @@
+<mat-toolbar id="main-menu">
+  <div class="main-nav-container">
+    <mat-nav-list class="list-horizontal">
+      <mat-list-item
+        routerLink="/anlaesse"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        matRipple
+      >
+        <button mat-button class="mainNav" disableRipple>Alle Anlässe</button>
+      </mat-list-item>
+
+      <mat-list-item routerLink="/anlaesse-admin" routerLinkActive="active">
+        <button mat-button class="mainNav" disableRipple>
+          Anlässe verwalten
+        </button>
+        <mat-menu #anlaessAdmin="matMenu">
+          <div class="dropdown-item">
+            <button
+              mat-button
+              class="mainNav"
+              routerLink="/anlaesse-admin/1"
+              disableRipple
+            >
+              Anlass 1
+            </button>
+          </div>
+        </mat-menu>
+      </mat-list-item>
+      <mat-list-item routerLink="/teilnehmer" routerLinkActive="active">
+        <button mat-button class="mainNav" disableRipple>Teilnehmer</button>
+      </mat-list-item>
+
+      <mat-list-item routerLink="/rechnungsbuero" routerLinkActive="active">
+        <button mat-button class="mainNav" disableRipple>Rechnungsbüro</button>
+
+        <mat-menu #rechnungsbuero="matMenu">
+          <div class="dropdown-item">
+            <button
+              mat-button
+              class="mainNav"
+              routerLink="/importer"
+              disableRipple
+            >
+              Daten Importieren
+            </button>
+          </div>
+        </mat-menu>
+      </mat-list-item>
+    </mat-nav-list>
+    <mat-nav-list class="list-horizontal">
+      <mat-list-item
+        routerLink=""
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        matRipple
+      >
+        <button mat-button class="mainNav" disableRipple>Benutzerdaten</button>
+      </mat-list-item>
+    </mat-nav-list>
+  </div>
+</mat-toolbar>

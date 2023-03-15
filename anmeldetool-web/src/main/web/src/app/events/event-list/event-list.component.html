@@ -1,6 +1,7 @@
 <h1>ZTV Anlässe</h1>
 <hr />
-<div class="row" *ngIf="anlaesse$ | async; else loading">
+<!--div class="row" *ngIf="anlaesse$ | async; else loading"-->
+<div class="row">
   <div *ngFor="let anlass of anlaesse" class="col-md-auto">
     <app-event-thumbnail #thumbnail [anlass]="anlass"></app-event-thumbnail>
   </div>

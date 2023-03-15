@@ -2,7 +2,7 @@ import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { MaterialModule } from "../material-module";
+import { MaterialModule } from "../shared/material-module";
 import { SharedComponentsModule } from "../shared/component/shared.components.module";
 import { ErfassenComponent } from "./erfassen/erfassen.component";
 import { RechnungsbueroRoutes } from "./rechnungsbuero.routes";

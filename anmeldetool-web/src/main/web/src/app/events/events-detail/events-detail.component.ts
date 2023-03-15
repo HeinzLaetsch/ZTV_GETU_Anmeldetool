@@ -18,8 +18,8 @@ import { IUser } from "src/app/core/model/IUser";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterStatusEnum";
-import { AppState } from "src/app/core/redux";
 import { AnlassActions, selectAnlassForId } from "src/app/core/redux/anlass";
+import { AppState } from "src/app/core/redux/core.state";
 import {
   loadAllOalAction,
   selectOalForKeys,

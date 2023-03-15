@@ -2,7 +2,7 @@ import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { MaterialModule } from "../material-module";
+import { MaterialModule } from "../shared/material-module";
 import { SharedComponentsModule } from "../shared/component/shared.components.module";
 import { TeilnehmerComponent } from "./teilnehmer/teilnehmer.component";
 import { TeilnehmerRoutes } from "./teilnehmer.routes";
@@ -18,6 +18,7 @@ import {
   teilnehmerReducers,
 } from "../core/redux/teilnehmer";
 import { TeilnehmerEffects } from "../core/redux/teilnahme/teilnahme.effects";
+import { CoreModule } from "../core/core.module";
 
 @NgModule({
   declarations: [
@@ -29,10 +30,11 @@ import { TeilnehmerEffects } from "../core/redux/teilnahme/teilnahme.effects";
   ],
   imports: [
     CommonModule,
+    CoreModule,
+    SharedComponentsModule,
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    SharedComponentsModule,
     AgGridModule,
     RouterModule.forChild(TeilnehmerRoutes),
     StoreModule.forFeature(teilnehmerFeatureStateName, teilnehmerReducers),

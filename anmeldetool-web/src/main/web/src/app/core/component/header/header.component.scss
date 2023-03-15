@@ -1,0 +1,19 @@
+@import "src/assets/styles/colors";
+
+.container {
+  margin: 1em;
+}
+
+.container#page {
+  width: 1520px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+#page {
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+  background: $white;
+  box-shadow: 0 0 60px 0 rgb($black, 30%);
+}
