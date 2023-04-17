@@ -496,11 +496,21 @@ export class AnlassService {
         );
       });
   }
+
   public importTeilnehmerForAnlassCsv(
     anlass: IAnlass,
     formData: FormData
   ): Observable<any> {
     const combinedUrl = this.url + "/" + anlass.id + "/teilnehmer/";
+    return this.http.post<any>(combinedUrl, formData);
+  }
+
+  public importContestTeilnehmerForAnlassCsv(
+    anlass: IAnlass,
+    formData: FormData
+  ): Observable<any> {
+    const combinedUrl = this.url + "/" + anlass.id + "/teilnehmer/contest";
+    console.log("importContestTeilnehmerForAnlassCsv called: ", combinedUrl);
     return this.http.post<any>(combinedUrl, formData);
   }
 

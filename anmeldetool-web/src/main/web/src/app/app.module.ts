@@ -31,6 +31,7 @@ import {
   EventStartListRowComponent,
   EventThumbnailComponent,
   Upload,
+  ContestUpload,
   WertungsrichterChipComponent,
   WertungsrichterSlotComponent,
 } from "./events/index";
@@ -71,6 +72,7 @@ export function initVereinservice(
   declarations: [
     AnmeldeToolComponent,
     Upload,
+    ContestUpload,
     EventListComponent,
     WertungsrichterChipComponent,
     WertungsrichterSlotComponent,

@@ -72,8 +72,10 @@ public class ZTVScheduler {
 
 	@Transactional(value = TxType.REQUIRES_NEW)
 	@Scheduled(cron = "${scheduler.reminder.cron}")
+	// @Scheduled(fixedDelay =30000)
+	// @Scheduled(cron = "0 */5 * * * ?")
 	public void reminderCheck() {
-		log.debug("Reminder check fired");
+		log.info("Reminder check fired");
 
 		List<Anlass> anlaesse = anlassSrv.getAllAnlaesse();
 
@@ -123,6 +125,7 @@ public class ZTVScheduler {
 	}
 
 	private void sendReminderMailIfNeeded(List<Anlass> filteredAnlaesse, String subject, String datumText) {
+		log.info("sendReminderMailIfNeeded Anzahl: {},  Wettkampf {}", filteredAnlaesse.size(), datumText);
 		filteredAnlaesse.forEach(anlass -> {
 			if (!anlass.isReminderMeldeschlussSent()) {
 				List<Organisation> allZHOrgs = orgSrv.getAllZuercherOrganisationen();
