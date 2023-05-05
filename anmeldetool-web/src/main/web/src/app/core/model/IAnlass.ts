@@ -26,6 +26,9 @@ export class IAnlass {
   }
 
   set startDatum(startDatum: Date) {
+    if (!(startDatum instanceof Date)) {
+      startDatum = new Date(startDatum);
+    }
     this.startDatum_ = startDatum;
   }
   get startDatum(): Date {

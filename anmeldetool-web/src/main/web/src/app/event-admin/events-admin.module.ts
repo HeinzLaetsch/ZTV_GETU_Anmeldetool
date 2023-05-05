@@ -10,10 +10,12 @@ import { EinteilungComponent } from "./einteilung/einteilung.component";
 import { EventAdminComponent } from "./event-admin.component";
 import { EventsAdminRoutingModule } from "./events-admin-routing.module";
 import { Upload } from "./upload-dialog/upload.component";
+import { ContestUpload } from "./contest-upload-dialog/contest-upload.component";
 
 @NgModule({
   declarations: [
     Upload,
+    ContestUpload,
     EventAdminComponent,
     EinteilungComponent,
     EinteilungStartgeraetComponent,

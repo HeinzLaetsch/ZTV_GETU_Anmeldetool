@@ -23,8 +23,8 @@ export const loadAllAnlaesseFailed = createAction(
 export const AnlassActions = createActionGroup({
   source: "Anlass",
   events: {
-    "Load All Anlaesse": emptyProps(),
-    "Load All Anlaesse success": props<{ payload: IAnlass[] }>(),
-    "Load All Anlaesse error": props<{ error: string }>(),
+    "Load All Anlaesse INVOKED": emptyProps(),
+    "Load All Anlaesse SUCCESS": props<{ payload: IAnlass[] }>(),
+    "Load All Anlaesse ERROR": props<{ error: string }>(),
   },
 });

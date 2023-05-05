@@ -2,6 +2,7 @@ import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { AuthRouteActivatorService } from "./core/routing/auth-route-activator.service";
 import { EventRouteActivatorService } from "./events/index";
+import { Page404Component } from "./error/page404/page404.component";
 
 const routes: Routes = [
   {
@@ -39,6 +40,10 @@ const routes: Routes = [
       import("./verein/user.module").then((m) => m.UserModule),
   },
   {
+    path: "page404",
+    component: Page404Component,
+  },
+  {
     path: "",
     redirectTo: "anlaesse",
     pathMatch: "full",
@@ -53,7 +58,6 @@ const routes: Routes = [
       useHash: true,
       relativeLinkResolution: "legacy",
     }),
-    // RouterModule.forRoot(routes),
   ],
   exports: [RouterModule],
 })

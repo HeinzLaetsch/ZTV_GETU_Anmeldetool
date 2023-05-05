@@ -7,11 +7,14 @@ import { AnlassState } from "./anlass";
 import { anlassFeature } from "./anlass/anlass.reducer";
 import { debug } from "./meta-reducers/debug.reducer";
 import { RouterStateUrl } from "./router/router.state";
+import { vereinFeature } from "./verein/verein.reducer";
+import { VereinState } from "./verein";
 
 export const reducers: ActionReducerMap<AppState> = {
   router: routerReducer,
   loading: loadingFeature.reducer,
   anlass: anlassFeature.reducer,
+  verein: vereinFeature.reducer,
 };
 
 export const metaReducers: MetaReducer<AppState>[] = [
@@ -26,4 +29,5 @@ export interface AppState {
   router: RouterReducerState<RouterStateUrl>;
   loading: LoadingState;
   anlass: AnlassState;
+  verein: VereinState;
 }

@@ -18,7 +18,7 @@ import { IUser } from "src/app/core/model/IUser";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterStatusEnum";
-import { AnlassActions, selectAnlassForId } from "src/app/core/redux/anlass";
+import { AnlassActions, selectAnlassById } from "src/app/core/redux/anlass";
 import { AppState } from "src/app/core/redux/core.state";
 import {
   loadAllOalAction,
@@ -45,7 +45,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
   @ViewChild("tabs") tabGroup: MatTabGroup;
 
   anlass: IAnlass;
-  anlass$: Observable<IAnlass[]>;
+  anlass$: Observable<IAnlass>;
   starts$: Observable<ReadonlyArray<IOrganisationAnlassLink>>;
   teilnehmer$: Observable<ITeilnehmer[]>;
   teilnahmenBrevet1$: Observable<ReadonlyArray<IAnlassLink>>;
@@ -81,10 +81,10 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
     this.store.dispatch(loadAllTeilnahmenAction());
 
     //TODO Sollte nicht nötig sein !!! State wird beim Start geladen
-    this.store.dispatch(AnlassActions.loadAllAnlaesse());
-    this.anlass$ = this.store.pipe(select(selectAnlassForId(anlassId)));
+    // this.store.dispatch(AnlassActions.loadAllAnlaesse());
+    this.anlass$ = this.store.pipe(select(selectAnlassById(anlassId)));
     this.anlass$.subscribe((anlass) => {
-      this.anlass = anlass[1];
+      this.anlass = anlass;
 
       this.starts$ = this.store.pipe(
         select(
@@ -282,11 +282,11 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
   }
 
   get anzahlTeilnehmerBrevet1(): number {
-    return this.teilnahmenBrevet1.length;
+    return this.teilnahmenBrevet1?.length;
   }
 
   get anzahlTeilnehmerBrevet2(): number {
-    return this.teilnahmenBrevet2.length;
+    return this.teilnahmenBrevet2?.length;
   }
 
   get wertungsrichterPflichtBrevet1(): number {
@@ -303,7 +303,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
 
   // TODO check with this.teilnahmenBrevet1 = this.anlassService.getTeilnahmen(this.anlass, 1);
   get anzahlTeilnehmer(): number {
-    return this.teilnehmer.length;
+    return this.teilnehmer?.length;
   }
 
   get availableWertungsrichter1(): IUser[] {

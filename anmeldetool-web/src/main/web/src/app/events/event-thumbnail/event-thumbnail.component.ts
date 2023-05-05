@@ -16,7 +16,6 @@ export class EventThumbnailComponent implements OnInit {
   @Input() anlass: IAnlass;
   @Output() anlassClick = new EventEmitter();
 
-  someProperty: any = "some Text";
   // organisationAnlassLink: IOrganisationAnlassLink;
   anlassSummary: IAnlassSummary;
 
@@ -76,7 +75,7 @@ export class EventThumbnailComponent implements OnInit {
   }
   handleClickMe(event: PointerEvent) {
     // this.anlassClick.emit(this.anlass.anlassBezeichnung);
-    this.router.navigate(["/anlass/", this.anlass?.id]);
+    this.router.navigate(["/anlaesse/", this.anlass?.id]);
   }
 
   vereinStartedClicked(event: PointerEvent) {

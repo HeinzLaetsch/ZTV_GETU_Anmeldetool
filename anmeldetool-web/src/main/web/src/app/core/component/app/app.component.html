@@ -1,4 +1,3 @@
-<!--app-nav-bar></app-nav-bar-->
 <app-busy-indicator-progress-bar></app-busy-indicator-progress-bar>
 <app-nav></app-nav>
 <ng-container *ngIf="authenticated; else login">
@@ -10,13 +9,13 @@
   <div *ngIf="!dialogOpen && appBlocked" class="overlay">
     <h1 class="center">
       Das AnmeldeTool ist gesperrt !!! Im Moment findet ein Wettkampf statt.
-      <div *ngIf="anlass && administrator" class="col-sm-4">
+      <!--div *ngIf="anlass && administrator" class="col-sm-4">
         <mat-checkbox
           [(ngModel)]="anlass.toolSperren"
           (ngModelChange)="toolSperrenClicked($event)"
           >Tool sperren
         </mat-checkbox>
-      </div>
+      </div-->
     </h1>
   </div>
 </ng-template>

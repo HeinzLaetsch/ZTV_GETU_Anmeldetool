@@ -8,11 +8,11 @@ import {
   EventStartListComponent,
 } from "./index";
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: "",
     component: EventListComponent,
-    canActivate: [EventRouteActivatorService],
+    // canActivate: [EventRouteActivatorService],
   },
   {
     path: ":id",

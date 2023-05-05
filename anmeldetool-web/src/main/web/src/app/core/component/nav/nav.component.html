@@ -10,7 +10,41 @@
         <button mat-button class="mainNav" disableRipple>Alle Anlässe</button>
       </mat-list-item>
 
-      <mat-list-item routerLink="/anlaesse-admin" routerLinkActive="active">
+      <mat-list-item
+        class="task-add-btn"
+        *ngIf="authService.isAdministrator() || authService.isSekretariat()"
+        data-cy="admin-funcs-nav-btn"
+      >
+        <button
+          mat-button
+          class="mainNav"
+          disableRipple
+          [matMenuTriggerFor]="menu"
+        >
+          Anlässe Verwalten
+          <mat-icon class="material-icons-outlined arrow-icon">
+            arrow_drop_down
+          </mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <div
+            *ngFor="let anlass of anlaesse"
+            class="dropdown-item"
+            data-cy="data-import-nav-btn"
+          >
+            <button
+              mat-button
+              class="mainNav"
+              routerLink="['/anlass', anlass.id, 'admin']"
+              disableRipple
+            >
+              {{ anlass.getCleaned() }} - {{ anlass.organisator }}
+            </button>
+          </div>
+        </mat-menu>
+      </mat-list-item>
+
+      <!--mat-list-item routerLink="/anlaesse-admin" routerLinkActive="active">
         <button mat-button class="mainNav" disableRipple>
           Anlässe verwalten
         </button>
@@ -26,7 +60,7 @@
             </button>
           </div>
         </mat-menu>
-      </mat-list-item>
+      </mat-list-item-->
       <mat-list-item routerLink="/teilnehmer" routerLinkActive="active">
         <button mat-button class="mainNav" disableRipple>Teilnehmer</button>
       </mat-list-item>

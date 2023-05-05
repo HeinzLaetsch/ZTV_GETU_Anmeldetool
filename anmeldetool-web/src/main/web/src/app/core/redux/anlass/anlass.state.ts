@@ -1,11 +1,15 @@
+import { EntityAdapter, EntityState, createEntityAdapter } from "@ngrx/entity";
 import { IAnlass } from "../../model/IAnlass";
 
-export interface AnlassState {
-  items: IAnlass[];
-  loadStatus: "NOT_LOADED" | "LOADING" | "LOADED";
+export const anlassAdapter: EntityAdapter<IAnlass> =
+  createEntityAdapter<IAnlass>({
+    sortComparer: sortByStartDatum,
+  });
+
+export function sortByStartDatum(a: IAnlass, b: IAnlass): any {
+  return a.startDatum.getTime() - b.startDatum.getTime();
 }
 
-export const initialState: AnlassState = {
-  items: [],
-  loadStatus: "NOT_LOADED",
-};
+export interface AnlassState extends EntityState<IAnlass> {}
+
+export const initialState: AnlassState = anlassAdapter.getInitialState();

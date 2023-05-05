@@ -1,4 +1,5 @@
 import { CommonModule } from "@angular/common";
+import { RouterModule } from "@angular/router";
 import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { HoverOverDirective } from "../core/directive/hover.directive";
@@ -20,6 +21,15 @@ import {
 } from "./events-detail";
 import { EventsRoutingModule } from "./events-routing.module";
 
+export function checkDirtyState(component: CreateEventComponent) {
+  if (component.isDirty) {
+    return window.confirm(
+      "Anlass nicht gespeichert, wollen Sie wirklich abbrechen"
+    );
+  }
+  return true;
+}
+
 @NgModule({
   declarations: [
     EventListComponent,
@@ -37,10 +47,10 @@ import { EventsRoutingModule } from "./events-routing.module";
   ],
   imports: [
     CommonModule,
-    EventsRoutingModule,
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
+    EventsRoutingModule,
   ],
   providers: [],
 })

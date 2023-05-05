@@ -1,58 +1,48 @@
-import { Component, EventEmitter, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { IAnlass } from "src/app/core/model/IAnlass";
-import { TiTuEnum } from "src/app/core/model/TiTuEnum";
-import { AnlassState } from "src/app/core/redux/anlass";
-import { anlassFeature } from "src/app/core/redux/anlass/anlass.reducer";
+import { selectAllAnlaesse } from "src/app/core/redux/anlass";
 import { AppState } from "src/app/core/redux/core.state";
-import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
+import { AuthService } from "src/app/core/service/auth/auth.service";
+import { SubscriptionHelper } from "src/app/utils/subscription-helper";
 
 @Component({
   selector: "app-event-list",
   templateUrl: "./event-list.component.html",
   styleUrls: ["./event-list.component.css"],
 })
-export class EventListComponent implements OnInit {
+export class EventListComponent extends SubscriptionHelper implements OnInit {
   anlaesse: IAnlass[];
-  public anlaesse$!: Observable<AnlassState>;
-  // localAdresseEmitter: EventEmitter<boolean>;
+  public anlaesse$: Observable<IAnlass[]>;
   loaded = false;
-  // localObs: Observable<boolean>;
-  //// localObs: BehaviorSubject<boolean>;
   subscription: Subscription[] = [];
 
   constructor(
+    public authService: AuthService,
     private store: Store<AppState> // private anlassService: CachingAnlassService
   ) {
-    // this.localAdresseEmitter = new EventEmitter();
-    // this.localObs = this.localAdresseEmitter.asObservable();
-
-    // this.localObs = new BehaviorSubject(false);
-
-    this.anlaesse$ = this.store.select(anlassFeature.name);
+    super();
+    this.anlaesse$ = this.store.pipe(select(selectAllAnlaesse));
   }
 
   ngOnInit() {
-    this.subscription.push(
+    this.registerSubscription(
       this.anlaesse$.subscribe((data) => {
-        if (data) {
-          this.anlaesse = data.items;
-        }
+        this.anlaesse = data;
       })
     );
   }
 
-  /*
-  get anlaesseLoaded(): Observable<boolean> {
-    if (this.loaded) {
-      console.log("Already loaded");
-      this.localAdresseEmitter.emit(true);
-    }
-    return this.localObs;
+  get showEvents(): boolean {
+    return (
+      (this.authService.isAuthenticated() &&
+        this.authService.isVereinsAnmmelder() &&
+        !this.authService.isAdministrator()) ||
+      (this.authService.isAdministrator() &&
+        this.authService.currentVerein.name != "ZTV")
+    );
   }
-  */
-
   handleEventClicked(data) {
     console.log("received :", data);
   }
