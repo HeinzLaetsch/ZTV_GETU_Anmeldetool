@@ -57,6 +57,7 @@ import org.ztv.anmeldetool.service.OrganisationService;
 import org.ztv.anmeldetool.service.PersonService;
 import org.ztv.anmeldetool.service.RoleService;
 import org.ztv.anmeldetool.service.ServiceException;
+import org.ztv.anmeldetool.service.StvContestService;
 import org.ztv.anmeldetool.service.TeilnehmerAnlassLinkService;
 import org.ztv.anmeldetool.service.TeilnehmerService;
 import org.ztv.anmeldetool.service.VerbandService;
@@ -74,6 +75,7 @@ import org.ztv.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.transfer.TeilnahmeStatisticDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkCsvDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
+import org.ztv.anmeldetool.transfer.TeilnehmerCsvContestDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerStartDTO;
 import org.ztv.anmeldetool.transfer.WertungsrichterEinsatzDTO;
 import org.ztv.anmeldetool.util.AnlassMapper;
@@ -127,6 +129,9 @@ public class AnlassAdminController {
 
 	@Autowired
 	TeilnehmerAnlassLinkService teilnehmerAnlassLinkSrv;
+
+	@Autowired
+	StvContestService stvContestService;
 
 	@Autowired
 	WertungsrichterEinsatzService wertungsrichterEinsatzSrv;
@@ -556,11 +561,7 @@ public class AnlassAdminController {
 		}
 	}
 
-	// @RequestBody Resource resource) {
-	// , consumes = "application/octet-stream"
-
 	@PostMapping(value = "/{anlassId}/teilnehmer/")
-	// @ResponseBody
 	public ResponseEntity updateTeilnehmer(@PathVariable UUID anlassId,
 			@RequestParam("teilnehmer") MultipartFile teilnehmer) {
 		try {
@@ -571,6 +572,25 @@ public class AnlassAdminController {
 			List<TeilnehmerAnlassLinkCsvDTO> tals = TeilnehmerExportImport
 					.csvWriteToWriter(teilnehmer.getInputStream());
 			teilnehmerAnlassLinkSrv.updateAnlassTeilnahmen(anlassId, tals);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping(value = "/{anlassId}/teilnehmer/contest")
+	public ResponseEntity updateTeilnehmerFromContest(@PathVariable UUID anlassId,
+			@RequestParam("teilnehmer") MultipartFile teilnehmer) {
+		try {
+			// this.log.debug("Resource: {} , length: {}", resource.getFilename(),
+			// resource.contentLength());
+			this.log.info("Import: {} , length: {}", teilnehmer.getOriginalFilename(), teilnehmer.getSize());
+
+			List<TeilnehmerCsvContestDTO> contestTeilnehmer = TeilnehmerExportImport
+					.csvContestWriteToWriter(teilnehmer.getInputStream());
+			stvContestService.updateAnlassTeilnahmen(anlassId, contestTeilnehmer);
+			this.log.info("Import: {} , length: {}", teilnehmer.getOriginalFilename(), contestTeilnehmer.size());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

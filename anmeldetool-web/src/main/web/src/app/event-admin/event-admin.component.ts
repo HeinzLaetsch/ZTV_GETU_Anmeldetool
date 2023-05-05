@@ -11,6 +11,7 @@ import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
 import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.service";
+import { ContestUpload } from "./contest-upload-dialog/contest-upload.component";
 import { Upload } from "./upload-dialog/upload.component";
 
 @Component({
@@ -94,6 +95,11 @@ export class EventAdminComponent implements OnInit {
   }
   importTeilnehmer(): void {
     const dialogRef = this.dialog.open(Upload, {
+      data: this.anlass,
+    });
+  }
+  importContestTeilnehmer(): void {
+    const dialogRef = this.dialog.open(ContestUpload, {
       data: this.anlass,
     });
   }

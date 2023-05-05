@@ -161,6 +161,13 @@ export class CachingAnlassService {
     return this.anlassService.importTeilnehmerForAnlassCsv(anlass, formData);
   }
 
+  importContestTeilnehmerForAnlassCsv(
+    anlass: IAnlass,
+    formData: FormData
+  ): Observable<any> {
+    return this.anlassService.importContestTeilnehmerForAnlassCsv(anlass, formData);
+  }
+
   getBenutzerForAnlassCsv(anlass: IAnlass): void {
     this.anlassService.getBenutzerForAnlassCsv(anlass);
   }

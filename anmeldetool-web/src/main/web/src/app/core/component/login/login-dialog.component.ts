@@ -6,15 +6,18 @@ import { Observable, of } from "rxjs";
 import { map, startWith } from "rxjs/operators";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
-import { CachingVereinService } from "src/app/core/service/caching-services/caching.verein.service";
 import { IVerein } from "src/app/verein/verein";
+import { AppState } from "../../redux/core.state";
+import { Store, select } from "@ngrx/store";
+import { SubscriptionHelper } from "src/app/utils/subscription-helper";
+import { selectAlleVereine } from "../../redux/verein";
 
 @Component({
   selector: "app-login-dialog",
   templateUrl: "./login-dialog.component.html",
   styleUrls: ["./login-dialog.component.css"],
 })
-export class LoginDialogComponent implements OnInit {
+export class LoginDialogComponent extends SubscriptionHelper implements OnInit {
   @Output()
   showDialog = new EventEmitter<Number>();
 
@@ -22,6 +25,7 @@ export class LoginDialogComponent implements OnInit {
   loginError: boolean;
   errorMessage = undefined;
 
+  public vereine$: Observable<IVerein[]>;
   vereine: IVerein[];
   username: string;
   password: string;
@@ -35,19 +39,25 @@ export class LoginDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<LoginDialogComponent>,
     private authService: AuthService,
-    public vereinService: CachingVereinService,
+    private store: Store<AppState>,
     private userService: CachingUserService,
     private router: Router
   ) {
+    super();
+    this.vereine$ = this.store.pipe(select(selectAlleVereine));
     this.loginError = false;
   }
 
   ngOnInit() {
-    this.vereine = this.vereinService.getVereine();
-    this.filteredOptions = this.vwVereinControl.valueChanges.pipe(
-      startWith(""),
-      map((value) => (typeof value === "string" ? value : value.name)),
-      map((name) => (name ? this._filter(name) : this.vereine.slice()))
+    this.registerSubscription(
+      this.vereine$.subscribe((data) => {
+        this.vereine = data;
+        this.filteredOptions = this.vwVereinControl.valueChanges.pipe(
+          startWith(""),
+          map((value) => (typeof value === "string" ? value : value.name)),
+          map((name) => (name ? this._filter(name) : this.vereine.slice()))
+        );
+      })
     );
   }
   private _filter(name: string): IVerein[] {

@@ -29,7 +29,7 @@ export class AnlassService {
   constructor(private http: HttpClient) {}
 
   getAnlaesse(): Observable<IAnlass[]> {
-    // console.log("getAnlaesse called");
+    console.log("getAnlaesse called: " + this.apiHost);
     return this.http.get<IAnlass[]>(this.url).pipe(
       map((anlaesse) => {
         return anlaesse.map((value) => {
@@ -524,11 +524,21 @@ export class AnlassService {
         );
       });
   }
+
   public importTeilnehmerForAnlassCsv(
     anlass: IAnlass,
     formData: FormData
   ): Observable<any> {
     const combinedUrl = this.url + "/" + anlass.id + "/teilnehmer/";
+    return this.http.post<any>(combinedUrl, formData);
+  }
+
+  public importContestTeilnehmerForAnlassCsv(
+    anlass: IAnlass,
+    formData: FormData
+  ): Observable<any> {
+    const combinedUrl = this.url + "/" + anlass.id + "/teilnehmer/contest";
+    console.log("importContestTeilnehmerForAnlassCsv called: ", combinedUrl);
     return this.http.post<any>(combinedUrl, formData);
   }
 

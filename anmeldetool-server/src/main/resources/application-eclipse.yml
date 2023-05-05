@@ -56,7 +56,7 @@ logging:
 # Sec Min Hours Day_of_Month Month Day_of_week Year    
 scheduler:
    reminder:
-      cron: "0/10 1 * * 12 *"
+      cron: "20 * * * * *"
       daysbefore: 3
    closed:
       cron: "0/10 1 * * 12 *"

@@ -7,7 +7,11 @@ import {
   Output,
   SimpleChanges,
 } from "@angular/core";
-import { UntypedFormControl, UntypedFormGroup, Validators } from "@angular/forms";
+import {
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+} from "@angular/forms";
 import { IRolle } from "src/app/core/model/IRolle";
 import { IUser } from "src/app/core/model/IUser";
 import { IWertungsrichter } from "src/app/core/model/IWertungsrichter";
@@ -33,11 +37,21 @@ export class WertungsrichterFormComponent implements OnInit, OnChanges {
 
   userValid: boolean;
 
+  /*
+  <<<<<< <HEAD
+  */
   brevetControl = new UntypedFormControl("", Validators.required);
   letzterFkControl = new UntypedFormControl("");
   gueltigControl = new UntypedFormControl("");
   bestaetigtControl = new UntypedFormControl("");
-
+  /*
+  =======
+  brevetControl = new FormControl(undefined, Validators.required);
+  letzterFkControl = new FormControl(undefined);
+  gueltigControl = new FormControl(undefined);
+  bestaetigtControl = new FormControl(undefined);
+>>>>>>> main
+*/
   form: UntypedFormGroup = new UntypedFormGroup({
     brevetControl: this.brevetControl,
     letzterFkControl: this.letzterFkControl,
@@ -52,7 +66,8 @@ export class WertungsrichterFormComponent implements OnInit, OnChanges {
 
     this.form.valueChanges.subscribe((value: any) => {
       if (this.form.dirty && this.brevetControl.dirty) {
-        this.wertungsrichter.brevet = this.brevetControl.value;
+        this.wertungsrichter.brevet = this.brevetControl
+          .value as unknown as number;
         this.wertungsrichterChange.emit(this.wertungsrichter);
       }
     });

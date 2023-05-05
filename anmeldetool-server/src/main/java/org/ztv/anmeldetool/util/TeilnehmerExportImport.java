@@ -9,11 +9,13 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.util.StreamUtils;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkCsvDTO;
+import org.ztv.anmeldetool.transfer.TeilnehmerCsvContestDTO;
 
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -36,7 +38,7 @@ public class TeilnehmerExportImport {
 
 		StatefulBeanToCsv<TeilnehmerAnlassLinkCsvDTO> writer = new StatefulBeanToCsvBuilder<TeilnehmerAnlassLinkCsvDTO>(
 				responseWriter).withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(';').withOrderedResults(false)
-						.build();
+				.build();
 		writer.write(tals);
 		responseWriter.flush();
 		responseWriter.close();
@@ -59,5 +61,21 @@ public class TeilnehmerExportImport {
 				.withSeparator(';').withOrderedResults(false).build().parse();
 		targetReader.close();
 		return tals;
+	}
+
+	public static List<TeilnehmerCsvContestDTO> csvContestWriteToWriter(InputStream inputStream) throws IOException {
+		byte[] cachedBody = StreamUtils.copyToByteArray(inputStream);
+		int start = 0;
+		if (cachedBody[0] == 239 && cachedBody[1] == 187 && cachedBody[2] == 191
+				|| cachedBody[0] == -17 && cachedBody[1] == -69 && cachedBody[2] == -65) {
+			start = 3;
+		}
+		InputStream byteArrayInputStream = new ByteArrayInputStream(cachedBody, start, cachedBody.length);
+		Reader targetReader = new InputStreamReader(byteArrayInputStream, "UTF-8");
+		List<TeilnehmerCsvContestDTO> teilnehmer = new CsvToBeanBuilder<TeilnehmerCsvContestDTO>(targetReader)
+				.withType(TeilnehmerCsvContestDTO.class).withQuoteChar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(';')
+				.withOrderedResults(false).build().parse();
+		targetReader.close();
+		return teilnehmer.stream().filter(t -> "Geräteturnen".equals(t.getSparte())).collect(Collectors.toList());
 	}
 }

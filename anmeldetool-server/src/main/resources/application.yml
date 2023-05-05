@@ -29,15 +29,15 @@ spring:
      time-zone: "Europe/Zurich"   
      # time-zone: "UTC"
   mail:
-     # host: "smtp.office365.com"
-     host: "mail.gmx.net"
+     host: "smtp.office365.com"
+     # host: "mail.gmx.net"
      port: 587
      templates:
         path: "mail-templates"
      username: "getu-wettkaempfe-tu@ztv.ch"
      # username: "heinz.laetsch@gmx.ch"
-     password: win123Paratech
-     # password: "gmx32Paratech"
+     password: win123ParatechAll
+     # password: "gmx32Paratech123"
      properties:
         mail:
            smtp:
@@ -63,16 +63,17 @@ logging:
     org.flywaydb: INFO
     org.springframework.web.cors: INFO
     org.hibernate.SQL: INFO
-
+    org.ztv.anmeldetool.service: INFO
+# 0 */5 * * * ?
 scheduler:
    reminder:
-      cron: "0 0 1 * * *"
+      cron: "0 0 1 * * ?"
       daysbefore: 3
    closed:
-      cron: "0 0 2 * * *"
+      cron: "0 0 2 * * ?"
       daysafter: 1
    mutationen:
-      cron: "0 0 3 * * *"
+      cron: "0 0 3 * * ?"
       daysbefore: 3
 
       

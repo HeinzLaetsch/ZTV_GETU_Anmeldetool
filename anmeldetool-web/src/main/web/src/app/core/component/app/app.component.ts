@@ -58,7 +58,7 @@ export class AnmeldeToolComponent
 
   ngAfterViewInit(): void {
     if (!this.appBlocked && !this.authService.isAuthenticated()) {
-      // console.log('AnmeldeToolComponent::ngOnInit 2: ');
+      console.log("AnmeldeToolComponent::ngAfterViewInit: ");
       this.openLoginDialog();
     }
   }
