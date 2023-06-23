@@ -9,4 +9,19 @@ public enum MeldeStatusEnum {
 	private MeldeStatusEnum(String text) {
 		this.text = text;
 	}
+
+	public boolean startetVorMeldeschluss() {
+		return this.equals(MeldeStatusEnum.STARTET) || this.equals(MeldeStatusEnum.NEUMELDUNG)
+				|| this.equals(MeldeStatusEnum.ABGEMELDET_2) || this.equals(MeldeStatusEnum.ABGEMELDET_3)
+				|| this.equals(MeldeStatusEnum.VERLETZT) || this.equals(MeldeStatusEnum.NICHTGESTARTET);
+	}
+
+	public boolean vorWettkampfAbgemeldet() {
+		return this.equals(MeldeStatusEnum.ABGEMELDET_2);
+	}
+
+	public boolean amWettkampfAbgemeldet() {
+		return this.equals(MeldeStatusEnum.ABGEMELDET_3) || this.equals(MeldeStatusEnum.VERLETZT)
+				|| this.equals(MeldeStatusEnum.NICHTGESTARTET);
+	}
 }

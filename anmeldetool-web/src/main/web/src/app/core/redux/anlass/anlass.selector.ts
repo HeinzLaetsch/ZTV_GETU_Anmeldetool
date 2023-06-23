@@ -3,19 +3,22 @@ import { AnlassState } from "./anlass.state";
 import { anlassFeature } from "./anlass.reducer";
 import * as fromAnlass from "./anlass.reducer";
 
-export const selectAnlasseState = createFeatureSelector<AnlassState>(
+export const selectAnlaesseState = createFeatureSelector<AnlassState>(
   anlassFeature.name
 );
 
 export const selectAllAnlaesse = createSelector(
-  selectAnlasseState,
+  selectAnlaesseState,
   fromAnlass.selectAll
 );
 
 export const selectAnlassById = (id: string) =>
-  createSelector(selectAnlasseState, (anlaesseState) =>
-    anlaesseState.entities.length ? anlaesseState.entities[id] : undefined
-  );
+  createSelector(selectAnlaesseState, (anlaesseState) => {
+    const ret = anlaesseState.ids.length
+      ? anlaesseState.entities[id]
+      : undefined;
+    return ret;
+  });
 
 export const selectAnlassByName = (anlassBezeichnung: string) =>
   createSelector(selectAllAnlaesse, (anlaesse) =>

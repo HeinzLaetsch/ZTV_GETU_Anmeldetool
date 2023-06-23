@@ -1,28 +1,25 @@
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 import { OalState } from "./oal.state";
+import { oalFeature } from "./oal.reducer";
+import * as fromOal from "./oal.reducer";
 
-export const oalFeatureStateName = "oalFeature";
+export const selectOalState = createFeatureSelector<OalState>(oalFeature.name);
 
-export const selectOal = createFeatureSelector<OalState>(oalFeatureStateName);
-
-export const selectAllItems = createSelector(
-  selectOal,
-  (state: OalState) => state.items
+export const selectAllAnlaesse = createSelector(
+  selectOalState,
+  fromOal.selectAll
 );
 
-export const selectLoadStatus = createSelector(
-  selectOal,
-  (state: OalState) => state.loadStatus
-);
-
-export const selectOalForAnlassId = (anlassId: string) =>
-  createSelector(selectOal, (state: OalState) =>
-    state.items.filter((x) => anlassId === x.anlassId)
-  );
+export const selectOalByAnlassId = (anlassId: string) =>
+  createSelector(selectOalState, (oalState) => {
+    const ret = oalState.ids.length ? oalState.entities[anlassId] : undefined;
+    return ret;
+  });
 
 export const selectOalForKeys = (orgId: string, anlassId: string) =>
-  createSelector(selectOal, (state: OalState) =>
-    state.items.filter(
+  createSelector(selectAllAnlaesse, (oalState) => {
+    const ret = oalState.filter(
       (x) => orgId === x.organisationsId && anlassId === x.anlassId
-    )
-  );
+    );
+    return ret;
+  });

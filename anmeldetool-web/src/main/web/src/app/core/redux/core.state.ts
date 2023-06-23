@@ -9,12 +9,15 @@ import { debug } from "./meta-reducers/debug.reducer";
 import { RouterStateUrl } from "./router/router.state";
 import { vereinFeature } from "./verein/verein.reducer";
 import { VereinState } from "./verein";
+import { OalState } from "./organisation-anlass";
+import { oalFeature } from "./organisation-anlass/oal.reducer";
 
 export const reducers: ActionReducerMap<AppState> = {
   router: routerReducer,
   loading: loadingFeature.reducer,
   anlass: anlassFeature.reducer,
   verein: vereinFeature.reducer,
+  oal: oalFeature.reducer,
 };
 
 export const metaReducers: MetaReducer<AppState>[] = [
@@ -30,4 +33,5 @@ export interface AppState {
   loading: LoadingState;
   anlass: AnlassState;
   verein: VereinState;
+  oal: OalState;
 }

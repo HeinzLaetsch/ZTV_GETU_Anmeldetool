@@ -1,6 +1,22 @@
-import { Action, createAction, props } from "@ngrx/store";
+import { createActionGroup, emptyProps, props } from "@ngrx/store";
 import { IOrganisationAnlassLink } from "../../model/IOrganisationAnlassLink";
 
+export const OalActions = createActionGroup({
+  source: "oal",
+  events: {
+    "Load All OAL INVOKED": emptyProps(),
+    "Load All OAL SUCCESS": props<{ payload: IOrganisationAnlassLink[] }>(),
+    "Load All OAL ERROR": props<{ error: string }>(),
+    "Update Vereins Start INVOKED": props<{
+      payload: IOrganisationAnlassLink;
+    }>(),
+    "Update Vereins Start  SUCCESS": props<{
+      payload: IOrganisationAnlassLink;
+    }>(),
+    "Update Vereins Start  ERROR": props<{ error: string }>(),
+  },
+});
+/*
 export enum ActionTypes {
   LoadAllOal = "[Oal] Load OrganisationAnlassLink",
   LoadAllOalSuccess = "[Oal] Load OrganisationAnlassLink success",
@@ -36,18 +52,4 @@ export const updateVereinsStartFailed = createAction(
   ActionTypes.UpdateVereinsStartFailed,
   props<{ error: any }>()
 );
-
-/*
-export class LoadAllOrganisationAnlassAction implements Action {
-  readonly type = ActionTypes.LoadAllOrganisationAnlass;
-}
-
-export class LoadAllOrganisationAnlassFinishedAction implements Action {
-  readonly type = ActionTypes.LoadAllOrganisationAnlassFinished;
-  constructor(public payload: ReadonlyArray<IOrganisationAnlassLink>) {}
-}
-
-export type OrganisationAnlassActions =
-  | LoadAllOrganisationAnlassAction
-  | LoadAllOrganisationAnlassFinishedAction;
 */

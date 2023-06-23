@@ -1,0 +1,119 @@
+Anlass Statistik
+  <div class="row">
+    <div class="col-12" *ngIf="anlassSummary">
+      <mat-checkbox
+        [(ngModel)]="anlassSummary.startet"
+        [disabled]="isStartedCheckboxDisabled()"
+        (ngModelChange)="vereinStartedClicked($event)"
+        >Verein startet</mat-checkbox
+      >
+    </div>
+  </div>
+<!--
+  <div class="row">
+    <div class="col-3">Teilnehmer Total: {{ anzahlTeilnehmer }}</div>
+    <div class="col-3">Teilnehmer K1-K4: {{ anzahlTeilnehmerBrevet1 }}</div>
+    <div class="col-3">Teilnehmer K5-K7: {{ anzahlTeilnehmerBrevet2 }}</div>
+  </div>
+  <div class="row">
+    <div *ngIf="isBrevet1Anlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet1Anlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet1Anlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet1Anlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet2Anlass() && isTuAnlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet2Anlass() && isTiAnlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet2Anlass() && isTiAnlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet2Anlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet2Anlass() && isTuAnlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet2Anlass() && isTiAnlass()" class="col-1">Anzahl</div>
+    <div *ngIf="isBrevet2Anlass()" class="col-1">Anzahl</div>
+  </div>
+  <div class="row">
+    <div
+      *ngIf="isBrevet1Anlass() && getTeilnahmenForKategorieK1() | async; let k1"
+      class="col-1"
+    >
+      K1: {{ k1.length }}
+    </div>
+    <div
+      *ngIf="isBrevet1Anlass() && getTeilnahmenForKategorieK2() | async; let k2"
+      class="col-1"
+    >
+      K2: {{ k2.length }}
+    </div>
+    <div
+      *ngIf="isBrevet1Anlass() && getTeilnahmenForKategorieK3() | async; let k3"
+      class="col-1"
+    >
+      K3: {{ k3.length }}
+    </div>
+    <div
+      *ngIf="isBrevet1Anlass() && getTeilnahmenForKategorieK4() | async; let k4"
+      class="col-1"
+    >
+      K4: {{ k4.length }}
+    </div>
+    <div
+      *ngIf="
+        isBrevet2Anlass() && isTuAnlass() && getTeilnahmenForKategorieK5()
+          | async;
+        let k5
+      "
+      class="col-1"
+    >
+      K5: {{ k5.length }}
+    </div>
+    <div
+      *ngIf="
+        isBrevet2Anlass() && isTiAnlass() && getTeilnahmenForKategorieK5A()
+          | async;
+        let k5A
+      "
+      class="col-1"
+    >
+      K5A: {{ k5A.length }}
+    </div>
+    <div
+      *ngIf="
+        isBrevet2Anlass() && isTiAnlass() && getTeilnahmenForKategorieK5B()
+          | async;
+        let k5B
+      "
+      class="col-1"
+    >
+      K5B: {{ k5B.length }}
+    </div>
+    <div
+      *ngIf="isBrevet2Anlass() && getTeilnahmenForKategorieK6() | async; let k6"
+      class="col-1"
+    >
+      K6: {{ k6.length }}
+    </div>
+    <div
+      *ngIf="
+        isBrevet2Anlass() && isTuAnlass() && getTeilnahmenForKategorieKH()
+          | async;
+        let kH
+      "
+      class="col-1"
+    >
+      KH: {{ kH.length }}
+    </div>
+    <div
+      *ngIf="
+        isBrevet2Anlass() && isTiAnlass() && getTeilnahmenForKategorieKD()
+          | async;
+        let kD
+      "
+      class="col-1"
+    >
+      KD: {{ kD.length }}
+    </div>
+    <div
+      *ngIf="isBrevet2Anlass() && getTeilnahmenForKategorieK7() | async; let k7"
+      class="col-1"
+    >
+      K7: {{ k7.length }}
+    </div>
+  </div>
+  -->

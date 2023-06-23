@@ -1,5 +1,4 @@
 import { CommonModule } from "@angular/common";
-import { RouterModule } from "@angular/router";
 import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { HoverOverDirective } from "../core/directive/hover.directive";
@@ -15,6 +14,8 @@ import {
 } from "./event-start-list";
 import { EventThumbnailComponent } from "./event-thumbnail";
 import {
+  AnlassDetailComponent,
+  AnlassStatistikComponent,
   EventsDetailComponent,
   WertungsrichterChipComponent,
   WertungsrichterSlotComponent,
@@ -44,6 +45,8 @@ export function checkDirtyState(component: CreateEventComponent) {
     EventStartListRowComponent,
     EventStartListHeaderComponent,
     HoverOverDirective,
+    AnlassDetailComponent,
+    AnlassStatistikComponent,
   ],
   imports: [
     CommonModule,

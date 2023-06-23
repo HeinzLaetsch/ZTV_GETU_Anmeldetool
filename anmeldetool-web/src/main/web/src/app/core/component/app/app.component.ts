@@ -21,7 +21,7 @@ import { NewVereinComponent } from "../new-verein/new-verein.component";
   styleUrls: ["app.component.css"],
 })
 export class AnmeldeToolComponent
-  implements AfterViewInit, AfterContentChecked
+  implements OnInit, AfterViewInit, AfterContentChecked
 {
   private showPage = 0;
   dialogOpen = false;
@@ -37,10 +37,14 @@ export class AnmeldeToolComponent
     private anlassService: CachingAnlassService,
     // private router: ActivatedRoute,
     public dialog: MatDialog
-  ) {
+  ) {}
+  ngOnInit(): void {
     this.anlass = this.anlassService.findetAnlassStatt();
     if (this.anlass) {
       this.appBlocked = true;
+    }
+    if (!this.appBlocked && !this.authService.isAuthenticated()) {
+      this.dialogOpen = true;
     }
   }
 
@@ -74,7 +78,7 @@ export class AnmeldeToolComponent
   }
 
   openLoginDialog() {
-    this.dialogOpen = true;
+    // this.dialogOpen = true;
 
     // console.log("Dialog open");
 

@@ -37,6 +37,7 @@ import org.ztv.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.GeraetEnum;
 import org.ztv.anmeldetool.models.KategorieEnum;
+import org.ztv.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.OrganisationAnlassLink;
 import org.ztv.anmeldetool.models.OrganisationPersonLink;
@@ -207,6 +208,7 @@ public class AnlassAdminController {
 			return ResponseEntity.ok(asDto);
 		}
 		int startBr1 = 0;
+		int startK1 = 0;
 		int startBr2 = 0;
 		int gemeldeteBr1 = 0;
 		int gemeldeteBr2 = 0;
@@ -216,6 +218,11 @@ public class AnlassAdminController {
 			List<TeilnehmerAnlassLink> links = anlassSrv.getTeilnahmen(anlassId, orgId, false);
 			startBr1 = (int) links.stream().filter(link -> {
 				return link.getKategorie().isJugend();
+			}).count();
+			startK1 = (int) links.stream().filter(link -> {
+				return link.getKategorie().equals(KategorieEnum.K1)
+						&& (link.getMeldeStatus().equals(MeldeStatusEnum.STARTET)
+								&& link.getMeldeStatus().equals(MeldeStatusEnum.NEUMELDUNG));
 			}).count();
 			startBr2 = (int) links.stream().filter(link -> {
 				return !link.getKategorie().isJugend();

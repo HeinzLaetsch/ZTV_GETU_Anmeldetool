@@ -3,7 +3,13 @@ import {
   moveItemInArray,
   transferArrayItem,
 } from "@angular/cdk/drag-drop";
-import { AfterViewInit, Component, OnInit, ViewChild } from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  Input,
+  OnInit,
+  ViewChild,
+} from "@angular/core";
 import { MatTabGroup } from "@angular/material/tabs";
 import { ActivatedRoute, Router } from "@angular/router";
 import { select, Store } from "@ngrx/store";
@@ -16,15 +22,9 @@ import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassL
 import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
 import { IUser } from "src/app/core/model/IUser";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterStatusEnum";
-import { AnlassActions, selectAnlassById } from "src/app/core/redux/anlass";
+import { selectAnlassById } from "src/app/core/redux/anlass";
 import { AppState } from "src/app/core/redux/core.state";
-import {
-  loadAllOalAction,
-  selectOalForKeys,
-  updateVereinsStart,
-} from "src/app/core/redux/organisation-anlass";
 import {
   getBrevet1Entries,
   getBrevet2Entries,
@@ -32,9 +32,14 @@ import {
   loadAllTeilnahmenAction,
   selectTeilnehmerForAnlassEntries,
 } from "src/app/core/redux/teilnahme";
+import {
+  OalActions,
+  selectOalForKeys,
+} from "src/app/core/redux/organisation-anlass";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
 import { WertungsrichterService } from "src/app/core/service/wertungsrichter.service";
+import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
 
 @Component({
   selector: "app-events-detail",
@@ -43,6 +48,9 @@ import { WertungsrichterService } from "src/app/core/service/wertungsrichter.ser
 })
 export class EventsDetailComponent implements OnInit, AfterViewInit {
   @ViewChild("tabs") tabGroup: MatTabGroup;
+
+  @Input()
+  anlassSummary: IAnlassSummary;
 
   anlass: IAnlass;
   anlass$: Observable<IAnlass>;
@@ -77,43 +85,21 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     const anlassId: string = this.route.snapshot.params.id;
-    this.store.dispatch(loadAllOalAction());
-    this.store.dispatch(loadAllTeilnahmenAction());
 
-    //TODO Sollte nicht nötig sein !!! State wird beim Start geladen
-    // this.store.dispatch(AnlassActions.loadAllAnlaesse());
     this.anlass$ = this.store.pipe(select(selectAnlassById(anlassId)));
     this.anlass$.subscribe((anlass) => {
       this.anlass = anlass;
-
-      this.starts$ = this.store.pipe(
-        select(
-          selectOalForKeys(this.authService.currentVerein.id, this.anlass.id)
-        )
-      );
-
-      this.starts$.subscribe((oalLinks) => {
-        if (oalLinks !== undefined && oalLinks.length > 0) {
-          this.orgAnlassLink = oalLinks[1];
-          this.anlass.erfassenVerlaengert =
-            this.orgAnlassLink.verlaengerungsDate;
-        }
-      });
-
-      this.teilnahmenBrevet1$ = this.store.select(
-        getBrevet1Entries(this.anlass.id)
-      );
-      this.teilnahmenBrevet2$ = this.store.select(
-        getBrevet2Entries(this.anlass.id)
-      );
-      this.teilnehmer$ = this.store.select(
-        selectTeilnehmerForAnlassEntries(this.anlass.id)
-      );
-      this.teilnehmer$.subscribe(
-        (teilnehmer) => (this.teilnehmer = teilnehmer)
-      );
+      // anlassInit();
     });
 
+    // wrInit();
+  }
+
+  storeInit() {
+    this.store.dispatch(OalActions.loadAllOalInvoked());
+    this.store.dispatch(loadAllTeilnahmenAction());
+  }
+  wrInit() {
     this.wertungsrichterService
       .getEingeteilteWertungsrichter(this.anlass, 1)
       .subscribe((assignedWrs) => {
@@ -137,12 +123,40 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
     this.getVerfuegbareWertungsrichter(this.wr2s, 2);
   }
 
+  anlassInit() {
+    this.starts$ = this.store.pipe(
+      select(
+        selectOalForKeys(this.authService.currentVerein.id, this.anlass.id)
+      )
+    );
+
+    this.starts$.subscribe((oalLinks) => {
+      if (oalLinks !== undefined && oalLinks.length > 0) {
+        this.orgAnlassLink = oalLinks[1];
+        this.anlass.erfassenVerlaengert = this.orgAnlassLink.verlaengerungsDate;
+      }
+    });
+
+    this.teilnahmenBrevet1$ = this.store.select(
+      getBrevet1Entries(this.anlass.id)
+    );
+    this.teilnahmenBrevet2$ = this.store.select(
+      getBrevet2Entries(this.anlass.id)
+    );
+    this.teilnehmer$ = this.store.select(
+      selectTeilnehmerForAnlassEntries(this.anlass.id)
+    );
+    this.teilnehmer$.subscribe((teilnehmer) => (this.teilnehmer = teilnehmer));
+  }
+
   ngAfterViewInit(): void {
+    /*
     if (this.isBrevet1Anlass()) {
       this.tabGroup.selectedIndex = 0;
     } else {
       this.tabGroup.selectedIndex = 1;
     }
+    */
   }
 
   isViewOnly(): boolean {
@@ -153,7 +167,9 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
     const asMoment = moment(event);
     this.orgAnlassLink.verlaengerungsDate = asMoment.add(1, "h").toDate();
 
-    this.store.dispatch(updateVereinsStart({ payload: this.orgAnlassLink }));
+    this.store.dispatch(
+      OalActions.updateVereinsStartInvoked({ payload: this.orgAnlassLink })
+    );
 
     /*
     this.anlassService
@@ -165,6 +181,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
       */
   }
 
+  /*
   isStartedCheckboxDisabled(): boolean {
     if (
       !this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)
@@ -177,6 +194,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
     }
     return true;
   }
+  */
   isTuAnlass(): boolean {
     return this.anlass.tuAnlass;
   }
@@ -393,10 +411,13 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
   useBrevet2Clicked(check: boolean) {
     console.log("Use Brevet 2: ", this.useBrevet2);
   }
+  /*
   vereinStartedClicked(check: boolean) {
-    this.store.dispatch(updateVereinsStart({ payload: this.orgAnlassLink }));
+    this.store.dispatch(
+      OalActions.updateVereinsStartInvoked({ payload: this.orgAnlassLink })
+    );
   }
-
+*/
   handleClickMe(event: PointerEvent) {
     this.router.navigate(["anlass/anmeldungen/", this.anlass?.id]);
   }

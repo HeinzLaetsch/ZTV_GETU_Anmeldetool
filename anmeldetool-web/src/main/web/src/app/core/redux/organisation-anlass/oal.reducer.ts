@@ -1,7 +1,22 @@
-import { Action, createReducer, on } from "@ngrx/store";
-import { loadAllOalSuccess } from "./oal.actions";
-import { initialState, OalState } from "./oal.state";
+import { Action, createFeature, createReducer, on } from "@ngrx/store";
+import { OalActions } from "./oal.actions";
+import { initialState, oalAdapter, OalState } from "./oal.state";
 
+export const oalFeature = createFeature({
+  name: "oal",
+  reducer: createReducer(
+    initialState,
+    on(OalActions.loadAllOalSuccess, (state, action) => {
+      const oals = action.payload;
+      return oalAdapter.setAll(oals, state);
+    })
+  ),
+});
+
+export const { selectAll, selectEntities, selectIds, selectTotal } =
+  oalAdapter.getSelectors();
+
+/*
 const oalReducer = createReducer(
   initialState,
   on(loadAllOalSuccess, (state, { payload }) => ({
@@ -12,32 +27,5 @@ const oalReducer = createReducer(
 
 export function reducer(state: OalState | undefined, action: Action) {
   return oalReducer(state, action);
-}
-
-/*
-export interface ReducerOrganisationAnlassState {
-  items: ReadonlyArray<IOrganisationAnlassLink>;
-  loadStatus: "NOT_LOADED" | "LOADING" | "LOADED";
-}
-export const initialState: ReducerOrganisationAnlassState = {
-  items: [],
-  loadStatus: "NOT_LOADED",
-};
-
-export function oalReducer(
-  state = initialState,
-  action: OrganisationAnlassActions
-): ReducerOrganisationAnlassState {
-  switch (action.type) {
-    case ActionTypes.LoadAllOrganisationAnlassFinished: {
-      return {
-        ...state,
-        items: [...action.payload],
-        loadStatus: "LOADED",
-      };
-    }
-    default:
-      return state;
-  }
 }
 */
