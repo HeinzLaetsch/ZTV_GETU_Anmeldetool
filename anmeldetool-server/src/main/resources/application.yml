@@ -34,10 +34,10 @@ spring:
      port: 587
      templates:
         path: "mail-templates"
-     username: "getu-wettkaempfe-tu@ztv.ch"
-     # username: "heinz.laetsch@gmx.ch"
-     password: win123Paratech
-     # password: "gmx32Paratech"
+     username: "getu-wettkaempfe-tu1@ztv.ch"
+     # username: "heinz.laetsch1@gmx.ch"
+     password: 
+     # password: 
      properties:
         mail:
            smtp:
