@@ -7,7 +7,6 @@ import { Observable } from "rxjs";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IAnlassLink } from "src/app/core/model/IAnlassLink";
 import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
-import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
 import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
 import { selectAnlassById } from "src/app/core/redux/anlass";
 import {
@@ -15,10 +14,6 @@ import {
   selectAnlassSummaryByAnlassId,
 } from "src/app/core/redux/anlass-summary";
 import { AppState } from "src/app/core/redux/core.state";
-import {
-  OalActions,
-  selectOalForKeys,
-} from "src/app/core/redux/organisation-anlass";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { SubscriptionHelper } from "src/app/utils/subscription-helper";
 
@@ -346,12 +341,100 @@ export class EventsDetailComponent
       this.anlass
     );
   }
-  */
-  /*
-  vereinStartedClicked(check: boolean) {
-    this.store.dispatch(
-      OalActions.updateVereinsStartInvoked({ payload: this.orgAnlassLink })
+
+  // TODO check with this.teilnahmenBrevet1 = this.anlassService.getTeilnahmen(this.anlass, 1);
+  get anzahlTeilnehmer(): number {
+    if (this.anlassService.getTeilnehmerForAnlass(this.anlass)) {
+      return this.anlassService.getTeilnehmerForAnlass(this.anlass).length;
+    }
+    return 0;
+  }
+  get availableWertungsrichter1(): IUser[] {
+    if (this.useBrevet2) {
+      return this.wr1s.concat(this.wr2s);
+    }
+    return this.wr1s;
+  }
+  get availableWertungsrichter2(): IUser[] {
+    return this.wr2s;
+  }
+
+  drop(event: CdkDragDrop<IUser[]>, liste: string) {
+    console.log("Drop: ", event, ", liste", liste);
+    if (event.previousContainer === event.container) {
+      console.log("move Drop: ", event);
+      moveItemInArray(
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+    } else {
+      console.log("Transfer Drop: ", event);
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+      console.log("Data: ", event.container.data[0]);
+      if (liste === "2") {
+        this.anlassService
+          .addWertungsrichterToAnlass(
+            this.anlass,
+            this.authService.currentVerein,
+            event.container.data[event.currentIndex] as unknown as IUser
+          )
+          .subscribe((result) => {
+            this.statusBr1 = this.getStatusBr1();
+            this.statusBr2 = this.getStatusBr2();
+
+            this.loadWrLink(
+              event.container.data[event.currentIndex] as unknown as IUser
+            );
+          });
+      } else {
+        this.anlassService
+          .deleteWertungsrichterFromAnlass(
+            this.anlass,
+            this.authService.currentVerein,
+            event.container.data[event.currentIndex] as unknown as IUser
+          )
+          .subscribe((result) => {
+            this.statusBr1 = this.getStatusBr1();
+            this.statusBr2 = this.getStatusBr2();
+          });
+      }
+    }
+  }
+
+  getStatusBr1(): WertungsrichterStatusEnum {
+    this.statusBr1 = this.wertungsrichterService.getStatusWertungsrichterBr(
+      this.assignedWr1s,
+      this.wertungsrichterPflichtBrevet1
     );
+    return this.statusBr1;
+  }
+  getStatusBr2(): WertungsrichterStatusEnum {
+    this.statusBr2 = this.wertungsrichterService.getStatusWertungsrichterBr(
+      this.assignedWr2s,
+      this.wertungsrichterPflichtBrevet2
+    );
+    return this.statusBr2;
+  }
+
+  loadWrLink(wertungsrichterUser: IUser): void {
+    this.anlassService
+      .getWrEinsatz(
+        this.anlass,
+        this.authService.currentVerein,
+        wertungsrichterUser
+      )
+      .subscribe((pal) => {
+        wertungsrichterUser.pal = pal;
+      });
+  }
+  useBrevet2Clicked(check: boolean) {
+    console.log("Use Brevet 2: ", this.useBrevet2);
   }
 */
 }

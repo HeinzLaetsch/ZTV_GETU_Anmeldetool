@@ -3,6 +3,7 @@ import { RouterModule, Routes } from "@angular/router";
 import { AuthRouteActivatorService } from "./core/routing/auth-route-activator.service";
 import { EventRouteActivatorService } from "./events/index";
 import { Page404Component } from "./error/page404/page404.component";
+import { SmQualiViewerComponent } from "./smquali/smquali-viewer/smquali-viewer.component";
 
 const routes: Routes = [
   {
@@ -49,6 +50,11 @@ const routes: Routes = [
     pathMatch: "full",
     // canActivate: [AuthRouteActivatorService],
   },
+  {
+    path: "smquali",
+    component: SmQualiViewerComponent,
+  },
+  { path: "", redirectTo: "anlass", pathMatch: "full" },
 ];
 
 @NgModule({

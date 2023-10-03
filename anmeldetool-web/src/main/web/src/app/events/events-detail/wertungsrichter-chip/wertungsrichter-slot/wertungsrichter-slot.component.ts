@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IPersonAnlassLink } from "src/app/core/model/IPersonAnlassLink";
+import { IUser } from "src/app/core/model/IUser";
 import { IWertungsrichter } from "src/app/core/model/IWertungsrichter";
 import { IWertungsrichterEinsatz } from "src/app/core/model/IWertungsrichterEinsatz";
 import { IWertungsrichterSlot } from "src/app/core/model/IWertungsrichterSlot";
@@ -22,7 +23,7 @@ export class WertungsrichterSlotComponent implements OnInit {
   @Input()
   slot: IWertungsrichterSlot;
   @Input()
-  wertungsrichter: IWertungsrichter;
+  wertungsrichter: IUser;
   @Input()
   wrAnlassLink: IPersonAnlassLink;
   @Input()

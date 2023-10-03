@@ -227,7 +227,7 @@ public class ZTVScheduler {
 	}
 
 	private void sendMutationMailIfNeeded(List<Anlass> filteredAnlaesse, String subject, String datumText) {
-
+		log.info("sendMutationMailIfNeeded Anzahl: {},  Wettkampf {}", filteredAnlaesse.size(), datumText);
 		filteredAnlaesse.forEach(anlass -> {
 			anlass.getOrganisationenLinks().forEach(oal -> {
 				Organisation org = oal.getOrganisation();

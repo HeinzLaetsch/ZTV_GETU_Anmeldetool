@@ -1,0 +1,149 @@
+<!-- https://getbootstrap.com/docs/4.0/components/navbar/ -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="collapse navbar-collapse show" id="navbarCollapse">
+    <ul class="nav navbar-nav" *ngIf="!authService.isAnlassUser()">
+      <li class="nav-item active">
+        <a
+          [routerLink]="['/anlass']"
+          class="nav-link"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          >Alle Anlässe<span class="sr-only"></span
+        ></a>
+      </li>
+    </ul>
+    <div class="navbar-header navbar-right">
+      <ul class="nav navbar-nav">
+        <li
+          class="nav-item dropdown"
+          *ngIf="authService.isAdministrator() || authService.isSekretariat()"
+        >
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            id="navbarDropdownMenuLink"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            Anlässe verwalten
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a
+              *ngFor="let anlass of getAnlaesse()"
+              class="dropdown-item"
+              [routerLink]="['/anlass', anlass.id, 'admin']"
+              >{{ anlass.getCleaned() }} {{ anlass.organisator }}</a
+            >
+          </div>
+        </li>
+
+        <li>
+          <!--a *ngIf="!authService.isAuthenticated()" [routerLink]="['user/login']">Login</a-->
+          <a
+            *ngIf="
+              (authService.isAuthenticated() && !authService.isAnlassUser()) ||
+              (authService.isAdministrator() && authService.currentVerein)
+            "
+            [routerLink]="['teilnehmer']"
+            class="nav-link"
+            >Teilnehmer</a
+          >
+        </li>
+        <li
+          class="nav-item dropdown"
+          *ngIf="
+            (authService.isAdministrator() || authService.isRechnungsbuero()) &&
+            authService.currentVerein
+          "
+        >
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            id="navbarDropdownMenuLink"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            Rechnungsbüro
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a
+              class="dropdown-item"
+              [routerLink]="['/rechnungsbuero', organisator.id, 'erfassen']"
+              >Noten erfassen</a
+            >
+            <a
+              class="dropdown-item"
+              [routerLink]="['/rechnungsbuero', organisator.id, 'check']"
+              >Noten überprüfen</a
+            >
+            <a
+              class="dropdown-item"
+              [routerLink]="['/rechnungsbuero', organisator.id, 'ranglisten']"
+              >Ranglisten</a
+            >
+          </div>
+        </li>
+        <li>
+          <a
+            *ngIf="
+              authService.isAuthenticated() ||
+              authService.isRechnungsbuero() ||
+              (authService.isAdministrator() && authService.currentVerein)
+            "
+            [routerLink]="['user/user']"
+            class="nav-link"
+            >Benutzerdaten</a
+          >
+        </li>
+        <li class="nav-item dropdown" *ngIf="authService.isAdministrator()">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            id="navbarDropdownMenuLink"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            Verein auswählen
+          </a>
+
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a
+              *ngFor="let verein of getVereine()"
+              class="dropdown-item"
+              (click)="setVerein(verein)"
+              >{{ verein.name }}</a
+            >
+          </div>
+        </li>
+        <li *ngIf="authService.isAdministrator()">
+          <a
+            [routerLink]="['/smquali']"
+            class="nav-link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            >SM Quali<span class="sr-only"></span
+          ></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <a
+    *ngIf="authService.currentVerein && authService.isAdministrator()"
+    class="navbar-brand"
+  >
+    selektierter Verein <span>{{ authService.currentVerein.name }}</span>
+  </a>
+  <a
+    *ngIf="!authService.currentVerein && authService.isAdministrator()"
+    class="navbar-brand"
+  >
+    Kein Verein selektiert
+  </a>
+  <a class="navbar-brand">
+    Ressort GETU
+    <img brand src="assets/images/ZTV_Logo_CMYK_freigestellt.png" height="36" />
+  </a>
+</nav>

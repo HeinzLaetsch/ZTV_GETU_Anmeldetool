@@ -22,6 +22,8 @@ export class IAnlass {
   anlageFix?: boolean;
   startgeraetFix?: boolean;
   toolSperren?: boolean;
+  smQuali: boolean;
+  ausserkantonal: boolean;
 
   tiefsteKategorie: KategorieEnum;
   hoechsteKategorie: KategorieEnum;

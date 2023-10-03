@@ -94,12 +94,12 @@ export class EventThumbnailComponent
       return { greenNoMargin: true };
     }
   }
-  handleClickMe(event: PointerEvent) {
+  handleClickMe(event: MouseEvent) {
     // this.anlassClick.emit(this.anlass.anlassBezeichnung);
     this.router.navigate(["/anlaesse/", this.anlassExtended.anlass?.id]);
   }
 
-  vereinStartedClicked(event: PointerEvent) {
+  vereinStartedClicked(event: MouseEvent) {
     console.log(event);
     event.cancelBubble = true;
     const organisationAnlassLink: IOrganisationAnlassLink = {

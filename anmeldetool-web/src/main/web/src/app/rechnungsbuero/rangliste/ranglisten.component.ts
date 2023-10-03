@@ -1,8 +1,9 @@
 import { Component, OnInit } from "@angular/core";
-import { MatSelect } from "@angular/material/select";
-import { ActivatedRoute } from "@angular/router";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { MatSelectChange } from "@angular/material/select";
+import { MatSliderChange } from "@angular/material/slider";
+import { ActivatedRoute } from "@angular/router";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { ILauflistenStatus } from "src/app/core/model/ILauflistenStatus";
 import { IRanglistenConfiguration } from "src/app/core/model/IRanglistenConfiguration";
@@ -99,7 +100,7 @@ export class RanglistenComponent extends SubscriptionHelper implements OnInit {
   set maxAuszeichnungen(maxAuszeichnungen: number) {
     if (this.config) this.config.maxAuszeichnungen = maxAuszeichnungen;
   }
-  sliderChanged(value: number) {
+  sliderChanged(value: MatSliderChange) {
     console.log("Slider: ", value);
     this.getRangliste();
   }
@@ -190,18 +191,15 @@ export class RanglistenComponent extends SubscriptionHelper implements OnInit {
     return anlass.getKategorienRaw().slice(1);
   }
 
-  kategorieSelected(kategorie: MatSelect): void {
+  kategorieSelected(kategorie: MatSelectChange): void {
     this.kategorie = kategorie.value;
     //     this.getRangliste();
     this.getConfig();
     this.getRanglistenState();
   }
 
-  tiTuSelected(kategorie: MatSelect): void {
-    this.tiTu = TiTuEnum[kategorie.value];
-    // this.getRangliste();
-    const b1 = TiTuEnum.Tu === this.tiTu;
-    const b2 = TiTuEnum.Ti === this.tiTu;
+  tiTuSelected(tiTu: MatSelectChange): void {
+    this.tiTu = TiTuEnum[tiTu.value];
     this.getConfig();
     this.getRanglistenState();
   }

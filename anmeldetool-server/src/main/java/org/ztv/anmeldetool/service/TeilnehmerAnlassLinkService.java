@@ -323,6 +323,10 @@ public class TeilnehmerAnlassLinkService {
 		tal.setAnlage(tsDTO.getAnlage());
 		tal.setStartgeraet(tsDTO.getStartgeraet());
 		tal.setMeldeStatus(tsDTO.getMeldeStatus());
+		if (MeldeStatusEnum.ABGEMELDET_3.equals(tal.getMeldeStatus())) {
+			tal.setDeleted(true);
+			tal.setAktiv(false);
+		}
 		teilnehmerAnlassLinkRepository.save(tal);
 	}
 }

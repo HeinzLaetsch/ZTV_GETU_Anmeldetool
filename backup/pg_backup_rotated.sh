@@ -19,7 +19,7 @@ done
 
 if [ -z $CONFIG_FILE_PATH ] ; then
         SCRIPTPATH=$(cd ${0%/*} && pwd -P)
-        CONFIG_FILE_PATH="${SCRIPTPATH}/pg_backup.config"
+        CONFIG_FILE_PATH="${SCRIPTPATH}/getu_db_backup.config"
 fi
 
 if [ ! -r ${CONFIG_FILE_PATH} ] ; then
@@ -61,7 +61,7 @@ function perform_backups()
 {
 	SUFFIX=$1
 	## _\%H_\&M
-	FINAL_BACKUP_DIR=$BACKUP_DIR"`date +\%Y-\%m-\%d_\%H_\&M`$SUFFIX/"
+	FINAL_BACKUP_DIR=$BACKUP_DIR"`date +\%Y-\%m-\%d_\%H_\%M`$SUFFIX/"
 
 	echo "Making backup directory in $FINAL_BACKUP_DIR"
 

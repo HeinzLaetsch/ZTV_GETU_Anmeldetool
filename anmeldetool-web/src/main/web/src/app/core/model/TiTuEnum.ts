@@ -33,4 +33,13 @@ export namespace TiTuEnum {
     }
     return tiTu1String === tiTu2String;
   }
+  /*
+  export function getTiTuEnum(value: string): TiTuEnum {
+    const values = Object.entries(TiTuEnum);
+    const ret = values.filter((val) => {
+      const asString: string = val[1];
+      return asString === value;
+    });
+    return TiTuEnum[ret[0][0]] as TiTuEnum;
+  } */
 }

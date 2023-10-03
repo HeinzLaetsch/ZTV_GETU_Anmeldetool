@@ -146,7 +146,7 @@ public class TableHeaderEventHandler implements IEventHandler {
 		// cell = cell.setHeight(18);
 		cell = cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
 		cell.setBorder(Border.NO_BORDER);
-		Text text = new Text(anlass.getAnlassBezeichnung()).setFont(fontN).setFontSize(13);
+		Text text = new Text(anlass.getAnlassBezeichnung().replace("%", "")).setFont(fontN).setFontSize(13);
 		Text textOrt = new Text(" in " + anlass.getOrt()).setFont(fontN).setFontSize(13);
 		DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 

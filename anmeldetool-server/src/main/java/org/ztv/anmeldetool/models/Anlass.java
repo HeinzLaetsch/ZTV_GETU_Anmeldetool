@@ -70,6 +70,19 @@ public class Anlass extends Base {
 
 	private boolean reminderMeldeschlussSent;
 
+	private boolean smQuali;
+
+	private boolean ausserkantonal;
+
+	/*
+	 * @Column(name = "sieger_total_k5") private float siegerTotalK5;
+	 * 
+	 * @Column(name = "sieger_total_k6") private float siegerTotalK6;
+	 * 
+	 * @Column(name = "sieger_total_kh") private float siegerTotalKH;
+	 * 
+	 * @Column(name = "sieger_total_k7") private float siegerTotalK7;
+	 */
 	@Enumerated(EnumType.STRING)
 	private TiTuEnum tiTu;
 

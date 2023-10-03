@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.ztv.anmeldetool.models.Anlass;
+import org.ztv.anmeldetool.models.KategorieEnum;
+import org.ztv.anmeldetool.models.TiTuEnum;
 
 /**
  * 
@@ -24,4 +26,11 @@ public interface AnlassRepository extends CrudRepository<Anlass, UUID> {
 
 	List<Anlass> findByStartDateBetweenAndAktivOrderByStartDate(LocalDateTime startDate, LocalDateTime endDate,
 			boolean aktiv);
+
+	List<Anlass> findByAktivAndSmQualiAndTiTuOrTiTuAndHoechsteKategorieEqualsAndStartDateBetweenOrderByStartDate(
+			boolean aktiv, boolean smQuali, TiTuEnum tiTu, TiTuEnum tiTuAlle, KategorieEnum kategorie,
+			LocalDateTime start, LocalDateTime end);
+
+	List<Anlass> findByAktivTrueAndSmQualiInAndTiTuInAndHoechsteKategorieEqualsAndStartDateBetweenOrderByStartDate(
+			boolean[] smQuali, TiTuEnum tiTu[], KategorieEnum kategorie, LocalDateTime start, LocalDateTime end);
 }

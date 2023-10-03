@@ -2,6 +2,7 @@ package org.ztv.anmeldetool.models;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +69,9 @@ public class LauflistenContainer extends Base {
 	}
 
 	public List<TeilnehmerAnlassLink> getTeilnehmerAnlassLinksOrdered() {
-		this.teilnehmerAnlassLinks.sort(TeilnehmerAnlassLink::compareByTiTuThenVereinThenName);
+		// this.teilnehmerAnlassLinks.sort(TeilnehmerAnlassLink::compareByTiTuThenVereinThenName);
+		Collections.sort(this.teilnehmerAnlassLinks,
+				Collections.reverseOrder(TeilnehmerAnlassLink::compareByTiTuThenVereinThenName));
 		return this.teilnehmerAnlassLinks;
 	}
 

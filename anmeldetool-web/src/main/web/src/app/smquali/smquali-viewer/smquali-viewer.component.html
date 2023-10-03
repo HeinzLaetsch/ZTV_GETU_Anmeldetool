@@ -1,0 +1,109 @@
+<h1>Qualifikation Schweizermeisterschaften Auswertung</h1>
+<hr />
+<div class="row">
+  <div class="col-sm-1">
+    <mat-form-field>
+      <mat-label>Jahr</mat-label>
+      <mat-select (selectionChange)="jahrSelected($event)" [value]="jahr">
+        <mat-option *ngFor="let jahr of getJahre()" [value]="jahr">{{
+          jahr
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="col-sm-1">
+    <!--  appearance="fill" -->
+    <mat-form-field>
+      <mat-label>Geschlecht</mat-label>
+      <mat-select (selectionChange)="tiTuSelected($event)" [value]="tiTu">
+        <mat-option *ngFor="let titu of getTiTu()" [value]="titu">{{
+          titu
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="col-sm-1">
+    <mat-form-field>
+      <mat-label>Kategorie</mat-label>
+      <mat-select
+        (selectionChange)="kategorieSelected($event)"
+        [value]="kategorie"
+      >
+        <mat-option
+          *ngFor="let kategorie of getKategorien()"
+          [value]="kategorie"
+          >{{ kategorie }}</mat-option
+        >
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="col-sm-1">
+    <mat-checkbox [checked]="nurQuali" (change)="setNurQuali($event.checked)"
+      >Qualiwettkämpfe</mat-checkbox
+    >
+  </div>
+  <div class="col-sm-1">
+    <button
+      mat-button
+      type="button"
+      color="primary"
+      aria-label="SmQuali als CSV"
+      (click)="downloadAuswertungCSV()"
+      tabindex="-1"
+    >
+      CSV generieren
+    </button>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-1">Name</div>
+  <div class="col-sm-1">Vorname</div>
+  <div class="col-sm-1">Jahrgang</div>
+  <div class="col-sm-1">Verein</div>
+  <div class="col-sm-1">DurchschnittlichePunktzahl</div>
+  <div class="col-sm-1">1. Wettkampf Punktzahl</div>
+  <div class="col-sm-1">2. Wettkampf Punktzahl</div>
+  <div class="col-sm-1">3. Wettkampf Punktzahl</div>
+  <div class="col-sm-1">KMS Punktzahl</div>
+  <div class="col-sm-1">Final Punktzahl</div>
+  <div class="col-sm-1">1. Ausserkantonaler Punktzahl</div>
+  <div class="col-sm-1">2. Ausserkantonaler Punktzahl</div>
+</div>
+<div class="row" *ngFor="let smquali of smQualiList">
+  <div class="col-sm-1">
+    {{ smquali.name }}
+  </div>
+  <div class="col-sm-1">
+    {{ smquali.vorname }}
+  </div>
+  <div class="col-sm-1">
+    {{ smquali.jahrgang }}
+  </div>
+  <div class="col-sm-1">
+    {{ smquali.organisation }}
+  </div>
+  <div class="col-sm-1">
+    {{ smquali.durchschnittlichePunktzahl }}
+  </div>
+  <div class="col-sm-1">
+    {{ smquali.wettkampf1Punktzahl }}
+  </div>
+  <div class="col-sm-1">
+    {{ smquali.wettkampf2Punktzahl }}
+  </div>
+  <div class="col-sm-1">
+    {{ smquali.wettkampf3Punktzahl }}
+  </div>
+  <div class="col-sm-1">
+    {{ smquali.kmsPunktzahl }}
+  </div>
+  <div class="col-sm-1">
+    {{ smquali.finalPunktzahl }}
+  </div>
+  <div class="col-sm-1">
+    {{ smquali.ausserKantonal1Punktzahl }}
+  </div>
+  <div class="col-sm-1">
+    {{ smquali.ausserKantonal2Punktzahl }}
+  </div>
+</div>

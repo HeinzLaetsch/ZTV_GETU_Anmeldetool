@@ -108,6 +108,38 @@ export class TeilnehmerTableComponent implements AfterViewInit {
         }
         */
     this.anlaesse = this.anlassService.getAnlaesse(this.tiTu);
+    let i = 0;
+    if (this.checked.length === 0) {
+      this.anlaesse.forEach((anlass) => {
+        const empty = {
+          anlassId: anlass?.id,
+          organisationsId: this.authService.currentVerein?.id,
+          startet: false,
+          verlaengerungsDate: undefined,
+        };
+        this.checked.push(empty);
+        anlass.position = i++;
+        console.log("Checked Positio: ", anlass.position, " , ", anlass?.id);
+        this.anlassService
+          .getVereinStart(anlass, this.authService.currentVerein)
+          .subscribe((result) => {
+            const oal = this.checked.filter(
+              (oal) => oal.anlassId === result.anlassId
+            );
+            oal[0].startet = result.startet;
+            // this.checked[anlass.position] = result;
+            console.log(
+              "Checked Positio: ",
+              anlass.position,
+              " , ",
+              anlass?.id + " , " + this.checked[anlass.position].anlassId
+            );
+          });
+      });
+
+      console.log("checked nullified , ", this.tiTu);
+    }
+
     // console.log("TeilnehmerTableComponent:: ngOnInit: ", this.anlaesse);
     this.allDisplayedColumns = this.displayedColumns.map((col) => col);
     this.anlaesse.forEach((anlass) => {
@@ -155,8 +187,8 @@ export class TeilnehmerTableComponent implements AfterViewInit {
     }
   }
   private loadTeilnahmen(createControl: boolean) {
-    let i = 0;
     let currentAnlass = 0;
+    // this.checked.push(o),e.position=t++}
     this.anlaesse.forEach((anlass) => {
       // console.log("Prepare Anlass: ", anlass);
       if (createControl) {
@@ -175,25 +207,9 @@ export class TeilnehmerTableComponent implements AfterViewInit {
           line.push(cntr);
         });
       }
-      const empty = {
-        anlassId: anlass?.id,
-        organisationsId: this.authService.currentVerein?.id,
-        startet: false,
-        verlaengerungsDate: undefined,
-      };
-      this.anlassService
-        .getVereinStart(anlass, this.authService.currentVerein)
-        .subscribe((result) => {
-          if (this.checked.length === 0) {
-            this.anlaesse.forEach((anlass) => {
-              this.checked.push(empty);
-              anlass.position = i++;
-            });
-          }
-          this.checked[anlass.position] = result;
-          const isLast = currentAnlass++ === this.anlaesse.length - 1;
-          this.teilnahmenloader(anlass, isLast);
-        });
+
+      const isLast = currentAnlass++ === this.anlaesse.length - 1;
+      this.teilnahmenloader(anlass, isLast);
     });
   }
   public resetDataSource() {
@@ -663,6 +679,12 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   }
 
   getStartet(colIndex: number): boolean {
+    console.log(
+      "getStartet: ",
+      colIndex,
+      ", ",
+      this.checked[colIndex]?.startet
+    );
     return this.checked[colIndex]?.startet;
   }
 
