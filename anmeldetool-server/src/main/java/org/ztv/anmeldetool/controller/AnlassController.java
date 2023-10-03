@@ -526,10 +526,12 @@ public class AnlassController {
 			TeilnehmerAnlassLink tal = talOpt.get();
 			Laufliste laufliste = lauflisteOpt.get();
 			Einzelnote einzelnote = tal.getNotenblatt().getEinzelnoteForGeraet(laufliste.getGeraet());
+			einzelnote.setChecked(lauflistenEintragDto.isChecked());
 			if (GeraetEnum.BARREN.equals(laufliste.getGeraet()) && TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu())) {
 				einzelnote.setNote_1(0);
 				einzelnote.setNote_2(0);
 				einzelnote.setErfasst(true);
+				einzelnote.setChecked(true);
 			} else {
 				einzelnote.setNote_1(lauflistenEintragDto.getNote_1());
 				einzelnote.setNote_2(lauflistenEintragDto.getNote_2());
@@ -540,7 +542,6 @@ public class AnlassController {
 					einzelnote.setErfasst(false);
 				}
 			}
-			einzelnote.setChecked(lauflistenEintragDto.isChecked());
 			einzelnote = lauflistenService.saveEinzelnote(einzelnote);
 			if (!(GeraetEnum.BARREN.equals(laufliste.getGeraet())
 					&& TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu()))) {

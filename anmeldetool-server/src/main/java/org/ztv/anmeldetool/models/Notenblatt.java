@@ -1,6 +1,7 @@
 package org.ztv.anmeldetool.models;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -43,9 +44,12 @@ public class Notenblatt extends Base {
 		if (einzelnoten == null) {
 			return new Einzelnote();
 		}
-		Einzelnote einzelnote = einzelnoten.stream().filter(en -> {
+		Optional<Einzelnote> einzelnoteOpt = einzelnoten.stream().filter(en -> {
 			return en.getGeraet().equals(geraet);
-		}).findFirst().get();
-		return einzelnote;
+		}).findFirst();
+		if (einzelnoteOpt.isPresent()) {
+			return einzelnoteOpt.orElse(null);
+		}
+		return null;
 	}
 }

@@ -1,5 +1,6 @@
 package org.ztv.anmeldetool.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -358,6 +359,23 @@ public class AnlassService {
 	public List<Anlass> getAllAnlaesse() {
 		List<Anlass> anlaesse = anlassRepo.findByAktivOrderByStartDate(true);
 		return anlaesse;
+	}
+
+	public List<Anlass> getAnlaesseFiltered(int jahr, boolean nurSmQuali, TiTuEnum tiTu) {
+		LocalDateTime start = LocalDateTime.parse(jahr + "-01-01T00:00:00");
+		LocalDateTime end = LocalDateTime.parse(jahr + 1 + "-01-01T00:00:00");
+		end = LocalDateTime.now();
+//		return anlassRepo
+//				.findByAktivAndSmQualiAndTiTuOrTiTuAndHoechsteKategorieEqualsAndStartDateBetweenOrderByStartDate(true,
+//						nurSmQuali, tiTu, TiTuEnum.Alle, kategorie, start, end);
+		TiTuEnum[] tiTus = { tiTu, TiTuEnum.Alle };
+		boolean[] nurSmQualis = { true, false };
+		if (nurSmQuali) {
+			nurSmQualis[1] = true;
+		}
+		return anlassRepo
+				.findByAktivTrueAndSmQualiInAndTiTuInAndHoechsteKategorieEqualsAndStartDateBetweenOrderByStartDate(
+						nurSmQualis, tiTus, KategorieEnum.K7, start, end);
 	}
 
 	public List<TeilnehmerAnlassLink> getTeilnahmen(UUID anlassId, UUID OrgId, boolean exclude) {

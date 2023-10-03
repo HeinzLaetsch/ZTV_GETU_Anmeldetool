@@ -19,6 +19,7 @@ import { MeldeStatusEnum } from "../../model/MeldeStatusEnum";
 import { TiTuEnum } from "../../model/TiTuEnum";
 import { AnlassService } from "../anlass/anlass.service";
 import { CachingVereinService } from "./caching.verein.service";
+import { AuthService } from "../auth/auth.service";
 
 export interface IHash {
   [anlassId: string]: IAnlassLinks;
@@ -42,6 +43,7 @@ export class CachingAnlassService {
   private teilnamen: IHash = {};
 
   constructor(
+    private authService: AuthService,
     private anlassService: AnlassService,
     private vereinService: CachingVereinService
   ) {
@@ -165,7 +167,10 @@ export class CachingAnlassService {
     anlass: IAnlass,
     formData: FormData
   ): Observable<any> {
-    return this.anlassService.importContestTeilnehmerForAnlassCsv(anlass, formData);
+    return this.anlassService.importContestTeilnehmerForAnlassCsv(
+      anlass,
+      formData
+    );
   }
 
   getBenutzerForAnlassCsv(anlass: IAnlass): void {
@@ -298,13 +303,29 @@ export class CachingAnlassService {
     // return this.vereineLoaded.asObservable().pipe(skip(1));
     return this.anlaesseLoaded.asObservable();
   }
-
   getAnlaesse(titu: TiTuEnum): IAnlass[] {
+    return this.getAnlaesseSM(titu, true);
+  }
+  getAnlaesseSM(titu: TiTuEnum, sm: boolean): IAnlass[] {
+    const admin = this.authService.isAdministrator();
     if (this.loaded) {
       if (titu === TiTuEnum.Alle) {
+        if (sm) {
+          return this.anlaesse.filter((anlass) => {
+            if (sm && anlass.smQuali && anlass.ausserkantonal) {
+              if (admin) return true;
+              else return false;
+            }
+            return true;
+          });
+        }
         return this.anlaesse;
       }
       return this.anlaesse.filter((anlass) => {
+        if (sm && anlass.smQuali && anlass.ausserkantonal) {
+          if (admin) return true;
+          else return false;
+        }
         const key = TiTuEnum[anlass.tiTu];
         if (key === titu) {
           return true;

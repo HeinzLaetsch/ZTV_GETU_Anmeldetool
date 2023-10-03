@@ -12,6 +12,7 @@ import { IAnlass } from "src/app/core/model/IAnlass";
 import { IAnlassLink } from "src/app/core/model/IAnlassLink";
 import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
 import { IUser } from "src/app/core/model/IUser";
+import { IWertungsrichter } from "src/app/core/model/IWertungsrichter";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterStatusEnum";
@@ -272,7 +273,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
     return this.wr2s;
   }
 
-  drop(event: CdkDragDrop<String[]>, liste: string) {
+  drop(event: CdkDragDrop<IUser[]>, liste: string) {
     console.log("Drop: ", event, ", liste", liste);
     if (event.previousContainer === event.container) {
       console.log("move Drop: ", event);

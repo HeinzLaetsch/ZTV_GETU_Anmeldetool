@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnDestroy, OnInit } from "@angular/core";
-import { MatSelect } from "@angular/material/select";
+import { MatSelect, MatSelectChange } from "@angular/material/select";
+import { MatSliderChange } from "@angular/material/slider";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subject, Subscription } from "rxjs";
 import { GeraeteEnum } from "src/app/core/model/GeraeteEnum";
@@ -88,7 +89,7 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
   set maxAuszeichnungen(maxAuszeichnungen: number) {
     if (this.config) this.config.maxAuszeichnungen = maxAuszeichnungen;
   }
-  sliderChanged(value: number) {
+  sliderChanged(value: MatSliderChange) {
     console.log("Slider: ", value);
     this.getRangliste();
   }
@@ -179,18 +180,15 @@ export class RechnungsbueroComponent implements OnInit, OnDestroy {
     return anlass.getKategorienRaw().slice(1);
   }
 
-  kategorieSelected(kategorie: MatSelect): void {
+  kategorieSelected(kategorie: MatSelectChange): void {
     this.kategorie = kategorie.value;
     //     this.getRangliste();
     this.getConfig();
     this.getRanglistenState();
   }
 
-  tiTuSelected(kategorie: MatSelect): void {
-    this.tiTu = TiTuEnum[kategorie.value];
-    // this.getRangliste();
-    const b1 = TiTuEnum.Tu === this.tiTu;
-    const b2 = TiTuEnum.Ti === this.tiTu;
+  tiTuSelected(tiTu: MatSelectChange): void {
+    this.tiTu = TiTuEnum[tiTu.value];
     this.getConfig();
     this.getRanglistenState();
   }

@@ -150,8 +150,6 @@ public class ZTVScheduler {
 		});
 		AtomicBoolean error = new AtomicBoolean(false);
 		oplStream.forEach(opl -> {
-			// Person person =
-			// this.personSrv.findPersonByBenutzername("heinz.laetsch@gmx.ch");
 			log.debug("Sende Mail an: {} / {}", opl.getOrganisation().getName(), opl.getPerson().getEmail());
 			if (!sendAnmeldeKontrolleMail(anlass, org, opl.getPerson(), subject, datum, datumText)) {
 				error.set(true);
@@ -177,7 +175,7 @@ public class ZTVScheduler {
 	}
 
 	private void sendMutationMailIfNeeded(List<Anlass> filteredAnlaesse, String subject, String datumText) {
-
+		log.info("sendMutationMailIfNeeded Anzahl: {},  Wettkampf {}", filteredAnlaesse.size(), datumText);
 		filteredAnlaesse.forEach(anlass -> {
 			anlass.getOrganisationenLinks().forEach(oal -> {
 				Organisation org = oal.getOrganisation();

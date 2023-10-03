@@ -8,6 +8,7 @@ import {
   EventsDetailComponent,
   EventStartListComponent,
 } from "./events/index";
+import { SmQualiViewerComponent } from "./smquali/smquali-viewer/smquali-viewer.component";
 
 const routes: Routes = [
   //   {path: 'newVerein', component: NewVereinComponent},
@@ -61,6 +62,10 @@ const routes: Routes = [
     path: "user",
     loadChildren: () =>
       import("./verein/user.module").then((m) => m.UserModule),
+  },
+  {
+    path: "smquali",
+    component: SmQualiViewerComponent,
   },
   { path: "", redirectTo: "anlass", pathMatch: "full" },
 ];

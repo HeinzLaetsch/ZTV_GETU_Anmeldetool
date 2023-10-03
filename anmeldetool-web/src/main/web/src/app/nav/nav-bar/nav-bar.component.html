@@ -118,6 +118,15 @@
             >
           </div>
         </li>
+        <li *ngIf="authService.isAdministrator()">
+          <a
+            [routerLink]="['/smquali']"
+            class="nav-link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            >SM Quali<span class="sr-only"></span
+          ></a>
+        </li>
       </ul>
     </div>
   </div>

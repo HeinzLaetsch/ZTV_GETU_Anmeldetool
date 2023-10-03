@@ -45,6 +45,7 @@ import { CachingAnlassService } from "./core/service/caching-services/caching.an
 import { EinteilungAbteilungComponent } from "./events/event-admin/einteilung/einteilung-abteilung/einteilung-abteilung.component";
 import { EinteilungAnlageComponent } from "./events/event-admin/einteilung/einteilung-anlage/einteilung-anlage.component";
 import { EinteilungStartgeraetComponent } from "./events/event-admin/einteilung/einteilung-startgeraet/einteilung-startgeraet.component";
+import { SmQualiViewerComponent } from "./smquali/smquali-viewer/smquali-viewer.component";
 registerLocaleData(localeDeCH, "de-ch");
 registerLocaleData(localeDe, "de");
 
@@ -91,6 +92,7 @@ export function initVereinservice(
     EinteilungAbteilungComponent,
     EinteilungAnlageComponent,
     EinteilungStartgeraetComponent,
+    SmQualiViewerComponent,
     Page404Component,
     NewAnmelderComponent,
     NewVereinComponent,

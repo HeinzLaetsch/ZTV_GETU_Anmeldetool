@@ -9,7 +9,7 @@
       />
       <button
         *ngIf="filterValue"
-        matSuffix
+        matSuffixztv
         mat-icon-button
         aria-label="leeren"
         (click)="applyFilter('')"
@@ -126,7 +126,7 @@
             <mat-checkbox
               (click)="clicked($event, colIndex)"
               (ngModelChange)="checkedClicked($event, colIndex)"
-              [ngModel]="getStartet(colIndex)"
+              [ngModel]="this.checked[colIndex]?.startet"
               [disabled]="isErfassenDisabled(anlass) && !administrator"
               >Verein startet
             </mat-checkbox>

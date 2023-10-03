@@ -52,6 +52,10 @@ public class AnlassDTO {
 
 	private boolean published;
 
+	private boolean smQuali;
+
+	private boolean ausserkantonal;
+
 	TiTuEnum tiTu;
 
 	KategorieEnum tiefsteKategorie;
