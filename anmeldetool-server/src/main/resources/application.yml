@@ -34,6 +34,7 @@ spring:
      port: 587
      templates:
         path: "mail-templates"
+<<<<<<< HEAD
      username: "getu-wettkaempfe-tu@ztv.ch"
      # username: "heinz.laetsch@gmx.ch"
      password: secret
