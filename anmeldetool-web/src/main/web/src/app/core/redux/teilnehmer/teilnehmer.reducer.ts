@@ -1,6 +1,22 @@
-import { ITeilnehmer } from "../../model/ITeilnehmer";
-import { ActionTypes, TeilnehmerActions } from "./teilnehmer.actions";
+import { createFeature, createReducer, on } from "@ngrx/store";
+import { TeilnehmerActions } from "./teilnehmer.actions";
+import { initialState, teilnehmerAdapter } from "./teilnehmer.state";
 
+export const teilnehmerFeature = createFeature({
+  name: "teilnehmer",
+  reducer: createReducer(
+    initialState,
+    on(TeilnehmerActions.loadAllTeilnehmerSuccess, (state, action) => {
+      const teilnehmer = action.payload;
+      return teilnehmerAdapter.setAll(teilnehmer, state);
+    })
+  ),
+});
+
+export const { selectAll, selectEntities, selectIds, selectTotal } =
+  teilnehmerAdapter.getSelectors();
+
+/*
 export interface ReducerTeilnehmerState {
   items: ITeilnehmer[];
   areTeilnehmerLoaded: boolean;
@@ -33,3 +49,4 @@ export function teilnehmerReducer(
       return state;
   }
 }
+*/

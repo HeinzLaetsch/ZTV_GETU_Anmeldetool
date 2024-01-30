@@ -1,6 +1,20 @@
-import { Action, createAction, props } from "@ngrx/store";
-import { IAnlassLink } from "../../model/IAnlassLink";
+import { createActionGroup, props } from "@ngrx/store";
+import { ITeilnahmen } from "../../model/ITeilnahmen";
 
+export const TeilnahmenActions = createActionGroup({
+  source: "teilnahmen",
+  events: {
+    "Load All TEILNAHMEN INVOKED": props<{
+      payload: number;
+    }>(),
+    "Load All TEILNAHMEN SUCCESS": props<{
+      payload: ITeilnahmen[];
+    }>(),
+    "Load All TEILNAHMEN ERROR": props<{ error: string }>(),
+  },
+});
+
+/*
 export enum ActionTypes {
   LoadAllTeilnahmen = "[Teilnahmen] Load Teilnahmen",
   LoadAllTeilnahmenSuccess = "[Teilnahmen] Load Teilnahmen success",
@@ -38,30 +52,4 @@ export const addTeilnahmeFailed = createAction(
   ActionTypes.AddTeilnahmeFailed,
   props<{ error: any }>()
 );
-
-/*
-export class LoadAllTeilnahmenAction implements Action {
-  readonly type = ActionTypes.LoadAllTeilnahmen;
-}
-
-export class LoadAllTeilnahmenFinishedAction implements Action {
-  readonly type = ActionTypes.LoadAllTeilnahmenFinished;
-  constructor(public payload: IAnlassLink[]) {}
-}
-
-export class AddTeilnahmeAction implements Action {
-  readonly type = ActionTypes.AddTeilnahme;
-  constructor(public payload: IAnlassLink) {}
-}
-
-export class AddTeilnahmeFinishedAction implements Action {
-  readonly type = ActionTypes.AddTeilnahmeFinished;
-  constructor(public payload: IAnlassLink) {}
-}
-
-export type TeilnahmenActions =
-  | AddTeilnahmeAction
-  | AddTeilnahmeFinishedAction
-  | LoadAllTeilnahmenAction
-  | LoadAllTeilnahmenFinishedAction;
 */

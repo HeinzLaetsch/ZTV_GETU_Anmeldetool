@@ -13,12 +13,8 @@ import { TeilnehmerGridComponent } from "./teilnehmer/teilnehmer-grid/teilnehmer
 import { AgGridModule } from "ag-grid-angular";
 import { StoreModule } from "@ngrx/store";
 import { EffectsModule } from "@ngrx/effects";
-import {
-  teilnehmerFeatureStateName,
-  teilnehmerReducers,
-} from "../core/redux/teilnehmer";
-import { TeilnehmerEffects } from "../core/redux/teilnahme/teilnahme.effects";
-import { CoreModule } from "../core/core.module";
+import { teilnahmenFeature } from "../core/redux/teilnahmen/teilnahmen.reducer";
+import { TeilnahmenEffects } from "../core/redux/teilnahmen";
 
 @NgModule({
   declarations: [
@@ -30,15 +26,15 @@ import { CoreModule } from "../core/core.module";
   ],
   imports: [
     CommonModule,
-    CoreModule,
+    // CoreModule,
     SharedComponentsModule,
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
     AgGridModule,
     RouterModule.forChild(TeilnehmerRoutes),
-    StoreModule.forFeature(teilnehmerFeatureStateName, teilnehmerReducers),
-    EffectsModule.forFeature([TeilnehmerEffects]),
+    StoreModule.forFeature(teilnahmenFeature),
+    EffectsModule.forFeature([TeilnahmenEffects]),
   ],
   providers: [],
 })

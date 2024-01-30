@@ -165,7 +165,10 @@ export class CachingAnlassService {
     anlass: IAnlass,
     formData: FormData
   ): Observable<any> {
-    return this.anlassService.importContestTeilnehmerForAnlassCsv(anlass, formData);
+    return this.anlassService.importContestTeilnehmerForAnlassCsv(
+      anlass,
+      formData
+    );
   }
 
   getBenutzerForAnlassCsv(anlass: IAnlass): void {
@@ -380,6 +383,7 @@ export class CachingAnlassService {
       .subscribe((anlassLinkArray) => {
         const anlassLinks: IAnlassLinks = {
           dirty: false,
+          anlass: anlass,
           anlassLinks: anlassLinkArray,
         };
         if (anlassLinks) {

@@ -26,13 +26,6 @@ import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterSta
 import { selectAnlassById } from "src/app/core/redux/anlass";
 import { AppState } from "src/app/core/redux/core.state";
 import {
-  getBrevet1Entries,
-  getBrevet2Entries,
-  getTeilnahmenForKategorie,
-  loadAllTeilnahmenAction,
-  selectTeilnehmerForAnlassEntries,
-} from "src/app/core/redux/teilnahme";
-import {
   OalActions,
   selectOalForKeys,
 } from "src/app/core/redux/organisation-anlass";
@@ -97,8 +90,11 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
 
   storeInit() {
     this.store.dispatch(OalActions.loadAllOalInvoked());
-    this.store.dispatch(loadAllTeilnahmenAction());
+    //TODO Old style ???
+    // Still needed?
+    // this.store.dispatch(loadAllTeilnahmenAction());
   }
+  /*
   wrInit() {
     this.wertungsrichterService
       .getEingeteilteWertungsrichter(this.anlass, 1)
@@ -122,6 +118,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
     this.getVerfuegbareWertungsrichter(this.wr1s, 1);
     this.getVerfuegbareWertungsrichter(this.wr2s, 2);
   }
+  */
 
   anlassInit() {
     this.starts$ = this.store.pipe(
@@ -137,6 +134,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
       }
     });
 
+    /*
     this.teilnahmenBrevet1$ = this.store.select(
       getBrevet1Entries(this.anlass.id)
     );
@@ -147,6 +145,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
       selectTeilnehmerForAnlassEntries(this.anlass.id)
     );
     this.teilnehmer$.subscribe((teilnehmer) => (this.teilnehmer = teilnehmer));
+    */
   }
 
   ngAfterViewInit(): void {
@@ -238,11 +237,13 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
   get isWertungsrichter2Ok(): boolean {
     return this.statusBr2 !== WertungsrichterStatusEnum.NOTOK;
   }
+  /*
   wertungsrichterUserChange(wertungsrichterUser: IUser) {
     this.statusBr1 = this.getStatusBr1();
     this.statusBr2 = this.getStatusBr2();
-  }
+  }*/
 
+  /*
   getTeilnahmenForKategorieK1(): Observable<IAnlassLink[]> {
     return this.store.select(
       getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K1)
@@ -318,7 +319,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
       this.anlass
     );
   }
-
+  */
   // TODO check with this.teilnahmenBrevet1 = this.anlassService.getTeilnahmen(this.anlass, 1);
   get anzahlTeilnehmer(): number {
     return this.teilnehmer?.length;
@@ -352,6 +353,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
         event.currentIndex
       );
       console.log("Data: ", event.container.data[0]);
+      /*
       if (liste === "2") {
         this.anlassService
           .addWertungsrichterToAnlass(
@@ -379,9 +381,11 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
             this.statusBr2 = this.getStatusBr2();
           });
       }
+      */
     }
   }
 
+  /*
   getStatusBr1(): WertungsrichterStatusEnum {
     this.statusBr1 = this.wertungsrichterService.getStatusWertungsrichterBr(
       this.assignedWr1s,
@@ -396,6 +400,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
     );
     return this.statusBr2;
   }
+  */
 
   loadWrLink(wertungsrichterUser: IUser): void {
     this.anlassService

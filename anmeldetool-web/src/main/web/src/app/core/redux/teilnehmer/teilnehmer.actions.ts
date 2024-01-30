@@ -1,7 +1,27 @@
-import { Action } from "@ngrx/store";
+import { createActionGroup, emptyProps, props } from "@ngrx/store";
 import { ITeilnehmer } from "../../model/ITeilnehmer";
-import { TiTuEnum } from "../../model/TiTuEnum";
 
+export const TeilnehmerActions = createActionGroup({
+  source: "teilnehmer",
+  events: {
+    "Load All TEILNEHMER INVOKED": emptyProps(),
+    "Load All TEILNEHMER SUCCESS": props<{
+      payload: ITeilnehmer[];
+    }>(),
+    "Load All TEILNEHMER ERROR": props<{ error: string }>(),
+    /*
+    "Update Vereins Start INVOKED": props<{
+      payload: IOrganisationAnlassLink;
+    }>(),
+    "Update Vereins Start  SUCCESS": props<{
+      payload: IOrganisationAnlassLink;
+    }>(),
+    "Update Vereins Start  ERROR": props<{ error: string }>(),
+    */
+  },
+});
+
+/*
 export enum ActionTypes {
   LoadAllTeilnehmer = "[Teilnehmer] Load Teilnehmer",
   LoadAllTeilnehmerFinished = "[Teilnehmer] Load Teilnehmer Finished",
@@ -34,3 +54,4 @@ export type TeilnehmerActions =
   | AddTeilnehmerFinishedAction
   | LoadAllTeilnehmerAction
   | LoadAllTeilnehmerFinishedAction;
+*/

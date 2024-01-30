@@ -22,7 +22,17 @@ export class IAnlass {
   toolSperren?: boolean;
 
   getCleaned(): string {
-    return this.anlassBezeichnung.replace("%", "");
+    return this.anlassBezeichnung.replace("%", " ");
+  }
+  getPart(first: boolean): string {
+    if (this.anlassBezeichnung.lastIndexOf("%") === -1) {
+      return this.anlassBezeichnung;
+    }
+    if (first) {
+      return this.anlassBezeichnung.split("%")[0];
+    } else {
+      return this.anlassBezeichnung.split("%")[1];
+    }
   }
 
   set startDatum(startDatum: Date) {

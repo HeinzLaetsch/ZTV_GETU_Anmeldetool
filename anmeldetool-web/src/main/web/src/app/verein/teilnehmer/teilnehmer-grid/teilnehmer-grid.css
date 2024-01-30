@@ -6,3 +6,9 @@ body {
   box-sizing: border-box;
   -webkit-overflow-scrolling: touch;
 }
+.ztvAnlassHeaderLabel {
+  width: 30px;
+  transform: rotate(90deg);
+  margin-top: 50px;
+  display: inline-block;
+}

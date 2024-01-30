@@ -6,9 +6,12 @@
   class="ag-theme-alpine"
   [columnDefs]="columnDefs"
   [defaultColDef]="defaultColDef"
+  [context]="context"
   [rowData]="rowData$ | async"
   [rowSelection]="'multiple'"
   [animateRows]="true"
+  [pagination]="true"
+  [paginationAutoPageSize]="true"
   (gridReady)="onGridReady($event)"
   (cellClicked)="onCellClicked($event)"
 ></ag-grid-angular>

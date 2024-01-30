@@ -201,6 +201,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     if (!teilnehmer.teilnahmen) {
       const teilnahmen: IAnlassLinks = {
         dirty: true,
+        anlass: undefined,
         anlassLinks: new Array<IAnlassLink>(),
       };
       teilnehmer.teilnahmen = teilnahmen;
@@ -256,6 +257,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     if (!teilnehmer.teilnahmen) {
       const teilnahmen: IAnlassLinks = {
         dirty: true,
+        anlass: undefined,
         anlassLinks: new Array<IAnlassLink>(),
       };
       teilnehmer.teilnahmen = teilnahmen;

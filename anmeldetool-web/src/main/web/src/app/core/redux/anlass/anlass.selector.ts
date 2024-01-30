@@ -2,6 +2,7 @@ import { createFeatureSelector, createSelector } from "@ngrx/store";
 import { AnlassState } from "./anlass.state";
 import { anlassFeature } from "./anlass.reducer";
 import * as fromAnlass from "./anlass.reducer";
+import { TiTuEnum } from "../../model/TiTuEnum";
 
 export const selectAnlaesseState = createFeatureSelector<AnlassState>(
   anlassFeature.name
@@ -25,4 +26,14 @@ export const selectAnlassByName = (anlassBezeichnung: string) =>
     anlaesse.filter(
       (anlaess) => anlaess.anlassBezeichnung === anlassBezeichnung
     )
+  );
+export const selectAllAnlaesseTiTu = (tiTu: TiTuEnum) =>
+  createSelector(selectAllAnlaesse, (anlaesse) =>
+    anlaesse.filter((anlaess) => {
+      if (TiTuEnum.equals(TiTuEnum.Ti, tiTu)) {
+        return anlaess.tiAnlass;
+      } else {
+        return anlaess.tuAnlass;
+      }
+    })
   );

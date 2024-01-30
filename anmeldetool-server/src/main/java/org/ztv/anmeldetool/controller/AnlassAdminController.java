@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -45,6 +46,7 @@ import org.ztv.anmeldetool.models.Person;
 import org.ztv.anmeldetool.models.PersonAnlassLink;
 import org.ztv.anmeldetool.models.RollenEnum;
 import org.ztv.anmeldetool.models.RollenLink;
+import org.ztv.anmeldetool.models.Teilnehmer;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.models.WertungsrichterBrevetEnum;
 import org.ztv.anmeldetool.models.WertungsrichterEinsatz;
@@ -74,9 +76,11 @@ import org.ztv.anmeldetool.transfer.PersonAnlassLinkCsvDTO;
 import org.ztv.anmeldetool.transfer.PersonAnlassLinkDTO;
 import org.ztv.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.transfer.TeilnahmeStatisticDTO;
+import org.ztv.anmeldetool.transfer.TeilnahmenDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkCsvDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerCsvContestDTO;
+import org.ztv.anmeldetool.transfer.TeilnehmerDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerStartDTO;
 import org.ztv.anmeldetool.transfer.WertungsrichterEinsatzDTO;
 import org.ztv.anmeldetool.util.AnlassMapper;
@@ -90,6 +94,7 @@ import org.ztv.anmeldetool.util.PersonMapper;
 import org.ztv.anmeldetool.util.TeilnehmerAnlassLinkExportImportMapper;
 import org.ztv.anmeldetool.util.TeilnehmerAnlassLinkMapper;
 import org.ztv.anmeldetool.util.TeilnehmerExportImport;
+import org.ztv.anmeldetool.util.TeilnehmerHelper;
 import org.ztv.anmeldetool.util.WertungsrichterEinsatzMapper;
 import org.ztv.anmeldetool.util.WertungsrichterExport;
 import org.ztv.anmeldetool.util.WertungsrichterMapper;
@@ -209,6 +214,17 @@ public class AnlassAdminController {
 		}
 		int startBr1 = 0;
 		int startK1 = 0;
+		int startK2 = 0;
+		int startK3 = 0;
+		int startK4 = 0;
+		int startK5 = 0;
+		int startK5A = 0;
+		int startK5B = 0;
+		int startK6 = 0;
+		int startK7 = 0;
+		int startKD = 0;
+		int startKH = 0;
+
 		int startBr2 = 0;
 		int gemeldeteBr1 = 0;
 		int gemeldeteBr2 = 0;
@@ -219,26 +235,45 @@ public class AnlassAdminController {
 			startBr1 = (int) links.stream().filter(link -> {
 				return link.getKategorie().isJugend();
 			}).count();
-			startK1 = (int) links.stream().filter(link -> {
-				return link.getKategorie().equals(KategorieEnum.K1)
-						&& (link.getMeldeStatus().equals(MeldeStatusEnum.STARTET)
-								&& link.getMeldeStatus().equals(MeldeStatusEnum.NEUMELDUNG));
-			}).count();
+			startK1 = getStartendeForKategorie(links, KategorieEnum.K1);
+			startK2 = getStartendeForKategorie(links, KategorieEnum.K2);
+			startK3 = getStartendeForKategorie(links, KategorieEnum.K3);
+			startK4 = getStartendeForKategorie(links, KategorieEnum.K4);
+			startK5 = getStartendeForKategorie(links, KategorieEnum.K5);
+			startK5A = getStartendeForKategorie(links, KategorieEnum.K5A);
+			startK5B = getStartendeForKategorie(links, KategorieEnum.K5B);
+			startK6 = getStartendeForKategorie(links, KategorieEnum.K6);
+			startK7 = getStartendeForKategorie(links, KategorieEnum.K7);
+			startKD = getStartendeForKategorie(links, KategorieEnum.KD);
+			startKH = getStartendeForKategorie(links, KategorieEnum.KH);
+
 			startBr2 = (int) links.stream().filter(link -> {
 				return !link.getKategorie().isJugend();
 			}).count();
-			List<PersonAnlassLink> pals = anlassSrv.getEingeteilteWertungsrichter(anlassId);
-			gemeldeteBr1 = (int) pals.stream().filter(
-					pal -> pal.getPerson().getWertungsrichter().getBrevet().equals(WertungsrichterBrevetEnum.Brevet_1))
-					.count();
-			gemeldeteBr2 = (int) pals.stream().filter(
-					pal -> pal.getPerson().getWertungsrichter().getBrevet().equals(WertungsrichterBrevetEnum.Brevet_2))
-					.count();
+			List<PersonAnlassLink> pals = anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId,
+					WertungsrichterBrevetEnum.Brevet_1);
+			gemeldeteBr1 = pals.size();
+			pals = anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId, WertungsrichterBrevetEnum.Brevet_1);
+			gemeldeteBr2 = pals.size();
+			// TODO check anzahl
+			br1Ok = (Math.ceil(startBr1 / 15.0f)) <= gemeldeteBr1;
+			br2Ok = (Math.ceil(startBr2 / 15.0f)) <= gemeldeteBr2;
 		}
 		AnlassSummaryDTO asDto = AnlassSummaryDTO.builder().anlassId(anlassId).organisationsId(orgId)
-				.startet(oalResult.isAktiv()).verlaengerungsDate(null).startendeBr1(startBr1).startendeBr2(startBr2)
-				.gemeldeteBr1(gemeldeteBr1).gemeldeteBr2(gemeldeteBr2).br1Ok(br1Ok).br2Ok(br2Ok).build();
+				.startet(oalResult.isAktiv()).verlaengerungsDate(null).startendeBr1(startBr1).startendeK1(startK1)
+				.startendeK2(startK2).startendeK3(startK3).startendeK4(startK4).startendeK5(startK5)
+				.startendeK5A(startK5A).startendeK5B(startK5B).startendeK6(startK6).startendeK7(startK7)
+				.startendeKD(startKD).startendeKH(startKH).startendeBr2(startBr2).gemeldeteBr1(gemeldeteBr1)
+				.gemeldeteBr2(gemeldeteBr2).br1Ok(br1Ok).br2Ok(br2Ok).build();
 		return ResponseEntity.ok(asDto);
+	}
+
+	private int getStartendeForKategorie(List<TeilnehmerAnlassLink> links, KategorieEnum kategorie) {
+		return (int) links.stream().filter(link -> {
+			return link.getKategorie().equals(kategorie) && (link.getMeldeStatus().equals(MeldeStatusEnum.STARTET)
+					|| link.getMeldeStatus().equals(MeldeStatusEnum.NEUMELDUNG));
+		}).count();
+
 	}
 
 	@GetMapping("/{anlassId}/organisationen/{orgId}")
@@ -642,6 +677,26 @@ public class AnlassAdminController {
 			return getNotFound();
 		}
 		return ResponseEntity.ok(linksDto);
+	}
+
+	@GetMapping("/{jahr}/organisationen/{orgId}/teilnahmen/")
+	public ResponseEntity<Collection<TeilnahmenDTO>> getTeilnahmen(HttpServletRequest request, @PathVariable int jahr,
+			@PathVariable UUID orgId) {
+		Map<Teilnehmer, List<TeilnehmerAnlassLink>> teilnehmer = anlassSrv.getTeilnahmen(jahr, orgId);
+		List<TeilnahmenDTO> teilnahmenDtos = teilnehmer.entrySet().stream().map(entry -> {
+			TeilnehmerDTO teilnehmerDto = TeilnehmerHelper.createTeilnehmerDTO(entry.getKey(),
+					entry.getKey().getOrganisation());
+			List<TeilnehmerAnlassLinkDTO> talDTOList = entry.getValue().stream().map(tal -> {
+				return teilnehmerAnlassMapper.toDto(tal);
+			}).collect(Collectors.toList());
+			TeilnahmenDTO tDto = new TeilnahmenDTO(teilnehmerDto, talDTOList);
+			return tDto;
+		}).collect(Collectors.toList());
+
+		if (teilnahmenDtos.size() == 0) {
+			return getNotFound();
+		}
+		return ResponseEntity.ok(teilnahmenDtos);
 	}
 
 	@GetMapping(value = "/{anlassId}/organisationen/{orgId}/anmeldekontrolle/", produces = "application/pdf")

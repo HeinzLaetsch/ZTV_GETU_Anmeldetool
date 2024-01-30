@@ -15,17 +15,3 @@ export const oalFeature = createFeature({
 
 export const { selectAll, selectEntities, selectIds, selectTotal } =
   oalAdapter.getSelectors();
-
-/*
-const oalReducer = createReducer(
-  initialState,
-  on(loadAllOalSuccess, (state, { payload }) => ({
-    ...state,
-    items: payload,
-  }))
-);
-
-export function reducer(state: OalState | undefined, action: Action) {
-  return oalReducer(state, action);
-}
-*/

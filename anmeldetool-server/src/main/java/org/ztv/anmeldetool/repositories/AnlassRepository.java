@@ -1,5 +1,6 @@
 package org.ztv.anmeldetool.repositories;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,4 +19,7 @@ public interface AnlassRepository extends CrudRepository<Anlass, UUID> {
 	List<Anlass> findByAktivOrderByAnlassBezeichnung(boolean aktiv);
 
 	List<Anlass> findByAktivOrderByStartDate(boolean aktiv);
+
+	List<Anlass> findByStartDateBetweenAndAktivOrderByStartDate(LocalDateTime startDate, LocalDateTime endDate,
+			boolean aktiv);
 }

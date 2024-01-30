@@ -1,16 +1,42 @@
 import { Injectable } from "@angular/core";
-import { Actions, Effect, ofType } from "@ngrx/effects";
-import { map, switchMap } from "rxjs";
-import { ITeilnehmer } from "../../model/ITeilnehmer";
-import { AuthService } from "../../service/auth/auth.service";
+import { Actions, Effect, createEffect, ofType } from "@ngrx/effects";
+import { catchError, map, mergeMap, of, switchMap } from "rxjs";
 import { TeilnehmerService } from "../../service/teilnehmer/teilnehmer.service";
-import {
-  ActionTypes,
-  AddTeilnehmerAction,
-  AddTeilnehmerFinishedAction,
-  LoadAllTeilnehmerFinishedAction,
-} from "./teilnehmer.actions";
+import { TeilnehmerActions } from "./teilnehmer.actions";
+import { AuthService } from "../../service/auth/auth.service";
 
+@Injectable()
+export class TeilnehmerEffects {
+  constructor(
+    private actions$: Actions,
+    private authService: AuthService,
+    private teilnehmerService: TeilnehmerService
+  ) {}
+
+  loadAnlaesse$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(TeilnehmerActions.loadAllTeilnehmerInvoked),
+      mergeMap((action) => {
+        return this.teilnehmerService
+          .getTeilnehmer(this.authService.currentVerein)
+          .pipe(
+            switchMap((teilnehmer) => [
+              TeilnehmerActions.loadAllTeilnehmerSuccess({
+                payload: teilnehmer,
+              }),
+            ]),
+            catchError((error) => {
+              return of(
+                TeilnehmerActions.loadAllTeilnehmerError({ error: error })
+              );
+            })
+          );
+      })
+    );
+  });
+}
+
+/*
 @Injectable()
 export class TeilnehmerEffects {
   constructor(
@@ -49,3 +75,4 @@ export class TeilnehmerEffects {
     )
   );
 }
+*/

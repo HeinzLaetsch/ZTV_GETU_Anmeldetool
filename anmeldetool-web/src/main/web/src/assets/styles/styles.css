@@ -3,6 +3,9 @@
 @import "ag-grid-community/dist/styles/ag-grid.css";
 @import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 
+.ag-theme-alpine .ag-header-cell {
+  padding: 5px;
+}
 /* @import "assets/styles/colors.scss"; */
 
 @font-face {

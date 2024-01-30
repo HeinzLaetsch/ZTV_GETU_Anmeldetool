@@ -20,6 +20,18 @@ public class AnlassSummaryDTO {
 
 	private int startendeBr1;
 
+	private int startendeK1;
+	private int startendeK2;
+	private int startendeK3;
+	private int startendeK4;
+	private int startendeK5;
+	private int startendeK5A;
+	private int startendeK5B;
+	private int startendeK6;
+	private int startendeK7;
+	private int startendeKD;
+	private int startendeKH;
+
 	private int startendeBr2;
 
 	private int gemeldeteBr1;

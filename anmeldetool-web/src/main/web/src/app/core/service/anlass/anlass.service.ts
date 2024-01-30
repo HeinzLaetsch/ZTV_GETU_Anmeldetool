@@ -18,6 +18,7 @@ import { ITeilnehmerStart } from "../../model/ITeilnehmerStart";
 import { IUser } from "../../model/IUser";
 import { IWertungsrichterEinsatz } from "../../model/IWertungsrichterEinsatz";
 import { KategorieEnum } from "../../model/KategorieEnum";
+import { ITeilnahmen } from "../../model/ITeilnahmen";
 
 @Injectable({
   providedIn: "root",
@@ -377,6 +378,23 @@ export class AnlassService {
     return this.http
       .get<IAnlassLink[]>(combinedUrl)
       .pipe(catchError(this.handleError<IAnlassLink[]>("getTeilnehmer", [])));
+  }
+
+  // "/{jahr}/organisationen/{orgId}/teilnahmen/";
+  getTeilnahmen(verein: IVerein, jahr: number): Observable<ITeilnahmen[]> {
+    const combinedUrl =
+      this.url +
+      "/" +
+      jahr +
+      "/" +
+      "organisationen" +
+      "/" +
+      verein.id +
+      "/teilnahmen/";
+    // console.log("getTeilnehmer called: ", combinedUrl);
+    return this.http
+      .get<ITeilnahmen[]>(combinedUrl)
+      .pipe(catchError(this.handleError<ITeilnahmen[]>("getTeilnahmen", [])));
   }
 
   updateStartgeraet(

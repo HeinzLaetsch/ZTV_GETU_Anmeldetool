@@ -8,7 +8,7 @@ import { RoleFormComponent } from "./profile/role-form/role-form.component";
 import { UserFormComponent } from "./user-form/user-form.component";
 import { WertungsrichterFormComponent } from "./profile/wertungsrichter-form/wertungsrichter-form.component";
 import { UserRoutes } from "./user.routes";
-import { CoreModule } from "../core/core.module";
+// import { CoreModule } from "../core/core.module";
 import { CommonModule } from "@angular/common";
 import { MaterialModule } from "../shared/material-module";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -24,7 +24,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
   ],
   imports: [
     CommonModule,
-    CoreModule,
+    // CoreModule,
     SharedComponentsModule,
     FormsModule,
     ReactiveFormsModule,
