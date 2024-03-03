@@ -31,6 +31,11 @@ export class TeilnahmenEffects {
               );
             })
           );
+      }),
+      ofType(TeilnahmenActions.updateTeilnahmenInvoked),
+      mergeMap((action) => {
+        console.log(action);
+        return of(TeilnahmenActions.updateTeilnahmenError({ error: "error" }));
       })
     );
   });

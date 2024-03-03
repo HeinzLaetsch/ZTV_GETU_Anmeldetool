@@ -30,6 +30,16 @@ export namespace KategorieEnumFunction {
     return kategorie1String === kategorie2String;
   }
 
+  export function valuesAndGreater(start: string): any[] {
+    if (start === undefined || start === null) {
+      start = "K1";
+    }
+    const startindex = Object.values(KategorieEnum).findIndex((element) =>
+      equals(element, parse(start))
+    );
+    return Object.values(KategorieEnum).slice(startindex);
+  }
+
   export function isBrevet1(kategorie: KategorieEnum): boolean {
     return (
       KategorieEnumFunction.equals(KategorieEnum.K1, kategorie) ||

@@ -13,6 +13,11 @@ export const selectAllTeilnahmen = createSelector(
   fromTeilnahmen.selectAll
 );
 
+export const selectTeilnahmen = () =>
+  createSelector(selectAllTeilnahmen, (teilnahmenState) => {
+    return teilnahmenState;
+  });
+
 export const selectTuTeilnahmen = () =>
   createSelector(selectAllTeilnahmen, (teilnahmenState) => {
     const ret = teilnahmenState.filter((x) =>

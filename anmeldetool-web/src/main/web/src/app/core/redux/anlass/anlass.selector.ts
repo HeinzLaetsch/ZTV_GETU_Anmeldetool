@@ -27,6 +27,10 @@ export const selectAnlassByName = (anlassBezeichnung: string) =>
       (anlaess) => anlaess.anlassBezeichnung === anlassBezeichnung
     )
   );
+export const selectAnlaesse = () =>
+  createSelector(selectAllAnlaesse, (anlaesse) => {
+    return anlaesse;
+  });
 export const selectAllAnlaesseTiTu = (tiTu: TiTuEnum) =>
   createSelector(selectAllAnlaesse, (anlaesse) =>
     anlaesse.filter((anlaess) => {

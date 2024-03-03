@@ -15,6 +15,13 @@ export const teilnahmenFeature = createFeature({
       // teilnahmenAdapter.addMany(teilnahmen, state);
       return teilnahmenAdapter.setAll(teilnahmen, state);
     })
+    /*
+    ,
+    on(TeilnahmenActions.updateTeilnahmenSuccess, (state, action) => {
+      const teilnahmen = action.payload;
+      // return teilnahmenAdapter.setAll(teilnahmen, state);
+    })
+    */
   ),
 });
 

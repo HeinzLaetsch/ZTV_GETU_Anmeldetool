@@ -11,6 +11,22 @@ export const TeilnahmenActions = createActionGroup({
       payload: ITeilnahmen[];
     }>(),
     "Load All TEILNAHMEN ERROR": props<{ error: string }>(),
+
+    "Add TEILNAHMEN INVOKED": props<{
+      payload: ITeilnahmen;
+    }>(),
+    "Add TEILNAHMEN SUCCESS": props<{
+      payload: ITeilnahmen;
+    }>(),
+    "Add TEILNAHMEN ERROR": props<{ error: string }>(),
+
+    "Update TEILNAHMEN INVOKED": props<{
+      payload: ITeilnahmen;
+    }>(),
+    "Update TEILNAHMEN SUCCESS": props<{
+      payload: ITeilnahmen;
+    }>(),
+    "Update TEILNAHMEN ERROR": props<{ error: string }>(),
   },
 });
 
