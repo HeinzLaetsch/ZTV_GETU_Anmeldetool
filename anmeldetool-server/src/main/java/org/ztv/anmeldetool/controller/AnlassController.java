@@ -160,23 +160,13 @@ public class AnlassController {
 		}
 	}
 
-	private List<RanglistenEntryDTO> getRanglistenPerVereinDtos(UUID anlassId, TiTuEnum tiTu, KategorieEnum kategorie)
-			throws ServiceException {
-		Anlass anlass = anlassService.findAnlassById(anlassId);
-		List<TeilnehmerAnlassLink> tals = ranglistenService.getRanglistePerVerein(anlass, tiTu, kategorie);
-
-		List<RanglistenEntryDTO> ranglistenDTOs = tals.stream().map(tal -> {
-			return talrMapper.fromEntity(tal);
-		}).collect(Collectors.toList());
-		return ranglistenDTOs;
-	}
-
 	@GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}/vereine")
 	public ResponseEntity<List<RanglistenEntryDTO>> getRanglistePerVerein(HttpServletRequest request,
 			HttpServletResponse response, @PathVariable UUID anlassId, @PathVariable TiTuEnum tiTu,
 			@PathVariable KategorieEnum kategorie) {
 		try {
-			List<RanglistenEntryDTO> ranglistenDTOs = getRanglistenPerVereinDtos(anlassId, tiTu, kategorie);
+			List<RanglistenEntryDTO> ranglistenDTOs = ranglistenService.getRanglistenPerVereinDtos(anlassId, tiTu,
+					kategorie);
 			return ResponseEntity.ok(ranglistenDTOs);
 		} catch (Exception ex) {
 			log.error("Unable to query Ranglisten per Verein: ", ex);
@@ -189,7 +179,8 @@ public class AnlassController {
 	public void getRanglistePerVereinPdf(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable UUID anlassId, @PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie) {
 		try {
-			List<RanglistenEntryDTO> ranglistenDTOs = getRanglistenPerVereinDtos(anlassId, tiTu, kategorie);
+			List<RanglistenEntryDTO> ranglistenDTOs = ranglistenService.getRanglistenPerVereinDtos(anlassId, tiTu,
+					kategorie);
 
 			response.addHeader("Content-Disposition",
 					"attachment; filename=Ranglisten-Per-Verein-" + kategorie + ".pdf");
@@ -210,7 +201,8 @@ public class AnlassController {
 			HttpServletResponse response, @PathVariable UUID anlassId, @PathVariable TiTuEnum tiTu,
 			@PathVariable KategorieEnum kategorie) {
 		try {
-			List<RanglistenEntryDTO> ranglistenDTOs = getRanglistenPerVereinDtos(anlassId, tiTu, kategorie);
+			List<RanglistenEntryDTO> ranglistenDTOs = ranglistenService.getRanglistenPerVereinDtos(anlassId, tiTu,
+					kategorie);
 
 			return ResponseEntity.ok(ranglistenDTOs);
 		} catch (Exception ex) {
@@ -224,13 +216,26 @@ public class AnlassController {
 	public void getTeamwertungPdf(HttpServletRequest request, HttpServletResponse response, @PathVariable UUID anlassId,
 			@PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie) {
 		try {
-			List<RanglistenEntryDTO> ranglistenDTOs = getRanglistenPerVereinDtos(anlassId, tiTu, kategorie);
-			List<TeamwertungDTO> twList = this.ranglistenService.getTeamwertung(kategorie, ranglistenDTOs);
-			response.addHeader("Content-Disposition", "attachment; filename=Teamwertung-" + kategorie + ".pdf");
+			String titel = kategorie.name();
+			String subTitle = "";
+			List<TeamwertungDTO> twList = null;
+			if (TiTuEnum.Ti.equals(tiTu)) {
+				twList = this.ranglistenService.getTeamwertungTi(anlassId, kategorie);
+			} else {
+				twList = this.ranglistenService.getTeamwertungTu(anlassId, kategorie);
+				if (kategorie.isJugend()) {
+					titel = "Jugendkategorien";
+					subTitle = "K1-K4";
+				} else {
+					titel = "Aktivkategorien";
+					subTitle = "K5-K7/H";
+				}
+			}
+			response.addHeader("Content-Disposition", "attachment; filename=Teamwertung-" + titel + ".pdf");
 			response.addHeader("Content-Type", "application/pdf");
 			response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
 
-			RanglistenOutput.createTeamwertung(response, twList, kategorie);
+			RanglistenOutput.createTeamwertung(response, twList, kategorie, titel, subTitle);
 
 		} catch (Exception ex) {
 			ex.printStackTrace();

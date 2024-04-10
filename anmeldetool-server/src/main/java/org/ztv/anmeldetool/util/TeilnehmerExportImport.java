@@ -60,6 +60,8 @@ public class TeilnehmerExportImport {
 				.withType(TeilnehmerAnlassLinkCsvDTO.class).withQuoteChar(CSVWriter.NO_QUOTE_CHARACTER)
 				.withSeparator(';').withOrderedResults(false).build().parse();
 		targetReader.close();
+		byteArrayInputStream.reset();
+		String asString = new String(byteArrayInputStream.readAllBytes());
 		return tals;
 	}
 
