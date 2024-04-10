@@ -1,10 +1,12 @@
 package org.ztv.anmeldetool.service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.ztv.anmeldetool.repositories.NotenblaetterRepository;
 import org.ztv.anmeldetool.repositories.RanglisteConfigurationRepository;
 import org.ztv.anmeldetool.transfer.RanglistenEntryDTO;
 import org.ztv.anmeldetool.transfer.TeamwertungDTO;
+import org.ztv.anmeldetool.util.TeilnehmerAnlassLinkRanglistenMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,13 +33,31 @@ public class RanglistenService {
 	TeilnehmerAnlassLinkService talService;
 
 	@Autowired
+	AnlassService anlassService;
+
+	@Autowired
 	NotenblaetterRepository notenblaetterRepo;
 
 	@Autowired
 	RanglisteConfigurationRepository ranglisteConfigurationRepo;
 
-	public List<TeamwertungDTO> getTeamwertung(KategorieEnum kategorie, List<RanglistenEntryDTO> entries) {
-		Map<String, TeamwertungDTO> teamwertungen = new HashMap();
+	@Autowired
+	TeilnehmerAnlassLinkRanglistenMapper talrMapper;
+
+	public List<RanglistenEntryDTO> getRanglistenPerVereinDtos(UUID anlassId, TiTuEnum tiTu, KategorieEnum kategorie)
+			throws ServiceException {
+		Anlass anlass = anlassService.findAnlassById(anlassId);
+		List<TeilnehmerAnlassLink> tals = getRanglistePerVerein(anlass, tiTu, kategorie);
+
+		List<RanglistenEntryDTO> ranglistenDTOs = tals.stream().map(tal -> {
+			return talrMapper.fromEntity(tal);
+		}).collect(Collectors.toList());
+		return ranglistenDTOs;
+	}
+
+	public List<TeamwertungDTO> getTeamwertungTi(UUID anlassId, KategorieEnum kategorie) throws ServiceException {
+		Map<String, TeamwertungDTO> teamwertungen = new HashMap<>();
+		List<RanglistenEntryDTO> entries = getRanglistenPerVereinDtos(anlassId, TiTuEnum.Ti, kategorie);
 		for (RanglistenEntryDTO entry : entries) {
 			TeamwertungDTO teamwertung;
 			if (teamwertungen.containsKey(entry.getVerein())) {
@@ -70,6 +91,128 @@ public class RanglistenService {
 		return result;
 	}
 
+	public List<TeamwertungDTO> getTeamwertungTu(UUID anlassId, KategorieEnum kategorie) throws ServiceException {
+		List<TeamwertungDTO> unsortedResult = null;
+		Map<String, Map<KategorieEnum, List<RanglistenEntryDTO>>> teamListe = new HashMap<>();
+		if (kategorie.isJugend()) {
+			prepareKategory(teamListe, anlassId, KategorieEnum.K1, 3);
+			prepareKategory(teamListe, anlassId, KategorieEnum.K2, 3);
+			prepareKategory(teamListe, anlassId, KategorieEnum.K3, 3);
+			prepareKategory(teamListe, anlassId, KategorieEnum.K4, 3);
+
+			cleanUp(teamListe);
+			sortTeam(teamListe);
+			unsortedResult = calcTeamResult(teamListe, 4);
+		} else {
+			prepareKategory(teamListe, anlassId, KategorieEnum.K5, 2);
+			prepareKategory(teamListe, anlassId, KategorieEnum.K6, 2);
+			prepareKategory(teamListe, anlassId, KategorieEnum.KH, 2);
+			prepareKategory(teamListe, anlassId, KategorieEnum.K7, 2);
+
+			cleanUp(teamListe);
+			sortTeam(teamListe);
+			unsortedResult = calcTeamResult(teamListe, 3);
+		}
+		List<TeamwertungDTO> sortedResult = sortAndSetRank(unsortedResult);
+		return sortedResult;
+	}
+
+	private Map<String, Map<KategorieEnum, List<RanglistenEntryDTO>>> prepareKategory(
+			Map<String, Map<KategorieEnum, List<RanglistenEntryDTO>>> teamListe, UUID anlassId, KategorieEnum kategorie,
+			int maxProKategorie) throws ServiceException {
+		List<RanglistenEntryDTO> entries = getRanglistenPerVereinDtos(anlassId, TiTuEnum.Tu, kategorie);
+		selectBestResults(teamListe, entries, kategorie, maxProKategorie);
+		return teamListe;
+	}
+
+	private Map<String, Map<KategorieEnum, List<RanglistenEntryDTO>>> selectBestResults(
+			Map<String, Map<KategorieEnum, List<RanglistenEntryDTO>>> teamListe, List<RanglistenEntryDTO> entries,
+			KategorieEnum kategorie, int maxKategorieResults) {
+		entries.forEach(entry -> {
+			List<RanglistenEntryDTO> ranglistenDtos = null;
+			Map<KategorieEnum, List<RanglistenEntryDTO>> perKategorieMap = null;
+			if (teamListe.containsKey(entry.getVerein())) {
+				perKategorieMap = teamListe.get(entry.getVerein());
+			} else {
+				perKategorieMap = new HashMap<>();
+				teamListe.put(entry.getVerein(), perKategorieMap);
+			}
+			if (perKategorieMap.containsKey(kategorie)) {
+				ranglistenDtos = perKategorieMap.get(kategorie);
+			} else {
+				ranglistenDtos = new ArrayList<>();
+				perKategorieMap.put(kategorie, ranglistenDtos);
+			}
+			if (ranglistenDtos.size() <= maxKategorieResults) {
+				ranglistenDtos.add(entry);
+			}
+		});
+		return teamListe;
+	}
+
+	private List<TeamwertungDTO> calcTeamResult(Map<String, Map<KategorieEnum, List<RanglistenEntryDTO>>> teamListe,
+			int teamSize) {
+		List<TeamwertungDTO> unsortedResult = new ArrayList<>();
+		teamListe.values().forEach(team -> {
+			if (team.get(KategorieEnum.KEIN_START) != null && team.get(KategorieEnum.KEIN_START).size() >= teamSize) {
+				TeamwertungDTO teamWertungDto = new TeamwertungDTO();
+				team.get(KategorieEnum.KEIN_START).forEach(entry -> {
+					teamWertungDto.setVerein(entry.getVerein());
+					if (teamWertungDto.getAnzahlResultate() < teamSize) {
+						teamWertungDto.setAnzahlResultate(teamWertungDto.getAnzahlResultate() + 1);
+						teamWertungDto
+								.setGesamtPunktzahl(teamWertungDto.getGesamtPunktzahl() + entry.getGesamtPunktzahl());
+					}
+				});
+				if (teamWertungDto.getVerein() != null) {
+					unsortedResult.add(teamWertungDto);
+				}
+			}
+		});
+		return unsortedResult;
+	}
+
+	private Map<String, Map<KategorieEnum, List<RanglistenEntryDTO>>> sortTeam(
+			Map<String, Map<KategorieEnum, List<RanglistenEntryDTO>>> teamListe) {
+		teamListe.values().forEach(team -> {
+			team.values().forEach(kategorie -> {
+				List<RanglistenEntryDTO> sortedList = kategorie.stream()
+						.sorted(Comparator.comparing(tw -> tw.getGesamtPunktzahl(), Comparator.reverseOrder()))
+						.collect(Collectors.toList());
+				kategorie.clear();
+				kategorie.addAll(sortedList);
+			});
+		});
+		return teamListe;
+	}
+
+	private Map<String, Map<KategorieEnum, List<RanglistenEntryDTO>>> cleanUp(
+			Map<String, Map<KategorieEnum, List<RanglistenEntryDTO>>> teamListe) {
+		teamListe.values().forEach(team -> {
+			if (team.size() < 2) {
+				team.clear();
+			}
+		});
+		teamListe.values().forEach(team -> {
+			List<RanglistenEntryDTO> alle = new ArrayList<>();
+			team.values().forEach(perKategorieMapEntry -> {
+				alle.addAll(perKategorieMapEntry);
+			});
+		});
+		return teamListe;
+	}
+
+	private List<TeamwertungDTO> sortAndSetRank(List<TeamwertungDTO> unsortedResult) {
+		List<TeamwertungDTO> result = unsortedResult.stream()
+				.sorted(Comparator.comparing(tw -> tw.getGesamtPunktzahl(), Comparator.reverseOrder()))
+				.collect(Collectors.toList());
+		int rang = 0;
+		for (TeamwertungDTO tw : result) {
+			tw.setRang(++rang);
+		}
+		return result;
+	}
+
 	public Notenblatt saveNotenblatt(Notenblatt notenblatt) {
 		return notenblaetterRepo.save(notenblatt);
 	}
@@ -87,11 +230,6 @@ public class RanglistenService {
 			throws ServiceException {
 		List<TeilnehmerAnlassLink> tals = talService
 				.findWettkampfTeilnahmenByKategorieAndTiTuOrderByOrganisation(anlass, kategorie, tiTu);
-		/*
-		 * tals = tals.stream().sorted( Comparator.comparing(tal ->
-		 * tal.getNotenblatt().getGesamtPunktzahl(), Comparator.reverseOrder()))
-		 * .collect(Collectors.toList());
-		 */
 		return tals;
 	}
 

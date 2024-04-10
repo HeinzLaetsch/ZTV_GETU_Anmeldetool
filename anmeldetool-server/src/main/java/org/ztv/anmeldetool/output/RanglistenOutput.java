@@ -48,7 +48,7 @@ import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 public class RanglistenOutput {
 
 	public static void createTeamwertung(HttpServletResponse response, List<TeamwertungDTO> twDTOs,
-			KategorieEnum kategorie) throws DocumentException, IOException {
+			KategorieEnum kategorie, String titel, String subTitel) throws DocumentException, IOException {
 		PdfDocument pdf = new PdfDocument(new PdfWriter(response.getOutputStream()));
 		// Document doc = new Document(pdf, PageSize.A4);
 		Document doc = new Document(pdf);
@@ -57,7 +57,7 @@ public class RanglistenOutput {
 
 		// Calculate top margin to be sure that the table will fit the margin.
 		doc.setMargins(36, 36, 36, 36);
-		Text text = new Text("Teamwertung Kategorie " + kategorie).setFont(fontB).setFontSize(16);
+		Text text = new Text("Teamwertung Kategorie " + titel + " " + subTitel).setFont(fontB).setFontSize(16);
 		doc.add(new Paragraph(text));
 		float[] cols = { 15.0f, 30.0f, 55.0f };
 		boolean even = false;

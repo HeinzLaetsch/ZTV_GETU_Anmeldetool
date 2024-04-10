@@ -1,6 +1,9 @@
 package org.ztv.anmeldetool.transfer;
 
+import org.ztv.anmeldetool.models.KategorieEnum;
+
 import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvIgnore;
 
 import lombok.Data;
 
@@ -45,5 +48,7 @@ public class RanglistenEntryDTO {
 	private String abteilung;
 	@CsvBindByName(column = "Anlage")
 	private String anlage;
+	@CsvIgnore
+	private KategorieEnum kategorie;
 
 }
