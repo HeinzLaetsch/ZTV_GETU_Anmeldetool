@@ -143,7 +143,14 @@ public class RanglistenService {
 				ranglistenDtos = new ArrayList<>();
 				perKategorieMap.put(kategorie, ranglistenDtos);
 			}
-			if (ranglistenDtos.size() <= maxKategorieResults) {
+			if (ranglistenDtos.size() < maxKategorieResults) {
+				ranglistenDtos.add(entry);
+				if (perKategorieMap.containsKey(KategorieEnum.KEIN_START)) {
+					ranglistenDtos = perKategorieMap.get(KategorieEnum.KEIN_START);
+				} else {
+					ranglistenDtos = new ArrayList<>();
+					perKategorieMap.put(KategorieEnum.KEIN_START, ranglistenDtos);
+				}
 				ranglistenDtos.add(entry);
 			}
 		});
