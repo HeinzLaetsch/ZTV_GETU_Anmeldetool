@@ -221,7 +221,7 @@ export class CachingAnlassService {
     anlass: IAnlass,
     teilnehmerStart: ITeilnehmerStart
   ): Observable<boolean> {
-    return this.anlassService.updateStartgeraet(anlass, teilnehmerStart);
+    return this.anlassService.updateTeilnehmerStart(anlass, teilnehmerStart);
   }
   getTeilnehmerForAnlass(anlass: IAnlass): IAnlassLink[] {
     if (this.teilnamen && this.teilnamen[anlass.id]?.anlassLinks) {
@@ -346,11 +346,11 @@ export class CachingAnlassService {
     const anlassLinks: IAnlassLinks = this.teilnamen[anlass.id];
     if (anlassLinks) {
       const anzahlUmmeldungen = anlassLinks.anlassLinks.filter((link) => {
-        const isUmmeldung = link.meldeStatus === MeldeStatusEnum.UMMELDUNG;
+        const isUmmeldung = link.meldeStatus === MeldeStatusEnum.STARTET; //TODO MeldeStatusEnum.Ummeldung;
         return isUmmeldung;
       }).length;
       const neuMeldungen = anlassLinks.anlassLinks.filter((link) => {
-        return link.meldeStatus === MeldeStatusEnum.NEUMELDUNG;
+        return link.meldeStatus === MeldeStatusEnum.STARTET; //TODO MeldeStatusEnum.Neumeldung;
       }).length;
       return anzahlUmmeldungen > neuMeldungen;
     }
@@ -363,12 +363,12 @@ export class CachingAnlassService {
     const anlassLinks: IAnlassLinks = this.teilnamen[anlass.id];
     const anzahlUmmeldungen = anlassLinks.anlassLinks.filter((link) => {
       const sameKat = link.kategorie === kategorie;
-      const isUmmeldung = link.meldeStatus === MeldeStatusEnum.UMMELDUNG;
+      const isUmmeldung = link.meldeStatus === MeldeStatusEnum.STARTET; //TODO MeldeStatusEnum.Ummeldung;
       return sameKat && isUmmeldung;
     }).length;
     const neuMeldungen = anlassLinks.anlassLinks.filter((link) => {
       const sameKat = link.kategorie === kategorie;
-      const isNeumeldung = link.meldeStatus === MeldeStatusEnum.NEUMELDUNG;
+      const isNeumeldung = link.meldeStatus === MeldeStatusEnum.STARTET; //TODO MeldeStatusEnum.Neumeldung;
       return sameKat && isNeumeldung;
     }).length;
     return anzahlUmmeldungen > neuMeldungen;
@@ -437,9 +437,10 @@ export class CachingAnlassService {
       return new Array();
     }
   }
+  /*
   saveTeilnahme(verein: IVerein, anlassLink: IAnlassLink): Observable<boolean> {
     return this.anlassService.saveTeilnahme(verein, anlassLink);
-  }
+  } */
   getVereinAnmeldeKontrollePdf(
     anlass: IAnlass,
     verein: IVerein

@@ -330,7 +330,7 @@ export class CachingTeilnehmerService {
       ) {
         teilnehmer.teilnahmen.anlassLinks.forEach((value) => {
           if (value.dirty) {
-            observables.push(this.anlassService.saveTeilnahme(verein, value));
+            // observables.push(this.anlassService.saveTeilnahme(verein, value));
             value.dirty = false;
           }
         });

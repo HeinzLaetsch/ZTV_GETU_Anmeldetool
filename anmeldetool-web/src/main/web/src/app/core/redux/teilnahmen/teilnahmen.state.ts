@@ -1,6 +1,4 @@
 import { EntityAdapter, EntityState, createEntityAdapter } from "@ngrx/entity";
-import { IAnlassLink } from "../../model/IAnlassLink";
-import { IAnlassLinks } from "../../model/IAnlassLinks";
 import { ITeilnahmen } from "../../model/ITeilnahmen";
 
 export const teilnahmenAdapter: EntityAdapter<ITeilnahmen> =

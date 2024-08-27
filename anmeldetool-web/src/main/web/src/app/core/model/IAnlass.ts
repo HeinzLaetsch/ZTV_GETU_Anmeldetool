@@ -4,6 +4,7 @@ import { GeraeteEnum } from "./GeraeteEnum";
 import { IWertungsrichterSlot } from "./IWertungsrichterSlot";
 import { KategorieEnum } from "./KategorieEnum";
 import { TiTuEnum } from "./TiTuEnum";
+import { IOrganisationTeilnahmenStatistik } from "./IOrganisationTeilnahmenStatistik";
 
 export class IAnlass {
   id: string;
@@ -21,8 +22,20 @@ export class IAnlass {
   startgeraetFix?: boolean;
   toolSperren?: boolean;
 
+  tiefsteKategorie: KategorieEnum;
+  hoechsteKategorie: KategorieEnum;
+  wertungsrichterSlots?: IWertungsrichterSlot[];
+
+  anzeigeStatus?: Anzeigestatus;
+
+  constructor(source: Partial<IAnlass>) {
+    this.anzeigeStatus = new Anzeigestatus();
+    Object.assign(this, source);
+  }
+
   getCleaned(): string {
-    return this.anlassBezeichnung.replace("%", " ");
+    const step1 = this.anlassBezeichnung.replace("Zürcher Kantonaler", "");
+    return step1.replace("%", " ");
   }
   getPart(first: boolean): string {
     if (this.anlassBezeichnung.lastIndexOf("%") === -1) {
@@ -156,15 +169,6 @@ export class IAnlass {
   get brevet2Anlass(): boolean {
     const br2 = this.hoechsteKategorie > KategorieEnum.K4;
     return br2;
-  }
-  tiefsteKategorie: KategorieEnum;
-  hoechsteKategorie: KategorieEnum;
-  wertungsrichterSlots?: IWertungsrichterSlot[];
-
-  anzeigeStatus?: Anzeigestatus;
-
-  constructor() {
-    this.anzeigeStatus = new Anzeigestatus();
   }
 
   getStartgeraete(): GeraeteEnum[] {

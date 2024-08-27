@@ -21,6 +21,7 @@ export class BusyIndicatorProgressBarEffects {
   loadingProcessStopped$ = createEffect(() => {
     return this.actions$.pipe(
       filter((action) => {
+        console.log("Action : ", action.type);
         return action.type.includes("SUCCESS") || action.type.includes("ERROR"); // Service Aufruf Action muss SUCCESS oder ERROR beinhalten um Progressbar zu stoppen
       }),
       map(() => {

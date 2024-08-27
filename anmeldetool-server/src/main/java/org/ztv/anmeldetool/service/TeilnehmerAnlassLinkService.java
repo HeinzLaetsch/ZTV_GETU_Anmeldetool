@@ -19,6 +19,7 @@ import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.OrganisationAnlassLink;
+import org.ztv.anmeldetool.models.Teilnehmer;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.repositories.OrganisationAnlassLinkRepository;
@@ -51,6 +52,15 @@ public class TeilnehmerAnlassLinkService {
 
 	public Optional<TeilnehmerAnlassLink> findTeilnehmerAnlassLinkById(UUID id) {
 		return teilnehmerAnlassLinkRepository.findById(id);
+	}
+
+	public Optional<TeilnehmerAnlassLink> findTeilnehmerAnlassLinkByAnlassAndTeilnehmer(Anlass anlass,
+			Teilnehmer teilnehmer) {
+		return teilnehmerAnlassLinkRepository.findByAnlassAndTeilnehmer(anlass, teilnehmer);
+	}
+
+	public List<TeilnehmerAnlassLink> findTeilnehmerAnlassLinkByTeilnehmer(Teilnehmer teilnehmer) {
+		return teilnehmerAnlassLinkRepository.findByTeilnehmer(teilnehmer);
 	}
 
 	public List<TeilnehmerAnlassLink> findAnlassTeilnahmenByKategorie(Anlass anlass, KategorieEnum kategorie)
@@ -134,14 +144,19 @@ public class TeilnehmerAnlassLinkService {
 		return teilnahmen;
 	}
 
-	private List<TeilnehmerAnlassLink> updateStartNummern(List<TeilnehmerAnlassLink> tals) {
+	public int findMaxStartNummer() {
 		Optional<TeilnehmerAnlassLink> max = teilnehmerAnlassLinkRepository
 				.findTopByStartnummerNotNullOrderByStartnummerDesc();
 		int maxStartnummer = 1;
 		if (max.isPresent() && max.get().getStartnummer() != null) {
 			maxStartnummer = max.get().getStartnummer() + 1;
 		}
-		AtomicInteger maxStartnummerAtomic = new AtomicInteger(maxStartnummer);
+		return maxStartnummer;
+	}
+
+	private List<TeilnehmerAnlassLink> updateStartNummern(List<TeilnehmerAnlassLink> tals) {
+
+		AtomicInteger maxStartnummerAtomic = new AtomicInteger(findMaxStartNummer());
 		List<TeilnehmerAnlassLink> mustUpdateTal = tals.stream().filter(tal -> {
 			if (tal.getStartnummer() == null) {
 				tal.setStartnummer(maxStartnummerAtomic.getAndIncrement());
@@ -202,6 +217,7 @@ public class TeilnehmerAnlassLinkService {
 		return tss;
 	}
 
+	// TODO Adjust to new Data
 	public TeilnahmeStatisticDTO getStatisticForAnlass(UUID anlassId, KategorieEnum kategorie, AbteilungEnum abteilung,
 			AnlageEnum anlage, GeraetEnum geraet, Optional<String> search) throws ServiceException {
 		TeilnahmeStatisticDTO teilnahmeStatstic = new TeilnahmeStatisticDTO();

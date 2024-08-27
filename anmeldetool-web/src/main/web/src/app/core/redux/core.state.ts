@@ -11,6 +11,8 @@ import { vereinFeature } from "./verein/verein.reducer";
 import { VereinState } from "./verein";
 import { OalState } from "./organisation-anlass";
 import { oalFeature } from "./organisation-anlass/oal.reducer";
+import { otsFeature } from "./organisation-teilnahmen/ots.reducer";
+import { OtsState } from "./organisation-teilnahmen";
 
 export const reducers: ActionReducerMap<AppState> = {
   router: routerReducer,
@@ -18,6 +20,7 @@ export const reducers: ActionReducerMap<AppState> = {
   anlass: anlassFeature.reducer,
   verein: vereinFeature.reducer,
   oal: oalFeature.reducer,
+  ots: otsFeature.reducer,
 };
 
 export const metaReducers: MetaReducer<AppState>[] = [
@@ -34,4 +37,5 @@ export interface AppState {
   anlass: AnlassState;
   verein: VereinState;
   oal: OalState;
+  ots: OtsState;
 }

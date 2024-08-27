@@ -23,6 +23,9 @@ import { NewVereinComponent } from "../new-verein/new-verein.component";
 export class AnmeldeToolComponent
   implements OnInit, AfterViewInit, AfterContentChecked
 {
+  localeTextDE = {
+    contains: "Beinhaltet",
+  };
   private showPage = 0;
   dialogOpen = false;
   appBlocked = false;

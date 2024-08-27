@@ -36,7 +36,14 @@ public interface TeilnehmerAnlassLinkMapper {
 	}
 
 	default MeldeStatusEnum createMeldeStatus(String text) {
-		return MeldeStatusEnum.valueOf(text);
+		if (text != null && text.length() > 0) {
+			try {
+				return MeldeStatusEnum.valueOf(text.toUpperCase());
+			} catch (IllegalArgumentException ex) {
+				return MeldeStatusEnum.fromText(text);
+			}
+		}
+		return null;
 	}
 
 }

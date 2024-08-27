@@ -56,6 +56,9 @@ public abstract class Base {
 
 	@Override
 	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
 		Base other = (Base) obj;
 		if (id != null) {
 			if (other.id != null)

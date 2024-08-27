@@ -11,11 +11,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.ztv.anmeldetool.exception.EntityNotFoundException;
 import org.ztv.anmeldetool.models.LoginData;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.Person;
@@ -169,7 +172,7 @@ public class AdminController {
 	public ResponseEntity<Collection<TeilnehmerDTO>> getTeilnehmer(HttpServletRequest request, @PathVariable UUID orgId,
 			@RequestParam(name = "page") int page, @RequestParam(name = "size") int size) {
 		Pageable pageable = PageRequest.of(page, size);
-		return teilnehmerSrv.findTeilnehmerByOrganisation(orgId, pageable);
+		return teilnehmerSrv.findTeilnehmerDtoByOrganisation(orgId, pageable);
 	}
 
 	@GetMapping("/organisationen/{orgId}/teilnehmer/count")
@@ -185,8 +188,8 @@ public class AdminController {
 
 	@PatchMapping("/organisationen/{orgId}/teilnehmer")
 	public ResponseEntity<TeilnehmerDTO> updateNewTeilnehmer(HttpServletRequest request, @PathVariable UUID orgId,
-			@RequestBody TeilnehmerDTO teilnehmerDTO) {
-		return teilnehmerSrv.update(orgId, teilnehmerDTO);
+			@RequestBody TeilnehmerDTO teilnehmerDTO) throws EntityNotFoundException {
+		return ResponseEntity.ok(teilnehmerSrv.update(orgId, teilnehmerDTO));
 	}
 
 	@DeleteMapping("/organisationen/{orgId}/teilnehmer/{teilnehmerId}")
@@ -328,5 +331,12 @@ public class AdminController {
 	private String getEncodedPassword(String password) {
 		log.debug("passwordEncoder: " + passwordEncoder.toString() + " ,work: " + password);
 		return passwordEncoder.encode(password);
+	}
+
+	@ExceptionHandler(EntityNotFoundException.class)
+	public ResponseEntity<?> handlerEntityNotFound(EntityNotFoundException ex) {
+		this.log.warn(ex.getMessage());
+
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
 	}
 }

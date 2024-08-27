@@ -1,0 +1,219 @@
+[36m⠋[39m Generating browser application bundles (phase: setup)...[2K[1G[36m⠙[39m Generating browser application bundles (phase: setup)...[2K[1G[36m⠹[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠸[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠼[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠴[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠦[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠧[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠇[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠏[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠋[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠙[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠹[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠸[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠼[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠴[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠦[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠧[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠇[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠏[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠋[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠙[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠹[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠸[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠼[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠴[39m Generating browser application bundles (phase: sealing)...[2K[1G[36m⠦[39m Generating browser application bundles (phase: emitting)...[2K[1G[36m⠧[39m Generating browser application bundles (phase: emitting)...[2K[1G[32m✔[39m Browser application bundle generation complete.
+[37m[39m
+[37m[0m[1mInitial Chunk Files[22m                                                                                    [2m | [22m[1mNames[22m                               [2m | [22m [1mRaw Size[22m[0m[39m
+[37m[0m[92mvendor.js[39m[37m                                                                                              [2m | [22mvendor                              [2m | [22m  [96m7.30 MB[39m[37m[2m | [22m[0m[39m
+[37m[0m[92mpolyfills.js[39m[37m                                                                                           [2m | [22mpolyfills                           [2m | [22m  [96m1.18 MB[39m[37m[2m | [22m[0m[39m
+[37m[0m[92mstyles.css, styles.js[39m[37m                                                                                  [2m | [22mstyles                              [2m | [22m[96m794.33 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[92mmain.js[39m[37m                                                                                                [2m | [22mmain                                [2m | [22m[96m478.18 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[92mscripts.js[39m[37m                                                                                             [2m | [22mscripts                             [2m | [22m[96m229.86 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[92mruntime.js[39m[37m                                                                                             [2m | [22mruntime                             [2m | [22m [96m12.96 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[0m[39m
+[37m[0m[1m [22m                                                                                                      [2m | [22m[1mInitial Total[22m                       [2m | [22m  [1m9.96 MB[22m[0m[39m
+[37m[0m[0m[39m
+[37m[0m[1mLazy Chunk Files[22m                                                                                       [2m | [22m[1mNames[22m                               [2m | [22m [1mRaw Size[22m[0m[39m
+[37m[0m[92msrc_app_verein_teilnehmer_module_ts.js[39m[37m                           [39m[37m                                      [2m | [22mverein-teilnehmer-module            [2m | [22m  [96m2.74 MB[39m[37m[2m | [22m[0m[39m
+[37m[0m[92msrc_app_rechnungsbuero_rechnungsbuero_module_ts.js[39m[37m                                                     [2m | [22mrechnungsbuero-rechnungsbuero-module[2m | [22m[96m114.14 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[92msrc_app_event-admin_events-admin_module_ts.js[39m[37m                                                          [2m | [22mevent-admin-events-admin-module     [2m | [22m [96m87.78 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[92msrc_app_verein_user_module_ts.js[39m[37m                                                                       [2m | [22mverein-user-module                  [2m | [22m [96m73.21 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[92mdefault-src_app_core_routing_auth-route-activator_service_ts-node_modules_ngx-toastr_fesm2015-caef87.js[39m[37m[2m | [22mverein-teilnehmer-module            [2m | [22m [96m62.53 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[92mdefault-src_app_core_model_AbteilungEnum_ts-src_app_core_model_AnlageEnum_ts-src_app_core_ser-0ba6d2.js[39m[37m[2m | [22mevent-admin-events-admin-module     [2m | [22m [96m17.71 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[92msrc_app_events_events_module_ts.js[39m[37m                                                                     [2m | [22mevents-events-module                [2m | [22m  [96m9.43 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[0m[39m
+[37m[0mBuild at: [1m[37m2024-02-06T14:04:28.134Z[39m[37m[22m - Hash: [1m[37m283397c10d0d39c5[39m[37m[22m - Time: [1m[37m9664[39m[37m[22mms[0m[39m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/app/core/model/keycloak/user_representation.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entry points to the 'files' or 'include' properties in your tsconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/app/core/redux/teilnehmer/index.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entry points to the 'files' or 'include' properties in your tsconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/app/core/redux/teilnehmer/teilnehmer.actions.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entry points to the 'files' or 'include' properties in your tsconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/app/core/redux/teilnehmer/teilnehmer.effects.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entry points to the 'files' or 'include' properties in your tsconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/app/core/redux/teilnehmer/teilnehmer.reducer.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entry points to the 'files' or 'include' properties in your tsconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/app/core/redux/teilnehmer/teilnehmer.selectors.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entry points to the 'files' or 'include' properties in your tsconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/app/core/redux/teilnehmer/teilnehmer.state.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entry points to the 'files' or 'include' properties in your t[39m[22m[1m[33msconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/app/core/routing/authService-resolver.service.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entry points to the 'files' or 'include' properties in your tsconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/app/core/routing/teilnehmer-resolver.service.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entry points to the 'files' or 'include' properties in your tsconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/app/core/service/anlass/anlass.service.ts depends on 'file-saver'. CommonJS or AMD dependencies can cause optimization bailouts.[39m[22m
+[1m[33mFor more info see: https://angular.io/guide/build#configuring-commonjs-dependencies[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/app/core/service/auth/auth_http.service copy.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entry points to the 'files' or 'include' properties in your tsconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/app/core/service/auth/role.enum.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entry points to the 'files' or 'include' properties in your tsconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/app/verein/teilnehmer/starts.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entry points to the 'files' or 'include' properties in your tsconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/app/verein/teilnehmer/teilnehmer-grid/anlass-header/anlass-header.component.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entr[39m[22m[1m[33my points to the 'files' or 'include' properties in your tsconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/environments/environment.halle.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entry points to the 'files' or 'include' properties in your tsconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/environments/environment.local.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entry points to the 'files' or 'include' properties in your tsconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/environments/environment.prod.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entry points to the 'files' or 'include' properties in your tsconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/material-module.ts is part of the TypeScript compilation but it's unused.[39m[22m
+[1m[33mAdd only entry points to the 'files' or 'include' properties in your tsconfig.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[39m[22m
+[37m[39m
+[37m** Angular Live Development Server is listening on localhost:4200, open your browser on http://localhost:4200/ztv-anmeldetool **[39m
+[37m[39m
+[37m[39m
+[37m[92m✔[39m[37m Compiled successfully.[39m
+[36m⠋[39m Generating browser application bundles...[2K[1G[36m⠙[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠹[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠸[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠼[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠴[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠦[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠧[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠇[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠏[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠋[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠙[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠹[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠸[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠼[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠴[39m Generating browser application bundles (phase: sealing)...[2K[1G[36m⠦[39m Generating browser application bundles (phase: emitting)...[2K[1G[36m⠧[39m Generating browser application bundles (phase: emitting)...[2K[1G[32m✔[39m Browser application bundle generation complete.
+[37m[39m
+[37m[0m[1mInitial Chunk Files[22m                   [2m | [22m[1mNames[22m                   [2m | [22m[1mRaw Size[22m[0m[39m
+[37m[0m[92mruntime.js[39m[37m                            [2m | [22mruntime                 [2m | [22m[96m12.96 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[0m[39m
+[37m[0m[1mLazy Chunk Files[22m                      [2m | [22m[1mNames[22m                   [2m | [22m[1mRaw Size[22m[0m[39m
+[37m[0m[92msrc_app_verein_teilnehmer_module_ts.js[39m[37m[2m | [22mverein-teilnehmer-module[2m | [22m [96m2.74 MB[39m[37m[2m | [22m[0m[39m
+[37m[0m[0m[39m
+[37m[0m11 unchanged chunks[0m[39m
+[37m[0m[0m[39m
+[37m[0mBuild at: [1m[37m2024-02-06T14:26:36.150Z[39m[37m[22m - Hash: [1m[37m45f766648bbe6f58[39m[37m[22m - Time: [1m[37m2757[39m[37m[22mms[0m[39m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/home/heinz/Documents/Development/Anmeldetool/anmeldetool-web/src/main/web/src/app/events/events-detail/events-detail.component.ts depends on 'moment'. CommonJS or AMD dependencies can cause optimization bailouts.[39m[22m
+[1m[33mFor more info see: https://angular.io/guide/build#configuring-commonjs-dependencies[39m[22m
+[1m[33m[39m[22m
+[1m[33m[39m[22m
+[37m[39m
+[37m[92m✔[39m[37m Compiled successfully.[39m
+[36m⠋[39m Generating browser application bundles...[2K[1G[36m⠙[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠹[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠸[39m Generating browser application bundles (phase: sealing)...[2K[1G[36m⠼[39m Generating browser application bundles (phase: emitting)...[2K[1G[36m⠴[39m Generating browser application bundles (phase: emitting)...[2K[1G[32m✔[39m Browser application bundle generation complete.
+[37m[39m
+[37m[0m[1mInitial Chunk Files[22m[2m | [22m[1mNames[22m  [2m | [22m[1mRaw Size[22m[0m[39m
+[37m[0m[92mruntime.js[39m[37m         [2m | [22mruntime[2m | [22m[96m12.96 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[0m[39m
+[37m[0m12 unchanged chunks[0m[39m
+[37m[0m[0m[39m
+[37m[0mBuild at: [1m[37m2024-02-06T14:26:46.572Z[39m[37m[22m - Hash: [1m[37m8c579fc8754de06b[39m[37m[22m - Time: [1m[37m879[39m[37m[22mms[0m[39m
+[37m[39m
+[37m[92m✔[39m[37m Compiled successfully.[39m
+[36m⠋[39m Generating browser application bundles...[2K[1G[36m⠙[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠹[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠸[39m Generating browser application bundles (phase: sealing)...[2K[1G[36m⠼[39m Generating browser application bundles (phase: emitting)...[2K[1G[32m✔[39m Browser application bundle generation complete.
+[37m[39m
+[37m[0m[1mInitial Chunk Files[22m                   [2m | [22m[1mNames[22m                   [2m | [22m[1mRaw Size[22m[0m[39m
+[37m[0m[92mruntime.js[39m[37m                            [2m | [22mruntime                 [2m | [22m[96m12.96 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[0m[39m
+[37m[0m[1mLazy Chunk Files[22m                      [2m | [22m[1mNames[22m                   [2m | [22m[1mRaw Size[22m[0m[39m
+[37m[0m[92msrc_app_verein_teilnehmer_module_ts.js[39m[37m[2m | [22mverein-teilnehmer-module[2m | [22m [96m2.74 MB[39m[37m[2m | [22m[0m[39m
+[37m[0m[0m[39m
+[37m[0m11 unchanged chunks[0m[39m
+[37m[0m[0m[39m
+[37m[0mBuild at: [1m[37m2024-02-06T14:29:31.458Z[39m[37m[22m - Hash: [1m[37m03ff3a3a353f61a9[39m[37m[22m - Time: [1m[37m897[39m[37m[22mms[0m[39m
+[37m[39m
+[37m[92m✔[39m[37m Compiled successfully.[39m
+[36m⠋[39m Generating browser application bundles...[2K[1G[36m⠙[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠹[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠸[39m Generating browser application bundles (phase: emitting)...[2K[1G[32m✔[39m Browser application bundle generation complete.
+[37m[39m
+[37m[0m13 unchanged chunks[0m[39m
+[37m[0m[0m[39m
+[37m[0mBuild at: [1m[37m2024-02-06T14:29:33.539Z[39m[37m[22m - Hash: [1m[37m03ff3a3a353f61a9[39m[37m[22m - Time: [1m[37m546[39m[37m[22mms[0m[39m
+[37m[39m
+[37m[92m✔[39m[37m Compiled successfully.[39m
+[36m⠋[39m Generating browser application bundles...[2K[1G[36m⠙[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠹[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠸[39m Generating browser application bundles (phase: emitting)...[2K[1G[32m✔[39m Browser application bundle generation complete.
+[37m[39m
+[37m[0m13 unchanged chunks[0m[39m
+[37m[0m[0m[39m
+[37m[0mBuild at: [1m[37m2024-02-06T14:29:38.070Z[39m[37m[22m - Hash: [1m[37m03ff3a3a353f61a9[39m[37m[22m - Time: [1m[37m493[39m[37m[22mms[0m[39m
+[37m[39m
+[37m[92m✔[39m[37m Compiled successfully.[39m
+[36m⠋[39m Generating browser application bundles...[2K[1G[36m⠙[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠹[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠸[39m Generating browser application bundles (phase: sealing)...[2K[1G[36m⠼[39m Generating browser application bundles (phase: emitting)...[2K[1G[32m✔[39m Browser application bundle generation complete.
+[37m[39m
+[37m[0m[1mInitial Chunk Files[22m                   [2m | [22m[1mNames[22m                   [2m | [22m[1mRaw Size[22m[0m[39m
+[37m[0m[92mruntime.js[39m[37m                            [2m | [22mruntime                 [2m | [22m[96m12.96 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[0m[39m
+[37m[0m[1mLazy Chunk Files[22m                      [2m | [22m[1mNames[22m                   [2m | [22m[1mRaw Size[22m[0m[39m
+[37m[0m[92msrc_app_verein_teilnehmer_module_ts.js[39m[37m[2m | [22mverein-teilnehmer-module[2m | [22m [96m2.74 MB[39m[37m[2m | [22m[0m[39m
+[37m[0m[0m[39m
+[37m[0m11 unchanged chunks[0m[39m
+[37m[0m[0m[39m
+[37m[0mBuild at: [1m[37m2024-02-06T14:31:52.210Z[39m[37m[22m - Hash: [1m[37m77849dae8076af7f[39m[37m[22m - Time: [1m[37m979[39m[37m[22mms[0m[39m
+[37m[39m
+[37m[92m✔[39m[37m Compiled successfully.[39m
+[36m⠋[39m Generating browser application bundles...[2K[1G[36m⠙[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠹[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠸[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠼[39m Generating browser application bundles (phase: sealing)...[2K[1G[32m✔[39m Browser application bundle generation complete.
+[37m[39m
+[37m[0m[1mInitial Chunk Files[22m                   [2m | [22m[1mNames[22m                   [2m | [22m[1mRaw Size[22m[0m[39m
+[37m[0m[92mruntime.js[39m[37m                            [2m | [22mruntime                 [2m | [22m[96m12.96 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[0m[39m
+[37m[0m[1mLazy Chunk Files[22m                      [2m | [22m[1mNames[22m                   [2m | [22m[1mRaw Size[22m[0m[39m
+[37m[0m[92msrc_app_verein_teilnehmer_module_ts.js[39m[37m[2m | [22mverein-teilnehmer-module[2m | [22m [96m2.74 MB[39m[37m[2m | [22m[0m[39m
+[37m[0m[0m[39m
+[37m[0m11 unchanged chunks[0m[39m
+[37m[0m[0m[39m
+[37m[0mBuild at: [1m[37m2024-02-06T14:33:59.957Z[39m[37m[22m - Hash: [1m[37m5552c0f8a001e157[39m[37m[22m - Time: [1m[37m1073[39m[37m[22mms[0m[39m
+[1m[31m[39m[22m
+[1m[31m[0m[91mError: [39m[31m[0m[96msrc/app/core/redux/teilnahmen/teilnahmen.effects.ts[0m:[93m16[0m:[93m34[0m - [91merror[0m[90m TS2345: [0mArgument of type '() => Observable<unknown>' is not assignable to parameter of type '() => EffectResult<Action>'.[39m[22m
+[1m[31m  Type 'Observable<unknown>' is not assignable to type 'EffectResult<Action>'.[39m[22m
+[1m[31m    Type 'Observable<unknown>' is not assignable to type 'Observable<Action>'.[39m[22m
+[1m[31m      Property 'type' is missing in type '{}' but required in type 'Action'.[39m[22m
+[1m[31m[39m[22m
+[1m[31m[7m16[0m   loadTeilnahmen$ = createEffect(() => {[39m[22m
+[1m[31m[7m  [0m [91m                                 ~~~~~~~[0m[39m[22m
+[1m[31m[39m[22m
+[1m[31m  [96mnode_modules/@ngrx/store/src/models.d.ts[0m:[93m3[0m:[93m5[0m[39m[22m
+[1m[31m    [7m3[0m     type: string;[39m[22m
+[1m[31m    [7m [0m [96m    ~~~~[0m[39m[22m
+[1m[31m    'type' is declared here.[39m[22m
+[1m[31m[39m[22m
+[1m[31m[39m[22m
+[1m[31m[39m[22m
+[37m[39m
+[37m[91m✖[39m[37m Failed to compile.[39m
+[36m⠋[39m Generating browser application bundles...[2K[1G[36m⠙[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠹[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠸[39m Generating browser application bundles (phase: sealing)...[2K[1G[32m✔[39m Browser application bundle generation complete.
+[37m[39m
+[37m[0m[1mInitial Chunk Files[22m                   [2m | [22m[1mNames[22m                   [2m | [22m[1mRaw Size[22m[0m[39m
+[37m[0m[92mruntime.js[39m[37m                            [2m | [22mruntime                 [2m | [22m[96m12.96 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[0m[39m
+[37m[0m[1mLazy Chunk Files[22m                      [2m | [22m[1mNames[22m                   [2m | [22m[1mRaw Size[22m[0m[39m
+[37m[0m[92msrc_app_verein_teilnehmer_module_ts.js[39m[37m[2m | [22mverein-teilnehmer-module[2m | [22m [96m2.74 MB[39m[37m[2m | [22m[0m[39m
+[37m[0m[0m[39m
+[37m[0m11 unchanged chunks[0m[39m
+[37m[0m[0m[39m
+[37m[0mBuild at: [1m[37m2024-02-06T14:35:11.387Z[39m[37m[22m - Hash: [1m[37m26fa0c05b0821539[39m[37m[22m - Time: [1m[37m925[39m[37m[22mms[0m[39m
+[1m[31m[39m[22m
+[1m[31m[0m[91mError: [39m[31m[0m[96msrc/app/core/redux/teilnahmen/teilnahmen.effects.ts[0m:[93m38[0m:[93m69[0m - [91merror[0m[90m TS2552: [0mCannot find name 'error'. Did you mean 'Error'?[39m[22m
+[1m[31m[39m[22m
+[1m[31m[7m38[0m         return of(TeilnahmenActions.loadAllTeilnahmenError({ error: error }));[39m[22m
+[1m[31m[7m  [0m [91m                                                                    ~~~~~[0m[39m[22m
+[1m[31m[39m[22m
+[1m[31m  [96mnode_modules/typescript/lib/lib.es5.d.ts[0m:[93m1039[0m:[93m13[0m[39m[22m
+[1m[31m    [7m1039[0m declare var Error: ErrorConstructor;[39m[22m
+[1m[31m    [7m    [0m [96m            ~~~~~[0m[39m[22m
+[1m[31m    'Error' is declared here.[39m[22m
+[1m[31m[39m[22m
+[1m[31m[39m[22m
+[1m[31m[39m[22m
+[37m[39m
+[37m[91m✖[39m[37m Failed to compile.[39m
+[36m⠋[39m Generating browser application bundles...[2K[1G[36m⠙[39m Generating browser application bundles (phase: building)...[2K[1G[36m⠹[39m Generating browser application bundles (phase: sealing)...[2K[1G[36m⠸[39m Generating browser application bundles (phase: emitting)...[2K[1G[32m✔[39m Browser application bundle generation complete.
+[37m[39m
+[37m[0m[1mInitial Chunk Files[22m                   [2m | [22m[1mNames[22m                   [2m | [22m[1mRaw Size[22m[0m[39m
+[37m[0m[92mruntime.js[39m[37m                            [2m | [22mruntime                 [2m | [22m[96m12.96 kB[39m[37m[2m | [22m[0m[39m
+[37m[0m[0m[39m
+[37m[0m[1mLazy Chunk Files[22m                      [2m | [22m[1mNames[22m                   [2m | [22m[1mRaw Size[22m[0m[39m
+[37m[0m[92msrc_app_verein_teilnehmer_module_ts.js[39m[37m[2m | [22mverein-teilnehmer-module[2m | [22m [96m2.74 MB[39m[37m[2m | [22m[0m[39m
+[37m[0m[0m[39m
+[37m[0m11 unchanged chunks[0m[39m
+[37m[0m[0m[39m
+[37m[0mBuild at: [1m[37m2024-02-06T14:35:33.550Z[39m[37m[22m - Hash: [1m[37mc4ef6322cd2e6af2[39m[37m[22m - Time: [1m[37m800[39m[37m[22mms[0m[39m
+[37m[39m
+[37m[92m✔[39m[37m Compiled successfully.[39m

@@ -10,6 +10,14 @@ export namespace TiTuEnum {
     return TiTuEnum[tiTu];
   }
 
+  export function values(): any[] {
+    return Object.values(TiTuEnum);
+  }
+
+  export function keys(): any[] {
+    return Object.keys(TiTuEnum);
+  }
+
   export function parse(tiTu: string): TiTuEnum {
     return TiTuEnum[tiTu];
   }

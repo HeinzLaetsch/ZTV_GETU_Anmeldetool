@@ -35,7 +35,7 @@ public class ZTVWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
 				.antMatchers("/", "/admin/login", "/admin/verbaende", "/admin/anlaesse", "/admin/organisationen",
-						"/favicon.ico", "/admin/user", "/admin/user/benutzernamen/**")
+						"/admin/teilnahmen", "/favicon.ico", "/admin/user", "/admin/user/benutzernamen/**")
 				.permitAll()
 				// .antMatchers("/admin")
 				// .access("@userAuthorizationControl.checkAccessBasedOnRoleBla(authentication)")

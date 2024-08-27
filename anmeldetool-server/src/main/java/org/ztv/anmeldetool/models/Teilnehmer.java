@@ -8,15 +8,22 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 @Entity()
 @Table(name = "TEILNEHMER")
+@SQLDelete(sql = "UPDATE teilnehmer SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false") // Deleted Teilnehmer nicht mehr zugreifbar, Alternative mit Filter
 @Getter
 @Setter
+@EqualsAndHashCode
 public class Teilnehmer extends Base {
 
 	private String name;

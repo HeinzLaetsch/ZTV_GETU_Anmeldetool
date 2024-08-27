@@ -1,3 +1,5 @@
+import { TiTuEnum } from "./TiTuEnum";
+
 export namespace KategorieEnumFunction {
   export function toString(kategorie: KategorieEnum): string {
     return KategorieEnum[kategorie];
@@ -30,14 +32,34 @@ export namespace KategorieEnumFunction {
     return kategorie1String === kategorie2String;
   }
 
-  export function valuesAndGreater(start: string): any[] {
+  export function valuesAndGreater(start: string, titu: TiTuEnum): any[] {
     if (start === undefined || start === null) {
       start = "K1";
     }
     const startindex = Object.values(KategorieEnum).findIndex((element) =>
       equals(element, parse(start))
     );
-    return Object.values(KategorieEnum).slice(startindex);
+    const sliced = Object.values(KategorieEnum).slice(startindex);
+    return sliced.filter((katgorie) => {
+      if (TiTuEnum.equals(TiTuEnum.Ti, titu)) {
+        switch (katgorie) {
+          case "K5":
+            return false;
+          case "KH":
+            return false;
+        }
+      } else {
+        switch (katgorie) {
+          case "K5A":
+            return false;
+          case "K5B":
+            return false;
+          case "KD":
+            return false;
+        }
+      }
+      return true;
+    });
   }
 
   export function isBrevet1(kategorie: KategorieEnum): boolean {
@@ -55,13 +77,14 @@ export namespace KategorieEnumFunction {
       !KategorieEnumFunction.equals(KategorieEnum.K2, kategorie) &&
       !KategorieEnumFunction.equals(KategorieEnum.K3, kategorie) &&
       !KategorieEnumFunction.equals(KategorieEnum.K4, kategorie) &&
-      !KategorieEnumFunction.equals(KategorieEnum.KEINE_TEILNAHME, kategorie)
+      !KategorieEnumFunction.equals(KategorieEnum.KEIN_START, kategorie)
     );
   }
 }
 
 export enum KategorieEnum {
   KEINE_TEILNAHME = "keine Teilnahme",
+  KEIN_START = "kein Start",
   K1 = "K1",
   K2 = "K2",
   K3 = "K3",

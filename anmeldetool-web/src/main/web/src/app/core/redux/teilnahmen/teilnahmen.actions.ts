@@ -1,9 +1,13 @@
-import { createActionGroup, props } from "@ngrx/store";
+import { Action, createActionGroup, props } from "@ngrx/store";
 import { ITeilnahmen } from "../../model/ITeilnahmen";
+import { Update } from "@ngrx/entity";
 
 export const TeilnahmenActions = createActionGroup({
-  source: "teilnahmen",
+  source: "Teilnahmen",
   events: {
+    "Refresh All TEILNAHMEN": props<{
+      payload: number;
+    }>(),
     "Load All TEILNAHMEN INVOKED": props<{
       payload: number;
     }>(),
@@ -24,11 +28,20 @@ export const TeilnahmenActions = createActionGroup({
       payload: ITeilnahmen;
     }>(),
     "Update TEILNAHMEN SUCCESS": props<{
-      payload: ITeilnahmen;
+      payload: Update<ITeilnahmen>;
     }>(),
     "Update TEILNAHMEN ERROR": props<{ error: string }>(),
   },
 });
+
+/*
+Check if this is needed !!
+export class UpdateTeilnahme implements Action {
+  readonly type = TeilnahmenActions.updateTeilnahmenSuccess.type;
+
+  constructor(public payload: Update<ITeilnahmen>) {}
+}
+*/
 
 /*
 export enum ActionTypes {

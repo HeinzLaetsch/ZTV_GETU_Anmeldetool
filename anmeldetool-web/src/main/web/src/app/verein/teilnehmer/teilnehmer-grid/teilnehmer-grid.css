@@ -12,3 +12,18 @@ body {
   margin-top: 50px;
   display: inline-block;
 }
+.mat-fab {
+  font-size: 12px;
+  right: 15px;
+  top: 90px;
+  left: auto;
+  position: absolute;
+}
+
+.mat-fab2 {
+  right: 85px;
+}
+
+.mat-fab3 {
+  right: 155px;
+}

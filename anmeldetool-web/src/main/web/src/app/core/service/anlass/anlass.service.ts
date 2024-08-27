@@ -19,6 +19,7 @@ import { IUser } from "../../model/IUser";
 import { IWertungsrichterEinsatz } from "../../model/IWertungsrichterEinsatz";
 import { KategorieEnum } from "../../model/KategorieEnum";
 import { ITeilnahmen } from "../../model/ITeilnahmen";
+import { IOrganisationTeilnahmenStatistik } from "../../model/IOrganisationTeilnahmenStatistik";
 
 @Injectable({
   providedIn: "root",
@@ -26,6 +27,8 @@ import { ITeilnahmen } from "../../model/ITeilnahmen";
 export class AnlassService {
   apiHost = `${environment.apiHost}`;
   private url: string = this.apiHost + "/admin/anlaesse";
+
+  private url2: string = this.apiHost + "/admin/teilnahmen";
 
   constructor(private http: HttpClient) {}
 
@@ -35,8 +38,9 @@ export class AnlassService {
       map((anlaesse) => {
         return anlaesse.map((value) => {
           // Check wieso Copy
-          return Object.assign(new IAnlass(), value);
-          // return value;
+          // const tmp: IAnlass = Object.assign(new IAnlass(), value);
+          const tmp: IAnlass = new IAnlass(value);
+          return tmp;
         });
       }),
       catchError(this.handleError<IAnlass[]>("getAnlaesse", []))
@@ -346,21 +350,28 @@ export class AnlassService {
       .pipe(catchError(this.handleError<IAnlass>("updateAnlass")));
   }
 
-  saveTeilnahme(verein: IVerein, anlassLink: IAnlassLink): Observable<boolean> {
-    console.log("Service save Teilnahme: ", anlassLink);
+  // updateTeilnahme
+  //saveTeilnahme(verein: IVerein, anlassLink: IAnlassLink): Observable<boolean> {
+  saveTeilnahme(
+    verein: IVerein,
+    teilnahmen: ITeilnahmen
+  ): Observable<ITeilnahmen> {
+    console.log("Service save Teilnahme: ", teilnahmen);
+
     const combinedUrl =
-      this.url +
+      this.url2 +
       "/" +
-      anlassLink.anlassId +
+      teilnahmen.jahr +
       "/" +
       "organisationen" +
       "/" +
       verein.id +
-      "/teilnehmer/" +
-      anlassLink.teilnehmerId;
+      "/teilnahmen/" +
+      teilnahmen.teilnehmer.id;
+
     return this.http
-      .patch<boolean>(combinedUrl, anlassLink)
-      .pipe(catchError(this.handleError<boolean>("saveTeilnahme")));
+      .put<ITeilnahmen>(combinedUrl, teilnahmen)
+      .pipe(catchError(this.handleError<ITeilnahmen>("saveTeilnahme")));
   }
 
   // /anlaesse/{anlassId}/organisationen/{orgId}/teilnehmer/
@@ -383,7 +394,7 @@ export class AnlassService {
   // "/{jahr}/organisationen/{orgId}/teilnahmen/";
   getTeilnahmen(verein: IVerein, jahr: number): Observable<ITeilnahmen[]> {
     const combinedUrl =
-      this.url +
+      this.url2 +
       "/" +
       jahr +
       "/" +
@@ -394,16 +405,48 @@ export class AnlassService {
     // console.log("getTeilnehmer called: ", combinedUrl);
     return this.http
       .get<ITeilnahmen[]>(combinedUrl)
-      .pipe(catchError(this.handleError<ITeilnahmen[]>("getTeilnahmen", [])));
+      .pipe(
+        catchError(this.handleError<ITeilnahmen[]>("getTeilnahmen", undefined))
+      );
   }
 
-  updateStartgeraet(
+  getOrganisationTeilnahmenStatistik(
+    verein: IVerein,
+    jahr: number
+  ): Observable<IOrganisationTeilnahmenStatistik[]> {
+    const combinedUrl =
+      this.url2 + "/" + jahr + "/" + "organisationen" + "/" + verein.id;
+    return this.http
+      .get<IOrganisationTeilnahmenStatistik[]>(combinedUrl)
+      .pipe(
+        catchError(
+          this.handleError<IOrganisationTeilnahmenStatistik[]>(
+            "getOrganisationTeilnahmenStatistik",
+            undefined
+          )
+        )
+      );
+  }
+
+  /*
+  updateTeilnahme(anlassLink: IAnlassLink): Observable<IAnlassLink> {
+    const combinedUrl =
+      this.url + "/" + anlassLink.anlassId + "/" + anlassLink.teilnehmerId;
+    return this.http.post<IAnlassLink>(combinedUrl, anlassLink).pipe(
+      catchError((error) => {
+        this.handleError<boolean>("updateTeilnahme");
+        return of(undefined);
+      })
+    );
+  }*/
+
+  updateTeilnehmerStart(
     anlass: IAnlass,
     teilnehmerStart: ITeilnehmerStart
   ): Observable<boolean> {
     let combinedUrl = this.url + "/" + anlass.id + "/teilnehmer/";
     return this.http
-      .patch<boolean>(combinedUrl, teilnehmerStart)
+      .put<boolean>(combinedUrl, teilnehmerStart)
       .pipe(catchError(this.handleError<boolean>("updateStartgeraet")));
   }
 

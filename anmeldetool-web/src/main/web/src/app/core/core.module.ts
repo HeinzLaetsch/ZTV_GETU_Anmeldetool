@@ -49,6 +49,12 @@ export function initVereinservice(
     );
 }
 
+/*
+const localeText = useMemo(() => {
+    return AG_GRID_LOCALE_DE;
+}, []);
+*/
+
 registerLocaleData(localeDeCH, "de-ch");
 registerLocaleData(localeDe, "de");
 

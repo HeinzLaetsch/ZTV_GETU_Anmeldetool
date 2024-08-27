@@ -219,6 +219,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
       const newLink: IAnlassLink = {
         anlassId: anlass.id,
         teilnehmerId: teilnehmer.id,
+        organisationId: undefined,
         kategorie: undefined,
         meldeStatus: value,
         dirty: true,
@@ -273,7 +274,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     }
     let meldeStatus = MeldeStatusEnum.STARTET;
     if (erfassenDisabled) {
-      meldeStatus = MeldeStatusEnum.NEUMELDUNG;
+      meldeStatus = MeldeStatusEnum.STARTET; //TODO MeldeStatusEnum.Neumeldung;
     }
     if (filtered.length > 0) {
       filtered[0].kategorie = corrected;
@@ -283,6 +284,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
       const newLink: IAnlassLink = {
         anlassId: anlass.id,
         teilnehmerId: teilnehmer.id,
+        organisationId: undefined,
         kategorie: corrected,
         meldeStatus,
         dirty: true,

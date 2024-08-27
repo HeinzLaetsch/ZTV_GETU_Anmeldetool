@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.ztv.anmeldetool.exception.EntityNotFoundException;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.MeldeStatusEnum;
@@ -55,12 +56,18 @@ public class TeilnehmerService {
 		return ResponseEntity.ok(anzahl);
 	}
 
-	public ResponseEntity<Collection<TeilnehmerDTO>> findTeilnehmerByOrganisation(UUID orgId, Pageable pageable) {
+	public Collection<Teilnehmer> findTeilnehmerByOrganisation(UUID orgId, Pageable pageable) {
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		if (organisation == null) {
-			return ResponseEntity.notFound().build();
+			return null;
 		}
 		Collection<Teilnehmer> teilnehmerListe = teilnehmerRepository.findByOrganisation(organisation, pageable);
+		return teilnehmerListe;
+	}
+
+	public ResponseEntity<Collection<TeilnehmerDTO>> findTeilnehmerDtoByOrganisation(UUID orgId, Pageable pageable) {
+		Collection<Teilnehmer> teilnehmerListe = findTeilnehmerByOrganisation(orgId, pageable);
+
 		List<TeilnehmerDTO> teilnehmerDTOs = new ArrayList<TeilnehmerDTO>();
 		for (Teilnehmer teilnehmer : teilnehmerListe) {
 			List<TeilnehmerAnlassLink> tals = teilnehmerAnlassLinkRepository.findByTeilnehmer(teilnehmer);
@@ -134,23 +141,23 @@ public class TeilnehmerService {
 		return ResponseEntity.ok(true);
 	}
 
-	public ResponseEntity<TeilnehmerDTO> update(UUID orgId, TeilnehmerDTO teilnehmerDTO) {
+	public TeilnehmerDTO update(UUID orgId, TeilnehmerDTO teilnehmerDTO) throws EntityNotFoundException {
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		if (organisation == null) {
-			return ResponseEntity.notFound().build();
+			throw new EntityNotFoundException(Organisation.class, orgId);// ResponseEntity.notFound().build();
 		}
 		return update(organisation, teilnehmerDTO);
 	}
 
-	public ResponseEntity<TeilnehmerDTO> update(TeilnehmerDTO teilnehmerDTO) {
+	public TeilnehmerDTO update(TeilnehmerDTO teilnehmerDTO) throws EntityNotFoundException {
 		return update(teilnehmerDTO.getOrganisationid(), teilnehmerDTO);
 	}
 
-	public ResponseEntity<TeilnehmerDTO> update(Organisation organisation, TeilnehmerDTO teilnehmerDTO) {
+	public TeilnehmerDTO update(Organisation organisation, TeilnehmerDTO teilnehmerDTO) throws EntityNotFoundException {
 		Optional<Teilnehmer> teilnehmerOptional = teilnehmerRepository.findById(teilnehmerDTO.getId());
 		if (teilnehmerOptional.isEmpty()) {
 			log.warn("Could not find Teilnehmer with ID: {}", teilnehmerDTO.getId());
-			return ResponseEntity.notFound().build();
+			throw new EntityNotFoundException(Teilnehmer.class, teilnehmerDTO.getId()); // ResponseEntity.notFound().build();
 		}
 		Teilnehmer teilnehmer2 = TeilnehmerHelper.createTeilnehmer(teilnehmerDTO);
 
@@ -167,16 +174,16 @@ public class TeilnehmerService {
 
 		teilnehmer = create(teilnehmer);
 		teilnehmerDTO = TeilnehmerHelper.createTeilnehmerDTO(teilnehmer, organisation);
-		return ResponseEntity.ok(teilnehmerDTO);
+		return teilnehmerDTO;
 	}
 
-	public ResponseEntity updateAnlassTeilnahmen(UUID anlassId, UUID teilnehmerId, TeilnehmerAnlassLinkDTO tal) {
+	public TeilnehmerAnlassLink updateAnlassTeilnahmen(UUID anlassId, UUID teilnehmerId, TeilnehmerAnlassLinkDTO tal) {
 
 		Anlass anlass = anlassSrv.findAnlassById(anlassId);
 
 		Optional<Teilnehmer> teilnehmerOptional = teilnehmerRepository.findById(teilnehmerId);
 		if (teilnehmerOptional.isEmpty()) {
-			return ResponseEntity.notFound().build();
+			return null;
 		}
 
 		Iterable<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository
@@ -205,8 +212,8 @@ public class TeilnehmerService {
 				&& neuerStatus == MeldeStatusEnum.STARTET)) {
 			teilnehmerAnlassLink.setMeldeStatus(neuerStatus);
 		}
-		teilnehmerAnlassLinkRepository.save(teilnehmerAnlassLink);
+		teilnehmerAnlassLink = teilnehmerAnlassLinkRepository.save(teilnehmerAnlassLink);
 
-		return ResponseEntity.ok().build();
+		return teilnehmerAnlassLink;
 	}
 }

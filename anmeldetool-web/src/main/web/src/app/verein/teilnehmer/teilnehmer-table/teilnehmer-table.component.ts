@@ -213,6 +213,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   }
 
   getMeldeStatus(): String[] {
+    /*
     let allMeldeStatus = Object.values(MeldeStatusEnum);
     allMeldeStatus = allMeldeStatus.filter(
       (meldeStatus) =>
@@ -220,6 +221,9 @@ export class TeilnehmerTableComponent implements AfterViewInit {
         meldeStatus !== MeldeStatusEnum.ABGEMELDET_3
     );
     return allMeldeStatus;
+    */
+    const stati = Object.keys(MeldeStatusEnum);
+    return stati;
   }
   getKategorien(anlass: IAnlass): String[] {
     if (this.isErfassenDisabled(anlass) && !this.administrator) {
@@ -600,10 +604,10 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       if (!nno && !closed) {
         const abgemeldet =
           this.mutationsControls[rowIndex][colIndex].value ===
-          MeldeStatusEnum.ABGEMELDET_1;
+          MeldeStatusEnum.ABGEMELDET;
         const umgemeldet =
           this.mutationsControls[rowIndex][colIndex].value ===
-          MeldeStatusEnum.UMMELDUNG;
+          MeldeStatusEnum.STARTET; //TODO MeldeStatusEnum.Ummeldung;
         if (!abgemeldet && !umgemeldet) {
           const keinStart =
             this.teilnahmenControls[rowIndex][colIndex].value ===

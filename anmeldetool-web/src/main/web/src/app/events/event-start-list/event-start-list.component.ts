@@ -44,6 +44,7 @@ export class EventStartListComponent implements OnInit {
     this.alleTeilnehmer.forEach((teilnehmer) => {
       if (teilnehmer.teilnahmen && teilnehmer.teilnahmen.anlassLinks[0]) {
         if (!teilnehmer.teilnahmen.anlassLinks[0].meldeStatus) {
+          //TODO check
           teilnehmer.teilnahmen.anlassLinks[0].meldeStatus =
             MeldeStatusEnum.STARTET;
         }

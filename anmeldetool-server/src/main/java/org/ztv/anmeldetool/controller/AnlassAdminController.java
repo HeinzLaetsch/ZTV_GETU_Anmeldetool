@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -20,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.ztv.anmeldetool.exception.EntityNotFoundException;
 import org.ztv.anmeldetool.models.AbteilungEnum;
 import org.ztv.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.models.Anlass;
@@ -46,7 +47,6 @@ import org.ztv.anmeldetool.models.Person;
 import org.ztv.anmeldetool.models.PersonAnlassLink;
 import org.ztv.anmeldetool.models.RollenEnum;
 import org.ztv.anmeldetool.models.RollenLink;
-import org.ztv.anmeldetool.models.Teilnehmer;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.models.WertungsrichterBrevetEnum;
 import org.ztv.anmeldetool.models.WertungsrichterEinsatz;
@@ -76,11 +76,9 @@ import org.ztv.anmeldetool.transfer.PersonAnlassLinkCsvDTO;
 import org.ztv.anmeldetool.transfer.PersonAnlassLinkDTO;
 import org.ztv.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.transfer.TeilnahmeStatisticDTO;
-import org.ztv.anmeldetool.transfer.TeilnahmenDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkCsvDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerCsvContestDTO;
-import org.ztv.anmeldetool.transfer.TeilnehmerDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerStartDTO;
 import org.ztv.anmeldetool.transfer.WertungsrichterEinsatzDTO;
 import org.ztv.anmeldetool.util.AnlassMapper;
@@ -94,7 +92,6 @@ import org.ztv.anmeldetool.util.PersonMapper;
 import org.ztv.anmeldetool.util.TeilnehmerAnlassLinkExportImportMapper;
 import org.ztv.anmeldetool.util.TeilnehmerAnlassLinkMapper;
 import org.ztv.anmeldetool.util.TeilnehmerExportImport;
-import org.ztv.anmeldetool.util.TeilnehmerHelper;
 import org.ztv.anmeldetool.util.WertungsrichterEinsatzMapper;
 import org.ztv.anmeldetool.util.WertungsrichterExport;
 import org.ztv.anmeldetool.util.WertungsrichterMapper;
@@ -256,6 +253,7 @@ public class AnlassAdminController {
 			pals = anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId, WertungsrichterBrevetEnum.Brevet_1);
 			gemeldeteBr2 = pals.size();
 			// TODO check anzahl
+			// TODO store anzahl within config
 			br1Ok = (Math.ceil(startBr1 / 15.0f)) <= gemeldeteBr1;
 			br2Ok = (Math.ceil(startBr2 / 15.0f)) <= gemeldeteBr2;
 		}
@@ -407,7 +405,7 @@ public class AnlassAdminController {
 		}
 	}
 
-	@PatchMapping(value = "/{anlassId}/teilnehmer")
+	@PutMapping(value = "/{anlassId}/teilnehmer")
 	public ResponseEntity updateAnlassStart(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable UUID anlassId, @RequestBody TeilnehmerStartDTO ts) {
 
@@ -679,24 +677,14 @@ public class AnlassAdminController {
 		return ResponseEntity.ok(linksDto);
 	}
 
-	@GetMapping("/{jahr}/organisationen/{orgId}/teilnahmen/")
-	public ResponseEntity<Collection<TeilnahmenDTO>> getTeilnahmen(HttpServletRequest request, @PathVariable int jahr,
-			@PathVariable UUID orgId) {
-		Map<Teilnehmer, List<TeilnehmerAnlassLink>> teilnehmer = anlassSrv.getTeilnahmen(jahr, orgId);
-		List<TeilnahmenDTO> teilnahmenDtos = teilnehmer.entrySet().stream().map(entry -> {
-			TeilnehmerDTO teilnehmerDto = TeilnehmerHelper.createTeilnehmerDTO(entry.getKey(),
-					entry.getKey().getOrganisation());
-			List<TeilnehmerAnlassLinkDTO> talDTOList = entry.getValue().stream().map(tal -> {
-				return teilnehmerAnlassMapper.toDto(tal);
-			}).collect(Collectors.toList());
-			TeilnahmenDTO tDto = new TeilnahmenDTO(teilnehmerDto, talDTOList);
-			return tDto;
-		}).collect(Collectors.toList());
+	@PutMapping("/{anlassId}/organisationen/{orgId}/teilnehmer/{teilnehmerId}")
+	public @ResponseBody ResponseEntity<TeilnehmerAnlassLinkDTO> putAnlassTeilnehmer(HttpServletRequest request,
+			@PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable UUID teilnehmerId,
+			@RequestBody TeilnehmerAnlassLinkDTO talDto) {
 
-		if (teilnahmenDtos.size() == 0) {
-			return getNotFound();
-		}
-		return ResponseEntity.ok(teilnahmenDtos);
+		TeilnehmerAnlassLink tal = teilnehmerSrv.updateAnlassTeilnahmen(anlassId, teilnehmerId, talDto);
+		talDto = teilnehmerAnlassMapper.toDto(tal);
+		return ResponseEntity.ok(talDto);
 	}
 
 	@GetMapping(value = "/{anlassId}/organisationen/{orgId}/anmeldekontrolle/", produces = "application/pdf")
@@ -743,12 +731,6 @@ public class AnlassAdminController {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Anmeldekontrolle: ",
 					ex);
 		}
-	}
-
-	@PatchMapping("/{anlassId}/organisationen/{orgId}/teilnehmer/{teilnehmerId}")
-	public @ResponseBody ResponseEntity patchAnlassTeilnehmer(HttpServletRequest request, @PathVariable UUID anlassId,
-			@PathVariable UUID orgId, @PathVariable UUID teilnehmerId, @RequestBody TeilnehmerAnlassLinkDTO tal) {
-		return teilnehmerSrv.updateAnlassTeilnahmen(anlassId, teilnehmerId, tal);
 	}
 
 	@GetMapping("/{anlassId}/organisationen/{orgId}/wertungsrichter/{brevet}/verfuegbar")
@@ -864,5 +846,19 @@ public class AnlassAdminController {
 		wrEinsatz = this.wertungsrichterEinsatzSrv.update(wrEinsatz);
 		WertungsrichterEinsatzDTO dto = this.wertungsrichterEinsatzMapper.ToDto(wrEinsatz);
 		return ResponseEntity.ok(dto);
+	}
+
+	@ExceptionHandler(EntityNotFoundException.class)
+	public ResponseEntity<?> handlerEntityNotFound(EntityNotFoundException ex) {
+		this.log.warn(ex.getMessage());
+
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<?> handlerException(Exception ex) {
+		log.warn("Call failed", ex);
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
 	}
 }

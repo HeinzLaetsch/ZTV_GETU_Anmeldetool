@@ -197,11 +197,12 @@ export class EinteilungStartgeraetComponent implements OnInit {
   }
   abmelden(rowIndex: number): void {
     console.log("Abmelden von ", this.startende[rowIndex].name);
+    //TODO Check
     this.startende[rowIndex].meldeStatus =
-      MeldeStatusEnum.ABGEMELDET_3.toString().toUpperCase();
+      MeldeStatusEnum.ABGEMELDET.toString().toUpperCase();
     if (!this.anlass.aenderungenNichtMehrErlaubt) {
       this.startende[rowIndex].meldeStatus =
-        MeldeStatusEnum.ABGEMELDET_1.toString().toUpperCase();
+        MeldeStatusEnum.ABGEMELDET.toString().toUpperCase();
     }
     this.anlassService
       .updateStartgeraet(this.anlass, this.startende[rowIndex])

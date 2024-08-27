@@ -55,7 +55,9 @@ import org.ztv.anmeldetool.transfer.LauflistenStatusDTO;
 import org.ztv.anmeldetool.transfer.RanglisteConfigurationDTO;
 import org.ztv.anmeldetool.transfer.RanglistenEntryDTO;
 import org.ztv.anmeldetool.transfer.TeamwertungDTO;
+import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.util.RanglistenConfigurationMapper;
+import org.ztv.anmeldetool.util.TeilnehmerAnlassLinkMapper;
 import org.ztv.anmeldetool.util.TeilnehmerAnlassLinkRanglistenMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -80,6 +82,9 @@ public class AnlassController {
 
 	@Autowired
 	TeilnehmerAnlassLinkService teilnehmerAnlassLinkService;
+
+	@Autowired
+	TeilnehmerAnlassLinkMapper teilnehmerAnlassMapper;
 
 	@Autowired
 	TeilnehmerAnlassLinkRanglistenMapper talrMapper;
@@ -588,8 +593,8 @@ public class AnlassController {
 	}
 
 	@DeleteMapping("/{anlassId}/lauflisten/{lauflistenId}/lauflisteneintraege/{lauflisteneintragId}")
-	public ResponseEntity<Boolean> deleteLauflistenEintrag(HttpServletRequest request, @PathVariable UUID anlassId,
-			@PathVariable UUID lauflistenId, @PathVariable UUID lauflisteneintragId,
+	public ResponseEntity<TeilnehmerAnlassLinkDTO> deleteLauflistenEintrag(HttpServletRequest request,
+			@PathVariable UUID anlassId, @PathVariable UUID lauflistenId, @PathVariable UUID lauflisteneintragId,
 			@RequestParam(name = "grund") String grund) {
 		try {
 			Optional<TeilnehmerAnlassLink> talOpt = teilnehmerAnlassLinkService
@@ -606,9 +611,11 @@ public class AnlassController {
 			if ("verletzt".equals(grund)) {
 				tal.setMeldeStatus(MeldeStatusEnum.VERLETZT);
 			}
-			teilnehmerAnlassLinkService.save(tal);
+			tal = teilnehmerAnlassLinkService.save(tal);
 
-			return ResponseEntity.ok(Boolean.TRUE);
+			TeilnehmerAnlassLinkDTO talDto = teilnehmerAnlassMapper.toDto(tal);
+
+			return ResponseEntity.ok(talDto);
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().build();
 		}

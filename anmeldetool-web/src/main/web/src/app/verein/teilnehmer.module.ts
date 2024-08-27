@@ -15,6 +15,8 @@ import { StoreModule } from "@ngrx/store";
 import { EffectsModule } from "@ngrx/effects";
 import { teilnahmenFeature } from "../core/redux/teilnahmen/teilnahmen.reducer";
 import { TeilnahmenEffects } from "../core/redux/teilnahmen";
+import { OtsEffects } from "../core/redux/organisation-teilnahmen";
+import { otsFeature } from "../core/redux/organisation-teilnahmen/ots.reducer";
 
 @NgModule({
   declarations: [
@@ -34,7 +36,8 @@ import { TeilnahmenEffects } from "../core/redux/teilnahmen";
     AgGridModule,
     RouterModule.forChild(TeilnehmerRoutes),
     StoreModule.forFeature(teilnahmenFeature),
-    EffectsModule.forFeature([TeilnahmenEffects]),
+    StoreModule.forFeature(otsFeature),
+    EffectsModule.forFeature([TeilnahmenEffects, OtsEffects]),
   ],
   providers: [],
 })

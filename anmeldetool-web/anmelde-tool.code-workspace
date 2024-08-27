@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "src/main/web"
+		}
+	],
+	"settings": {
+		"terminal.integrated.env.windows": {
+			"PATH": "c:/devsbb/eaio-ng/nodejs"
+		},
+		"terminal.integrated.defaultProfile.windows": "Command Prompt",
+		"git.ignoreLimitWarning": true
+	}
+}

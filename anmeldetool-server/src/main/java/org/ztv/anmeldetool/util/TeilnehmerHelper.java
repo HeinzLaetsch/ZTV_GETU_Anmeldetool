@@ -31,6 +31,9 @@ public class TeilnehmerHelper {
 				.jahrgang(teilnehmerDTO.getJahrgang()).tiTu(teilnehmerDTO.getTiTu()).dirty(teilnehmerDTO.isDirty())
 				.stvNummer(teilnehmerDTO.getStvNummer()).build();
 		teilnehmer.setAktiv(teilnehmerDTO.isAktiv());
+		if (teilnehmerDTO.getId() != null) {
+			teilnehmer.setId(teilnehmerDTO.getId());
+		}
 		return teilnehmer;
 	}
 

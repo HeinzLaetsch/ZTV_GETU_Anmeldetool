@@ -1,14 +1,58 @@
 <h3>Anzeige Filtern</h3>
+<!--
+  (change)="onChange($event)"
+-->
 <mat-button-toggle-group
+  #group="matButtonToggleGroup"
   name="geschlecht"
   aria-label="Geschlecht"
-  multiple
   [value]="selectedState"
-  (change)="onChange($event)"
+  (click)="onClick(group.value)"
+  localeText="localeTextDE"
 >
   <mat-button-toggle value="Turnerin">Turnerinnen</mat-button-toggle>
   <mat-button-toggle value="Turner">Turner</mat-button-toggle>
 </mat-button-toggle-group>
+<div>
+  <button
+    mat-fab
+    [disabled]="disAllowAdd()"
+    color="primary"
+    #tooltip="matTooltip"
+    matTooltip="Neue TurnerIn anlegen"
+    matTooltipPosition="below"
+    matTooltipHideDelay="500"
+    (click)="addRow($event)"
+  >
+    Neu
+  </button>
+  <!--button Kein Save
+    [disabled]="disAllowSave"
+    class="mat-fab2"
+    mat-fab
+    color="primary"
+    #tooltip="matTooltip"
+    matTooltip="Änderungen speichern"
+    matTooltipPosition="below"
+    matTooltipHideDelay="500"
+    (click)="saveTeilnehmer($event)"
+  >
+    Speichern
+  </button>
+  <button
+    [disabled]="disAllowCancel"
+    class="mat-fab3"
+    mat-fab
+    color="primary"
+    #tooltip="matTooltip"
+    matTooltip="Änderungen verwerfen"
+    matTooltipPosition="below"
+    matTooltipHideDelay="500"
+    (click)="cancel($event)"
+  >
+    Verwerfen
+  </button-->
+</div>
 <!-- AG Grid Angular Component -->
 <ag-grid-angular
   style="width: 100%; height: 80%"
@@ -16,7 +60,7 @@
   [columnDefs]="columnDefs"
   [defaultColDef]="defaultColDef"
   [context]="context"
-  [rowData]="rowData$ | async"
+  [rowData]="rowData"
   [rowSelection]="'multiple'"
   [animateRows]="true"
   [pagination]="true"
@@ -24,5 +68,3 @@
   (gridReady)="onGridReady($event)"
   (cellClicked)="onCellClicked($event)"
 ></ag-grid-angular>
-<!-- Button to clear selection -->
-<button (click)="clearSelection()">Clear Selection</button>

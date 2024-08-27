@@ -1,4 +1,10 @@
-import { Action, createFeature, createReducer, on } from "@ngrx/store";
+import {
+  Action,
+  createFeature,
+  createReducer,
+  createSelector,
+  on,
+} from "@ngrx/store";
 import {
   initialState,
   teilnahmenAdapter,
@@ -14,20 +20,20 @@ export const teilnahmenFeature = createFeature({
       const teilnahmen = action.payload;
       // teilnahmenAdapter.addMany(teilnahmen, state);
       return teilnahmenAdapter.setAll(teilnahmen, state);
-    })
-    /*
-    ,
+    }),
     on(TeilnahmenActions.updateTeilnahmenSuccess, (state, action) => {
-      const teilnahmen = action.payload;
+      const teilnahme = action.payload;
+      return teilnahmenAdapter.updateOne(teilnahme, state);
       // return teilnahmenAdapter.setAll(teilnahmen, state);
     })
-    */
   ),
 });
 
 export const { selectAll, selectEntities, selectIds, selectTotal } =
   teilnahmenAdapter.getSelectors();
 
+export const selectEntityById = (id) =>
+  createSelector(selectEntities, (entities) => entities[id]);
 /*
 const teilnahmeReducer = createReducer(
   initialState,

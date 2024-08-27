@@ -1,0 +1,19 @@
+
+Initial Chunk Files           | Names                                |  Raw Size | Estimated Transfer Size
+main.5a090b059578349f.js      | main                                 |   1.52 MB |               310.93 kB
+styles.b982150e6792ede1.css   | styles                               | 536.89 kB |                54.51 kB
+scripts.370cc1e1a067f351.js   | scripts                              | 146.86 kB |                42.71 kB
+polyfills.12763411546b3d59.js | polyfills                            |  46.56 kB |                14.30 kB
+runtime.2f7d43ae21f6870c.js   | runtime                              |   2.95 kB |                 1.42 kB
+
+| Initial Total                        |   2.23 MB |               423.87 kB
+
+Lazy Chunk Files              | Names                                |  Raw Size | Estimated Transfer Size
+820.50d2ddacf8ff9542.js       | verein-teilnehmer-module             |   1.25 MB |               207.19 kB
+682.29466a2074807463.js       | rechnungsbuero-rechnungsbuero-module |  67.04 kB |                11.58 kB
+607.be507cf6fc2bfc36.js       | event-admin-events-admin-module      |  38.96 kB |                 6.64 kB
+892.f345200e187ec137.js       | verein-user-module                   |  25.16 kB |                 5.90 kB
+common.d181fb786a2267f7.js    | common                               |   6.11 kB |                 1.35 kB
+709.9950196808d9ac01.js       | events-events-module                 | 884 bytes |               434 bytes
+
+Build at: 2024-07-10T05:44:49.372Z - Hash: 6031ed5b022b34b3 - Time: 43196ms
