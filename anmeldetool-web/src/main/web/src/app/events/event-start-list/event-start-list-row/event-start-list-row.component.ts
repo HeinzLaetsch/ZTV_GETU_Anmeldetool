@@ -18,7 +18,7 @@ export class EventStartListRowComponent implements OnInit {
   constructor(public authService: AuthService) {}
 
   ngOnInit() {
-    console.log("Anlass: ", this.anlass);
+    // console.log("Anlass: ", this.anlass);
   }
 
   get administrator(): boolean {

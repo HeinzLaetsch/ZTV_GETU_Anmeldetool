@@ -71,7 +71,7 @@ export class CachingTeilnehmerService {
   }
 
   loadTeilnehmer(verein: IVerein): Observable<number> {
-    // console.log("Teilnehmer Caching loadTeilnehmer: ", verein.name);
+    console.log("Teilnehmer Caching loadTeilnehmer: ", verein.name);
     if (!this._loadRunning && !this.loaded) {
       this._loadRunning = true;
       // verein: IVerein, filter = '',  sortDirection = 'asc', pageIndex = 0, pageSize = 3
@@ -86,7 +86,7 @@ export class CachingTeilnehmerService {
           this.dirty = false;
           this.valid = true;
           this.teilnehmerLoaded.next(teilnehmer.length);
-          // console.log("Teilnehmer Loaded: ", teilnehmer.length);
+          console.log("Teilnehmer Loaded: ", teilnehmer.length);
         });
     } else {
       if (this.loaded) {
@@ -251,17 +251,27 @@ export class CachingTeilnehmerService {
     return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
   }
   public getTeilnehmerForAnlass(anlass: IAnlass) {
+    // console.log("getTeilnehmerForAnlass: " + anlass.anlassBezeichnung);
     const aLinks = this.anlassService.getTeilnahmenForAnlassSorted(anlass);
+    // console.log("aLinks: " + aLinks.length);
     const teilnehmer = aLinks.map((alink) => {
+      // console.log("alink.kategorie: " + alink.kategorie);
       if (alink.kategorie != KategorieEnum.KEINE_TEILNAHME) {
+        // console.log("create copy: " + alink.teilnehmerId);
         const teilnehmer = this.getTeilnehmerById(alink.teilnehmerId);
+        // teilnehmer ist schon copy
+        // console.log("teilnehmer: " + teilnehmer);
         const copy = Object.assign(teilnehmer);
+        // console.log("copy: " + copy);
         copy.teilnahmen = {
           anlassLinks: [alink],
         };
+        // console.log("copy.anlasslinks: " + copy.anlassLinks);
         return copy;
       }
+      return undefined;
     });
+    // console.log("teilnehmer: " + teilnehmer);
     return teilnehmer.filter((teilnehmer) => {
       return !!teilnehmer?.teilnahmen;
     });
@@ -291,13 +301,14 @@ export class CachingTeilnehmerService {
   }
 
   getTeilnehmerById(id: string) {
+    // console.log("getTeilnehmerById id: " + id + ", loaded:" + this.loaded);
     if (this.loaded) {
       const newTeilnehmer = this.teilnehmer.find(
         (newTeilnehmer) => newTeilnehmer.id === id
       );
-      // console.log('Org: ' , newUser, ' , alle: ' , this.orgUsers);
+      // console.log("Org: ", newTeilnehmer);
       const copy = this.deepCopy(newTeilnehmer);
-      // console.log('Copy: ' , copy);
+      // console.log("Copy: ", copy);
       return copy;
     }
     return undefined;

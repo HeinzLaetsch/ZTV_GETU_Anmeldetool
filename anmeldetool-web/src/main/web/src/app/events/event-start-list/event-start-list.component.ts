@@ -135,61 +135,62 @@ export class EventStartListComponent
   }
 
   getTeilnahmenForKategorieK1(): ITeilnehmer[] {
-    return this.alleTeilnehmer.filter((teilnehmer) => {
+    console.log("getK1 ", this.alleTeilnehmer);
+    return this.alleTeilnehmer?.filter((teilnehmer) => {
       return teilnehmer.teilnahmen.anlassLinks[0].kategorie == KategorieEnum.K1;
     });
   }
   getTeilnahmenForKategorieK2(): ITeilnehmer[] {
-    return this.alleTeilnehmer.filter((teilnehmer) => {
+    return this.alleTeilnehmer?.filter((teilnehmer) => {
       return teilnehmer.teilnahmen.anlassLinks[0].kategorie == KategorieEnum.K2;
     });
   }
   getTeilnahmenForKategorieK3(): ITeilnehmer[] {
-    return this.alleTeilnehmer.filter((teilnehmer) => {
+    return this.alleTeilnehmer?.filter((teilnehmer) => {
       return teilnehmer.teilnahmen.anlassLinks[0].kategorie == KategorieEnum.K3;
     });
   }
   getTeilnahmenForKategorieK4(): ITeilnehmer[] {
-    return this.alleTeilnehmer.filter((teilnehmer) => {
+    return this.alleTeilnehmer?.filter((teilnehmer) => {
       return teilnehmer.teilnahmen.anlassLinks[0].kategorie == KategorieEnum.K4;
     });
   }
   getTeilnahmenForKategorieK5(): ITeilnehmer[] {
-    return this.alleTeilnehmer.filter((teilnehmer) => {
+    return this.alleTeilnehmer?.filter((teilnehmer) => {
       return teilnehmer.teilnahmen.anlassLinks[0].kategorie == KategorieEnum.K5;
     });
   }
   getTeilnahmenForKategorieK5A(): ITeilnehmer[] {
-    return this.alleTeilnehmer.filter((teilnehmer) => {
+    return this.alleTeilnehmer?.filter((teilnehmer) => {
       return (
         teilnehmer.teilnahmen.anlassLinks[0].kategorie == KategorieEnum.K5A
       );
     });
   }
   getTeilnahmenForKategorieK5B(): ITeilnehmer[] {
-    return this.alleTeilnehmer.filter((teilnehmer) => {
+    return this.alleTeilnehmer?.filter((teilnehmer) => {
       return (
         teilnehmer.teilnahmen.anlassLinks[0].kategorie == KategorieEnum.K5B
       );
     });
   }
   getTeilnahmenForKategorieK6(): ITeilnehmer[] {
-    return this.alleTeilnehmer.filter((teilnehmer) => {
+    return this.alleTeilnehmer?.filter((teilnehmer) => {
       return teilnehmer.teilnahmen.anlassLinks[0].kategorie == KategorieEnum.K6;
     });
   }
   getTeilnahmenForKategorieKD(): ITeilnehmer[] {
-    return this.alleTeilnehmer.filter((teilnehmer) => {
+    return this.alleTeilnehmer?.filter((teilnehmer) => {
       return teilnehmer.teilnahmen.anlassLinks[0].kategorie == KategorieEnum.KD;
     });
   }
   getTeilnahmenForKategorieKH(): ITeilnehmer[] {
-    return this.alleTeilnehmer.filter((teilnehmer) => {
+    return this.alleTeilnehmer?.filter((teilnehmer) => {
       return teilnehmer.teilnahmen.anlassLinks[0].kategorie == KategorieEnum.KH;
     });
   }
   getTeilnahmenForKategorieK7(): ITeilnehmer[] {
-    return this.alleTeilnehmer.filter((teilnehmer) => {
+    return this.alleTeilnehmer?.filter((teilnehmer) => {
       return teilnehmer.teilnahmen.anlassLinks[0].kategorie == KategorieEnum.K7;
     });
   }

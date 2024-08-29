@@ -208,6 +208,7 @@ export class EventsDetailComponent
       });
     this.getVerfuegbareWertungsrichter(this.wr1s, 1);
     this.getVerfuegbareWertungsrichter(this.wr2s, 2);
+    this.teilnehmerService.loadTeilnehmer(this.authService.currentVerein);
   }
   */
   /*
