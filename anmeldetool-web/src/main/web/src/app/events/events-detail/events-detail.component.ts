@@ -18,6 +18,7 @@ import { TiTuEnum } from "src/app/core/model/TiTuEnum";
 import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterStatusEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
+import { CachingTeilnehmerService } from "src/app/core/service/caching-services/caching.teilnehmer.service";
 import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
 import { WertungsrichterService } from "src/app/core/service/wertungsrichter.service";
 
@@ -47,6 +48,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
     private anlassService: CachingAnlassService,
     private userService: CachingUserService,
     private wertungsrichterService: WertungsrichterService,
+    private teilnehmerService: CachingTeilnehmerService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -85,6 +87,7 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
       });
     this.getVerfuegbareWertungsrichter(this.wr1s, 1);
     this.getVerfuegbareWertungsrichter(this.wr2s, 2);
+    this.teilnehmerService.loadTeilnehmer(this.authService.currentVerein);
   }
   ngAfterViewInit(): void {
     if (this.isBrevet1Anlass()) {
