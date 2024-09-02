@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -215,21 +217,27 @@ public class RanglistenOutput {
 		printCell(table, String.format("%d", dto.getRangSchaukelringe()), false, even);
 		printCell(table, String.format("%.2f", dto.getNoteSprung1()), false, even);
 		printCell(table, String.format("%.2f", dto.getNoteSprung2()), false, even);
-		if (sprungAverage) {
-			printCell(table, String.format("%.2f", dto.getNoteZaehlbar()), false, even);
-		} else {
-			printCell(table, String.format("%.2f", dto.getNoteZaehlbar()), false, even);
-		}
+		DecimalFormat df = new DecimalFormat("#0.00");
+		df.setRoundingMode(RoundingMode.HALF_UP);
+		printCell(table, df.format(dto.getNoteZaehlbar() + 0.0005f), false, even);
+		/*
+		 * if (sprungAverage) { printCell(table, String.format("%.2f",
+		 * dto.getNoteZaehlbar()), false, even); } else { printCell(table,
+		 * String.format("%.2f", dto.getNoteZaehlbar()), false, even); }
+		 */
 		printCell(table, String.format("%d", dto.getRangSprung()), false, even);
 		if (turner) {
 			printCell(table, String.format("%.2f", dto.getNoteBarren()), false, even);
 			printCell(table, String.format("%d", dto.getRangBarren()), false, even);
 		}
-		if (sprungAverage) {
-			printCell(table, String.format("%.2f", dto.getGesamtPunktzahl()), false, even);
-		} else {
-			printCell(table, String.format("%.2f", dto.getGesamtPunktzahl()), false, even);
-		}
+		df.setRoundingMode(RoundingMode.HALF_UP);
+		String asText = df.format(dto.getGesamtPunktzahl() + 0.0005f);
+		printCell(table, asText, false, even);
+		/*
+		 * if (sprungAverage) { printCell(table, String.format("%.2f",
+		 * dto.getGesamtPunktzahl()), false, even); } else { printCell(table,
+		 * String.format("%.2f", dto.getGesamtPunktzahl()), false, even); }
+		 */
 		if (rang == dto.getRang()) {
 			printCell(table, String.format("%d", dto.getRang()), false, even);
 		} else {
