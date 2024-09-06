@@ -69,6 +69,47 @@ export class TeilnahmenEffects {
     );
   });
 
+  addTeilnehmer$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(TeilnahmenActions.addTeilnehmerInvoked),
+      mergeMap((action) => {
+        return this.teilnehmerService
+          .addTeilnehmer(this.authService.currentVerein, action.payload)
+          .pipe(
+            switchMap((teilnehmer) => [
+              TeilnahmenActions.addTeilnehmerSuccess({
+                payload: teilnehmer,
+              }),
+            ]),
+            catchError((error) => {
+              return of(TeilnahmenActions.addTeilnehmerError({ error: error }));
+            })
+          );
+      })
+    );
+  });
+
+  deleteTeilnehmer$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(TeilnahmenActions.deleteTeilnehmerInvoked),
+      mergeMap((action) => {
+        return this.teilnehmerService
+          .delete(this.authService.currentVerein, action.payload)
+          .pipe(
+            switchMap((teilnehmerId) => [
+              TeilnahmenActions.deleteTeilnehmerSuccess({
+                payload: teilnehmerId,
+              }),
+            ]),
+            catchError((error) => {
+              return of(
+                TeilnahmenActions.deleteTeilnehmerError({ error: error })
+              );
+            })
+          );
+      })
+    );
+  });
   /*
   @Effect()
   loadTodos$ = this.actions$.pipe(

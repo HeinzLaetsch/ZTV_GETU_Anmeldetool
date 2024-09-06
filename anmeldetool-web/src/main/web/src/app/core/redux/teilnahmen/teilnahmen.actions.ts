@@ -1,6 +1,7 @@
-import { Action, createActionGroup, props } from "@ngrx/store";
+import { Action, createActionGroup, emptyProps, props } from "@ngrx/store";
 import { ITeilnahmen } from "../../model/ITeilnahmen";
 import { Update } from "@ngrx/entity";
+import { ITeilnehmer } from "../../model/ITeilnehmer";
 
 export const TeilnahmenActions = createActionGroup({
   source: "Teilnahmen",
@@ -31,6 +32,14 @@ export const TeilnahmenActions = createActionGroup({
       payload: Update<ITeilnahmen>;
     }>(),
     "Update TEILNAHMEN ERROR": props<{ error: string }>(),
+
+    "Add TEILNEHMER INVOKED": props<{ payload: ITeilnehmer }>(),
+    "Add TEILNEHMER SUCCESS": props<{ payload: ITeilnehmer }>(),
+    "Add TEILNEHMER ERROR": props<{ error: string }>(),
+
+    "Delete TEILNEHMER INVOKED": props<{ payload: ITeilnehmer }>(),
+    "Delete TEILNEHMER SUCCESS": props<{ payload: string }>(),
+    "Delete TEILNEHMER ERROR": props<{ error: string }>(),
   },
 });
 

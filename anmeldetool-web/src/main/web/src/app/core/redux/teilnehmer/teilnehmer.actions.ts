@@ -9,15 +9,14 @@ export const TeilnehmerActions = createActionGroup({
       payload: ITeilnehmer[];
     }>(),
     "Load All TEILNEHMER ERROR": props<{ error: string }>(),
-    /*
-    "Update Vereins Start INVOKED": props<{
-      payload: IOrganisationAnlassLink;
-    }>(),
-    "Update Vereins Start  SUCCESS": props<{
-      payload: IOrganisationAnlassLink;
-    }>(),
-    "Update Vereins Start  ERROR": props<{ error: string }>(),
-    */
+
+    "Add TEILNEHMER INVOKED": props<{ payload: ITeilnehmer }>(),
+    "Add TEILNEHMER SUCCESS": props<{ payload: ITeilnehmer }>(),
+    "Add TEILNEHMER ERROR": props<{ error: string }>(),
+
+    "Delete TEILNEHMER INVOKED": props<{ payload: ITeilnehmer }>(),
+    "Delete TEILNEHMER SUCCESS": emptyProps(),
+    "Delete TEILNEHMER ERROR": props<{ error: string }>(),
   },
 });
 

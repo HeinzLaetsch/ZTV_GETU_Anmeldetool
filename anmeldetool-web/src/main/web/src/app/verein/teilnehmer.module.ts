@@ -17,6 +17,7 @@ import { teilnahmenFeature } from "../core/redux/teilnahmen/teilnahmen.reducer";
 import { TeilnahmenEffects } from "../core/redux/teilnahmen";
 import { OtsEffects } from "../core/redux/organisation-teilnahmen";
 import { otsFeature } from "../core/redux/organisation-teilnahmen/ots.reducer";
+import { TeilnehmerDialog } from "./teilnehmer/teilnehmer-grid/teilnehmer-dialog/teilnehmer-dialog.component";
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { otsFeature } from "../core/redux/organisation-teilnahmen/ots.reducer";
     HasChangesComponent,
     DeleteUser,
     TeilnehmerGridComponent,
+    TeilnehmerDialog,
   ],
   imports: [
     CommonModule,

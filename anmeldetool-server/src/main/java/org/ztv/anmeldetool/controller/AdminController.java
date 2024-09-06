@@ -183,7 +183,7 @@ public class AdminController {
 	@PostMapping("/organisationen/{orgId}/teilnehmer")
 	public ResponseEntity<TeilnehmerDTO> addNewTeilnehmer(HttpServletRequest request, @PathVariable UUID orgId,
 			@RequestBody TeilnehmerDTO teilnehmerDTO) {
-		return teilnehmerSrv.create(orgId, teilnehmerDTO.getTiTu());
+		return teilnehmerSrv.create(orgId, teilnehmerDTO);
 	}
 
 	@PatchMapping("/organisationen/{orgId}/teilnehmer")
@@ -193,7 +193,7 @@ public class AdminController {
 	}
 
 	@DeleteMapping("/organisationen/{orgId}/teilnehmer/{teilnehmerId}")
-	public ResponseEntity<Boolean> deleteTeilnehmer(HttpServletRequest request, @PathVariable UUID orgId,
+	public ResponseEntity<UUID> deleteTeilnehmer(HttpServletRequest request, @PathVariable UUID orgId,
 			@PathVariable UUID teilnehmerId) {
 		return teilnehmerSrv.delete(orgId, teilnehmerId);
 	}

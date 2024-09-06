@@ -45,18 +45,18 @@ export class CachingTeilnehmerService {
     this.teilnehmerLoaded = new BehaviorSubject<number>(undefined);
     // this.teilnehmerLoaded = new Subject<number>();
   }
-  reset(verein: IVerein, loaded: boolean): Observable<boolean[]> {
+  reset(verein: IVerein, loaded: boolean): Observable<string[]> {
     this.loaded = loaded;
     this.dirty = false;
     this.valid = true;
-    const observables = new Array<Observable<boolean>>();
+    const observables = new Array<Observable<string>>();
     this.teilnehmer.forEach((teilnehmer) => {
       if (teilnehmer.onlyCreated) {
         observables.push(this.teilnehmerService.delete(verein, teilnehmer));
       }
     });
     if (observables.length === 0) {
-      return of([true]);
+      return of(["true"]);
     } else {
       this.teilnehmer = this.teilnehmer.filter((teilnehmer) => {
         return !teilnehmer.onlyCreated;
@@ -123,7 +123,7 @@ export class CachingTeilnehmerService {
   deleteTeilnehmer(
     verein: IVerein,
     teilnehmer: ITeilnehmer
-  ): Observable<boolean> {
+  ): Observable<string> {
     this.removeTeilnehmer(teilnehmer);
     return this.teilnehmerService.delete(verein, teilnehmer);
   }
@@ -134,7 +134,7 @@ export class CachingTeilnehmerService {
     tiTu: TiTuEnum,
     paginator: MatPaginator,
     row: number
-  ): Observable<boolean> {
+  ): Observable<string> {
     const teilnehmer = this.getTeilnehmer(
       filter,
       sort,

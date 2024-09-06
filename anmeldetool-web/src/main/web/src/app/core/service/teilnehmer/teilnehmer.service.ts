@@ -53,25 +53,35 @@ export class TeilnehmerService {
       .pipe(catchError(this.handleError<number>("count")))
       .subscribe((anzahl) => (this._anzahlTeilnehmer = anzahl));
   }
-
   add(verein: IVerein, titu: TiTuEnum): Observable<ITeilnehmer> {
     console.log("add Verein called");
     this._anzahlTeilnehmer++;
     const combinedUrl = this.url + verein.id + "/teilnehmer";
-    const teilnehmer = {
-      tiTu: titu === TiTuEnum.Ti ? "Ti" : "Tu",
+    const teilnehmer: ITeilnehmer = {
+      // tiTu: titu === TiTuEnum.Ti ? "Ti" : "Tu",
+      tiTu: titu,
     };
+    return this.addTeilnehmer(verein, teilnehmer);
+  }
+
+  addTeilnehmer(
+    verein: IVerein,
+    teilnehmer: ITeilnehmer
+  ): Observable<ITeilnehmer> {
+    console.log("add Teilnehmer called");
+    this._anzahlTeilnehmer++;
+    const combinedUrl = this.url + verein.id + "/teilnehmer";
     return this.http
       .post<ITeilnehmer>(combinedUrl, teilnehmer)
       .pipe(catchError(this.handleError<ITeilnehmer>("add")));
   }
 
-  delete(verein: IVerein, teilnehmer: ITeilnehmer): Observable<boolean> {
+  delete(verein: IVerein, teilnehmer: ITeilnehmer): Observable<string> {
     // console.log("Service delete: ", teilnehmer);
     const combinedUrl = this.url + verein.id + "/teilnehmer/" + teilnehmer.id;
     return this.http
-      .delete<boolean>(combinedUrl)
-      .pipe(catchError(this.handleError<boolean>("delete")));
+      .delete<string>(combinedUrl)
+      .pipe(catchError(this.handleError<string>("delete")));
   }
 
   save(verein: IVerein, teilnehmer: ITeilnehmer): Observable<ITeilnehmer> {

@@ -18,7 +18,6 @@ import org.ztv.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.Teilnehmer;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
-import org.ztv.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.repositories.TeilnehmerAnlassLinkRepository;
 import org.ztv.anmeldetool.repositories.TeilnehmerRepository;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
@@ -100,13 +99,20 @@ public class TeilnehmerService {
 		return teilnehmerList;
 	}
 
-	public ResponseEntity<TeilnehmerDTO> create(UUID orgId, TiTuEnum tiTu) {
-		TeilnehmerDTO teilnehmerDTO = TeilnehmerDTO.builder().aktiv(false).id(UUID.randomUUID()).organisationid(orgId)
-				.tiTu(tiTu).dirty(true).build();
-		return create(teilnehmerDTO);
-	}
+	/*
+	 * public ResponseEntity<TeilnehmerDTO> createEmpty(UUID orgId, TiTuEnum tiTu) {
+	 * TeilnehmerDTO teilnehmerDTO =
+	 * TeilnehmerDTO.builder().aktiv(false).id(UUID.randomUUID()).organisationid(
+	 * orgId) .tiTu(tiTu).dirty(true).build(); return create(teilnehmerDTO); }
+	 */
 
-	public ResponseEntity<TeilnehmerDTO> create(TeilnehmerDTO teilnehmerDTO) {
+	public ResponseEntity<TeilnehmerDTO> create(UUID orgId, TeilnehmerDTO teilnehmerDTORaw) {
+		TeilnehmerDTO teilnehmerDTO = TeilnehmerDTO.builder().aktiv(true).id(UUID.randomUUID()).organisationid(orgId)
+				.name(teilnehmerDTORaw.getName()).vorname(teilnehmerDTORaw.getVorname())
+				.stvNummer(teilnehmerDTORaw.getStvNummer()).jahrgang(teilnehmerDTORaw.getJahrgang())
+				.letzteKategorie(teilnehmerDTORaw.getLetzteKategorie()).tiTu(teilnehmerDTORaw.getTiTu()).dirty(false)
+				.build();
+
 		Organisation organisation = organisationSrv.findOrganisationById(teilnehmerDTO.getOrganisationid());
 		if (organisation == null) {
 			return ResponseEntity.notFound().build();
@@ -125,7 +131,8 @@ public class TeilnehmerService {
 		return teilnehmerRepository.save(teilnehmer);
 	}
 
-	public ResponseEntity<Boolean> delete(UUID orgId, UUID teilnehmerId) {
+	// Kein Softdelete !
+	public ResponseEntity<UUID> delete(UUID orgId, UUID teilnehmerId) {
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		if (organisation == null) {
 			return ResponseEntity.notFound().build();
@@ -138,7 +145,7 @@ public class TeilnehmerService {
 				.findByTeilnehmer(teilnehmerOptional.get());
 		this.teilnehmerAnlassLinkRepository.deleteAll(links);
 		teilnehmerRepository.delete(teilnehmerOptional.get());
-		return ResponseEntity.ok(true);
+		return ResponseEntity.ok(teilnehmerId);
 	}
 
 	public TeilnehmerDTO update(UUID orgId, TeilnehmerDTO teilnehmerDTO) throws EntityNotFoundException {

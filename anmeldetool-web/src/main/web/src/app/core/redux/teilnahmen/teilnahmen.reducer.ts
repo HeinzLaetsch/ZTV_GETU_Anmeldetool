@@ -25,6 +25,20 @@ export const teilnahmenFeature = createFeature({
       const teilnahme = action.payload;
       return teilnahmenAdapter.updateOne(teilnahme, state);
       // return teilnahmenAdapter.setAll(teilnahmen, state);
+    }),
+    on(TeilnahmenActions.addTeilnehmerSuccess, (state, action) => {
+      const teilnehmer = action.payload;
+      const teilnahme = {
+        jahr: 0,
+        teilnehmer,
+      };
+      const newState = teilnahmenAdapter.addOne(teilnahme, state);
+      return newState;
+    }),
+    on(TeilnahmenActions.deleteTeilnehmerSuccess, (state, action) => {
+      const teilnehmerId = action.payload;
+      const newState = teilnahmenAdapter.removeOne(teilnehmerId, state);
+      return newState;
     })
   ),
 });

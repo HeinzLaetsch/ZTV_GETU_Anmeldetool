@@ -34,7 +34,9 @@ export class IAnlass {
   }
 
   getCleaned(): string {
-    const step1 = this.anlassBezeichnung.replace("Zürcher Kantonaler", "");
+    var step1 = this.anlassBezeichnung.replace("Zürcher Kantonaler", "");
+    step1 = step1.replace("Zürcher Kantonale", "");
+    step1 = step1.replace("Zürcher Kant.", "");
     return step1.replace("%", " ");
   }
   getPart(first: boolean): string {

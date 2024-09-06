@@ -13,7 +13,7 @@ export class TeilnehmerEffects {
     private teilnehmerService: TeilnehmerService
   ) {}
 
-  loadAnlaesse$ = createEffect(() => {
+  loadAllTeilnehmer$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(TeilnehmerActions.loadAllTeilnehmerInvoked),
       mergeMap((action) => {
@@ -29,6 +29,26 @@ export class TeilnehmerEffects {
               return of(
                 TeilnehmerActions.loadAllTeilnehmerError({ error: error })
               );
+            })
+          );
+      })
+    );
+  });
+
+  addTeilnehmer$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(TeilnehmerActions.addTeilnehmerInvoked),
+      mergeMap((action) => {
+        return this.teilnehmerService
+          .addTeilnehmer(this.authService.currentVerein, action.payload)
+          .pipe(
+            switchMap((teilnehmer) => [
+              TeilnehmerActions.addTeilnehmerSuccess({
+                payload: teilnehmer,
+              }),
+            ]),
+            catchError((error) => {
+              return of(TeilnehmerActions.addTeilnehmerError({ error: error }));
             })
           );
       })

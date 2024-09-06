@@ -9,6 +9,11 @@ export const teilnehmerFeature = createFeature({
     on(TeilnehmerActions.loadAllTeilnehmerSuccess, (state, action) => {
       const teilnehmer = action.payload;
       return teilnehmerAdapter.setAll(teilnehmer, state);
+    }),
+    on(TeilnehmerActions.addTeilnehmerSuccess, (state, action) => {
+      const teilnehmer = action.payload;
+      const newState = teilnehmerAdapter.addOne(teilnehmer, state);
+      return newState;
     })
   ),
 });

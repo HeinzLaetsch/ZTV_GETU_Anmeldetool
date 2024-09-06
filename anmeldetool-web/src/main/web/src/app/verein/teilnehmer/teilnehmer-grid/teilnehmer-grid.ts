@@ -32,7 +32,6 @@ import {
 import { ITeilnahmen } from "src/app/core/model/ITeilnahmen";
 import { IAnlassLink } from "src/app/core/model/IAnlassLink";
 import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
-import { AddTeilnehmer } from "./add-teilnehmer/add-teilnehmer.component";
 import { MatDialog } from "@angular/material/dialog";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { TeilnahmeStatusEditor } from "./teilnahme-status/teilnahme-status-editor.component";
@@ -45,6 +44,9 @@ import {
   selectOts,
   selectOtsByAnlassId,
 } from "src/app/core/redux/organisation-teilnahmen";
+import { ButtonCellRenderer } from "./button-cell-renderer/button-cell-renderer.component";
+import { TeilnehmerActions } from "src/app/core/redux/teilnehmer";
+import { TeilnehmerDialog } from "./teilnehmer-dialog/teilnehmer-dialog.component";
 
 @Component({
   selector: "app-teilnehmer-grid",
@@ -85,6 +87,13 @@ export class TeilnehmerGridComponent implements OnInit {
   };
   public columnDefs: ColDef[] = [
     {
+      headerName: "Aktion",
+      field: "delete",
+      cellRenderer: ButtonCellRenderer,
+      width: 70,
+      editable: false,
+    },
+    {
       headerName: "Name",
       field: "teilnehmer.name",
       minWidth: 150,
@@ -121,6 +130,7 @@ export class TeilnehmerGridComponent implements OnInit {
   public defaultColDef: ColDef = {
     sortable: true,
     filter: true,
+    editable: true,
   };
 
   // For accessing the Grid's API
@@ -170,9 +180,26 @@ export class TeilnehmerGridComponent implements OnInit {
     });
   }
 
+  /*
+      if (TiTuEnum.equals(TiTuEnum.Ti, this.selectedState)) {
+      this.rowData = this.rowTiData;
+    } else if (TiTuEnum.equals(TiTuEnum.Tu, this.selectedState)) {
+      this.rowData = this.rowTuData;
+    } else {
+      this.rowData = this.rowAllData;
+    }
+    */
+
   private subscribeRowData() {
     this.rowDataAll$.subscribe((data) => {
       this.rowAllData = data;
+      if (
+        !TiTuEnum.equals(TiTuEnum.Ti, this.selectedState) &&
+        !TiTuEnum.equals(TiTuEnum.Tu, this.selectedState)
+      ) {
+        this.rowData = data;
+      }
+      /*
       if (this.rowData === undefined) {
         setTimeout(() => {
           //  api.redrawRows();
@@ -181,6 +208,7 @@ export class TeilnehmerGridComponent implements OnInit {
           }
         }, 0);
       }
+      */
       // this.rowData = this.rowAllData;
     });
 
@@ -207,6 +235,9 @@ export class TeilnehmerGridComponent implements OnInit {
     // Nur Ti
     this.rowDataTi$.subscribe((data) => {
       this.rowTiData = data;
+      if (TiTuEnum.equals(TiTuEnum.Ti, this.selectedState)) {
+        this.rowData = data;
+      }
       /*
         if (TiTuEnum.equals(TiTuEnum.Ti, this.selectedState)) {
           this.gridApi.setGridOption("rowData", data);
@@ -216,6 +247,9 @@ export class TeilnehmerGridComponent implements OnInit {
     // Nur Tu
     this.rowDataTu$.subscribe((data) => {
       this.rowTuData = data;
+      if (TiTuEnum.equals(TiTuEnum.Tu, this.selectedState)) {
+        this.rowData = data;
+      }
       /*
         if (TiTuEnum.equals(TiTuEnum.Tu, this.selectedState)) {
           this.gridApi.setGridOption("rowData", data);
@@ -585,7 +619,7 @@ export class TeilnehmerGridComponent implements OnInit {
     const index = Number(params.column.getColId());
     // && component.alleAnlaesse
     if (params.data) {
-      const tal = params.data.talDTOList.find((element) => {
+      const tal = params.data.talDTOList?.find((element) => {
         if (
           component.alleAnlaesse === undefined ||
           component.alleAnlaesse[index] === undefined
@@ -654,6 +688,9 @@ export class TeilnehmerGridComponent implements OnInit {
   clearSelection(): void {
     this.agGrid.api.deselectAll();
   }
+  onCellValueChanged($event) {
+    console.log("Change: ", $event.value);
+  }
 
   onChange($event) {
     console.log("Change: ", $event.value);
@@ -689,12 +726,29 @@ export class TeilnehmerGridComponent implements OnInit {
   saveTeilnehmer($event) {}
 
   private openDialog(newTeilnehmer: ITeilnehmer) {
-    const dialogRef = this.dialog.open(AddTeilnehmer, {
-      data: newTeilnehmer,
+    const dialogRef = this.dialog.open(TeilnehmerDialog, {
+      data: {
+        title: "Teilnehmer hinzufügen",
+        actionButton: "Speichern",
+        disabled: false,
+        teilnehmer: newTeilnehmer,
+      },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(`Dialog result: ${result}`);
+      if (result) {
+        console.log(`Dialog result: ${result}`);
+        this.store.dispatch(
+          TeilnahmenActions.addTeilnehmerInvoked({ payload: result })
+        );
+        /*
+        setTimeout(() => {
+          this.onClick(result.tiTu);
+        }, 1);
+        */
+      } else {
+        console.log(`Dialog Abbruch: ${result}`);
+      }
     });
   }
 }
