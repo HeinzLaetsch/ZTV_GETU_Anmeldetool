@@ -146,6 +146,17 @@ export class IAnlass {
   }
   published_: boolean;
 
+  // Anlass nicht anzeigen oder sperren kein Org
+  set aktiv(aktiv: boolean) {
+    this.aktiv_ = aktiv;
+    // console.log("Published gesetzt: ", published);
+    this.updateAnzeigeStatus();
+  }
+  get aktiv(): boolean {
+    return this.aktiv_;
+  }
+  aktiv_: boolean;
+
   tiTu: TiTuEnum;
   get tuAnlass(): boolean {
     const key = TiTuEnum[this.tiTu];

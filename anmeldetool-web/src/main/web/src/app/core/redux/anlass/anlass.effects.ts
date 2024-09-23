@@ -15,7 +15,7 @@ export class AnlassEffects {
     return this.actions$.pipe(
       ofType(AnlassActions.loadAllAnlaesseInvoked),
       mergeMap((action) => {
-        return this.anlassService.getAnlaesse().pipe(
+        return this.anlassService.getAnlaesse(false).pipe(
           switchMap((anlaesse) => [
             AnlassActions.loadAllAnlaesseSuccess({ payload: anlaesse }),
           ]),

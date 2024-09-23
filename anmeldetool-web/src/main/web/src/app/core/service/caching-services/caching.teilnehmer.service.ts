@@ -321,7 +321,7 @@ export class CachingTeilnehmerService {
         teilnehmer.dirty = false;
         teilnehmer.onlyCreated = false;
         this.dirty = false;
-        observables.push(this.teilnehmerService.save(verein, teilnehmer));
+        observables.push(this.teilnehmerService.patch(verein, teilnehmer));
       }
       if (
         teilnehmer.teilnahmen &&

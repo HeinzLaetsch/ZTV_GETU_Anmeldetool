@@ -32,9 +32,14 @@ export class AnlassService {
 
   constructor(private http: HttpClient) {}
 
-  getAnlaesse(): Observable<IAnlass[]> {
+  getAnlaesse(onlyAktiv: boolean): Observable<IAnlass[]> {
     console.log("getAnlaesse called: " + this.apiHost);
-    return this.http.get<IAnlass[]>(this.url).pipe(
+    let finalUrl = this.url;
+    if (!onlyAktiv) {
+      finalUrl = finalUrl + "?onlyAktiv=" + onlyAktiv;
+    }
+
+    return this.http.get<IAnlass[]>(finalUrl).pipe(
       map((anlaesse) => {
         return anlaesse.map((value) => {
           // Check wieso Copy

@@ -108,10 +108,6 @@ public class TeilnahmenService {
 			} else {
 				Optional<TeilnehmerAnlassLink> res = entry.getValue().stream()
 						.filter(tal -> !KategorieEnum.KEIN_START.equals(tal.getKategorie())).max((tal1, tal2) -> {
-							// if (KategorieEnum.KEIN_START.equals(tal1.getKategorie())) {
-							// return -1;
-							// }
-
 							return tal1.getKategorie().compareTo(tal2.getKategorie());
 						});
 				if (res.isPresent()) {
@@ -209,6 +205,7 @@ public class TeilnahmenService {
 		if (!teilnehmer.equals(teilnehmerNeu)) {
 			teilnehmerDto = teilnehmerSrv.update(teilnehmerDto);
 		}
+		// Teilnehmer wird nicht ersetzt
 
 		List<TeilnehmerAnlassLinkDTO> talDTOList = teilnahmenDto.getTalDTOList();
 		talDTOList.forEach(talDto -> {

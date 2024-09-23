@@ -278,7 +278,7 @@ export class CachingAnlassService {
   loadAnlaesse(): Observable<boolean> {
     if (!this._loadRunning && !this.loaded) {
       this._loadRunning = true;
-      this.anlassService.getAnlaesse().subscribe((anlaesse) => {
+      this.anlassService.getAnlaesse(true).subscribe((anlaesse) => {
         // this.anlaesse = anlaesse;
         this.anlaesse = anlaesse.map((anlass) => {
           anlass.organisator = this.vereinService.getVereinById(

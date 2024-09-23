@@ -4,7 +4,6 @@ import { Component } from "@angular/core";
 import { MaterialModule } from "src/app/shared/material-module";
 import { MatDialog } from "@angular/material/dialog";
 import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
-import { DeleteTeilnehmer } from "../delete-teilnehmer/delete-teilnehmer.component";
 import { AppState } from "src/app/core/redux/core.state";
 import { Store } from "@ngrx/store";
 import { TeilnahmenActions } from "src/app/core/redux/teilnahmen";

@@ -6,6 +6,20 @@ body {
   box-sizing: border-box;
   -webkit-overflow-scrolling: touch;
 }
+.ag-theme-alpine {
+  /* disable all borders */
+  --ag-borders: none;
+  /* then add back a border between rows */
+  --ag-row-border-style: dashed;
+  --ag-row-border-width: 1px;
+  --ag-row-border-color: rgb(150, 150, 200);
+  /* and between columns */
+  --ag-cell-horizontal-border: solid rgb(150, 150, 200);
+}
+.banner {
+  padding-top: 6px;
+  height: 64px;
+}
 .ztvAnlassHeaderLabel {
   width: 30px;
   transform: rotate(90deg);
@@ -15,7 +29,7 @@ body {
 .mat-fab {
   font-size: 12px;
   right: 15px;
-  top: 90px;
+  top: 62px;
   left: auto;
   position: absolute;
 }
@@ -28,3 +42,12 @@ body {
   right: 155px;
 }
 
+.store-row-data {
+  overflow: auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 5px #e5f3ef groove;
+}
+.abstand {
+  margin-left: 10px;
+}

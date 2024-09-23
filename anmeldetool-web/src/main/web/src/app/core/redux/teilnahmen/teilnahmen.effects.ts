@@ -50,7 +50,6 @@ export class TeilnahmenEffects {
           .saveTeilnahme(this.authService.currentVerein, action.payload)
           .pipe(
             map((teilnahmen) => {
-              //switchMap((teilnahmen) => [
               const updatedTeilnahme: Update<ITeilnahmen> = {
                 id: teilnahmen.teilnehmer.id,
                 changes: teilnahmen,
@@ -110,6 +109,34 @@ export class TeilnahmenEffects {
       })
     );
   });
+
+  /*
+  updateTeilnehmer$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(TeilnahmenActions.updateTeilnehmerInvoked),
+      mergeMap((action) => {
+        return this.teilnehmerService
+          .patch(this.authService.currentVerein, action.payload)
+          .pipe(
+            map((teilnehmer) => {
+              const updatedTeilnehmer: Update<ITeilnahmen> = {
+                id: teilnehmer.id,
+                changes: teilnehmer,
+              };
+              TeilnahmenActions.updateTeilnehmerSuccess({
+                payload: updatedTeilnehmer,
+              }),
+      }),
+            catchError((error) => {
+              return of(
+                TeilnahmenActions.deleteTeilnehmerError({ error: error })
+              );
+            })
+          );
+      })
+    );
+  });*/
+
   /*
   @Effect()
   loadTodos$ = this.actions$.pipe(

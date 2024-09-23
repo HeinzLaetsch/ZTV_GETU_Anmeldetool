@@ -19,8 +19,10 @@ export class BusyIndicatorProgressBarComponent {
     this.isLoading$ = this.store.pipe(select(loadingFeature.selectIsLoading));
     this.isLoading$.subscribe((data) => {
       if (data) {
+        console.log("ProgressBarMode: buffer");
         this.mode = "buffer";
       } else {
+        console.log("ProgressBarMode: determinate");
         this.mode = "determinate";
       }
     });

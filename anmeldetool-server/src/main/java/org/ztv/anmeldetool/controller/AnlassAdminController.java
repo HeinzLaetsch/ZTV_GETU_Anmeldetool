@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -185,8 +186,10 @@ public class AnlassAdminController {
 
 	@GetMapping()
 	// @ResponseBody
-	public ResponseEntity<Collection<AnlassDTO>> getAnlaesse() {
-		List<Anlass> anlaesse = anlassSrv.getAllAnlaesse();
+	public ResponseEntity<Collection<AnlassDTO>> getAnlaesse(@RequestParam Optional<Boolean> onlyAktiv) {
+		AtomicBoolean onlyAktivBoolean = new AtomicBoolean();
+		onlyAktiv.ifPresentOrElse((value) -> onlyAktivBoolean.set(value), () -> onlyAktivBoolean.getAndSet(true));
+		List<Anlass> anlaesse = anlassSrv.getAnlaesse(onlyAktivBoolean.get());
 		List<AnlassDTO> anlaesseDTO = anlaesse.stream().map(anlass -> {
 			return anlassMapper.toDto(anlass);
 		}).collect(Collectors.toList());

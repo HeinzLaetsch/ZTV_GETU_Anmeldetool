@@ -3,6 +3,8 @@ import { AnlassState } from "./anlass.state";
 import { anlassFeature } from "./anlass.reducer";
 import * as fromAnlass from "./anlass.reducer";
 import { TiTuEnum } from "../../model/TiTuEnum";
+import * as moment from "moment";
+import { IAnlass } from "../../model/IAnlass";
 
 export const selectAnlaesseState = createFeatureSelector<AnlassState>(
   anlassFeature.name
@@ -12,7 +14,10 @@ export const selectAllAnlaesse = createSelector(
   selectAnlaesseState,
   fromAnlass.selectAll
 );
-
+export const selectAktiveAnlaesse = () =>
+  createSelector(selectAllAnlaesse, (anlaesse) =>
+    anlaesse.filter((anlass) => anlass.aktiv)
+  );
 export const selectAnlassById = (id: string) =>
   createSelector(selectAnlaesseState, (anlaesseState) => {
     const ret = anlaesseState.ids.length
@@ -23,9 +28,7 @@ export const selectAnlassById = (id: string) =>
 
 export const selectAnlassByName = (anlassBezeichnung: string) =>
   createSelector(selectAllAnlaesse, (anlaesse) =>
-    anlaesse.filter(
-      (anlaess) => anlaess.anlassBezeichnung === anlassBezeichnung
-    )
+    anlaesse.filter((anlass) => anlass.anlassBezeichnung === anlassBezeichnung)
   );
 export const selectAnlaesse = () =>
   createSelector(selectAllAnlaesse, (anlaesse) => {
@@ -33,11 +36,22 @@ export const selectAnlaesse = () =>
   });
 export const selectAllAnlaesseTiTu = (tiTu: TiTuEnum) =>
   createSelector(selectAllAnlaesse, (anlaesse) =>
-    anlaesse.filter((anlaess) => {
+    anlaesse.filter((anlass) => {
       if (TiTuEnum.equals(TiTuEnum.Ti, tiTu)) {
-        return anlaess.tiAnlass;
+        return anlass.tiAnlass;
       } else {
-        return anlaess.tuAnlass;
+        return anlass.tuAnlass;
       }
     })
   );
+export const selectJahre = () =>
+  createSelector(selectAllAnlaesse, (anlaesse) => {
+    const hashMap = new Map<number, IAnlass>();
+    anlaesse.forEach((anlass) => {
+      hashMap.set(moment(anlass.endDatum).year(), anlass);
+    });
+
+    return [...hashMap.values()].sort(
+      (a1, a2) => moment(a1.endDatum).valueOf() - moment(a2.endDatum).valueOf()
+    );
+  });

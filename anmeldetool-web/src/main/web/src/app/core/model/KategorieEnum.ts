@@ -1,3 +1,4 @@
+import { IAnlass } from "./IAnlass";
 import { TiTuEnum } from "./TiTuEnum";
 
 export namespace KategorieEnumFunction {
@@ -32,7 +33,11 @@ export namespace KategorieEnumFunction {
     return kategorie1String === kategorie2String;
   }
 
-  export function valuesAndGreater(start: string, titu: TiTuEnum): any[] {
+  export function valuesAndGreater(
+    start: string,
+    titu: TiTuEnum,
+    anlass: IAnlass
+  ): any[] {
     if (start === undefined || start === null) {
       start = "K1";
     }
@@ -41,6 +46,14 @@ export namespace KategorieEnumFunction {
     );
     const sliced = Object.values(KategorieEnum).slice(startindex);
     return sliced.filter((katgorie) => {
+      if (anlass != undefined) {
+        if (
+          !(isBrevet1(anlass.tiefsteKategorie) && isBrevet1(katgorie)) ||
+          (isBrevet2(anlass.hoechsteKategorie) && isBrevet2(katgorie))
+        ) {
+          return false;
+        }
+      }
       if (TiTuEnum.equals(TiTuEnum.Ti, titu)) {
         switch (katgorie) {
           case "K5":

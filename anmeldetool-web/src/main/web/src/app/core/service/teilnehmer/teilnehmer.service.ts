@@ -84,14 +84,12 @@ export class TeilnehmerService {
       .pipe(catchError(this.handleError<string>("delete")));
   }
 
-  save(verein: IVerein, teilnehmer: ITeilnehmer): Observable<ITeilnehmer> {
+  patch(verein: IVerein, teilnehmer: ITeilnehmer): Observable<ITeilnehmer> {
     console.log("Service save: ", teilnehmer);
     const combinedUrl = this.url + verein.id + "/teilnehmer";
     return this.http
       .patch<ITeilnehmer>(combinedUrl, teilnehmer)
       .pipe(catchError(this.handleError<ITeilnehmer>("add")));
-    // this.teilnehmer.push(teilnehmer);
-    // return of(true);
   }
 
   private handleError<T>(operation = "operation", result?: T) {

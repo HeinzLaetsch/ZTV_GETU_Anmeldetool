@@ -11,6 +11,8 @@ import {
   TeilnahmenState,
 } from "./teilnahmen.state";
 import { TeilnahmenActions } from "./teilnahmen.actions";
+import { ITeilnahmen } from "../../model/ITeilnahmen";
+import { Update } from "@ngrx/entity";
 
 export const teilnahmenFeature = createFeature({
   name: "teilnahmen",
@@ -23,6 +25,7 @@ export const teilnahmenFeature = createFeature({
     }),
     on(TeilnahmenActions.updateTeilnahmenSuccess, (state, action) => {
       const teilnahme = action.payload;
+      console.log("Store updated : true");
       return teilnahmenAdapter.updateOne(teilnahme, state);
       // return teilnahmenAdapter.setAll(teilnahmen, state);
     }),

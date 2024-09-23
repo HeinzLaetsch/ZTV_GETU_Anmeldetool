@@ -2,7 +2,11 @@ import { Component, OnInit } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { IAnlass } from "src/app/core/model/IAnlass";
-import { selectAllAnlaesse } from "src/app/core/redux/anlass";
+import {
+  selectAktiveAnlaesse,
+  selectAllAnlaesse,
+  selectAnlaesse,
+} from "src/app/core/redux/anlass";
 import { AppState } from "src/app/core/redux/core.state";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { SubscriptionHelper } from "src/app/utils/subscription-helper";
@@ -14,7 +18,7 @@ import { SubscriptionHelper } from "src/app/utils/subscription-helper";
 })
 export class EventListComponent extends SubscriptionHelper implements OnInit {
   anlaesse: IAnlass[];
-  public anlaesse$: Observable<IAnlass[]>;
+  anlaesse$: Observable<IAnlass[]>;
   loaded = false;
   subscription: Subscription[] = [];
 
@@ -23,7 +27,7 @@ export class EventListComponent extends SubscriptionHelper implements OnInit {
     private store: Store<AppState> // private anlassService: CachingAnlassService
   ) {
     super();
-    this.anlaesse$ = this.store.pipe(select(selectAllAnlaesse));
+    this.anlaesse$ = this.store.pipe(select(selectAktiveAnlaesse()));
   }
 
   ngOnInit() {

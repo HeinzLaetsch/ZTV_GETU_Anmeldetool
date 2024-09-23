@@ -359,8 +359,14 @@ public class AnlassService {
 		return personAnlassLinkRepository.save(pal);
 	}
 
-	public List<Anlass> getAllAnlaesse() {
-		List<Anlass> anlaesse = anlassRepo.findByAktivOrderByStartDate(true);
+	public List<Anlass> getAnlaesse(boolean onlyAktiv) {
+		List<Anlass> anlaesse = null;
+		if (onlyAktiv) {
+			anlaesse = anlassRepo.findByAktivOrderByStartDate(true);
+		} else {
+			anlaesse = anlassRepo.findAllByOrderByStartDate();
+		}
+
 		return anlaesse;
 	}
 

@@ -77,7 +77,7 @@ public class ZTVScheduler {
 	public void reminderCheck() {
 		log.info("Reminder check fired");
 
-		List<Anlass> anlaesse = anlassSrv.getAllAnlaesse();
+		List<Anlass> anlaesse = anlassSrv.getAnlaesse(true);
 
 		List<Anlass> filteredAnlaesse = anlaesse.stream().filter(anlass -> {
 			boolean erfassenNotClosed = anlass.getErfassenGeschlossen().isAfter(LocalDateTime.now());
@@ -94,7 +94,7 @@ public class ZTVScheduler {
 	public void reminderClosed() {
 		log.debug("Closed fired");
 
-		List<Anlass> anlaesse = anlassSrv.getAllAnlaesse();
+		List<Anlass> anlaesse = anlassSrv.getAnlaesse(true);
 
 		List<Anlass> filteredAnlaesse = anlaesse.stream().filter(anlass -> {
 			boolean aenderungenNotClosed = anlass.getAenderungenNichtMehrErlaubt().isAfter(LocalDateTime.now());
@@ -111,7 +111,7 @@ public class ZTVScheduler {
 	public void reminderMutationen() {
 		log.debug("Reminder Mutation fired");
 
-		List<Anlass> anlaesse = anlassSrv.getAllAnlaesse();
+		List<Anlass> anlaesse = anlassSrv.getAnlaesse(true);
 
 		List<Anlass> filteredAnlaesse = anlaesse.stream().filter(anlass -> {
 			boolean erfassenClosed = anlass.getErfassenGeschlossen().isBefore(LocalDateTime.now());

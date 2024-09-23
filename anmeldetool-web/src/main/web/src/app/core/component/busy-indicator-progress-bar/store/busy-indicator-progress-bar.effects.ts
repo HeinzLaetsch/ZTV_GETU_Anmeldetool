@@ -13,6 +13,7 @@ export class BusyIndicatorProgressBarEffects {
         return action.type.includes("INVOKED"); // Service Aufruf Action muss INVOKED beinhalten um Progressbar zu starten
       }),
       map(() => {
+        // console.log("Action set isLoading : true");
         return LoadingActions.isLoading({ isLoading: true });
       })
     );
@@ -21,10 +22,10 @@ export class BusyIndicatorProgressBarEffects {
   loadingProcessStopped$ = createEffect(() => {
     return this.actions$.pipe(
       filter((action) => {
-        console.log("Action : ", action.type);
         return action.type.includes("SUCCESS") || action.type.includes("ERROR"); // Service Aufruf Action muss SUCCESS oder ERROR beinhalten um Progressbar zu stoppen
       }),
       map(() => {
+        // console.log("Action set isLoading : false");
         return LoadingActions.isLoading({ isLoading: false });
       })
     );

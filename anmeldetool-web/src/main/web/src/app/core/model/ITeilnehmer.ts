@@ -13,3 +13,11 @@ export interface ITeilnehmer {
   onlyCreated?: boolean;
   letzteKategorie?: string;
 }
+
+export function hashCode(str: string): number {
+  var h: number = 0;
+  for (var i = 0; i < str.length; i++) {
+    h = 31 * h + str.charCodeAt(i);
+  }
+  return h;
+}

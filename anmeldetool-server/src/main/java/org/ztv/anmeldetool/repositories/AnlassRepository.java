@@ -20,6 +20,8 @@ public interface AnlassRepository extends CrudRepository<Anlass, UUID> {
 
 	List<Anlass> findByAktivOrderByStartDate(boolean aktiv);
 
+	List<Anlass> findAllByOrderByStartDate();
+
 	List<Anlass> findByStartDateBetweenAndAktivOrderByStartDate(LocalDateTime startDate, LocalDateTime endDate,
 			boolean aktiv);
 }

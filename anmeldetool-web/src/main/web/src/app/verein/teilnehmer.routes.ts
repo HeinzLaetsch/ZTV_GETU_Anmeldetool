@@ -10,7 +10,7 @@ export const TeilnehmerRoutes = [
     path: "",
     component: TeilnehmerGridComponent,
     canActivate: [AuthRouteActivatorService],
-    canDeactivate: [CanDeactivateGuard],
+    // canDeactivate: [CanDeactivateGuard],
     data: { roles: ["ANMELDER"] },
   },
 ];
