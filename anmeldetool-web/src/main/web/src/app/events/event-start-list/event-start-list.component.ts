@@ -1,46 +1,76 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
+import { select, Store } from "@ngrx/store";
+import { Observable } from "rxjs";
 import { IAnlass } from "src/app/core/model/IAnlass";
+import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
 import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
 import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
+import { selectAnlassById } from "src/app/core/redux/anlass";
+import { AppState } from "src/app/core/redux/core.state";
+import { AnlassService } from "src/app/core/service/anlass/anlass.service";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
 import { CachingTeilnehmerService } from "src/app/core/service/caching-services/caching.teilnehmer.service";
+import { SubscriptionHelper } from "src/app/utils/subscription-helper";
 
 @Component({
   selector: "app-event-start-list",
   templateUrl: "./event-start-list.component.html",
   styleUrls: ["./event-start-list.component.css"],
 })
-export class EventStartListComponent implements OnInit {
+export class EventStartListComponent
+  extends SubscriptionHelper
+  implements OnInit
+{
   anlass: IAnlass;
+  anlass$: Observable<IAnlass>;
+
   organisationAnlassLink: IOrganisationAnlassLink;
   alleTeilnehmer: ITeilnehmer[];
 
+  anlassSummary: IAnlassSummary;
+
   constructor(
     public authService: AuthService,
-    private anlassService: CachingAnlassService,
+    private store: Store<AppState>,
+
+    private anlassService: AnlassService,
+    //private anlassService: CachingAnlassService,
     private teilnehmerService: CachingTeilnehmerService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private angWindow: Window
-  ) {}
+    private route: ActivatedRoute
+  ) {
+    super();
+  }
 
   ngOnInit() {
     const anlassId: string = this.route.snapshot.params.id;
     // console.log("url param: ", anlassId);
-    this.anlass = this.anlassService.getAnlassById(anlassId);
+    this.anlass$ = this.store.pipe(select(selectAnlassById(anlassId)));
+    this.registerSubscription(
+      this.anlass$.subscribe((data) => {
+        this.anlass = data;
+        this.loadAnlassRelated();
+      })
+    );
+
+    // this.anlass = this.anlassService.getAnlassById(anlassId);
+
+    /*
     this.anlassService
       .getVereinStart(this.anlass, this.authService.currentVerein)
       .subscribe((result) => {
         this.organisationAnlassLink = result;
         this.anlass.erfassenVerlaengert = result.verlaengerungsDate;
       });
+    */
+
     this.alleTeilnehmer = this.teilnehmerService.getTeilnehmerForAnlass(
       this.anlass
     );
+
     this.alleTeilnehmer.forEach((teilnehmer) => {
       if (teilnehmer.teilnahmen && teilnehmer.teilnahmen.anlassLinks[0]) {
         if (!teilnehmer.teilnahmen.anlassLinks[0].meldeStatus) {
@@ -50,6 +80,20 @@ export class EventStartListComponent implements OnInit {
         }
       }
     });
+  }
+
+  private loadAnlassRelated() {
+    this.registerSubscription(
+      this.anlassService
+        .getAnlassOrganisationSummary(
+          this.anlass,
+          this.authService.currentVerein
+        )
+        .subscribe((result) => {
+          this.anlassSummary = result;
+          console.log("Startet: ", result.startet);
+        })
+    );
   }
 
   print() {
@@ -65,7 +109,8 @@ export class EventStartListComponent implements OnInit {
     );
   }
   get vereinStarted(): boolean {
-    return this.organisationAnlassLink?.startet;
+    // return this.organisationAnlassLink?.startet;
+    return this.anlassSummary.startet;
   }
 
   get brevet1Anlass(): boolean {

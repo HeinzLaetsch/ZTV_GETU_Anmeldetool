@@ -18,6 +18,7 @@ import {
   AnlassStatistikComponent,
   EventsDetailComponent,
   WertungsrichterChipComponent,
+  WertungsrichterSelektionComponent,
   WertungsrichterSlotComponent,
 } from "./events-detail";
 import { EventsRoutingModule } from "./events-routing.module";
@@ -36,6 +37,7 @@ export function checkDirtyState(component: CreateEventComponent) {
     EventListComponent,
     WertungsrichterChipComponent,
     WertungsrichterSlotComponent,
+    WertungsrichterSelektionComponent,
     EventThumbnailComponent,
     EventsDatesComponent,
     EventsDetailComponent,

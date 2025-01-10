@@ -26,7 +26,7 @@ import { UserExists } from "./user-exists/user-exists.component";
   templateUrl: "./user.component.html",
   styleUrls: ["./user.component.css"],
 })
-export class UserComponent implements OnInit, AfterViewInit, OnChanges {
+export class UserComponent implements OnInit, OnChanges {
   @Input()
   modify: boolean;
   @Input()
@@ -94,15 +94,75 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
       ConfirmedValidator("passwortControl", "passwort2Control")
     );
   }
-  ngAfterViewInit(): void {
+
+  ngOnInit(): void {
+    this.updateUser(this.user);
     if (this.readOnly) {
       this.form.disable();
     }
     if (this.showBenutzername) {
       this.form.controls.eMailAdresseControl.disable();
     }
-    this.emitChange(false);
+
+    this.form.controls.benutzernameControl.valueChanges.subscribe((value) => {
+      if (this.form.controls.benutzernameControl.valid) {
+        this.userService
+          .getUserByBenutzername(value)
+          .subscribe((existingUser) => {
+            console.log("User: ", this.user, " returned: ", existingUser);
+            if (existingUser && this.user?.id !== existingUser.id) {
+              this.userAlreadyExists = true;
+              this.openDialog(existingUser);
+            } else {
+              this.userAlreadyExists = false;
+            }
+          });
+      }
+      if (this.user.benutzername !== value) {
+        this.user.benutzername = value;
+        this.emitChange(true);
+      }
+    });
+    this.form.controls.nachnameControl.valueChanges.subscribe((value) => {
+      if (this.user.name !== value) {
+        this.user.name = value;
+        this.emitChange(true);
+      }
+    });
+    this.form.controls.vornameControl.valueChanges.subscribe((value) => {
+      if (this.user.vorname !== value) {
+        this.user.vorname = value;
+        this.emitChange(true);
+      }
+    });
+    this.form.controls.passwortControl.valueChanges.subscribe((value) => {
+      if (this.user.password !== value) {
+        this.user.password = value;
+        this.enteredPassword = value;
+        this.emitChange(true);
+      }
+    });
+    this.form.controls.passwort2Control.valueChanges.subscribe((value) => {
+      if (this.user.password !== value) {
+        this.user.password = value;
+        this.emitChange(true);
+      }
+    });
+    this.form.controls.eMailAdresseControl.valueChanges.subscribe((value) => {
+      if (this.user.email !== value) {
+        this.user.email = value;
+        this.emitChange(true);
+      }
+    });
+    this.form.controls.mobilNummerControl.valueChanges.subscribe((value) => {
+      // console.log(this.form.controls.mobilNummerControl.value);
+      if (value && this.user.handy !== this.concatHandy(value)) {
+        this.user.handy = this.concatHandy(value);
+        this.emitChange(true);
+      }
+    });
   }
+
   ngOnChanges(changes: SimpleChanges) {
     for (const propName in changes) {
       if (changes.user) {
@@ -194,67 +254,6 @@ export class UserComponent implements OnInit, AfterViewInit, OnChanges {
     if (includeUser) {
       this.userChange.next(this.user);
     }
-  }
-
-  ngOnInit(): void {
-    this.updateUser(this.user);
-    this.form.controls.benutzernameControl.valueChanges.subscribe((value) => {
-      if (this.form.controls.benutzernameControl.valid) {
-        this.userService
-          .getUserByBenutzername(value)
-          .subscribe((existingUser) => {
-            console.log("User: ", this.user, " returned: ", existingUser);
-            if (existingUser && this.user?.id !== existingUser.id) {
-              this.userAlreadyExists = true;
-              this.openDialog(existingUser);
-            } else {
-              this.userAlreadyExists = false;
-            }
-          });
-      }
-      if (this.user.benutzername !== value) {
-        this.user.benutzername = value;
-        this.emitChange(true);
-      }
-    });
-    this.form.controls.nachnameControl.valueChanges.subscribe((value) => {
-      if (this.user.name !== value) {
-        this.user.name = value;
-        this.emitChange(true);
-      }
-    });
-    this.form.controls.vornameControl.valueChanges.subscribe((value) => {
-      if (this.user.vorname !== value) {
-        this.user.vorname = value;
-        this.emitChange(true);
-      }
-    });
-    this.form.controls.passwortControl.valueChanges.subscribe((value) => {
-      if (this.user.password !== value) {
-        this.user.password = value;
-        this.enteredPassword = value;
-        this.emitChange(true);
-      }
-    });
-    this.form.controls.passwort2Control.valueChanges.subscribe((value) => {
-      if (this.user.password !== value) {
-        this.user.password = value;
-        this.emitChange(true);
-      }
-    });
-    this.form.controls.eMailAdresseControl.valueChanges.subscribe((value) => {
-      if (this.user.email !== value) {
-        this.user.email = value;
-        this.emitChange(true);
-      }
-    });
-    this.form.controls.mobilNummerControl.valueChanges.subscribe((value) => {
-      // console.log(this.form.controls.mobilNummerControl.value);
-      if (value && this.user.handy !== this.concatHandy(value)) {
-        this.user.handy = this.concatHandy(value);
-        this.emitChange(true);
-      }
-    });
   }
 
   private concatHandy(mytel: MyTel): string {

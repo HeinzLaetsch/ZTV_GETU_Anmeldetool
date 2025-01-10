@@ -2,39 +2,31 @@ import { Component, OnInit, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { AgGridAngular } from "ag-grid-angular";
 import {
-  CellClickedEvent,
   ColDef,
   GetRowIdParams,
   GridApi,
   GridReadyEvent,
-  IRowNode,
+  ITooltipParams,
   ValueGetterParams,
   ValueSetterParams,
 } from "ag-grid-community";
-import { Observable, of, Subscription } from "rxjs";
+import { Observable, of } from "rxjs";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import {
   KategorieEnum,
   KategorieEnumFunction,
 } from "src/app/core/model/KategorieEnum";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
-import {
-  selectAktiveAnlaesse,
-  selectAllAnlaesseTiTu,
-  selectAnlaesse,
-  selectJahre,
-} from "src/app/core/redux/anlass";
+import { selectAnlaesse, selectJahre } from "src/app/core/redux/anlass";
 import { AppState } from "src/app/core/redux/core.state";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import {
   TeilnahmenActions,
   selectTeilnahmen,
-  selectTiTeilnahmen,
-  selectTuTeilnahmen,
 } from "src/app/core/redux/teilnahmen";
 import { ITeilnahmen } from "src/app/core/model/ITeilnahmen";
 import { IAnlassLink } from "src/app/core/model/IAnlassLink";
-import { hashCode, ITeilnehmer } from "src/app/core/model/ITeilnehmer";
+import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
 import { MatDialog } from "@angular/material/dialog";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { TeilnahmeStatusEditor } from "./teilnahme-status/teilnahme-status-editor.component";
@@ -43,25 +35,26 @@ import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
 import { IOrganisationTeilnahmenStatistik } from "src/app/core/model/IOrganisationTeilnahmenStatistik";
 import {
   OtsActions,
-  selectAllOts,
   selectOts,
-  selectOtsByAnlassId,
 } from "src/app/core/redux/organisation-teilnahmen";
 import { ButtonCellRenderer } from "./button-cell-renderer/button-cell-renderer.component";
-import { TeilnehmerActions } from "src/app/core/redux/teilnehmer";
 import { TeilnehmerDialog } from "./teilnehmer-dialog/teilnehmer-dialog.component";
-import { data } from "cypress/types/jquery";
 import * as moment from "moment";
 import { MatSelectChange } from "@angular/material/select";
+import { SubscriptionHelper } from "src/app/utils/subscription-helper";
 
 @Component({
   selector: "app-teilnehmer-grid",
   templateUrl: "./teilnehmer-grid.html",
   styleUrls: ["./teilnehmer-grid.css"],
 })
-export class TeilnehmerGridComponent implements OnInit {
+export class TeilnehmerGridComponent
+  extends SubscriptionHelper
+  implements OnInit
+{
   static tColumns = 4;
-  public selectedJahr = 2024;
+  tooltipShowDelay = 1500;
+  public selectedJahr = -1;
 
   selectedState = undefined;
 
@@ -78,8 +71,6 @@ export class TeilnehmerGridComponent implements OnInit {
   private otsData: IOrganisationTeilnahmenStatistik[];
 
   public showOldAnlaesse: boolean = false;
-
-  private subscriptions: Map<string, Subscription>;
 
   // Each Column Definition results in one Column.
   // headerValueGetter;
@@ -106,6 +97,7 @@ export class TeilnehmerGridComponent implements OnInit {
       valueSetter: this.teilnehmerAttributeValueSetter,
       valueGetter: this.teilnehmerAttributeValueGetter,
       pinned: "left",
+      tooltipValueGetter: (p: ITooltipParams) => "Doppelklicken um zu ändern",
     },
     {
       headerName: "Vorname",
@@ -115,6 +107,7 @@ export class TeilnehmerGridComponent implements OnInit {
       valueSetter: this.teilnehmerAttributeValueSetter,
       valueGetter: this.teilnehmerAttributeValueGetter,
       pinned: "left",
+      tooltipValueGetter: (p: ITooltipParams) => "Doppelklicken um zu ändern",
     },
     {
       headerName: "Jahrg.",
@@ -122,6 +115,7 @@ export class TeilnehmerGridComponent implements OnInit {
       maxWidth: 70,
       valueSetter: this.teilnehmerAttributeValueSetter,
       valueGetter: this.teilnehmerAttributeValueGetter,
+      tooltipValueGetter: (p: ITooltipParams) => "Doppelklicken um zu ändern",
     },
     {
       headerName: "Ti/Tu",
@@ -131,6 +125,7 @@ export class TeilnehmerGridComponent implements OnInit {
       cellEditorParams: { values: ["Ti", "Tu"] },
       valueSetter: this.teilnehmerAttributeValueSetter,
       valueGetter: this.teilnehmerAttributeValueGetter,
+      tooltipValueGetter: (p: ITooltipParams) => "Doppelklicken um zu ändern",
     },
     {
       headerName: "STV Nr.",
@@ -138,6 +133,7 @@ export class TeilnehmerGridComponent implements OnInit {
       maxWidth: 80,
       valueSetter: this.teilnehmerAttributeValueSetter,
       valueGetter: this.teilnehmerAttributeValueGetter,
+      tooltipValueGetter: (p: ITooltipParams) => "Doppelklicken um zu ändern",
     },
     {
       headerName: "aktuelle Kategorie",
@@ -176,7 +172,8 @@ export class TeilnehmerGridComponent implements OnInit {
     private store: Store<AppState>,
     private authService: AuthService
   ) {
-    this.subscriptions = new Map<string, Subscription>();
+    super();
+    this.selectedJahr = moment(Date.now()).year();
   }
 
   onSuppressKeyboardEvent(params): boolean {
@@ -192,6 +189,8 @@ export class TeilnehmerGridComponent implements OnInit {
   public jahrSelektiert(event: MatSelectChange) {
     console.log("Jahr: ", event);
     this.selectedJahr = event.value;
+    this.loadTeilnahmen();
+    this.rowData$ = this.store.pipe(select(selectTeilnahmen()));
   }
 
   public getYear(anlass: IAnlass): number {
@@ -295,11 +294,13 @@ export class TeilnehmerGridComponent implements OnInit {
 
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
-    this.rowData$.subscribe((data) => {
-      if (!this.gridApi.isDestroyed()) {
-        this.gridApi.setGridOption("rowData", data);
-      }
-    });
+    this.registerSubscription(
+      this.rowData$.subscribe((data) => {
+        if (!this.gridApi.isDestroyed()) {
+          this.gridApi.setGridOption("rowData", data);
+        }
+      })
+    );
     this.sortByNameAsc();
   }
 
@@ -319,10 +320,12 @@ export class TeilnehmerGridComponent implements OnInit {
   }
 
   public subscribeColumnData() {
-    this.anlaesseAlle$.subscribe((anlaesse) => {
-      this.alleAnlaesse = anlaesse;
-      this.refreshAnlaesse();
-    });
+    this.registerSubscription(
+      this.anlaesseAlle$.subscribe((anlaesse) => {
+        this.alleAnlaesse = anlaesse;
+        this.refreshAnlaesse();
+      })
+    );
   }
 
   registerSelects() {
@@ -330,12 +333,16 @@ export class TeilnehmerGridComponent implements OnInit {
     this.jahresListeAnlaesse$ = this.store.pipe(select(selectJahre()));
     this.rowData$ = this.store.pipe(select(selectTeilnahmen()));
     this.ots$ = this.store.pipe(select(selectOts()));
-    this.ots$.subscribe((data) => {
-      this.otsData = data;
-    });
-    this.jahresListeAnlaesse$.subscribe((anlaesse) => {
-      this.jahresListe$ = of(anlaesse.map((anlass) => this.getYear(anlass)));
-    });
+    this.registerSubscription(
+      this.ots$.subscribe((data) => {
+        this.otsData = data;
+      })
+    );
+    this.registerSubscription(
+      this.jahresListeAnlaesse$.subscribe((anlaesse) => {
+        this.jahresListe$ = of(anlaesse.map((anlass) => this.getYear(anlass)));
+      })
+    );
   }
 
   refreshAnlaesse() {
@@ -352,6 +359,7 @@ export class TeilnehmerGridComponent implements OnInit {
         },
         cellRenderer: TeilnahmeStatusRenderer,
         cellEditor: TeilnahmeStatusEditor,
+        tooltipValueGetter: (p: ITooltipParams) => "Doppelklicken um zu ändern",
         comparator: this.talComparator,
         cellEditorPopup: false,
         cellEditorParams: function (params) {
@@ -367,13 +375,18 @@ export class TeilnehmerGridComponent implements OnInit {
   }
 
   private showAnlass(anlass: IAnlass): boolean {
+    const asMoment = moment(anlass.endDatum);
     if (!this.showOldAnlaesse) {
-      const asMoment = moment(anlass.endDatum);
       if (asMoment.isBefore()) {
         return false;
+      } else {
+        return true;
       }
     }
-    return true;
+    if (asMoment.year() === this.selectedJahr) {
+      return true;
+    }
+    return false;
   }
   redraw() {
     const allState = this.agGrid.api.getColumnState();
@@ -733,16 +746,18 @@ export class TeilnehmerGridComponent implements OnInit {
       },
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        console.log(`Dialog result: ${result}`);
-        this.store.dispatch(
-          TeilnahmenActions.addTeilnehmerInvoked({ payload: result })
-        );
-      } else {
-        console.log(`Dialog Abbruch: ${result}`);
-      }
-    });
+    this.registerSubscription(
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result) {
+          console.log(`Dialog result: ${result}`);
+          this.store.dispatch(
+            TeilnahmenActions.addTeilnehmerInvoked({ payload: result })
+          );
+        } else {
+          console.log(`Dialog Abbruch: ${result}`);
+        }
+      })
+    );
   }
 }
 

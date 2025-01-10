@@ -1,36 +1,62 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Router } from "@angular/router";
+import { select, Store } from "@ngrx/store";
+import { Observable } from "rxjs";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
 import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
+import { selectAktiveAnlaesse } from "src/app/core/redux/anlass";
+import { AppState } from "src/app/core/redux/core.state";
+import { selectVereinById } from "src/app/core/redux/verein";
 import { AnlassService } from "src/app/core/service/anlass/anlass.service";
 import { AuthService } from "src/app/core/service/auth/auth.service";
+import { SubscriptionHelper } from "src/app/utils/subscription-helper";
+import { IVerein } from "src/app/verein/verein";
 
 @Component({
   selector: "app-event-thumbnail",
   templateUrl: "./event-thumbnail.component.html",
   styleUrls: ["./event-thumbnail.component.css"],
 })
-export class EventThumbnailComponent implements OnInit {
+export class EventThumbnailComponent
+  extends SubscriptionHelper
+  implements OnInit
+{
   @Input() anlass: IAnlass;
   @Output() anlassClick = new EventEmitter();
 
-  // organisationAnlassLink: IOrganisationAnlassLink;
   anlassSummary: IAnlassSummary;
+  organisator: IVerein;
 
   constructor(
     public authService: AuthService,
-    private anlassService: AnlassService,
-    private router: Router
-  ) {}
+    private store: Store<AppState>,
+    private router: Router,
+
+    private anlassService: AnlassService
+  ) {
+    super();
+  }
 
   ngOnInit() {
-    this.anlassService
-      .getAnlassOrganisationSummary(this.anlass, this.authService.currentVerein)
-      .subscribe((result) => {
-        this.anlassSummary = result;
-      });
+    this.registerSubscription(
+      this.anlassService
+        .getAnlassOrganisationSummary(
+          this.anlass,
+          this.authService.currentVerein
+        )
+        .subscribe((result) => {
+          this.anlassSummary = result;
+        })
+    );
+    this.registerSubscription(
+      this.store
+        .pipe(select(selectVereinById(this.anlass.organisatorId)))
+        .subscribe((result) => {
+          this.organisator = result;
+        })
+    );
   }
 
   isEnabled(): boolean {
@@ -87,11 +113,14 @@ export class EventThumbnailComponent implements OnInit {
       startet: this.anlassSummary.startet,
       verlaengerungsDate: this.anlassSummary.verlaengerungsDate,
     };
-    this.anlassService
-      .updateVereinsStart(organisationAnlassLink)
-      .subscribe((result) => {
-        console.log("Clicked: ", result);
-      });
+    // Sollte ersetzt werden
+    this.registerSubscription(
+      this.anlassService
+        .updateVereinsStart(organisationAnlassLink)
+        .subscribe((result) => {
+          console.log("Clicked: ", result);
+        })
+    );
   }
 
   get isWertungsrichterOk(): boolean {

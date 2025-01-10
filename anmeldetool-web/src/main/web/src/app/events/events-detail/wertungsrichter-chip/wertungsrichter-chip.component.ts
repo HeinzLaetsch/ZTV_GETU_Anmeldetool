@@ -49,7 +49,7 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
       changes.isAllWertungsrichterList &&
       !changes.isAllWertungsrichterList.currentValue
     ) {
-      console.error("Load Einsaetze");
+      // console.error("Load Einsaetze: ", changes);
     }
   }
 

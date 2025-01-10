@@ -6,6 +6,7 @@ import { WertungsrichterStatusEnum } from "../model/WertungsrichterStatusEnum";
 import { AuthService } from "./auth/auth.service";
 import { CachingAnlassService } from "./caching-services/caching.anlass.service";
 import { CachingUserService } from "./caching-services/caching.user.service";
+import { IAnlassSummary } from "../model/IAnlassSummary";
 
 @Injectable({
   providedIn: "root",
@@ -96,26 +97,28 @@ export class WertungsrichterService {
     return WertungsrichterStatusEnum.NOTOK;
   }
 
-  getWertungsrichterPflichtBrevet1(anlass: IAnlass): number {
-    const anzahlTeilnehmer = this.anlassService.getTeilnahmen(anlass, 1).length;
+  getWertungsrichterPflichtBrevet1(anlassSummary: IAnlassSummary): number {
+    // const anzahlTeilnehmer = this.anlassService.getTeilnahmen(anlass, 1).length;
+    const anzahlTeilnehmer = anlassSummary.startendeBr1;
     if (anzahlTeilnehmer > 0) return Math.ceil(anzahlTeilnehmer / 15);
     return 0;
   }
 
-  getWertungsrichterPflichtBrevet2(anlass: IAnlass): number {
-    const anzahlTeilnehmer = this.anlassService.getTeilnahmen(anlass, 2).length;
+  getWertungsrichterPflichtBrevet2(anlassSummary: IAnlassSummary): number {
+    //const anzahlTeilnehmer = this.anlassService.getTeilnahmen(anlass, 2).length;
+    const anzahlTeilnehmer = anlassSummary.startendeBr2;
     if (anzahlTeilnehmer > 0) return Math.ceil(anzahlTeilnehmer / 15);
     return 0;
   }
 
   // TODO abfüllen
   getStatusWertungsrichter(
-    anlass: IAnlass,
+    anlassSummary: IAnlassSummary,
     assignedWr1s: Array<IUser>,
     assignedWr2s: Array<IUser>
   ): WertungsrichterStatusEnum {
-    const pflichtBrevet1 = this.getWertungsrichterPflichtBrevet1(anlass);
-    const pflichtBrevet2 = this.getWertungsrichterPflichtBrevet2(anlass);
+    const pflichtBrevet1 = this.getWertungsrichterPflichtBrevet1(anlassSummary);
+    const pflichtBrevet2 = this.getWertungsrichterPflichtBrevet2(anlassSummary);
 
     const statusBrevet1 = this.getStatusWertungsrichterBr(
       assignedWr1s,

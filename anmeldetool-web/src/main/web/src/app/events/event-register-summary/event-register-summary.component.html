@@ -20,7 +20,7 @@
         <span *ngIf="anlass.startDatum !== anlass.endDatum">von</span>:
       </div>
       <div class="col-sm-2 text-bold">
-        {{ anlass.startDatum | date: "EEE, d MMMM , y":"GMT+1":"DE-CH" }}
+        {{ anlass.startDatum | date : "EEE, d MMMM , y" : "GMT+1" : "DE-CH" }}
       </div>
       <div class="col-sm-2" *ngIf="anlass.startDatum !== anlass.endDatum">
         bis:
@@ -29,7 +29,7 @@
         class="col-sm text-bold"
         *ngIf="anlass.startDatum !== anlass.endDatum"
       >
-        {{ anlass.endDatum | date: "EEE, d MMMM , y":"GMT+1":"DE-CH" }}
+        {{ anlass.endDatum | date : "EEE, d MMMM , y" : "GMT+1" : "DE-CH" }}
         >
       </div>
     </div>
@@ -55,7 +55,7 @@
       <div class="col-sm-2">Halle:</div>
       <div class="col-sm-2 text-bold">{{ anlass.halle }}</div>
       <div class="col-sm-2">Organisator:</div>
-      <div class="col-sm-2 text-bold">{{ anlass.organisator }}</div>
+      <div class="col-sm-2 text-bold">{{ organisator?.name }}</div>
     </div>
     <div class="row">
       <div class="col-sm-2">Wertungsrichter:</div>
@@ -144,7 +144,7 @@
     <div class="row">
       <div class="col-sm-2 total">Total Teilnehmer:</div>
       <div class="col-sm-10 total">
-        {{ anzahlTeilnehmer }}
+        {{ totalTeilnehmer }}
       </div>
     </div>
 
@@ -154,18 +154,20 @@
     <div class="row">
       <div class="col-sm-3 total"><h3>Startgeld:</h3></div>
       <div class="col-sm-1 total">
-        <h3>{{ anzahlTeilnehmer }}</h3>
+        <h3>{{ totalTeilnehmer }}</h3>
       </div>
-      <div class="col-sm-2 total"><h3>x 22.00 sFr.</h3></div>
+      <div class="col-sm-2 total"><h3>x 26.00 sFr.</h3></div>
       <div class="col-sm total">
-        <h3>{{ anzahlTeilnehmer * 22 }}.00 sFr.</h3>
+        <h3>{{ totalTeilnehmer * 26 }}.00 sFr.</h3>
       </div>
     </div>
     <div class="row">
       <div class="col-sm-3 total"><h3>Termin Anmeldung und Zahlung:</h3></div>
       <div class="col-sm total">
         <h3>
-          {{ anlass.erfassenGeschlossen | date: "d. MMMM y":"GMT+1":"DE-CH" }}
+          {{
+            anlass.erfassenGeschlossen | date : "d. MMMM y" : "GMT+1" : "DE-CH"
+          }}
         </h3>
       </div>
     </div>

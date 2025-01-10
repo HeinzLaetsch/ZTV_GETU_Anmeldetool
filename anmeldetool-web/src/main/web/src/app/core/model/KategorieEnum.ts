@@ -45,33 +45,40 @@ export namespace KategorieEnumFunction {
       equals(element, parse(start))
     );
     const sliced = Object.values(KategorieEnum).slice(startindex);
-    return sliced.filter((katgorie) => {
+    return sliced.filter((kategorie) => {
       if (anlass != undefined) {
-        if (
-          !(isBrevet1(anlass.tiefsteKategorie) && isBrevet1(katgorie)) ||
-          (isBrevet2(anlass.hoechsteKategorie) && isBrevet2(katgorie))
-        ) {
+        const startBr1 =
+          isBrevet1(anlass.tiefsteKategorie) &&
+          (isBrevet1(kategorie) || isBrevet2(kategorie));
+        const startBr2 =
+          isBrevet2(anlass.tiefsteKategorie) && isBrevet2(kategorie);
+        const endBr1 =
+          isBrevet1(anlass.hoechsteKategorie) && isBrevet1(kategorie);
+        const endBr2 =
+          isBrevet2(anlass.hoechsteKategorie) &&
+          (isBrevet1(kategorie) || isBrevet2(kategorie));
+        if (!((startBr1 && (endBr1 || endBr2)) || (startBr2 && endBr2))) {
           return false;
         }
-      }
-      if (TiTuEnum.equals(TiTuEnum.Ti, titu)) {
-        switch (katgorie) {
-          case "K5":
-            return false;
-          case "KH":
-            return false;
+        if (TiTuEnum.equals(TiTuEnum.Ti, titu)) {
+          switch (kategorie) {
+            case "K5":
+              return false;
+            case "KH":
+              return false;
+          }
+        } else {
+          switch (kategorie) {
+            case "K5A":
+              return false;
+            case "K5B":
+              return false;
+            case "KD":
+              return false;
+          }
         }
-      } else {
-        switch (katgorie) {
-          case "K5A":
-            return false;
-          case "K5B":
-            return false;
-          case "KD":
-            return false;
-        }
+        return true;
       }
-      return true;
     });
   }
 

@@ -82,6 +82,7 @@ public class TeilnahmenService {
 		Map<Teilnehmer, List<TeilnehmerAnlassLink>> allTeilnehmer = anlassSrv.getTeilnahmen(jahr, orgId);
 		Pageable pageable = PageRequest.of(0, 500); // return all
 		Collection<Teilnehmer> teilnehmerListe = teilnehmerSrv.findTeilnehmerByOrganisation(orgId, pageable);
+		// TODO support deleted
 		teilnehmerListe.forEach(t -> {
 			if (!allTeilnehmer.containsKey(t) && !t.isDeleted()) { // isAktiv not used
 				allTeilnehmer.put(t, new ArrayList<>());

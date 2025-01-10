@@ -187,17 +187,22 @@ public class AnlassAdminController {
 	@GetMapping()
 	// @ResponseBody
 	public ResponseEntity<Collection<AnlassDTO>> getAnlaesse(@RequestParam Optional<Boolean> onlyAktiv) {
-		AtomicBoolean onlyAktivBoolean = new AtomicBoolean();
-		onlyAktiv.ifPresentOrElse((value) -> onlyAktivBoolean.set(value), () -> onlyAktivBoolean.getAndSet(true));
-		List<Anlass> anlaesse = anlassSrv.getAnlaesse(onlyAktivBoolean.get());
-		List<AnlassDTO> anlaesseDTO = anlaesse.stream().map(anlass -> {
-			return anlassMapper.toDto(anlass);
-		}).collect(Collectors.toList());
-		if (anlaesseDTO.size() == 0) {
-			return getNotFound();
-		} else {
-			return ResponseEntity.ok(anlaesseDTO);
+		try {
+			AtomicBoolean onlyAktivBoolean = new AtomicBoolean();
+			onlyAktiv.ifPresentOrElse((value) -> onlyAktivBoolean.set(value), () -> onlyAktivBoolean.getAndSet(true));
+			List<Anlass> anlaesse = anlassSrv.getAnlaesse(onlyAktivBoolean.get());
+			List<AnlassDTO> anlaesseDTO = anlaesse.stream().map(anlass -> {
+				return anlassMapper.toDto(anlass);
+			}).collect(Collectors.toList());
+			if (anlaesseDTO.size() == 0) {
+				return getNotFound();
+			} else {
+				return ResponseEntity.ok(anlaesseDTO);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
+		return getNotFound();
 	}
 
 	@GetMapping("/{anlassId}/organisationen/{orgId}/summary")
@@ -248,7 +253,7 @@ public class AnlassAdminController {
 			startKH = getStartendeForKategorie(links, KategorieEnum.KH);
 
 			startBr2 = (int) links.stream().filter(link -> {
-				return !link.getKategorie().isJugend();
+				return link.getKategorie().isAktiv();
 			}).count();
 			List<PersonAnlassLink> pals = anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId,
 					WertungsrichterBrevetEnum.Brevet_1);

@@ -55,7 +55,7 @@ import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
       <div
         *ngIf="
           (params.mode === 1 || params.mode === 2) &&
-          tal.meldeStatus.toUpperCase() !== 'ABGEMELDET'
+          tal.meldeStatus?.toUpperCase() !== 'ABGEMELDET'
         "
         class="teilnahme-status-status-icon"
       >
@@ -112,7 +112,7 @@ export class TeilnahmeStatusEditor
 
   agInit(params: any): void {
     this.params = params;
-    console.log("Mode: ", params.mode);
+    console.log("Mode: ", params?.mode);
     this.tal = {
       anlassId: this.params.value.anlassId,
       teilnehmerId: this.params.value.teilnehmerId,
@@ -124,7 +124,7 @@ export class TeilnahmeStatusEditor
   selected() {
     if (
       this.params.kats.length > 0 &&
-      this.params.value.meldeStatus.toUpperCase() == "ABGEMELDET"
+      this.params.value.meldeStatus?.toUpperCase() == "ABGEMELDET"
     ) {
       console.log("Selected");
       this.tal.meldeStatus = MeldeStatusEnum.STARTET;
@@ -134,7 +134,7 @@ export class TeilnahmeStatusEditor
 
   resetKategorie() {
     // this.tal.kategorie = "KEIN_START";
-    if (this.tal.meldeStatus.toUpperCase() === "ABGEMELDET") {
+    if (this.tal.meldeStatus?.toUpperCase() === "ABGEMELDET") {
       this.tal.meldeStatus = MeldeStatusEnum.STARTET;
     } else {
       this.tal.meldeStatus = MeldeStatusEnum.ABGEMELDET;

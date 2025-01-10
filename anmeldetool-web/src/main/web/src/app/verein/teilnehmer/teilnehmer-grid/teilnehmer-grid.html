@@ -10,7 +10,7 @@
     <mat-button-toggle value="Turnerin">Turnerinnen</mat-button-toggle>
     <mat-button-toggle value="Turner">Turner</mat-button-toggle>
   </mat-button-toggle-group>
-  <span class="abstand">
+  <!--span class="abstand">
     <mat-form-field>
       <mat-label>Jahr</mat-label>
       <mat-select
@@ -26,18 +26,18 @@
         </mat-option>
       </mat-select>
     </mat-form-field>
-  </span>
-  <span class="abstand">
+  </span-->
+  <!--span class="abstand">
     <mat-checkbox
       class="checkbox"
       [(ngModel)]="showOldAnlaesse"
       (change)="showOldChanged($event.checked)"
       >vergangene Wettkämpfe anzeigen</mat-checkbox
     >
-  </span>
-  <span class="abstand">
+  </span-->
+  <!--span class="abstand">
     <mat-checkbox class="checkbox">gelöschte Teilnehmer anzeigen</mat-checkbox>
-  </span>
+  </span-->
 </div>
 <div>
   <button
@@ -67,5 +67,5 @@
   [paginationAutoPageSize]="true"
   (gridReady)="onGridReady($event)"
   [readOnlyEdit]="false"
+  [tooltipShowDelay]="tooltipShowDelay"
 ></ag-grid-angular>
-<!-- rowData$ | async -->

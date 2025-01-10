@@ -13,9 +13,10 @@ export const selectAlleVereine = createSelector(
 );
 
 export const selectVereinById = (id: string) =>
-  createSelector(selectVereinState, (vereinState) =>
-    vereinState.entities.length ? vereinState.entities[id] : undefined
-  );
+  createSelector(selectVereinState, (vereinState) => {
+    const ret = vereinState.ids.length ? vereinState.entities[id] : undefined;
+    return ret;
+  });
 
 export const selectVereinByName = (name: string) =>
   createSelector(selectAlleVereine, (vereine) =>

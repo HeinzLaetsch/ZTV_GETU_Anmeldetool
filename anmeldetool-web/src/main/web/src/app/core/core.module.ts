@@ -37,6 +37,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from "@angular/material/form-field";
 import { Page404Component } from "../error/page404/page404.component";
 import { VereinActions, VereinEffects } from "./redux/verein";
+import { OalEffects } from "./redux/organisation-anlass";
 
 export function initVereinservice(
   vereinService: CachingVereinService
@@ -87,6 +88,7 @@ registerLocaleData(localeDe, "de");
       BusyIndicatorProgressBarEffects,
       AnlassEffects,
       VereinEffects,
+      OalEffects,
     ]),
 
     StoreRouterConnectingModule.forRoot({

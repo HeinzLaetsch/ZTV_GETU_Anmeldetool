@@ -21,5 +21,15 @@ export const selectOalForKeys = (orgId: string, anlassId: string) =>
     const ret = oalState.filter(
       (x) => orgId === x.organisationsId && anlassId === x.anlassId
     );
+    if (ret === undefined || ret.length === 0) {
+      return [
+        {
+          organisationsId: orgId,
+          anlassId: anlassId,
+          startet: false,
+          verlaengerungsDate: undefined,
+        },
+      ];
+    }
     return ret;
   });

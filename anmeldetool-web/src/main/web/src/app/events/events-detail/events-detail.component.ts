@@ -33,67 +33,66 @@ import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
 import { WertungsrichterService } from "src/app/core/service/wertungsrichter.service";
 import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
+import { SubscriptionHelper } from "src/app/utils/subscription-helper";
+import { AnlassService } from "src/app/core/service/anlass/anlass.service";
 
 @Component({
   selector: "app-events-detail",
   templateUrl: "./events-detail.component.html",
   styleUrls: ["./events-detail.component.css"],
 })
-export class EventsDetailComponent implements OnInit, AfterViewInit {
-  @ViewChild("tabs") tabGroup: MatTabGroup;
-
-  @Input()
-  anlassSummary: IAnlassSummary;
+export class EventsDetailComponent
+  extends SubscriptionHelper
+  implements OnInit
+{
+  // @ViewChild("tabs") tabGroup: MatTabGroup;
 
   anlass: IAnlass;
   anlass$: Observable<IAnlass>;
+
   starts$: Observable<ReadonlyArray<IOrganisationAnlassLink>>;
   teilnehmer$: Observable<ITeilnehmer[]>;
   teilnahmenBrevet1$: Observable<ReadonlyArray<IAnlassLink>>;
   teilnahmenBrevet2$: Observable<ReadonlyArray<IAnlassLink>>;
 
-  starts: Readonly<Array<IOrganisationAnlassLink>>;
+  starts: Array<IOrganisationAnlassLink>;
   orgAnlassLink: IOrganisationAnlassLink;
-  assignedWr1s = new Array<IUser>();
-  assignedWr2s = new Array<IUser>();
-  wr1s = new Array<IUser>();
-  wr2s = new Array<IUser>();
+
   // _wrEinsaetze: IWertungsrichterEinsatz[];
   teilnehmer: ITeilnehmer[];
   teilnahmenBrevet1: IAnlassLink[];
   teilnahmenBrevet2: IAnlassLink[];
 
-  statusBr1: WertungsrichterStatusEnum;
-  statusBr2: WertungsrichterStatusEnum;
-  useBrevet2: boolean = false;
-
   constructor(
     public authService: AuthService,
-    private anlassService: CachingAnlassService,
+    private anlassService: AnlassService,
     private store: Store<AppState>,
-    private wertungsrichterService: WertungsrichterService,
     private route: ActivatedRoute,
     private router: Router
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit() {
     const anlassId: string = this.route.snapshot.params.id;
 
     this.anlass$ = this.store.pipe(select(selectAnlassById(anlassId)));
-    this.anlass$.subscribe((anlass) => {
-      this.anlass = anlass;
-      // anlassInit();
-    });
-
+    this.registerSubscription(
+      this.anlass$.subscribe((anlass) => {
+        this.anlass = anlass;
+        // anlassInit();
+      })
+    );
     // wrInit();
   }
-
+  /*
   storeInit() {
     this.store.dispatch(OalActions.loadAllOalInvoked());
     //TODO Old style ???
     // Still needed?
     // this.store.dispatch(loadAllTeilnahmenAction());
   }
+  */
   /*
   wrInit() {
     this.wertungsrichterService
@@ -148,15 +147,15 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
     */
   }
 
+  /*
   ngAfterViewInit(): void {
-    /*
     if (this.isBrevet1Anlass()) {
       this.tabGroup.selectedIndex = 0;
     } else {
       this.tabGroup.selectedIndex = 1;
     }
-    */
   }
+    */
 
   isViewOnly(): boolean {
     return !this.authService.isAdministrator();
@@ -200,48 +199,6 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
   isTiAnlass(): boolean {
     return this.anlass.tiAnlass;
   }
-  isBrevet1Anlass(): boolean {
-    // console.log("Brevet 1: ", this.anlass.tiefsteKategorie <= KategorieEnum.K4);
-    return this.anlass.brevet1Anlass;
-  }
-  isBrevet2Anlass(): boolean {
-    // console.log("Brevet 2: ", this.anlass.hoechsteKategorie > KategorieEnum.K4);
-    return this.anlass.brevet2Anlass;
-  }
-  private getVerfuegbareWertungsrichter(wrs: IUser[], brevet: number) {
-    this.anlassService
-      .getVerfuegbareWertungsrichter(
-        this.anlass,
-        this.authService.currentVerein,
-        brevet
-      )
-      .subscribe((allUser) => {
-        if (allUser) {
-          allUser.forEach((user) => wrs.push(user));
-          wrs.sort((a, b) => {
-            if (a.benutzername < b.benutzername) {
-              return -1;
-            }
-            if (a.benutzername > b.benutzername) {
-              return 1;
-            }
-            return 0;
-          });
-        }
-      });
-  }
-
-  get isWertungsrichter1Ok(): boolean {
-    return this.statusBr1 !== WertungsrichterStatusEnum.NOTOK;
-  }
-  get isWertungsrichter2Ok(): boolean {
-    return this.statusBr2 !== WertungsrichterStatusEnum.NOTOK;
-  }
-  /*
-  wertungsrichterUserChange(wertungsrichterUser: IUser) {
-    this.statusBr1 = this.getStatusBr1();
-    this.statusBr2 = this.getStatusBr2();
-  }*/
 
   /*
   getTeilnahmenForKategorieK1(): Observable<IAnlassLink[]> {
@@ -325,97 +282,6 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
     return this.teilnehmer?.length;
   }
 
-  get availableWertungsrichter1(): IUser[] {
-    if (this.useBrevet2) {
-      return this.wr1s.concat(this.wr2s);
-    }
-    return this.wr1s;
-  }
-  get availableWertungsrichter2(): IUser[] {
-    return this.wr2s;
-  }
-
-  drop(event: CdkDragDrop<String[]>, liste: string) {
-    console.log("Drop: ", event, ", liste", liste);
-    if (event.previousContainer === event.container) {
-      console.log("move Drop: ", event);
-      moveItemInArray(
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
-    } else {
-      console.log("Transfer Drop: ", event);
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
-      console.log("Data: ", event.container.data[0]);
-      /*
-      if (liste === "2") {
-        this.anlassService
-          .addWertungsrichterToAnlass(
-            this.anlass,
-            this.authService.currentVerein,
-            event.container.data[event.currentIndex] as unknown as IUser
-          )
-          .subscribe((result) => {
-            this.statusBr1 = this.getStatusBr1();
-            this.statusBr2 = this.getStatusBr2();
-
-            this.loadWrLink(
-              event.container.data[event.currentIndex] as unknown as IUser
-            );
-          });
-      } else {
-        this.anlassService
-          .deleteWertungsrichterFromAnlass(
-            this.anlass,
-            this.authService.currentVerein,
-            event.container.data[event.currentIndex] as unknown as IUser
-          )
-          .subscribe((result) => {
-            this.statusBr1 = this.getStatusBr1();
-            this.statusBr2 = this.getStatusBr2();
-          });
-      }
-      */
-    }
-  }
-
-  /*
-  getStatusBr1(): WertungsrichterStatusEnum {
-    this.statusBr1 = this.wertungsrichterService.getStatusWertungsrichterBr(
-      this.assignedWr1s,
-      this.wertungsrichterPflichtBrevet1
-    );
-    return this.statusBr1;
-  }
-  getStatusBr2(): WertungsrichterStatusEnum {
-    this.statusBr2 = this.wertungsrichterService.getStatusWertungsrichterBr(
-      this.assignedWr2s,
-      this.wertungsrichterPflichtBrevet2
-    );
-    return this.statusBr2;
-  }
-  */
-
-  loadWrLink(wertungsrichterUser: IUser): void {
-    this.anlassService
-      .getWrEinsatz(
-        this.anlass,
-        this.authService.currentVerein,
-        wertungsrichterUser
-      )
-      .subscribe((pal) => {
-        wertungsrichterUser.pal = pal;
-      });
-  }
-  useBrevet2Clicked(check: boolean) {
-    console.log("Use Brevet 2: ", this.useBrevet2);
-  }
   /*
   vereinStartedClicked(check: boolean) {
     this.store.dispatch(

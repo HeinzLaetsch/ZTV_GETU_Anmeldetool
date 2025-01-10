@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { Store } from "@ngrx/store";
+import { select, Store } from "@ngrx/store";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
 import { AppState } from "src/app/core/redux/core.state";
@@ -7,34 +7,63 @@ import { AnlassService } from "src/app/core/service/anlass/anlass.service";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { Observable } from "rxjs";
+import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
+import {
+  OalActions,
+  selectOalForKeys,
+} from "src/app/core/redux/organisation-anlass";
+import { SubscriptionHelper } from "src/app/utils/subscription-helper";
 
 @Component({
   selector: "app-anlass-statistik",
   templateUrl: "./anlass-statistik.component.html",
   styleUrls: ["./anlass-statistik.component.css"],
 })
-export class AnlassStatistikComponent implements OnInit {
+export class AnlassStatistikComponent
+  extends SubscriptionHelper
+  implements OnInit
+{
   @Input()
   anlass: IAnlass;
 
   anlassSummary: IAnlassSummary;
   anlassSummary$: Observable<IAnlassSummary>;
 
+  orgAnlassLink: IOrganisationAnlassLink;
+  starts$: Observable<ReadonlyArray<IOrganisationAnlassLink>>;
+
   constructor(
     public authService: AuthService,
     private store: Store<AppState>,
     private anlassService: AnlassService
-  ) {}
+  ) {
+    super();
+  }
   ngOnInit() {
     this.anlassSummary$ = this.anlassService.getAnlassOrganisationSummary(
       this.anlass,
       this.authService.currentVerein
     );
+    this.starts$ = this.store.pipe(
+      select(
+        selectOalForKeys(this.authService.currentVerein.id, this.anlass.id)
+      )
+    );
 
-    this.anlassSummary$.subscribe((result) => {
-      this.anlassSummary = result;
-      this.anlassSummary.startendeK2 = result.startendeK2;
-    });
+    this.registerSubscription(
+      this.anlassSummary$.subscribe((result) => {
+        this.anlassSummary = result;
+        this.anlassSummary.startendeK2 = result.startendeK2;
+      })
+    );
+
+    this.registerSubscription(
+      this.starts$.subscribe((oalLinks) => {
+        if (oalLinks !== undefined && oalLinks.length > 0) {
+          this.orgAnlassLink = oalLinks[0];
+        }
+      })
+    );
   }
   isStartedCheckboxDisabled(): boolean {
     if (
@@ -50,11 +79,11 @@ export class AnlassStatistikComponent implements OnInit {
   }
 
   vereinStartedClicked(check: boolean) {
-    /*
+    console.log("VereinStartedClicked: ", check);
+    this.orgAnlassLink.startet = check;
     this.store.dispatch(
       OalActions.updateVereinsStartInvoked({ payload: this.orgAnlassLink })
     );
-    */
   }
 
   isTuAnlass(): boolean {

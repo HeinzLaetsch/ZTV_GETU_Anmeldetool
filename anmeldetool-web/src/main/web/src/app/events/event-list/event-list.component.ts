@@ -2,11 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { IAnlass } from "src/app/core/model/IAnlass";
-import {
-  selectAktiveAnlaesse,
-  selectAllAnlaesse,
-  selectAnlaesse,
-} from "src/app/core/redux/anlass";
+import { selectAktiveAnlaesse } from "src/app/core/redux/anlass";
 import { AppState } from "src/app/core/redux/core.state";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import { SubscriptionHelper } from "src/app/utils/subscription-helper";
@@ -20,7 +16,7 @@ export class EventListComponent extends SubscriptionHelper implements OnInit {
   anlaesse: IAnlass[];
   anlaesse$: Observable<IAnlass[]>;
   loaded = false;
-  subscription: Subscription[] = [];
+  // subscription: Subscription[] = [];
 
   constructor(
     public authService: AuthService,
@@ -51,7 +47,8 @@ export class EventListComponent extends SubscriptionHelper implements OnInit {
     console.log("received :", data);
   }
 
+  /*
   ngOnDestroy(): void {
     this.subscription.forEach((s) => s.unsubscribe());
-  }
+  }*/
 }
