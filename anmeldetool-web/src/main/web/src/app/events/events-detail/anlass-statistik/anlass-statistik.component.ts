@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
@@ -25,6 +25,9 @@ export class AnlassStatistikComponent
 {
   @Input()
   anlass: IAnlass;
+
+  @Output()
+  startetClicked = new EventEmitter();
 
   anlassSummary: IAnlassSummary;
   anlassSummary$: Observable<IAnlassSummary>;
@@ -80,10 +83,12 @@ export class AnlassStatistikComponent
 
   vereinStartedClicked(check: boolean) {
     console.log("VereinStartedClicked: ", check);
-    this.orgAnlassLink.startet = check;
+    const newOAL = JSON.parse(JSON.stringify(this.orgAnlassLink));
+    newOAL.startet = check;
     this.store.dispatch(
-      OalActions.updateVereinsStartInvoked({ payload: this.orgAnlassLink })
+      OalActions.updateVereinsStartInvoked({ payload: newOAL })
     );
+    this.startetClicked.emit(check);
   }
 
   isTuAnlass(): boolean {

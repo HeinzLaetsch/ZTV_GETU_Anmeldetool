@@ -4,7 +4,7 @@ import {
   ViewChild,
   ViewContainerRef,
 } from "@angular/core";
-import { NgClass, NgFor } from "@angular/common";
+import { NgFor } from "@angular/common";
 import { NgIf } from "@angular/common";
 import { ICellEditorAngularComp } from "ag-grid-angular";
 import { FormsModule } from "@angular/forms";
@@ -14,7 +14,7 @@ import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
 
 @Component({
   standalone: true,
-  imports: [NgClass, NgFor, NgIf, FormsModule, MaterialModule],
+  imports: [NgFor, NgIf, FormsModule, MaterialModule],
   template: `
     <div #container class="teilnahme-status">
       <!-- Kategorie -->

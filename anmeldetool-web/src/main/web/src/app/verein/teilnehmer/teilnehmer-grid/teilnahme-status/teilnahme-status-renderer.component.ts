@@ -11,7 +11,7 @@ import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
 @Component({
   standalone: true,
   imports: [NgIf],
-  template: `<div class="teilnahme-status">
+  template: `<div [class]="getClass()">
     <div class="teilnahme-status-kategorie">
       <span *ngIf="showKategorie(params.value)">
         {{ params.value.kategorie }}
@@ -31,6 +31,13 @@ import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
       .teilnahme-status {
         display: flex;
         outline: none;
+      }
+      .teilnahme-status-disabled {
+        display: flex;
+        outline: none;
+        opacity: 0.5;
+        cursor: not-allowed;
+        height: 100%;
       }
       .teilnahme-status-kategorie {
         min-width: 2em;
@@ -74,5 +81,13 @@ export class TeilnahmeStatusRenderer implements ICellRendererAngularComp {
       }
     }
     return false;
+  }
+
+  getClass() {
+    if (this.params.column.isCellEditable(this.params.node)) {
+      return "teilnahme-status";
+    } else {
+      return "teilnahme-status-disabled";
+    }
   }
 }

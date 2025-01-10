@@ -51,3 +51,10 @@ body {
 .abstand {
   margin-left: 10px;
 }
+
+.normal {
+  background-color: gray;
+}
+.blocked {
+  background-color: green;
+}

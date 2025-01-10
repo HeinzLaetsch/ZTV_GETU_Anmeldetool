@@ -49,7 +49,10 @@
   -->
 
   <hr />
-  <app-anlass-statistik [anlass]="anlass"></app-anlass-statistik>
+  <app-anlass-statistik
+    [anlass]="anlass"
+    (startetClicked)="startetClicked($event)"
+  ></app-anlass-statistik>
   <!-- neu Anlass Statistik
   <div class="row">
     <div class="col-12" *ngIf="orgAnlassLink">
@@ -170,6 +173,7 @@
 -->
 
   <app-wertungsrichter-selektion
+    *ngIf="vereinStartet"
     [anlass]="anlass"
   ></app-wertungsrichter-selektion>
 

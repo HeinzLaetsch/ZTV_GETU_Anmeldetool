@@ -1,28 +1,12 @@
-import {
-  CdkDragDrop,
-  moveItemInArray,
-  transferArrayItem,
-} from "@angular/cdk/drag-drop";
-import {
-  AfterViewInit,
-  Component,
-  Input,
-  OnInit,
-  ViewChild,
-} from "@angular/core";
-import { MatTabGroup } from "@angular/material/tabs";
+import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { select, Store } from "@ngrx/store";
 import * as moment from "moment";
 import { Observable } from "rxjs";
-import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IAnlassLink } from "src/app/core/model/IAnlassLink";
 import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
 import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
-import { IUser } from "src/app/core/model/IUser";
-import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterStatusEnum";
 import { selectAnlassById } from "src/app/core/redux/anlass";
 import { AppState } from "src/app/core/redux/core.state";
 import {
@@ -30,11 +14,7 @@ import {
   selectOalForKeys,
 } from "src/app/core/redux/organisation-anlass";
 import { AuthService } from "src/app/core/service/auth/auth.service";
-import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
-import { WertungsrichterService } from "src/app/core/service/wertungsrichter.service";
-import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
 import { SubscriptionHelper } from "src/app/utils/subscription-helper";
-import { AnlassService } from "src/app/core/service/anlass/anlass.service";
 
 @Component({
   selector: "app-events-detail",
@@ -63,9 +43,10 @@ export class EventsDetailComponent
   teilnahmenBrevet1: IAnlassLink[];
   teilnahmenBrevet2: IAnlassLink[];
 
+  vereinStartet = false;
+
   constructor(
     public authService: AuthService,
-    private anlassService: AnlassService,
     private store: Store<AppState>,
     private route: ActivatedRoute,
     private router: Router
@@ -291,5 +272,9 @@ export class EventsDetailComponent
 */
   handleClickMe(event: PointerEvent) {
     this.router.navigate(["anlass/anmeldungen/", this.anlass?.id]);
+  }
+
+  startetClicked(start: boolean) {
+    this.vereinStartet = start;
   }
 }

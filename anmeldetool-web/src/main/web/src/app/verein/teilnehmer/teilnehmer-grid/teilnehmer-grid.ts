@@ -42,6 +42,8 @@ import { TeilnehmerDialog } from "./teilnehmer-dialog/teilnehmer-dialog.componen
 import * as moment from "moment";
 import { MatSelectChange } from "@angular/material/select";
 import { SubscriptionHelper } from "src/app/utils/subscription-helper";
+import { AnlassService } from "src/app/core/service/anlass/anlass.service";
+import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
 
 @Component({
   selector: "app-teilnehmer-grid",
@@ -65,6 +67,7 @@ export class TeilnehmerGridComponent
 
   public rowData$!: Observable<ITeilnahmen[]>;
   public data: ITeilnahmen[];
+  private anlassSummaries = new Array<IAnlassSummary>();
   private gridApi!: GridApi<ITeilnahmen>;
 
   public ots$!: Observable<IOrganisationTeilnahmenStatistik[]>;
@@ -170,7 +173,8 @@ export class TeilnehmerGridComponent
   constructor(
     public dialog: MatDialog,
     private store: Store<AppState>,
-    private authService: AuthService
+    private authService: AuthService,
+    private anlassService: AnlassService
   ) {
     super();
     this.selectedJahr = moment(Date.now()).year();
@@ -197,6 +201,7 @@ export class TeilnehmerGridComponent
     return moment(anlass.endDatum).year();
   }
 
+  /*
   private getAvailableKategories(params: any): string[] {
     const kats = KategorieEnumFunction.valuesAndGreater(
       KategorieEnum.K1,
@@ -205,6 +210,7 @@ export class TeilnehmerGridComponent
     );
     return kats;
   }
+  */
   teilnehmerAttributeValueGetter(params: ValueGetterParams): string {
     const component: TeilnehmerGridComponent = params.context.this;
     const rowValue: ITeilnahmen = JSON.parse(JSON.stringify(params.data));
@@ -302,6 +308,7 @@ export class TeilnehmerGridComponent
       })
     );
     this.sortByNameAsc();
+    this.getSummaries();
   }
 
   private sortByNameAsc() {
@@ -343,6 +350,27 @@ export class TeilnehmerGridComponent
         this.jahresListe$ = of(anlaesse.map((anlass) => this.getYear(anlass)));
       })
     );
+  }
+
+  getSummaries() {
+    this.agGrid.api.getColumns().forEach((column) => {
+      // this.agGrid.api.getColumnState().forEach((state) => {
+      if (!column.getColId().startsWith("teil")) {
+        const index = +column.getColId();
+        if (this.alleAnlaesse[index].aktiv) {
+          const anlassSummary$ =
+            this.anlassService.getAnlassOrganisationSummary(
+              this.alleAnlaesse[index],
+              this.authService.currentVerein
+            );
+          this.registerSubscription(
+            anlassSummary$.subscribe((anlassSummary) => {
+              this.anlassSummaries.push(anlassSummary);
+            })
+          );
+        }
+      }
+    });
   }
 
   refreshAnlaesse() {
@@ -519,6 +547,20 @@ export class TeilnehmerGridComponent
     //return this.authService.isAdministrator();
   }
   isEditable(params: any, anlass: IAnlass): boolean {
+    // check auf startet
+    if (this.anlassSummaries && this.anlassSummaries.length > 0) {
+      const summary = this.anlassSummaries.find((summary) => {
+        if (summary.anlassId === anlass.id) {
+          return true;
+        }
+      });
+      if (!summary || !summary.startet) {
+        return false;
+      }
+    } else {
+      return false;
+    }
+
     if (
       !(
         (anlass.tiAnlass &&
