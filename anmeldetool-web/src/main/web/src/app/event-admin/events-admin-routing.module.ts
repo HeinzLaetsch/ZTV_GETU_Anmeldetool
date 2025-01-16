@@ -3,7 +3,21 @@ import { RouterModule, Routes } from "@angular/router";
 import { EventRouteActivatorService } from "../events";
 import { EventAdminComponent } from "./index";
 
-const routes: Routes = [
+export const EventAdminRoutes: Routes = [
+  {
+    path: "",
+    component: EventAdminComponent,
+  },
+  {
+    path: ":id",
+    component: EventAdminComponent,
+  },
+  {
+    path: "admin",
+    component: EventAdminComponent,
+    canActivate: [EventRouteActivatorService],
+    data: { roles: ["SEKRETARIAT"] },
+  },
   {
     path: ":id/admin",
     component: EventAdminComponent,
@@ -12,8 +26,11 @@ const routes: Routes = [
   },
 ];
 
+/*
+
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
 export class EventsAdminRoutingModule {}
+*/

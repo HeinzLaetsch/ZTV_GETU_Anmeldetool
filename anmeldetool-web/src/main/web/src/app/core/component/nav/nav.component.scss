@@ -47,12 +47,12 @@
 .dropdown-item {
   display: flex;
   font-weight: 400;
+  font-size: 12px;
   flex-direction: row;
   align-items: center;
   box-sizing: border-box;
-  padding: 0 16px;
+  padding: 0 4px;
   position: relative;
-  height: 48px;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   width: 100%;
 }
@@ -67,4 +67,6 @@ div.dropdown-item.active:hover {
 
 .dropdown-item button {
   font-weight: 400 !important;
+  font-size: 10px;
+  line-height: 20px;
 }

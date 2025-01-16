@@ -227,7 +227,7 @@ public class TeilnahmenService {
 			}, () -> {
 				int startNummer = teilnehmerAnlassLinkSrv.findMaxStartNummer();
 				talNeu.setStartnummer(startNummer);
-				teilnehmerAnlassLinkSrv.save(talNeu);
+				saveAndSetAktivTal(talNeu);
 			});
 		});
 		List<TeilnehmerAnlassLink> tals = teilnehmerAnlassLinkSrv.findTeilnehmerAnlassLinkByTeilnehmer(teilnehmer);
@@ -244,7 +244,17 @@ public class TeilnahmenService {
 		return teilnahmenDto;
 	}
 
+	private void saveAndSetAktivTal(TeilnehmerAnlassLink tal) {
+		if (KategorieEnum.KEIN_START.equals(tal.getKategorie())) {
+			tal.setAktiv(false);
+		} else {
+			tal.setAktiv(true);
+		}
+		teilnehmerAnlassLinkSrv.save(tal);
+	}
+
 	private void mergeTeilnehmerAnlassLink(TeilnehmerAnlassLink persisted, TeilnehmerAnlassLink talNeu) {
+		// TODO check if this is handled correct
 		/*
 		 * persisted.setAktiv(talNeu.isAktiv());
 		 * persisted.setDeleted(talNeu.isDeleted());
@@ -261,7 +271,6 @@ public class TeilnahmenService {
 		} else {
 			persisted.setMeldeStatus(talNeu.getMeldeStatus());
 		}
-
-		teilnehmerAnlassLinkSrv.save(persisted);
+		saveAndSetAktivTal(persisted);
 	}
 }

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { ActivatedRoute, Router } from "@angular/router";
-import { Subject } from "rxjs";
+import { ActivatedRoute } from "@angular/router";
+import { Observable, Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { AbteilungEnum } from "src/app/core/model/AbteilungEnum";
 import { AnlageEnum } from "src/app/core/model/AnlageEnum";
@@ -9,17 +9,22 @@ import { IAnlass } from "src/app/core/model/IAnlass";
 import { ITeilnahmeStatistic } from "src/app/core/model/ITeilnahmeStatistic";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { AuthService } from "src/app/core/service/auth/auth.service";
-import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
 import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.service";
 import { ContestUpload } from "./contest-upload-dialog/contest-upload.component";
 import { Upload } from "./upload-dialog/upload.component";
+import { select, Store } from "@ngrx/store";
+import { AppState } from "../core/redux/core.state";
+import { SubscriptionHelper } from "../utils/subscription-helper";
+import { selectAnlassById } from "../core/redux/anlass";
+import { AnlassService } from "../core/service/anlass/anlass.service";
 
 @Component({
   selector: "app-event-admin",
   templateUrl: "./event-admin.component.html",
   styleUrls: ["./event-admin.component.css"],
 })
-export class EventAdminComponent implements OnInit {
+export class EventAdminComponent extends SubscriptionHelper implements OnInit {
+  anlass$: Observable<IAnlass>;
   anlass: IAnlass;
 
   private readonly lauflistenPDF$: Subject<void> = new Subject();
@@ -45,37 +50,44 @@ export class EventAdminComponent implements OnInit {
   loaded$: Subject<boolean>;
 
   constructor(
-    private router: Router,
     public dialog: MatDialog,
     private route: ActivatedRoute,
     public authService: AuthService,
-    private anlassService: CachingAnlassService,
+    private store: Store<AppState>,
+
+    private anlassService: AnlassService,
     private ranglistenService: RanglistenService
   ) {
+    super();
     this.loaded$ = new Subject();
   }
 
   ngOnInit() {
     const anlassId: string = this.route.snapshot.params.id;
     // console.log("url param: ", anlassId);
-    this.anlass = this.anlassService.getAnlassById(anlassId);
-    if (this.anlass.alleAnlass) {
-      this.hideOnlyTi = true;
-    }
-    this.kategorien = this.anlass.getKategorienRaw();
-    this.anlassService
-      .getTeilnahmeStatistic(
-        this.anlass,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined
-      )
-      .subscribe((statistic) => {
-        this.teilnahmeStatistic = statistic;
-        this.loaded$.next(true);
-      });
+    this.anlass$ = this.store.pipe(select(selectAnlassById(anlassId)));
+    this.registerSubscription(
+      this.anlass$.subscribe((data) => {
+        this.anlass = data;
+        if (this.anlass.alleAnlass) {
+          this.hideOnlyTi = true;
+        }
+        this.kategorien = this.anlass.getKategorienRaw();
+        this.anlassService
+          .getTeilnahmeStatistic(
+            this.anlass,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined
+          )
+          .subscribe((statistic) => {
+            this.teilnahmeStatistic = statistic;
+            this.loaded$.next(true);
+          });
+      })
+    );
   }
 
   get administrator(): boolean {

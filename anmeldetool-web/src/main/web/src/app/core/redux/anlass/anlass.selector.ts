@@ -34,6 +34,12 @@ export const selectAnlaesse = () =>
   createSelector(selectAllAnlaesse, (anlaesse) => {
     return anlaesse;
   });
+export const selectAnlaesseSortedNew = () =>
+  createSelector(selectAllAnlaesse, (anlaesse) => {
+    return [...anlaesse.values()].sort(
+      (a1, a2) => moment(a2.endDatum).valueOf() - moment(a1.endDatum).valueOf()
+    );
+  });
 export const selectAllAnlaesseTiTu = (tiTu: TiTuEnum) =>
   createSelector(selectAllAnlaesse, (anlaesse) =>
     anlaesse.filter((anlass) => {

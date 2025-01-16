@@ -179,6 +179,7 @@ public class TeilnehmerAnlassLinkService {
 					String.format("Could not find Anlass with id: %s", anlassId.toString()));
 		}
 		List<TeilnehmerAnlassLink> tals = null;
+		// TODO check wieso !
 		if (AbteilungEnum.UNDEFINED.equals(abteilung)) {
 			tals = this.teilnehmerAnlassLinkRepository.findByAnlass(anlass, kategorie, null, null, null);
 			tals = tals.stream().filter(tal -> {

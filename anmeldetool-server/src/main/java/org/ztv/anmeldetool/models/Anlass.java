@@ -66,6 +66,8 @@ public class Anlass extends Base {
 
 	private boolean published;
 
+	private boolean publishedSent;
+
 	private boolean reminderMeldeschlussSent;
 
 	@Enumerated(EnumType.STRING)

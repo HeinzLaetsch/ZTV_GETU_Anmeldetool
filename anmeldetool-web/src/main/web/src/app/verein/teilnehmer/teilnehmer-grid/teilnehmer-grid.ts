@@ -372,7 +372,6 @@ export class TeilnehmerGridComponent
       }
     });
   }
-
   refreshAnlaesse() {
     var columnId = 0;
     this.alleAnlaesse.forEach((anlass) => {
@@ -387,7 +386,9 @@ export class TeilnehmerGridComponent
         },
         cellRenderer: TeilnahmeStatusRenderer,
         cellEditor: TeilnahmeStatusEditor,
-        tooltipValueGetter: (p: ITooltipParams) => "Doppelklicken um zu ändern",
+        tooltipValueGetter: function (params) {
+          return params.context.this.getKategorieTooltip(params, anlass);
+        },
         comparator: this.talComparator,
         cellEditorPopup: false,
         cellEditorParams: function (params) {
@@ -402,6 +403,13 @@ export class TeilnehmerGridComponent
     });
   }
 
+  getKategorieTooltip(params: any, anlass: IAnlass): string {
+    const component: TeilnehmerGridComponent = params.context.this;
+    //if (component.isEditable(params, anlass)) {
+    return "Doppelklicken um zu ändern";
+    //}
+    //return "Dein Verein startet nicht! Kein Ändern möglich";
+  }
   private showAnlass(anlass: IAnlass): boolean {
     const asMoment = moment(anlass.endDatum);
     if (!this.showOldAnlaesse) {
@@ -544,8 +552,9 @@ export class TeilnehmerGridComponent
 
   isAdmin(params: any): boolean {
     return true;
-    //return this.authService.isAdministrator();
+    //return this.authService.isAdministrat or();
   }
+
   isEditable(params: any, anlass: IAnlass): boolean {
     // check auf startet
     if (this.anlassSummaries && this.anlassSummaries.length > 0) {

@@ -12,7 +12,7 @@ const routes: Routes = [
     // canActivate: [AuthRouteActivatorService],
   },
   {
-    path: "anlaesse-admin",
+    path: "admin",
     loadChildren: () =>
       import("./event-admin/events-admin.module").then(
         (m) => m.EventsAdminModule

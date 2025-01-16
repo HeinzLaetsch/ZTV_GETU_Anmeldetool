@@ -34,17 +34,24 @@
           >
             <button
               mat-button
-              class="mainNav"
-              routerLink="['/anlass', anlass.id, 'admin']"
+              class="mainNav small-text"
+              [routerLink]="['/admin', anlass.id, 'admin']"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
               disableRipple
             >
-              {{ anlass.getCleaned() }} - {{ anlass.organisator }}
+              <div *ngIf="getOrganisator(anlass) | async; let org">
+                {{ anlass.getCleaned() }} - {{ org.name }}
+              </div>
             </button>
           </div>
         </mat-menu>
       </mat-list-item>
 
       <!--mat-list-item routerLink="/anlaesse-admin" routerLinkActive="active">
+
+routerLink="['/anlaesse-admin', 123, 'admin']"
+
         <button mat-button class="mainNav" disableRipple>
           Anlässe verwalten
         </button>
@@ -53,7 +60,7 @@
             <button
               mat-button
               class="mainNav"
-              routerLink="/anlaesse-admin/1"
+              routerLink="/anlaesse-admin/anlass.id"
               disableRipple
             >
               Anlass 1
@@ -65,7 +72,11 @@
         <button mat-button class="mainNav" disableRipple>Teilnehmer</button>
       </mat-list-item>
 
-      <mat-list-item routerLink="/rechnungsbuero" routerLinkActive="active">
+      <mat-list-item
+        *ngIf="authService.isAdministrator() || authService.isRechnungsbuero()"
+        routerLink="/rechnungsbuero"
+        routerLinkActive="active"
+      >
         <button mat-button class="mainNav" disableRipple>Rechnungsbüro</button>
 
         <mat-menu #rechnungsbuero="matMenu">
@@ -78,6 +89,33 @@
             >
               Daten Importieren
             </button>
+          </div>
+        </mat-menu>
+      </mat-list-item>
+      <mat-list-item
+        class="task-add-btn"
+        *ngIf="authService.isAdministrator()"
+        data-cy="admin-funcs-nav-btn"
+      >
+        <button
+          mat-button
+          class="mainNav"
+          disableRipple
+          [matMenuTriggerFor]="menu"
+        >
+          Verein auswählen ({{ authService.currentVerein.name }})
+          <mat-icon class="material-icons-outlined arrow-icon">
+            arrow_drop_down
+          </mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <div
+            *ngFor="let verein of vereine"
+            class="dropdown-item"
+            data-cy="data-import-nav-btn"
+            (click)="setVerein(verein)"
+          >
+            {{ verein.name }}
           </div>
         </mat-menu>
       </mat-list-item>

@@ -11,7 +11,7 @@ export class IAnlass {
   anlassBezeichnung: string;
   ort: string;
   halle: string;
-  organisator?: string;
+  organisator_?: string;
   organisatorId: string;
   iban: string;
   zuGunsten: string;
@@ -49,7 +49,12 @@ export class IAnlass {
       return this.anlassBezeichnung.split("%")[1];
     }
   }
-
+  set organisator(organisator: string) {
+    this.organisator_ = organisator;
+  }
+  get organisator(): string {
+    return this.organisator_;
+  }
   set startDatum(startDatum: Date) {
     if (!(startDatum instanceof Date)) {
       startDatum = new Date(startDatum);

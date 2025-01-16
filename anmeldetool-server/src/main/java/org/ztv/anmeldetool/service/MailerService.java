@@ -76,4 +76,21 @@ public class MailerService {
 		return templateModel;
 	}
 
+	public Map<String, Object> getPublishedDaten(AnmeldeKontrolleDTO anlassKontrolle, String subject,
+			Organisation org) {
+
+		// AnmeldeKontrolleDTO anmeldeKontrolle =
+		// anlassSrv.getAnmeldeKontrolle(anlass.getId(), organisation.getId());
+
+		Map<String, Object> templateModel = new HashMap();
+
+		String anlassName = anlassKontrolle.getDetailAnlassName();
+		templateModel.put("vereinsname", org.getName());
+
+		templateModel.put("titel", subject + " für : " + anlassName);
+		templateModel.put("subject", subject + " für : " + anlassName);
+
+		return templateModel;
+	}
+
 }

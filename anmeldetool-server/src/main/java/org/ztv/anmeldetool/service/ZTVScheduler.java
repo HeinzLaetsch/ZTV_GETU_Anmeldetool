@@ -49,6 +49,9 @@ public class ZTVScheduler {
 	@Autowired
 	OrganisationAnlassLinkRepository oalRepo;
 
+	@Value("${spring.mail.simulate}")
+	private boolean simulate;
+
 	@Value("${spring.mail.username}")
 	private String sender;
 
@@ -124,13 +127,53 @@ public class ZTVScheduler {
 		sendMutationMailIfNeeded(filteredAnlaesse, "Mutationsschluss", "Mutationen möglich bis");
 	}
 
+	@Transactional(value = TxType.REQUIRES_NEW)
+	@Scheduled(cron = "${scheduler.published.cron}")
+	public void publishedCheck() {
+		log.debug("Published check fired");
+
+		List<Anlass> anlaesse = anlassSrv.getAnlaesse(true);
+
+		List<Anlass> filteredAnlaesse = anlaesse.stream().filter(anlass -> {
+			boolean erfassenOffen = anlass.getAnmeldungBeginn().isBefore(LocalDateTime.now());
+			boolean published = anlass.isPublished();
+			boolean publishedSent = anlass.isPublishedSent();
+			return erfassenOffen && published && !publishedSent;
+		}).collect(Collectors.toList());
+
+		sendPublishedMailIfNeeded(filteredAnlaesse, "Neue Wettkampf Anmeldung möglich", "Anmeldung möglich bis");
+	}
+
+	private void sendPublishedMailIfNeeded(List<Anlass> filteredAnlaesse, String subject, String datumText) {
+		log.info("sendPublishedMailIfNeeded Anzahl: {},  Wettkampf {}", filteredAnlaesse.size(), datumText);
+		filteredAnlaesse.forEach(anlass -> {
+			AtomicBoolean allreadySent = new AtomicBoolean(false);
+			if (!anlass.isPublishedSent()) {
+				List<Organisation> allZHOrgs = orgSrv.getAllZuercherOrganisationen();
+				allZHOrgs.forEach(org -> {
+					if (!simulate || (simulate && !allreadySent.get())) {
+						sendMailToOrg(anlass, org, subject, anlass.getErfassenGeschlossen(), datumText, false);
+						allreadySent.set(true);
+					}
+				});
+				anlass.setPublishedSent(true);
+				anlassSrv.save(anlass);
+			}
+		});
+
+	}
+
 	private void sendReminderMailIfNeeded(List<Anlass> filteredAnlaesse, String subject, String datumText) {
 		log.info("sendReminderMailIfNeeded Anzahl: {},  Wettkampf {}", filteredAnlaesse.size(), datumText);
+		AtomicBoolean allreadySent = new AtomicBoolean(false);
 		filteredAnlaesse.forEach(anlass -> {
 			if (!anlass.isReminderMeldeschlussSent()) {
 				List<Organisation> allZHOrgs = orgSrv.getAllZuercherOrganisationen();
 				allZHOrgs.forEach(org -> {
-					sendMailToOrg(anlass, org, subject, anlass.getErfassenGeschlossen(), datumText);
+					if (!simulate || (simulate && !allreadySent.get())) {
+						sendMailToOrg(anlass, org, subject, anlass.getErfassenGeschlossen(), datumText, true);
+						allreadySent.set(true);
+					}
 				});
 				anlass.setReminderMeldeschlussSent(true);
 				anlassSrv.save(anlass);
@@ -140,7 +183,7 @@ public class ZTVScheduler {
 	}
 
 	private boolean sendMailToOrg(Anlass anlass, Organisation org, String subject, LocalDateTime datum,
-			String datumText) {
+			String datumText, boolean kontrollMail) {
 		Stream<OrganisationPersonLink> oplStream = org.getPersonenLinks().stream().filter(pl -> {
 			return pl.getRollenLink().stream().filter(rolle -> {
 				log.debug("Name : {}", pl.getPerson().getBenutzername());
@@ -152,9 +195,15 @@ public class ZTVScheduler {
 		oplStream.forEach(opl -> {
 			// Person person =
 			// this.personSrv.findPersonByBenutzername("heinz.laetsch@gmx.ch");
-			log.debug("Sende Mail an: {} / {}", opl.getOrganisation().getName(), opl.getPerson().getEmail());
-			if (!sendAnmeldeKontrolleMail(anlass, org, opl.getPerson(), subject, datum, datumText)) {
-				error.set(true);
+			if (kontrollMail) {
+				log.debug("Sende Mail an: {} / {}", opl.getOrganisation().getName(), opl.getPerson().getEmail());
+				if (!sendAnmeldeKontrolleMail(anlass, org, opl.getPerson(), subject, datum, datumText)) {
+					error.set(true);
+				}
+			} else {
+				if (!sendPublishedMail(anlass, org, opl.getPerson(), subject, datum, datumText)) {
+					error.set(true);
+				}
 			}
 		});
 		return error.get();
@@ -166,7 +215,8 @@ public class ZTVScheduler {
 			anlass.getOrganisationenLinks().forEach(oal -> {
 				Organisation org = oal.getOrganisation();
 				if (oal.isAktiv() && !oal.isAnmeldeKontrolleSent()) {
-					boolean error = sendMailToOrg(anlass, org, subject, anlass.getErfassenGeschlossen(), datumText);
+					boolean error = sendMailToOrg(anlass, org, subject, anlass.getErfassenGeschlossen(), datumText,
+							true);
 					if (!error) {
 						oal.setAnmeldeKontrolleSent(true);
 						oalRepo.save(oal);
@@ -183,7 +233,7 @@ public class ZTVScheduler {
 				Organisation org = oal.getOrganisation();
 				if (oal.isAktiv() && !oal.isReminderMutationsschlussSent()) {
 					boolean error = sendMailToOrg(anlass, org, subject, anlass.getAenderungenInKategorieGeschlossen(),
-							datumText);
+							datumText, true);
 					if (!error) {
 						oal.setReminderMutationsschlussSent(true);
 						oalRepo.save(oal);
@@ -191,6 +241,23 @@ public class ZTVScheduler {
 				}
 			});
 		});
+	}
+
+	private boolean sendPublishedMail(Anlass anlass, Organisation org, Person person, String subject,
+			LocalDateTime datum, String datumText) {
+		AnmeldeKontrolleDTO anmeldeKontrolle = anlassSrv.getAnmeldeKontrolle(anlass.getId(), org.getId());
+		Map<String, Object> templateModel = mailerService.getPublishedDaten(anmeldeKontrolle, subject, org);
+
+		// Map<String, Object> templateModel = new HashMap();
+		templateModel.put("recipientName", person.getEmail());
+		templateModel.put("text", "AnmeldeKontrolle Daten");
+		templateModel.put("senderName", sender);
+		DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+		templateModel.put("datum", datum.format(formatters));
+		templateModel.put("datumText", datumText);
+
+		this.mailService.sendMessage(person, templateModel.get("subject").toString(), "published.html", templateModel);
+		return true;
 	}
 
 	private boolean sendAnmeldeKontrolleMail(Anlass anlass, Organisation org, Person person, String subject,

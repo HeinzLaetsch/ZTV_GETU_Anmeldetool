@@ -8,7 +8,10 @@ export const teilnahmenAdapter: EntityAdapter<ITeilnahmen> =
   });
 
 export function sortByTeilnehmer(a: ITeilnahmen, b: ITeilnahmen): any {
-  return a.teilnehmer.name.localeCompare(b.teilnehmer.name);
+  if (a.teilnehmer.name) {
+    return a.teilnehmer.name.localeCompare(b.teilnehmer.name);
+  }
+  return "".localeCompare(b.teilnehmer.name);
 }
 
 export interface TeilnahmenState extends EntityState<ITeilnahmen> {}
