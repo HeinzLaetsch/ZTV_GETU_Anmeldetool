@@ -6,7 +6,7 @@
         [readOnly]="
           !(isOwner() || isVereinsAnmelder || isVereinsVerantwortlicher)
         "
-        [(user)]="user"
+        [(user)]="currentUser"
         [showPassword]="isOwner()"
         [showBenutzername]="true"
         [mustShowPassword]="false"
@@ -15,7 +15,7 @@
     </div>
     <div class="col-6">
       <app-role
-        [currentUser]="user"
+        [currentUser]="currentUser"
         [isVereinsAnmelder]="isVereinsAnmelder"
         [isVereinsVerantwortlicher]="isVereinsVerantwortlicher"
         [(assignedRoles)]="assignedRoles"
@@ -31,7 +31,7 @@
       </app-wertungsrichter>
     </div>
   </div>
-  <div class="row">
+  <!--div class="row">
     <div class="col-9"></div>
     <div class="col-2">
       <button mat-button (click)="cancel()">Abbrechen</button>
@@ -44,5 +44,5 @@
         Speichern
       </button>
     </div>
-  </div>
+  </div-->
 </div>

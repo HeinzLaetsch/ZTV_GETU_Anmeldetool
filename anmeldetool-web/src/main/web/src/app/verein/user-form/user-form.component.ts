@@ -7,6 +7,8 @@ import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingRoleService } from "src/app/core/service/caching-services/caching.role.service";
 import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
 import { IChangeEvent } from "../profile/IChangeEvent";
+import { Store } from "@ngrx/store";
+import { AppState } from "src/app/core/redux/core.state";
 
 @Component({
   selector: "app-user-form",
@@ -15,6 +17,7 @@ import { IChangeEvent } from "../profile/IChangeEvent";
 })
 export class UserFormComponent implements OnInit {
   @Input()
+  //user: IUser;
   currentUser: IUser;
   @Input()
   tabIndex: number;
@@ -91,7 +94,7 @@ export class UserFormComponent implements OnInit {
   }
   private reloadRoles(user: IUser) {
     let localSubscription2: Subscription = undefined;
-    if (user.id && user.id.length > 0) {
+    if (user && user.id && user.id.length > 0) {
       // console.log("user.id is valid");
       localSubscription2 = this.roleService
         .getRolesForUser(user)
@@ -139,9 +142,9 @@ export class UserFormComponent implements OnInit {
     }
     return false;
   }
-  private updateChangeEvent() {
-    this.changeEvent.canceled = false;
-    this.changeEvent.saved = false;
+  private updateChangeEvent(saved: boolean, canceled: boolean) {
+    this.changeEvent.canceled = canceled;
+    this.changeEvent.saved = saved;
     this.userChange.next(this.changeEvent);
   }
   get userHasChanged(): boolean {
@@ -157,7 +160,8 @@ export class UserFormComponent implements OnInit {
   set wertungsrichter(value: IWertungsrichter) {
     this.changeEvent.wrChanged = true;
     this._wertungsrichter = value;
-    this.updateChangeEvent();
+    // this.updateChangeEvent(false, false);
+    this.checkWrChanged();
   }
   get isVereinsAnmelder() {
     if (this.authService.isAdministrator()) {
@@ -184,14 +188,33 @@ export class UserFormComponent implements OnInit {
       this.changeEvent.wrChanged = true;
     }
     this.changeEvent.hasWr = this.isWertungsrichter();
-    this.updateChangeEvent();
+    this.updateChangeEvent(false, false);
+    this.saveRolesChanged();
+    this.checkWrChanged();
   }
+
+  saveRolesChanged() {
+    this.userService
+      .updateRoles(
+        this.currentUser,
+        this.authService.currentVerein,
+        this.assignedRoles
+      )
+      .subscribe((user) => {
+        this.currentUser = user;
+        this.reloadRoles(this.currentUser);
+        this.updateChangeEvent(true, false);
+        this.changeEvent.rolesChanged = false;
+      });
+  }
+  /*
 
   get user(): IUser {
     // console.log('Get user: ', this.currentUser);
     // return this.deepCopy(this.currentUser);
-    return this.currentUser;
+    return JSON.parse(JSON.stringify(this.currentUser));
   }
+
   set user(value: IUser) {
     if (this._localPassword) {
       this.currentUser = value;
@@ -203,6 +226,8 @@ export class UserFormComponent implements OnInit {
       this.updateChangeEvent();
     }
   }
+*/
+  /*
   private deepCopy<T>(source: T): T {
     return Array.isArray(source)
       ? source.map((item) => this.deepCopy(item))
@@ -220,10 +245,13 @@ export class UserFormComponent implements OnInit {
         }, Object.create(Object.getPrototypeOf(source)))
       : (source as T);
   }
+  */
   updateUserValid(valid: boolean) {
     this.changeEvent.userValid = valid;
     // console.log("Valid changed: ", this.currentUser , ', ', valid);
   }
+
+  /* Ignore for now
 
   cancel() {
     this.currentUser = this.userService.getUserById(this.currentUser?.id);
@@ -289,17 +317,19 @@ export class UserFormComponent implements OnInit {
       this.userChange.next(this.changeEvent);
     }
   }
+  */
 
   checkWrChanged(): void {
     if (this.changeEvent.wrChanged) {
       if (this.changeEvent.hasWr) {
-        this._wertungsrichter.personId = this.currentUser.id;
+        const newWR = JSON.parse(JSON.stringify(this._wertungsrichter));
+        newWR.personId = this.currentUser.id;
         this.userService
-          .updateWertungsrichter(this.currentUser.id, this._wertungsrichter)
+          .updateWertungsrichter(this.currentUser.id, newWR)
           .subscribe((value) => {
-            this._wertungsrichter = value;
+            // created returns no Object just URL this._wertungsrichter = value;
             this.changeEvent.wrChanged = false;
-            this.userChange.next(this.changeEvent);
+            //this.userChange.next(this.changeEvent);
           });
       } else {
         this.userService
@@ -307,7 +337,7 @@ export class UserFormComponent implements OnInit {
           .subscribe((value) => {
             this._wertungsrichter = this.getEmptyWertungsrichter();
             this.changeEvent.wrChanged = false;
-            this.userChange.next(this.changeEvent);
+            //this.userChange.next(this.changeEvent);
           });
       }
     }

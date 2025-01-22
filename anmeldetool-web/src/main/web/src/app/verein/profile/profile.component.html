@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid" *ngIf="user$ | async; else loading">
   <div class="row">
     <div class="col-12">
       <h1 class="label">Vereinsadministration {{ verein.name }}</h1>
@@ -7,14 +7,14 @@
   <div class="row">
     <div class="col-12">
       <mat-tab-group mat-align-tabs="start" #tabs>
-        <mat-tab *ngFor="let user of vereinsUsers; index as i">
+        <mat-tab *ngFor="let user of vereinsUser; index as i">
           <ng-template mat-tab-label>
             <span [ngClass]="{ unsafed: hasUnsafedWork(i) }">{{
               getTabName(user.benutzername, i)
             }}</span>
           </ng-template>
           <app-user-form
-            [currentUser]="user"
+            [currentUser]="getUserCopy(user)"
             [tabIndex]="i"
             (userChange)="userChange($event)"
           ></app-user-form>
@@ -34,3 +34,4 @@
 >
   Neu
 </button>
+<ng-template #loading>Loading...</ng-template>

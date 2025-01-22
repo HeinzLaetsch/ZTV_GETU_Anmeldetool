@@ -44,6 +44,7 @@ import { MatSelectChange } from "@angular/material/select";
 import { SubscriptionHelper } from "src/app/utils/subscription-helper";
 import { AnlassService } from "src/app/core/service/anlass/anlass.service";
 import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
+import { TeilnehmerGridHelpComponent } from "./teilnehmer-grid-help/teilnehmer-grid-help.component";
 
 @Component({
   selector: "app-teilnehmer-grid",
@@ -201,7 +202,6 @@ export class TeilnehmerGridComponent
     return moment(anlass.endDatum).year();
   }
 
-  /*
   private getAvailableKategories(params: any): string[] {
     const kats = KategorieEnumFunction.valuesAndGreater(
       KategorieEnum.K1,
@@ -210,7 +210,6 @@ export class TeilnehmerGridComponent
     );
     return kats;
   }
-  */
   teilnehmerAttributeValueGetter(params: ValueGetterParams): string {
     const component: TeilnehmerGridComponent = params.context.this;
     const rowValue: ITeilnahmen = JSON.parse(JSON.stringify(params.data));
@@ -628,6 +627,9 @@ export class TeilnehmerGridComponent
     kategories: KategorieEnum[],
     ots: IOrganisationTeilnahmenStatistik
   ): any {
+    if (!ots || !ots.kategorieStati) {
+      return false;
+    }
     var retValue = false;
     for (const kategorie of kategories) {
       const kats = ots.kategorieStati.find(
@@ -809,6 +811,10 @@ export class TeilnehmerGridComponent
         }
       })
     );
+  }
+  openTeilnehmerGridHelp() {
+    console.log("openTeilnehmerGridHelp");
+    const dialogRef = this.dialog.open(TeilnehmerGridHelpComponent);
   }
 }
 

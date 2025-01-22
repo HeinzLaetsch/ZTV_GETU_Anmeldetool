@@ -42,6 +42,7 @@
 <div>
   <button
     mat-fab
+    class="mat-fab-pos1"
     color="primary"
     #tooltip="matTooltip"
     matTooltip="Neue TurnerIn anlegen"
@@ -50,6 +51,20 @@
     (click)="addRow($event)"
   >
     Neu
+  </button>
+</div>
+<div>
+  <button
+    mat-fab
+    class="mat-fab-pos2"
+    color="primary"
+    #tooltip="matTooltip"
+    matTooltip="Hilfe"
+    matTooltipPosition="below"
+    matTooltipHideDelay="500"
+    (click)="openTeilnehmerGridHelp()"
+  >
+    Hilfe
   </button>
 </div>
 <!-- AG Grid Angular Component -->

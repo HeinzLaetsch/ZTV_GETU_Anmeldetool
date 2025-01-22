@@ -18,7 +18,7 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   getUser(): Observable<IUser[]> {
-    // console.log("getUser called");
+    console.log("getUser called");
     return this.http
       .get<IUser[]>(this.url)
       .pipe(catchError(this.handleError<IUser[]>("getUser", [])));
@@ -27,7 +27,7 @@ export class UserService {
     // console.log("getUser called");
     return this.http
       .get<IUser>(this.url + "/benutzernamen/" + benutzername)
-      .pipe(catchError(this.handleError<IUser>("getUserByBenutzername")));
+      .pipe(catchError(this.handleError<any>("getUserByBenutzername")));
   }
 
   /*
@@ -73,7 +73,7 @@ export class UserService {
   updateWertungsrichter(
     id: string,
     wertungsrichter: IWertungsrichter
-  ): Observable<IWertungsrichter> {
+  ): Observable<any> {
     return this.http
       .put<IWertungsrichter>(
         this.url + "/" + id + "/wertungsrichter",

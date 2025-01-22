@@ -57,6 +57,7 @@ export class AnlassStatistikComponent
       this.anlassSummary$.subscribe((result) => {
         this.anlassSummary = result;
         this.anlassSummary.startendeK2 = result.startendeK2;
+        this.startetClicked.emit(this.anlassSummary.startet);
       })
     );
 

@@ -12,6 +12,10 @@ import { UserRoutes } from "./user.routes";
 import { CommonModule } from "@angular/common";
 import { MaterialModule } from "../shared/material-module";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { userFeature } from "../core/redux/user/user.reducer";
+import { StoreModule } from "@ngrx/store";
+import { EffectsModule } from "@ngrx/effects";
+import { UserEffects } from "../core/redux/user";
 
 @NgModule({
   declarations: [
@@ -30,6 +34,8 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
     ReactiveFormsModule,
     MaterialModule,
     RouterModule.forChild(UserRoutes),
+    StoreModule.forFeature(userFeature),
+    EffectsModule.forFeature([UserEffects]),
   ],
   providers: [],
 })

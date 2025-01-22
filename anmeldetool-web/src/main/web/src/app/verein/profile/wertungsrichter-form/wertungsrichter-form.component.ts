@@ -84,7 +84,9 @@ export class WertungsrichterFormComponent implements OnInit, OnChanges {
     for (const propName in changes) {
       if (changes.wertungsrichter) {
         this.wertungsrichter = changes.wertungsrichter.currentValue;
-        this.setValues();
+        if (this.wertungsrichter) {
+          this.setValues();
+        }
       }
     }
   }

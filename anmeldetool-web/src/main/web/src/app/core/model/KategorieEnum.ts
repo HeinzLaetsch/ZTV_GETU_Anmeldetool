@@ -60,25 +60,25 @@ export namespace KategorieEnumFunction {
         if (!((startBr1 && (endBr1 || endBr2)) || (startBr2 && endBr2))) {
           return false;
         }
-        if (TiTuEnum.equals(TiTuEnum.Ti, titu)) {
-          switch (kategorie) {
-            case "K5":
-              return false;
-            case "KH":
-              return false;
-          }
-        } else {
-          switch (kategorie) {
-            case "K5A":
-              return false;
-            case "K5B":
-              return false;
-            case "KD":
-              return false;
-          }
-        }
-        return true;
       }
+      if (TiTuEnum.equals(TiTuEnum.Ti, titu)) {
+        switch (kategorie) {
+          case "K5":
+            return false;
+          case "KH":
+            return false;
+        }
+      } else {
+        switch (kategorie) {
+          case "K5A":
+            return false;
+          case "K5B":
+            return false;
+          case "KD":
+            return false;
+        }
+      }
+      return true;
     });
   }
 
