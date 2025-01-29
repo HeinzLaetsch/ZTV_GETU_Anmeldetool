@@ -26,7 +26,7 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
   user$: Observable<IUser[]>;
   dirty$: Observable<IUser[]>;
   currentUser: IUser;
-  vereinsUsers: IUser[];
+  vereinsUsers: IUser[] = [];
   dirtyUsers: IUser[];
   _changeEvents: IChangeEvent[];
 
@@ -49,23 +49,14 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
     this.registerSubscription(
       this.user$.subscribe((users) => {
         if (users.length > 0) {
-          if (this.vereinsUsers) {
-            this.vereinsUsers = this.vereinsUsers.slice(0, 0);
-          } else {
-            this.vereinsUsers = [];
-          }
-          users.forEach((user) => {
-            this.vereinsUsers.push(JSON.parse(JSON.stringify(user)));
-          });
-          // this.vereinsUsers = users;
-          let index = 0;
-          this.vereinsUsers.forEach(() => {
-            this._changeEvents.push(this.getNewChangeEvent(index++));
-          });
+          this.synchUsers(users);
+
+          /* Produziert eine Menge leerer
           if (!this.tabGroup || !this.tabGroup.selectedIndex) {
             // this.tabGroup.selectedIndex = 0;
             this._changeEvents.push(this.getNewChangeEvent(0));
           }
+          */
         }
       })
     );
@@ -79,11 +70,51 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
     //this._vereinsUser = this.userService.getUser();
     let index = 0;
   }
+
+  private synchUsers(users: IUser[]) {
+    // Keine löschen und neu schreiben mehr!!
+    // Jedoch TODO wenn VereinUser > users dann abschneiden
+    /*
+    if (this.vereinsUsers) {
+      this.vereinsUsers = this.vereinsUsers.slice(0, 0);
+    } else {
+      this.vereinsUsers = [];
+    }*/
+
+    users.sort((a, b) => {
+      if (a.password === null) {
+        return a.benutzername.localeCompare(b.benutzername);
+      } else {
+        return -1;
+      }
+    });
+    let index = 0;
+    users.forEach((user) => {
+      let asVUString = "";
+      let asUString = JSON.stringify(user);
+      if (this.vereinsUsers[index]) {
+        asVUString = JSON.stringify(this.vereinsUsers[index]);
+        if (asUString !== asVUString) {
+          this.vereinsUsers[index] = JSON.parse(asUString);
+        }
+      } else {
+        this.vereinsUsers.push(JSON.parse(asUString));
+        this._changeEvents.push(this.getNewChangeEvent(index));
+      }
+      index++;
+    });
+    // this.vereinsUsers = users;
+    // Sollte keinen neuen brauchen wenn Daten geändert haben
+    /*
+    let index = 0;
+    this.vereinsUsers.forEach(() => {
+      this._changeEvents.push(this.getNewChangeEvent(index++));
+    });
+    */
+  }
+
   public disAllowTab(): boolean {
-    const changes = this._changeEvents.filter((ce) =>
-      this.hasUnsafedWork(ce.tabIndex)
-    );
-    return changes.length > 0;
+    return this.dirtyUsers.length > 0;
   }
   private getNewChangeEvent(index: number): IChangeEvent {
     const ce: IChangeEvent = {
@@ -138,7 +169,9 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
       return name;
     }
   }
-  hasUnsafedWork(tabIndex: number) {
+  hasUnsafedWork(tabIndex: number): boolean {
+    return this.vereinsUsers[tabIndex].dirty;
+    /*
     const ce = this._changeEvents[tabIndex];
     if (ce.userHasChanged || this.vereinsUsers[tabIndex].dirty) {
       return true;
@@ -149,6 +182,7 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
     if (ce.wrChanged) {
       return true;
     }
+    */
   }
 
   addUser(event: any) {
@@ -168,6 +202,7 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
       password: "getu",
       rollen: new Array<IRolle>(),
     };
+    this.vereinsUsers.unshift(JSON.parse(JSON.stringify(newUser)));
     this.store.dispatch(UserActions.addDirtyUser({ payload: newUser }));
     /*
     this.tabGroup.selectedIndex = this.vereinsUser.length - 1;

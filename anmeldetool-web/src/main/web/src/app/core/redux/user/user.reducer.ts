@@ -34,6 +34,7 @@ export const userFeature = createFeature({
         id: action.payload.id,
         changes: {
           dirty: false,
+          password: null,
           benutzername: action.payload.benutzername,
           name: action.payload.name,
           vorname: action.payload.vorname,
