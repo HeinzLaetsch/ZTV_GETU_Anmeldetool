@@ -36,6 +36,10 @@ public abstract class Base {
 	@Temporal(TemporalType.DATE)
 	private Calendar deletionDate = null;
 
+	public Base(UUID id) {
+		this.id = id;
+	}
+
 	public Base(Boolean aktiv) {
 		this.id = UUID.randomUUID();
 		this.aktiv = aktiv;

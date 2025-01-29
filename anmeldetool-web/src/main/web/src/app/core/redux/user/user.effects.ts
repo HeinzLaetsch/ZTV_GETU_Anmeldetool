@@ -28,7 +28,7 @@ export class UserEffects {
       })
     );
   });
-
+  /*
   addUser$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(UserActions.addUserInvoked),
@@ -45,19 +45,19 @@ export class UserEffects {
         );
       })
     );
-  });
-  updateUser$ = createEffect(() => {
+  });*/
+  saveUser$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(UserActions.updateUserInvoked),
+      ofType(UserActions.saveUserInvoked),
       mergeMap((action) => {
-        return this.authService.updateUser(action.payload).pipe(
+        return this.authService.createUser(action.payload).pipe(
           switchMap((user) => [
-            UserActions.updateUserSuccess({
+            UserActions.saveUserSuccess({
               payload: user,
             }),
           ]),
           catchError((error) => {
-            return of(UserActions.updateUserError({ error: error }));
+            return of(UserActions.saveUserError({ error: error }));
           })
         );
       })

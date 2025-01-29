@@ -7,7 +7,7 @@
   <div class="row">
     <div class="col-12">
       <mat-tab-group mat-align-tabs="start" #tabs>
-        <mat-tab *ngFor="let user of vereinsUser; index as i">
+        <mat-tab *ngFor="let user of vereinsUsers; index as i">
           <ng-template mat-tab-label>
             <span [ngClass]="{ unsafed: hasUnsafedWork(i) }">{{
               getTabName(user.benutzername, i)
@@ -25,6 +25,7 @@
 </div>
 <button
   mat-fab
+  class="mat-fab-pos1"
   color="primary"
   #tooltip="matTooltip"
   matTooltip="Neuen Benutzer anlegen"
@@ -33,5 +34,18 @@
   (click)="addUser($event)"
 >
   Neu
+</button>
+<button
+  mat-fab
+  class="mat-fab-pos2"
+  color="primary"
+  [disabled]="!hasChanges()"
+  #tooltip="matTooltip"
+  matTooltip="Änderungen speichern"
+  matTooltipPosition="below"
+  matTooltipHideDelay="500"
+  (click)="saveUser($event)"
+>
+  Speichern
 </button>
 <ng-template #loading>Loading...</ng-template>

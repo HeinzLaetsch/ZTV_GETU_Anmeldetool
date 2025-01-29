@@ -471,7 +471,16 @@ export class TeilnehmerGridComponent
 
     if (component.getMode(anlass) === 1) {
       const kats = KategorieEnumFunction.valuesAndGreater(
-        params.data.teilnehmer.letzteKategorie,
+        //params.data.teilnehmer.letzteKategorie,
+        KategorieEnum.K1,
+        params.data.teilnehmer.tiTu,
+        anlass
+      );
+      return kats;
+    }
+    if (component.getMode(anlass) === 4) {
+      const kats = KategorieEnumFunction.valuesAndGreater(
+        KategorieEnum.K1,
         params.data.teilnehmer.tiTu,
         anlass
       );
@@ -479,7 +488,8 @@ export class TeilnehmerGridComponent
     }
     if (component.getMode(anlass) === 2) {
       const kats = KategorieEnumFunction.valuesAndGreater(
-        params.data.teilnehmer.letzteKategorie,
+        //params.data.teilnehmer.letzteKategorie,
+        KategorieEnum.K1,
         params.data.teilnehmer.tiTu,
         anlass
       );
@@ -596,7 +606,7 @@ export class TeilnehmerGridComponent
     if (this.getMode(anlass) === 0 || this.getMode(anlass) === 3) {
       return false;
     }
-    if (this.getMode(anlass) === 1) {
+    if (this.getMode(anlass) === 1 || this.getMode(anlass) === 4) {
       return true;
     }
 
@@ -668,6 +678,9 @@ export class TeilnehmerGridComponent
     const anlass = component.getAnlassIdForColId(params);
 
     const newValue: ITeilnahmen = JSON.parse(JSON.stringify(params.data));
+    if (!newValue.talDTOList) {
+      newValue.talDTOList = [];
+    }
     newValue.jahr = component.selectedJahr;
 
     const tal: IAnlassLink = newValue.talDTOList.find(

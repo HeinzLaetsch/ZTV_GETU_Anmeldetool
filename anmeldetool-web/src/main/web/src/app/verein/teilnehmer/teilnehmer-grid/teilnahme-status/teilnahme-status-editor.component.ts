@@ -30,7 +30,9 @@ import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
       </div>
       <div
         *ngIf="
-          params.mode === 1 || (params.mode === 2 && params.kats.length > 0)
+          params.mode === 1 ||
+          params.mode === 4 ||
+          (params.mode === 2 && params.kats.length > 0)
         "
         class="teilnahme-status-kategorie"
       >
@@ -54,25 +56,13 @@ import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
       </div>
       <div
         *ngIf="
-          (params.mode === 1 || params.mode === 2) &&
+          (params.mode === 1 || params.mode === 4 || params.mode === 2) &&
           tal.meldeStatus?.toUpperCase() !== 'ABGEMELDET'
         "
         class="teilnahme-status-status-icon"
       >
         <mat-icon (click)="resetKategorie()">delete</mat-icon>
       </div>
-      <!--
-      <div *ngIf="params.mode === 2" class="teilnahme-status-status">
-        <mat-select
-          [(ngModel)]="tal.meldeStatus"
-          (selectionChange)="onChanged()"
-        >
-          <mat-option *ngFor="let stat of params.stats" [value]="stat">
-            {{ stat }}
-          </mat-option>
-        </mat-select>
-      </div>
-      -->
     </div>
   `,
   styles: [

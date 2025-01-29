@@ -13,6 +13,8 @@ export const selectAllUser = createSelector(
 );
 export const selectAktiveUser = () =>
   createSelector(selectAllUser, (user) => user.filter((user) => user.aktiv));
+export const selectDirtyUser = () =>
+  createSelector(selectAllUser, (user) => user.filter((user) => user.dirty));
 
 export const selectUserById = (id: string) =>
   createSelector(selectUserState, (userState) => {

@@ -3,14 +3,18 @@ import { MatTabGroup } from "@angular/material/tabs";
 import { IRolle } from "src/app/core/model/IRolle";
 import { IUser } from "src/app/core/model/IUser";
 import { AuthService } from "src/app/core/service/auth/auth.service";
-import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
 import { IVerein } from "../verein";
 import { IChangeEvent } from "./IChangeEvent";
 import { SubscriptionHelper } from "src/app/utils/subscription-helper";
 import { AppState } from "src/app/core/redux/core.state";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { selectUser, UserActions } from "src/app/core/redux/user";
+import {
+  selectDirtyUser,
+  selectUser,
+  UserActions,
+} from "src/app/core/redux/user";
+import { v4 as uuidv4 } from "uuid";
 
 @Component({
   selector: "app-profile",
@@ -20,8 +24,10 @@ import { selectUser, UserActions } from "src/app/core/redux/user";
 export class ProfileComponent extends SubscriptionHelper implements OnInit {
   appearance = "outline";
   user$: Observable<IUser[]>;
+  dirty$: Observable<IUser[]>;
   currentUser: IUser;
-  vereinsUser: IUser[];
+  vereinsUsers: IUser[];
+  dirtyUsers: IUser[];
   _changeEvents: IChangeEvent[];
 
   @ViewChild("tabs") tabGroup: MatTabGroup;
@@ -39,12 +45,21 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
     // console.log("ProfileComponent::ngOnInit: ", this.authService.currentUser);
     this.currentUser = this.authService.currentUser;
     this.user$ = this.store.pipe(select(selectUser()));
+    this.dirty$ = this.store.pipe(select(selectDirtyUser()));
     this.registerSubscription(
       this.user$.subscribe((users) => {
         if (users.length > 0) {
-          this.vereinsUser = users;
+          if (this.vereinsUsers) {
+            this.vereinsUsers = this.vereinsUsers.slice(0, 0);
+          } else {
+            this.vereinsUsers = [];
+          }
+          users.forEach((user) => {
+            this.vereinsUsers.push(JSON.parse(JSON.stringify(user)));
+          });
+          // this.vereinsUsers = users;
           let index = 0;
-          this.vereinsUser.forEach(() => {
+          this.vereinsUsers.forEach(() => {
             this._changeEvents.push(this.getNewChangeEvent(index++));
           });
           if (!this.tabGroup || !this.tabGroup.selectedIndex) {
@@ -54,6 +69,13 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
         }
       })
     );
+
+    this.registerSubscription(
+      this.dirty$.subscribe((dirtyUsers) => {
+        this.dirtyUsers = dirtyUsers;
+      })
+    );
+
     //this._vereinsUser = this.userService.getUser();
     let index = 0;
   }
@@ -80,6 +102,12 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
   isVereinsVerantwortlicher(): boolean {
     return true;
   }
+  hasChanges(): boolean {
+    if (this.dirtyUsers) {
+      return this.dirtyUsers.length > 0;
+    }
+    return false;
+  }
   get usertext(): string {
     return JSON.stringify(this.currentUser);
   }
@@ -95,12 +123,12 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
   getTabIndex() {
     console.log(
       "Index: ",
-      this.vereinsUser[this.vereinsUser.length - 1].benutzername
+      this.vereinsUsers[this.vereinsUsers.length - 1].benutzername
     );
-    if (this.vereinsUser[this.vereinsUser.length - 1].benutzername) {
+    if (this.vereinsUsers[this.vereinsUsers.length - 1].benutzername) {
       return 0;
     }
-    return this.vereinsUser.length - 1;
+    return this.vereinsUsers.length - 1;
   }
 
   getTabName(name: string, tabIndex: number) {
@@ -112,7 +140,7 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
   }
   hasUnsafedWork(tabIndex: number) {
     const ce = this._changeEvents[tabIndex];
-    if (ce.userHasChanged) {
+    if (ce.userHasChanged || this.vereinsUsers[tabIndex].dirty) {
       return true;
     }
     if (ce.rolesChanged) {
@@ -128,7 +156,7 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
 
     //this.vereinsUser.push({
     const newUser = {
-      id: undefined,
+      id: uuidv4(),
       organisationids: [this.authService.currentVerein.id],
       benutzername: "",
       name: "",
@@ -148,18 +176,22 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
     );
     */
   }
-
+  saveUser(event: any) {
+    this.dirtyUsers.forEach((user) => {
+      this.store.dispatch(UserActions.saveUserInvoked({ payload: user }));
+    });
+  }
   userChange(changeEvent: IChangeEvent) {
     //TODO Achtung change
     this._changeEvents[changeEvent.tabIndex] = changeEvent;
     if (changeEvent.saved) {
       // TODO reset dirty Flag
     }
-    if (changeEvent.canceled && !this.vereinsUser[changeEvent.tabIndex]?.id) {
-      const vu1 = this.vereinsUser.slice(0, changeEvent.tabIndex);
-      const vu2 = this.vereinsUser.slice(changeEvent.tabIndex + 1);
-      this.vereinsUser = vu1;
-      this.vereinsUser.concat(vu2);
+    if (changeEvent.canceled && !this.vereinsUsers[changeEvent.tabIndex]?.id) {
+      const vu1 = this.vereinsUsers.slice(0, changeEvent.tabIndex);
+      const vu2 = this.vereinsUsers.slice(changeEvent.tabIndex + 1);
+      this.vereinsUsers = vu1;
+      this.vereinsUsers.concat(vu2);
       const ce1 = this._changeEvents.slice(0, changeEvent.tabIndex);
       const ce2 = this._changeEvents.slice(changeEvent.tabIndex + 1);
       this._changeEvents = ce1;
@@ -170,6 +202,7 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
   getUserCopy(orgUser: IUser): IUser {
     // console.log('Get user: ', this.currentUser);
     // return this.deepCopy(this.currentUser);
-    return JSON.parse(JSON.stringify(orgUser));
+    //return JSON.parse(JSON.stringify(orgUser));
+    return orgUser;
   }
 }

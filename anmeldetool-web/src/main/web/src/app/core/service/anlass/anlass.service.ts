@@ -78,6 +78,24 @@ export class AnlassService {
     );
   }
 
+  getAnlassOrganisationSummaries(
+    verein: IVerein
+  ): Observable<IAnlassSummary[]> {
+    const combinedUrl = this.url + "/summaries";
+    "organisationen" + "/" + verein?.id;
+    if (!verein) {
+      return of(undefined);
+    }
+    return this.http.get<IAnlassSummary[]>(combinedUrl).pipe(
+      catchError((error) => {
+        if (error.status === 404) {
+          return of(undefined);
+        }
+        this.handleError<IAnlassSummary>("getAnlassOrganisationSummaries");
+      })
+    );
+  }
+
   getVerfuegbareWertungsrichter(
     anlass: IAnlass,
     verein: IVerein,

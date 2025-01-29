@@ -6,7 +6,7 @@ export const userAdapter: EntityAdapter<IUser> = createEntityAdapter<IUser>({
 });
 
 export function sortByName(a: IUser, b: IUser): any {
-  return a.name.localeCompare(b.name);
+  return a.benutzername.localeCompare(b.benutzername);
 }
 
 export interface UserState extends EntityState<IUser> {}

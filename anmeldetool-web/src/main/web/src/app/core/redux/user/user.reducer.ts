@@ -1,28 +1,48 @@
 import { createFeature, createReducer, on } from "@ngrx/store";
 import { UserActions } from "./user.actions";
 import { userAdapter, initialState } from "./user.state";
+import { Update } from "@ngrx/entity";
+import { IUser } from "../../model/IUser";
 
 export const userFeature = createFeature({
   name: "user",
   reducer: createReducer(
     initialState,
-    on(UserActions.loadAllUserSuccess, (state, action) => {
-      const user = action.payload;
-      return userAdapter.setAll(user, state);
-    }),
+
     on(UserActions.addDirtyUser, (state, action) => {
       const user = action.payload;
       const newState = userAdapter.addOne(user, state);
       return newState;
     }),
-    on(UserActions.updateUserSuccess, (state, action) => {
+    on(UserActions.updateUser, (state, action) => {
       const user = action.payload;
-      const newState = userAdapter.addOne(user, state);
+      const newState = userAdapter.updateOne(user, state);
       return newState;
     }),
+    on(UserActions.loadAllUserSuccess, (state, action) => {
+      const user = action.payload;
+      return userAdapter.setAll(user, state);
+    }),
+    /*
     on(UserActions.addUserSuccess, (state, action) => {
       const user = action.payload;
       const newState = userAdapter.addOne(user, state);
+      return newState;
+    }),*/
+    on(UserActions.saveUserSuccess, (state, action) => {
+      const user: Update<IUser> = {
+        id: action.payload.id,
+        changes: {
+          dirty: false,
+          benutzername: action.payload.benutzername,
+          name: action.payload.name,
+          vorname: action.payload.vorname,
+          handy: action.payload.handy,
+          email: action.payload.email,
+        },
+      };
+      // const user = action.payload;
+      const newState = userAdapter.updateOne(user, state);
       return newState;
     })
   ),

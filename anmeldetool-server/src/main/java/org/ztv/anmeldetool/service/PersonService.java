@@ -118,6 +118,7 @@ public class PersonService {
 					personDTO.getVorname());
 			return update(personDTO, organisationsId);
 		}
+		// TODO check wenn in mehreren Vereinen !!
 		Organisation organisation = null;
 		if (organisationsId == null && personDTO.getOrganisationids().size() > 0) {
 			organisation = organisationSrv.findOrganisationById(personDTO.getOrganisationids().get(0));

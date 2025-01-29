@@ -33,9 +33,23 @@ em {
   bottom: 45px;
 }
 .mat-fab {
-  right: 20px;
-  bottom: 10px;
   left: auto;
   position: absolute;
   z-index: 99;
+}
+.mat-fab-pos1 {
+  font-size: 12px;
+  right: 80px;
+  bottom: 10px;
+    left: auto;
+    position: absolute;
+    z-index: 99;}
+
+.mat-fab-pos2 {
+  font-size: 12px;
+  right: 20px;
+  bottom: 10px;
+    left: auto;
+    position: absolute;
+    z-index: 99;
 }

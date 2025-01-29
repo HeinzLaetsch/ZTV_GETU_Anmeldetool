@@ -63,9 +63,9 @@ public class PersonHelper {
 	}
 
 	public static Person createPerson(PersonDTO personDTO) {
-		Person person = Person.builder().benutzername(personDTO.getBenutzername()).email(personDTO.getEmail())
-				.handy(personDTO.getHandy()).name(personDTO.getName()).password(personDTO.getPassword())
-				.vorname(personDTO.getVorname()).build();
+		Person person = Person.builder().id(personDTO.getId()).benutzername(personDTO.getBenutzername())
+				.email(personDTO.getEmail()).handy(personDTO.getHandy()).name(personDTO.getName())
+				.password(personDTO.getPassword()).vorname(personDTO.getVorname()).build();
 		person.setAktiv(personDTO.isAktiv());
 		return person;
 	}

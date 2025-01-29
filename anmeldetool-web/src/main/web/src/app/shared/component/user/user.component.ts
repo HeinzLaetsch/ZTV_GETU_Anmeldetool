@@ -16,14 +16,14 @@ import {
 } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { IUser } from "src/app/core/model/IUser";
-import { UserService } from "src/app/core/service/user/user.service";
 import { ConfirmedValidator } from "../../validators/ConfirmedValidator";
 import { MyTel } from "../phonenumber/phone-input-component";
 import { UserExists } from "./user-exists/user-exists.component";
-import { select, Store } from "@ngrx/store";
+import { Store } from "@ngrx/store";
 import { AppState } from "src/app/core/redux/core.state";
 import { Observable } from "rxjs";
-import { selectUserByBenutzername, UserActions } from "src/app/core/redux/user";
+import { UserActions } from "src/app/core/redux/user";
+import { Update } from "@ngrx/entity";
 
 @Component({
   selector: "app-user",
@@ -116,8 +116,8 @@ export class UserComponent implements OnInit, OnChanges {
     }
 
     this.form.controls.benutzernameControl.valueChanges.subscribe((value) => {
+      /*
       if (this.form.controls.benutzernameControl.valid) {
-        /*
         this.userService
           .getUserByBenutzername(value)
           .subscribe((existingUser) => {
@@ -129,8 +129,8 @@ export class UserComponent implements OnInit, OnChanges {
               this.userAlreadyExists = false;
             }
           });
-        */
       }
+        */
       if (this.user.benutzername !== value) {
         this.user.benutzername = value;
         this.emitChange(true);
@@ -280,9 +280,34 @@ export class UserComponent implements OnInit, OnChanges {
 
     this.valid.next(valid);
     if (includeUser && valid) {
-      this.store.dispatch(
-        UserActions.updateUserInvoked({ payload: this.user })
-      );
+      let userUpdate: Update<IUser> = undefined;
+      if (this.showPassword) {
+        userUpdate = {
+          id: this.user.id,
+          changes: {
+            dirty: true,
+            benutzername: this.user.benutzername,
+            name: this.user.name,
+            vorname: this.user.vorname,
+            handy: this.user.handy,
+            email: this.user.email,
+            password: this.user.password,
+          },
+        };
+      } else {
+        userUpdate = {
+          id: this.user.id,
+          changes: {
+            dirty: true,
+            benutzername: this.user.benutzername,
+            name: this.user.name,
+            vorname: this.user.vorname,
+            handy: this.user.handy,
+            email: this.user.email,
+          },
+        };
+      }
+      this.store.dispatch(UserActions.updateUser({ payload: userUpdate }));
       //this.userChange.next(this.user);
     }
   }

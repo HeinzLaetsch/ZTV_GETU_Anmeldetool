@@ -238,7 +238,11 @@ public class AnlassAdminController {
 		if (oalResult.isAktiv()) {
 			List<TeilnehmerAnlassLink> links = anlassSrv.getTeilnahmen(anlassId, orgId, false);
 			startBr1 = (int) links.stream().filter(link -> {
-				return link.getKategorie().isJugend();
+				if (link.getKategorie() != null) {
+					return link.getKategorie().isJugend();
+				} else {
+					return false;
+				}
 			}).count();
 			startK1 = getStartendeForKategorie(links, KategorieEnum.K1);
 			startK2 = getStartendeForKategorie(links, KategorieEnum.K2);
@@ -253,12 +257,16 @@ public class AnlassAdminController {
 			startKH = getStartendeForKategorie(links, KategorieEnum.KH);
 
 			startBr2 = (int) links.stream().filter(link -> {
-				return link.getKategorie().isAktiv();
+				if (link.getKategorie() != null) {
+					return link.getKategorie().isAktiv();
+				} else {
+					return false;
+				}
 			}).count();
 			List<PersonAnlassLink> pals = anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId,
 					WertungsrichterBrevetEnum.Brevet_1);
 			gemeldeteBr1 = pals.size();
-			pals = anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId, WertungsrichterBrevetEnum.Brevet_1);
+			pals = anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId, WertungsrichterBrevetEnum.Brevet_2);
 			gemeldeteBr2 = pals.size();
 			// TODO check anzahl
 			// TODO store anzahl within config
@@ -276,8 +284,12 @@ public class AnlassAdminController {
 
 	private int getStartendeForKategorie(List<TeilnehmerAnlassLink> links, KategorieEnum kategorie) {
 		return (int) links.stream().filter(link -> {
-			return link.getKategorie().equals(kategorie) && (link.getMeldeStatus().equals(MeldeStatusEnum.STARTET)
-					|| link.getMeldeStatus().equals(MeldeStatusEnum.NEUMELDUNG));
+			if (link.getKategorie() != null) {
+				return link.getKategorie().equals(kategorie) && (link.getMeldeStatus().equals(MeldeStatusEnum.STARTET)
+						|| link.getMeldeStatus().equals(MeldeStatusEnum.NEUMELDUNG));
+			} else {
+				return false;
+			}
 		}).count();
 
 	}

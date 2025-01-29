@@ -1,5 +1,5 @@
-import { Action, createFeature, createReducer, on } from "@ngrx/store";
-import { initialState, otsAdapter, OtsState } from "./ots.state";
+import { createFeature, createReducer, on } from "@ngrx/store";
+import { initialState, otsAdapter } from "./ots.state";
 import { OtsActions } from "./ots.actions";
 
 export const otsFeature = createFeature({
@@ -7,8 +7,11 @@ export const otsFeature = createFeature({
   reducer: createReducer(
     initialState,
     on(OtsActions.loadAllOtsSuccess, (state, action) => {
-      const ots = action.payload;
-      return otsAdapter.setAll(ots, state);
+      if (action.payload) {
+        const ots = action.payload;
+        return otsAdapter.setAll(ots, state);
+      }
+      return state;
     })
   ),
 });

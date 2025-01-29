@@ -40,8 +40,9 @@ export class WertungsrichterSelektionComponent
   @Input()
   anlass: IAnlass;
 
-  anlassSummary: IAnlassSummary = null;
-  anlassSummary$: Observable<IAnlassSummary>;
+  @Input()
+  anlassSummary: IAnlassSummary;
+  anlassSummary$: Observable<IAnlassSummary>; // TODO REDUX
 
   statusBr1: WertungsrichterStatusEnum;
   statusBr2: WertungsrichterStatusEnum;
@@ -69,6 +70,7 @@ export class WertungsrichterSelektionComponent
     super();
   }
   ngOnInit() {
+    /* TODO REDUX */
     this.anlassSummary$ = this.anlassService.getAnlassOrganisationSummary(
       this.anlass,
       this.authService.currentVerein
@@ -79,6 +81,7 @@ export class WertungsrichterSelektionComponent
         this.wrInit();
       })
     );
+    /* TODO REDUX */
   }
 
   ngAfterViewInit(): void {

@@ -5,9 +5,14 @@ import * as moment from "moment";
 import { Observable } from "rxjs";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IAnlassLink } from "src/app/core/model/IAnlassLink";
+import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
 import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
 import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
 import { selectAnlassById } from "src/app/core/redux/anlass";
+import {
+  AnlassSummaryActions,
+  selectAnlassSummaryByAnlassId,
+} from "src/app/core/redux/anlass-summary";
 import { AppState } from "src/app/core/redux/core.state";
 import {
   OalActions,
@@ -29,6 +34,8 @@ export class EventsDetailComponent
 
   anlass: IAnlass;
   anlass$: Observable<IAnlass>;
+  anlassSummary$: Observable<IAnlassSummary>;
+  anlassSummary: IAnlassSummary;
 
   starts$: Observable<ReadonlyArray<IOrganisationAnlassLink>>;
   teilnehmer$: Observable<ITeilnehmer[]>;
@@ -52,6 +59,7 @@ export class EventsDetailComponent
     private router: Router
   ) {
     super();
+    // TODO REDUX store.dispatch(AnlassSummaryActions.loadAllAnlasssummaryInvoked());
   }
 
   ngOnInit() {
@@ -61,9 +69,18 @@ export class EventsDetailComponent
     this.registerSubscription(
       this.anlass$.subscribe((anlass) => {
         this.anlass = anlass;
-        // anlassInit();
       })
     );
+    /* TODO REDUX
+    this.anlassSummary$ = this.store.pipe(
+      select(selectAnlassSummaryByAnlassId(anlassId))
+    );
+    this.registerSubscription(
+      this.anlassSummary$.subscribe((anlassSummary) => {
+        this.anlassSummary = anlassSummary;
+      })
+    );
+*/
     // wrInit();
   }
   /*

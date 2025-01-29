@@ -2,6 +2,7 @@ package org.ztv.anmeldetool.models;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -47,8 +48,9 @@ public class Person extends Base {
 	}
 
 	@Builder
-	public Person(String benutzername, String name, String vorname, String handy, String email, String password) {
-		super();
+	public Person(UUID id, String benutzername, String name, String vorname, String handy, String email,
+			String password) {
+		super(id);
 		this.benutzername = benutzername;
 		this.name = name;
 		this.vorname = vorname;

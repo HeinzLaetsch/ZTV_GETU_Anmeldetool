@@ -226,13 +226,18 @@ public class AdminController {
 			@RequestHeader("userid") String userId, @RequestHeader("vereinsid") UUID vereinsId,
 			@RequestBody PersonDTO personDTO) {
 		log.info("patch User");
-		return personSrv.update(personDTO, vereinsId);
+		if (personDTO.getId() == null) {
+			return personSrv.create(personDTO, null);
+		} else {
+			return personSrv.update(personDTO, vereinsId);
+		}
 	}
 
 	@PostMapping("/user")
-	public @ResponseBody ResponseEntity<PersonDTO> post(HttpServletRequest request, @RequestBody PersonDTO personDTO) {
+	public @ResponseBody ResponseEntity<PersonDTO> post(HttpServletRequest request,
+			@RequestHeader("vereinsid") UUID vereinsId, @RequestBody PersonDTO personDTO) {
 		log.info("post User");
-		return personSrv.create(personDTO, null);
+		return personSrv.create(personDTO, vereinsId);
 	}
 
 	@PostMapping("/user/{id}")
