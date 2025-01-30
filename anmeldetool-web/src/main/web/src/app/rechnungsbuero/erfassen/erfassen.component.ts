@@ -1,4 +1,10 @@
-import { Component, EventEmitter, OnDestroy, OnInit } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+} from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subject, Subscription } from "rxjs";
 import { GeraeteEnum } from "src/app/core/model/GeraeteEnum";
@@ -17,32 +23,30 @@ import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.ser
   templateUrl: "./erfassen.component.html",
   styleUrls: ["./erfassen.component.css"],
 })
-export class ErfassenComponent implements OnInit, OnDestroy {
-  private routeSubject: Subscription;
+export class ErfassenComponent implements OnInit {
+  @Input()
+  anlass: IAnlass;
+  @Input()
+  modeErfassen;
 
   checkedChangedEmitter = new EventEmitter<ILaufliste>();
 
   erfasstChangedEmitter = new EventEmitter<ILaufliste>();
 
-  currentUser: IUser;
-  anlass: IAnlass;
   laufliste: ILaufliste;
 
   search: string;
 
-  modeErfassen = true;
-
   constructor(
     private authService: AuthService,
-    private anlassService: CachingAnlassService,
-    private ranglistenService: RanglistenService,
-    private route: ActivatedRoute
+    // private anlassService: CachingAnlassService,
+    private ranglistenService: RanglistenService
   ) {}
 
   ngOnInit() {
-    this.currentUser = this.authService.currentUser;
-    const organisatorId: string = this.route.snapshot.params.id;
-    this.anlass = this.anlassService.getAnlassByOrganisatorId(organisatorId);
+    // const organisatorId: string = this.route.snapshot.params.id;
+    // this.anlass = this.anlassService.getAnlassByOrganisatorId(organisatorId);
+    /*
     this.routeSubject = this.route.params.subscribe((param) => {
       if (param.function === "erfassen") {
         if (!this.modeErfassen) {
@@ -56,6 +60,7 @@ export class ErfassenComponent implements OnInit, OnDestroy {
         this.modeErfassen = false;
       }
     });
+    */
   }
 
   get sprung(): boolean {
@@ -163,9 +168,5 @@ export class ErfassenComponent implements OnInit, OnDestroy {
         this.checkErfassen();
       }
     }
-  }
-
-  ngOnDestroy() {
-    this.routeSubject.unsubscribe();
   }
 }

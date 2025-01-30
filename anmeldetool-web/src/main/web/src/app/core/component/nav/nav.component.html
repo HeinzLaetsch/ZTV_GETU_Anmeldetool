@@ -47,47 +47,45 @@
           </div>
         </mat-menu>
       </mat-list-item>
-
-      <!--mat-list-item routerLink="/anlaesse-admin" routerLinkActive="active">
-
-routerLink="['/anlaesse-admin', 123, 'admin']"
-
-        <button mat-button class="mainNav" disableRipple>
-          Anlässe verwalten
-        </button>
-        <mat-menu #anlaessAdmin="matMenu">
-          <div class="dropdown-item">
-            <button
-              mat-button
-              class="mainNav"
-              routerLink="/anlaesse-admin/anlass.id"
-              disableRipple
-            >
-              Anlass 1
-            </button>
-          </div>
-        </mat-menu>
-      </mat-list-item-->
       <mat-list-item routerLink="/teilnehmer" routerLinkActive="active">
         <button mat-button class="mainNav" disableRipple>Teilnehmer</button>
       </mat-list-item>
 
+      <!-- routerLink="/rechnungsbuero" routerLinkActive="active" -->
       <mat-list-item
-        *ngIf="authService.isAdministrator() || authService.isRechnungsbuero()"
-        routerLink="/rechnungsbuero"
-        routerLinkActive="active"
+        class="task-add-btn"
+        *ngIf="
+          (authService.isAdministrator() || authService.isRechnungsbuero()) &&
+          authService.currentVerein
+        "
+        data-cy="admin-funcs-nav-btn"
       >
-        <button mat-button class="mainNav" disableRipple>Rechnungsbüro</button>
-
-        <mat-menu #rechnungsbuero="matMenu">
-          <div class="dropdown-item">
+        <button
+          mat-button
+          class="mainNav"
+          disableRipple
+          [matMenuTriggerFor]="RBmenu"
+        >
+          Rechnungsbüro
+          <mat-icon class="material-icons-outlined arrow-icon">
+            arrow_drop_down
+          </mat-icon>
+        </button>
+        <mat-menu #RBmenu="matMenu">
+          <div
+            *ngFor="let anlass of rechnungsbueroAnlaesse"
+            class="dropdown-item"
+            data-cy="data-import-nav-btn"
+          >
             <button
               mat-button
-              class="mainNav"
-              routerLink="/importer"
+              class="mainNav small-text"
+              [routerLink]="['/rechnungsbuero', anlass.id]"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
               disableRipple
             >
-              Daten Importieren
+              {{ anlass.getWithDatum() }}
             </button>
           </div>
         </mat-menu>

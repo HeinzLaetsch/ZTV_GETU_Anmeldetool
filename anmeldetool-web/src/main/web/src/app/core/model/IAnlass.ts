@@ -39,6 +39,12 @@ export class IAnlass {
     step1 = step1.replace("Zürcher Kant. ", "");
     return step1.replace("%", " ");
   }
+
+  getWithDatum(): string {
+    const asMoment = moment(this.startDatum);
+    return asMoment.format("YY.MM.DD") + " " + this.getCleaned();
+  }
+
   getPart(first: boolean): string {
     if (this.anlassBezeichnung.lastIndexOf("%") === -1) {
       return this.anlassBezeichnung;

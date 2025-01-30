@@ -59,6 +59,20 @@ export class NavComponent extends SubscriptionHelper implements OnInit {
     );
   }
 
+  get rechnungsbueroAnlaesse(): IAnlass[] {
+    if (
+      this.authService.isRechnungsbuero() ||
+      this.authService.isAdministrator()
+    ) {
+      return this.anlaesse.filter((anlass) => {
+        if (anlass.organisatorId === this.authService.currentVerein.id) {
+          return true;
+        }
+        return false;
+      });
+    }
+  }
+
   getOrganisator(anlass: IAnlass): Observable<IVerein> {
     return this.store.pipe(select(selectVereinById(anlass.organisatorId)));
   }

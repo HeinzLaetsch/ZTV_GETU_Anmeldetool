@@ -1,8 +1,7 @@
-<div class="container-fluid">
+<div class="container-fluid" *ngIf="anlass$ | async; else loading">
   <div class="row">
-    <div class="col-sm-4">
-      <h1>{{ anlass.getCleaned() }}</h1>
-    </div>
+    <div class="col-sm-4"></div>
+    <!-- könnte auch in Tab Header geschrieben werden -->
     <div class="col-sm-1">
       <h2>Erfasst</h2>
     </div>
@@ -137,3 +136,5 @@
     *ngFor="let entry of ranglistenEntries; index as i"
   ></app-ranglisten-entry>
 </div>
+
+<ng-template #loading>Loading...</ng-template>

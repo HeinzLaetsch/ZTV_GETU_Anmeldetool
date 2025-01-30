@@ -1,8 +1,22 @@
+import { RouterModule, Routes } from "@angular/router";
 import { AuthRouteActivatorService } from "../core/routing/auth-route-activator.service";
-import { ErfassenComponent } from "./erfassen/erfassen.component";
-import { RechnungsbueroComponent } from "./rechnungsbuero/rechnungsbuero.component";
+import { RechnungsbueroComponent } from "./rechnungsbuero.component";
+import { NgModule } from "@angular/core";
 
-export const RechnungsbueroRoutes = [
+export const rechnungsbueroRoutes: Routes = [
+  {
+    path: ":id",
+    component: RechnungsbueroComponent,
+    canActivate: [AuthRouteActivatorService],
+    data: { roles: ["RECHNUNGSBUERO"] },
+  },
+  {
+    path: "",
+    component: RechnungsbueroComponent,
+    canActivate: [AuthRouteActivatorService],
+    data: { roles: ["RECHNUNGSBUERO"] },
+  },
+  /*
   {
     path: ":id/ranglisten",
     component: RechnungsbueroComponent,
@@ -14,11 +28,19 @@ export const RechnungsbueroRoutes = [
     component: ErfassenComponent,
     canActivate: [AuthRouteActivatorService],
     data: { roles: ["RECHNUNGSBUERO"] },
-  },
+  },*/
+  /*
   {
     path: ":id/:function",
     component: ErfassenComponent,
     canActivate: [AuthRouteActivatorService],
     data: { roles: ["RECHNUNGSBUERO"] },
   },
+  */
 ];
+
+@NgModule({
+  imports: [RouterModule.forChild(rechnungsbueroRoutes)],
+  exports: [RouterModule],
+})
+export class RechnungsbueroRoutingModule {}
