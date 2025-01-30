@@ -170,8 +170,8 @@ export class UserComponent implements OnInit, OnChanges {
     this.form.controls.mobilNummerControl.valueChanges.subscribe((value) => {
       // console.log(this.form.controls.mobilNummerControl.value);
       if (value && this.user.handy !== this.concatHandy(value)) {
-        //this.user.handy = this.concatHandy(value);
-        // this.emitChange(true);
+        this.user.handy = this.concatHandy(value);
+        this.emitChange(true);
       }
     });
   }
