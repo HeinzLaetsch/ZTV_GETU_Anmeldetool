@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -111,13 +112,22 @@ public class PersonService {
 		return ResponseEntity.ok(personDTO);
 	}
 
-	public ResponseEntity<PersonDTO> create(PersonDTO personDTO, UUID organisationsId) {
+	public ResponseEntity create(PersonDTO personDTO, UUID organisationsId) {
 		if (personDTO.getId() != null && persRepo.findById(personDTO.getId()).isPresent()) {
 			// Existiert momentan nur Merge
 			log.warn("User existiert: {} , {} , {} , {}", personDTO.getId(), personDTO.getEmail(), personDTO.getName(),
 					personDTO.getVorname());
 			return update(personDTO, organisationsId);
 		}
+		Person existingPerson = persRepo.findByBenutzernameIgnoreCase(personDTO.getBenutzername());
+		if (existingPerson != null) {
+			String message = String.format("User existiert in anderem Verein: %s , %s , %s , %s",
+					existingPerson.getId(), existingPerson.getEmail(), existingPerson.getName(),
+					existingPerson.getVorname());
+			log.warn(message);
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+		}
+
 		// TODO check wenn in mehreren Vereinen !!
 		Organisation organisation = null;
 		if (organisationsId == null && personDTO.getOrganisationids().size() > 0) {

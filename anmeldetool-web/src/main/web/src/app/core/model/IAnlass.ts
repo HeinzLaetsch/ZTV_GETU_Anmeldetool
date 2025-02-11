@@ -5,6 +5,7 @@ import { IWertungsrichterSlot } from "./IWertungsrichterSlot";
 import { KategorieEnum } from "./KategorieEnum";
 import { TiTuEnum } from "./TiTuEnum";
 import { IOrganisationTeilnahmenStatistik } from "./IOrganisationTeilnahmenStatistik";
+import { IAnlassSummary } from "./IAnlassSummary";
 
 export class IAnlass {
   id: string;

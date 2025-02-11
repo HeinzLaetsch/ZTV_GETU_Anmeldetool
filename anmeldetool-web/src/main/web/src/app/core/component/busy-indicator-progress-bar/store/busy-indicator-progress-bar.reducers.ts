@@ -7,9 +7,11 @@ export const loadingFeature = createFeature({
   reducer: createReducer(
     initialState,
     on(LoadingActions.isLoading, (state, action) => {
-      // console.log("LoadingActions Store updated : ", state, " ", action);
+      console.log("LoadingActions Store updated : ", state, " ", action);
       return {
         ...state,
+        error: action.error,
+        message: action.message,
         isLoading: action.isLoading,
       };
     })

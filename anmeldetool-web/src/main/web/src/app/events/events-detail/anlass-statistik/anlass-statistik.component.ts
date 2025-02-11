@@ -13,6 +13,7 @@ import {
   selectOalForKeys,
 } from "src/app/core/redux/organisation-anlass";
 import { SubscriptionHelper } from "src/app/utils/subscription-helper";
+import * as moment from "moment";
 
 @Component({
   selector: "app-anlass-statistik",
@@ -25,34 +26,41 @@ export class AnlassStatistikComponent
 {
   @Input()
   anlass: IAnlass;
+  @Input()
+  anlassSummary: IAnlassSummary;
 
   @Output()
-  startetClicked = new EventEmitter();
+  startetChanged = new EventEmitter();
 
-  anlassSummary: IAnlassSummary;
-  anlassSummary$: Observable<IAnlassSummary>;
+  // anlassSummary$: Observable<IAnlassSummary>;
 
   orgAnlassLink: IOrganisationAnlassLink;
-  starts$: Observable<ReadonlyArray<IOrganisationAnlassLink>>;
+  //starts$: Observable<ReadonlyArray<IOrganisationAnlassLink>>;
+
+  startet: boolean;
 
   constructor(
-    public authService: AuthService,
-    private store: Store<AppState>,
-    private anlassService: AnlassService
-  ) {
+    public authService: AuthService //private store: Store<AppState>,
+  ) //private anlassService: AnlassService
+  {
     super();
   }
   ngOnInit() {
+    this.startet = this.anlassSummary.startet;
+    /*
     this.anlassSummary$ = this.anlassService.getAnlassOrganisationSummary(
       this.anlass,
       this.authService.currentVerein
     );
+    */
+    /*
     this.starts$ = this.store.pipe(
       select(
         selectOalForKeys(this.authService.currentVerein.id, this.anlass.id)
       )
     );
-
+    */
+    /*
     this.registerSubscription(
       this.anlassSummary$.subscribe((result) => {
         this.anlassSummary = result;
@@ -60,7 +68,8 @@ export class AnlassStatistikComponent
         this.startetClicked.emit(this.anlassSummary.startet);
       })
     );
-
+    */
+    /*
     this.registerSubscription(
       this.starts$.subscribe((oalLinks) => {
         if (oalLinks !== undefined && oalLinks.length > 0) {
@@ -68,13 +77,18 @@ export class AnlassStatistikComponent
         }
       })
     );
+    */
   }
   isStartedCheckboxDisabled(): boolean {
     if (
       !this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)
     ) {
+      const asMoment = moment(this.anlassSummary.verlaengerungsDate);
       if (
-        !this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED)
+        !this.anlass.anzeigeStatus.hasStatus(
+          AnzeigeStatusEnum.ERFASSEN_CLOSED
+        ) ||
+        asMoment.isSameOrAfter(moment.now())
       ) {
         return false;
       }
@@ -84,12 +98,14 @@ export class AnlassStatistikComponent
 
   vereinStartedClicked(check: boolean) {
     console.log("VereinStartedClicked: ", check);
+    /*
     const newOAL = JSON.parse(JSON.stringify(this.orgAnlassLink));
     newOAL.startet = check;
     this.store.dispatch(
       OalActions.updateVereinsStartInvoked({ payload: newOAL })
     );
-    this.startetClicked.emit(check);
+    */
+    this.startetChanged.emit(check);
   }
 
   isTuAnlass(): boolean {

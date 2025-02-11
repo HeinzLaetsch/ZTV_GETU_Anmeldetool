@@ -5,12 +5,7 @@ import { Store, select } from "@ngrx/store";
 import { SubscriptionHelper } from "src/app/utils/subscription-helper";
 import { IAnlass } from "../../model/IAnlass";
 import { Observable } from "rxjs";
-import {
-  selectAktiveAnlaesse,
-  selectAllAnlaesse,
-  selectAnlaesse,
-  selectAnlaesseSortedNew,
-} from "../../redux/anlass";
+import { selectAnlaesseSortedNew } from "../../redux/anlass";
 import {
   selectAlleVereine,
   selectVereinById,
@@ -39,7 +34,7 @@ export class NavComponent extends SubscriptionHelper implements OnInit {
     private router: Router
   ) {
     super();
-    this.anlaesse$ = this.store.pipe(select(selectAnlaesseSortedNew()));
+    this.anlaesse$ = this.store.pipe(select(selectAnlaesseSortedNew(true)));
     this.vereine$ = this.store.pipe(select(selectVereineSorted()));
     this.router.routeReuseStrategy.shouldReuseRoute = function () {
       return false;

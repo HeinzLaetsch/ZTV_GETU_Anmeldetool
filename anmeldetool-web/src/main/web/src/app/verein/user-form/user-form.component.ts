@@ -7,8 +7,6 @@ import { AuthService } from "src/app/core/service/auth/auth.service";
 import { CachingRoleService } from "src/app/core/service/caching-services/caching.role.service";
 import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
 import { IChangeEvent } from "../profile/IChangeEvent";
-import { Store } from "@ngrx/store";
-import { AppState } from "src/app/core/redux/core.state";
 
 @Component({
   selector: "app-user-form",
@@ -111,6 +109,10 @@ export class UserFormComponent implements OnInit {
       this._assignedRoles = new Array<IRolle>();
       this.changeEvent.hasWr = false;
     }
+  }
+
+  isUserDirty(): boolean {
+    return this.currentUser.dirty;
   }
 
   isWertungsrichter() {

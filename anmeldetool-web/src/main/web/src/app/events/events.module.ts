@@ -22,6 +22,10 @@ import {
   WertungsrichterSlotComponent,
 } from "./events-detail";
 import { EventsRoutingModule } from "./events-routing.module";
+import { StoreModule } from "@ngrx/store";
+import { anlassSummariesFeature } from "../core/redux/anlass-summary/anlass-summary.reducer";
+import { EffectsModule } from "@ngrx/effects";
+import { AnlassSummaryEffects } from "../core/redux/anlass-summary";
 
 export function checkDirtyState(component: CreateEventComponent) {
   if (component.isDirty) {
@@ -56,8 +60,8 @@ export function checkDirtyState(component: CreateEventComponent) {
     ReactiveFormsModule,
     MaterialModule,
     EventsRoutingModule,
-    // StoreModule.forFeature(anlassSummaryFeature),
-    // EffectsModule.forFeature([AnlassSummaryEffects]),
+    StoreModule.forFeature(anlassSummariesFeature),
+    EffectsModule.forFeature([AnlassSummaryEffects]),
   ],
   providers: [],
 })

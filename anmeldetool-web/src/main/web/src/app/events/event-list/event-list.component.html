@@ -2,8 +2,11 @@
 <hr />
 <div class="row" *ngIf="anlaesse$ | async; else loading">
   <div *ngIf="showEvents" class="row">
-    <div *ngFor="let anlass of anlaesse" class="col-md-auto">
-      <app-event-thumbnail #thumbnail [anlass]="anlass"></app-event-thumbnail>
+    <div *ngFor="let anlass of anlaesseExtended" class="col-md-auto">
+      <app-event-thumbnail
+        #thumbnail
+        [anlassExtended]="anlass"
+      ></app-event-thumbnail>
     </div>
   </div>
 </div>

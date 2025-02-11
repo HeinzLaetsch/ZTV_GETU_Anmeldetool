@@ -1,22 +1,30 @@
 import { createFeature, createReducer, on } from "@ngrx/store";
-import { AnlassSummaryActions } from "./anlass-summary.actions";
-import { anlassSummaryAdapter, initialState } from "./anlass-summary.state";
+import { anlassSummariesAdapter, initialState } from "./anlass-summary.state";
+import { AnlassSummariesActions } from "./anlass-summary.actions";
 
-export const anlassSummaryFeature = createFeature({
-  name: "AnlassSummary",
+export const anlassSummariesFeature = createFeature({
+  name: "anlasssummaries",
   reducer: createReducer(
     initialState,
-    on(AnlassSummaryActions.loadAllAnlasssummarySuccess, (state, action) => {
-      const anlassSummaries = action.payload;
-      return anlassSummaryAdapter.setAll(anlassSummaries, state);
-    }),
-    on(AnlassSummaryActions.refreshAnlasssummarySuccess, (state, action) => {
+    on(
+      AnlassSummariesActions.loadAllAnlasssummariesSuccess,
+      (state, action) => {
+        const anlassSummaries = action.payload;
+        return anlassSummariesAdapter.setAll(anlassSummaries, state);
+      }
+    ),
+    on(AnlassSummariesActions.updateAnlasssummarySuccess, (state, action) => {
       const anlassSummary = action.payload;
-      return anlassSummaryAdapter.setOne(anlassSummary, state);
+      const newState = anlassSummariesAdapter.updateOne(anlassSummary, state);
+      return newState;
+    }),
+    on(AnlassSummariesActions.refreshAnlasssummarySuccess, (state, action) => {
+      const anlassSummary = action.payload;
+      return anlassSummariesAdapter.setOne(anlassSummary, state);
     })
   ),
 });
 // Spread         ...state,
 
 export const { selectAll, selectEntities, selectIds, selectTotal } =
-  anlassSummaryAdapter.getSelectors();
+  anlassSummariesAdapter.getSelectors();

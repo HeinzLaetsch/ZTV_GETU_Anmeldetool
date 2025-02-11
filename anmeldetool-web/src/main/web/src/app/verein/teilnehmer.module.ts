@@ -18,6 +18,8 @@ import { TeilnahmenEffects } from "../core/redux/teilnahmen";
 import { OtsEffects } from "../core/redux/organisation-teilnahmen";
 import { otsFeature } from "../core/redux/organisation-teilnahmen/ots.reducer";
 import { TeilnehmerDialog } from "./teilnehmer/teilnehmer-grid/teilnehmer-dialog/teilnehmer-dialog.component";
+import { AnlassSummaryEffects } from "../core/redux/anlass-summary";
+import { anlassSummariesFeature } from "../core/redux/anlass-summary/anlass-summary.reducer";
 
 @NgModule({
   declarations: [
@@ -37,9 +39,14 @@ import { TeilnehmerDialog } from "./teilnehmer/teilnehmer-grid/teilnehmer-dialog
     MaterialModule,
     AgGridModule,
     RouterModule.forChild(TeilnehmerRoutes),
+    StoreModule.forFeature(anlassSummariesFeature),
     StoreModule.forFeature(teilnahmenFeature),
     StoreModule.forFeature(otsFeature),
-    EffectsModule.forFeature([TeilnahmenEffects, OtsEffects]),
+    EffectsModule.forFeature([
+      AnlassSummaryEffects,
+      TeilnahmenEffects,
+      OtsEffects,
+    ]),
   ],
   providers: [],
 })

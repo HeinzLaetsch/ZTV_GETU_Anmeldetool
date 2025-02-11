@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { Actions, createEffect } from "@ngrx/effects";
 import { filter, map } from "rxjs/operators";
 import { LoadingActions } from "./busy-indicator-progress-bar.actions";
+import { Action } from "@ngrx/store";
 
 @Injectable()
 export class BusyIndicatorProgressBarEffects {
@@ -14,7 +15,11 @@ export class BusyIndicatorProgressBarEffects {
       }),
       map(() => {
         // console.log("Action set isLoading : true");
-        return LoadingActions.isLoading({ isLoading: true });
+        return LoadingActions.isLoading({
+          error: false,
+          message: "success",
+          isLoading: true,
+        });
       })
     );
   });
@@ -22,11 +27,31 @@ export class BusyIndicatorProgressBarEffects {
   loadingProcessStopped$ = createEffect(() => {
     return this.actions$.pipe(
       filter((action) => {
-        return action.type.includes("SUCCESS") || action.type.includes("ERROR"); // Service Aufruf Action muss SUCCESS oder ERROR beinhalten um Progressbar zu stoppen
+        return action.type.includes("SUCCESS"); // Service Aufruf Action muss SUCCESS oder ERROR beinhalten um Progressbar zu stoppen
       }),
       map(() => {
         // console.log("Action set isLoading : false");
-        return LoadingActions.isLoading({ isLoading: false });
+        return LoadingActions.isLoading({
+          error: false,
+          message: "success",
+          isLoading: false,
+        });
+      })
+    );
+  });
+
+  loadingProcessError$ = createEffect(() => {
+    return this.actions$.pipe(
+      filter((action) => {
+        return action.type.includes("ERROR"); // Service Aufruf Action muss SUCCESS oder ERROR beinhalten um Progressbar zu stoppen
+      }),
+      map((action: any) => {
+        console.log("Action ", action);
+        return LoadingActions.isLoading({
+          error: true,
+          message: action.error,
+          isLoading: false,
+        });
       })
     );
   });

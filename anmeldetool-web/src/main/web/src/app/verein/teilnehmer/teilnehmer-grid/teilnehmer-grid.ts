@@ -1,4 +1,9 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import {
+  Component,
+  ModuleWithComponentFactories,
+  OnInit,
+  ViewChild,
+} from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { AgGridAngular } from "ag-grid-angular";
 import {
@@ -10,14 +15,18 @@ import {
   ValueGetterParams,
   ValueSetterParams,
 } from "ag-grid-community";
-import { Observable, of } from "rxjs";
+import { combineLatest, Observable, of } from "rxjs";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import {
   KategorieEnum,
   KategorieEnumFunction,
 } from "src/app/core/model/KategorieEnum";
 import { TiTuEnum } from "src/app/core/model/TiTuEnum";
-import { selectAnlaesse, selectJahre } from "src/app/core/redux/anlass";
+import {
+  selectAnlaesse,
+  selectAnlaesseSortedNew,
+  selectJahre,
+} from "src/app/core/redux/anlass";
 import { AppState } from "src/app/core/redux/core.state";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 import {
@@ -42,9 +51,13 @@ import { TeilnehmerDialog } from "./teilnehmer-dialog/teilnehmer-dialog.componen
 import * as moment from "moment";
 import { MatSelectChange } from "@angular/material/select";
 import { SubscriptionHelper } from "src/app/utils/subscription-helper";
-import { AnlassService } from "src/app/core/service/anlass/anlass.service";
 import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
 import { TeilnehmerGridHelpComponent } from "./teilnehmer-grid-help/teilnehmer-grid-help.component";
+import { IAnlassExtended } from "src/app/core/model/IAnlassExtended";
+import {
+  AnlassSummariesActions,
+  selectAnlassSummaries,
+} from "src/app/core/redux/anlass-summary";
 
 @Component({
   selector: "app-teilnehmer-grid",
@@ -62,13 +75,15 @@ export class TeilnehmerGridComponent
   selectedState = undefined;
 
   anlaesseAlle$: Observable<IAnlass[]>;
+  anlassSummaries$: Observable<IAnlassSummary[]>;
   jahresListeAnlaesse$: Observable<IAnlass[]>;
   jahresListe$: Observable<number[]>;
-  alleAnlaesse: IAnlass[];
+  // alleAnlaesse: IAnlass[];
+  anlaesseExtended: IAnlassExtended[];
 
   public rowData$!: Observable<ITeilnahmen[]>;
   public data: ITeilnahmen[];
-  private anlassSummaries = new Array<IAnlassSummary>();
+  // private anlassSummaries = new Array<IAnlassSummary>();
   private gridApi!: GridApi<ITeilnahmen>;
 
   public ots$!: Observable<IOrganisationTeilnahmenStatistik[]>;
@@ -174,11 +189,11 @@ export class TeilnehmerGridComponent
   constructor(
     public dialog: MatDialog,
     private store: Store<AppState>,
-    private authService: AuthService,
-    private anlassService: AnlassService
+    private authService: AuthService // private anlassService: AnlassService
   ) {
     super();
     this.selectedJahr = moment(Date.now()).year();
+    this.store.dispatch(AnlassSummariesActions.loadAllAnlasssummariesInvoked());
   }
 
   onSuppressKeyboardEvent(params): boolean {
@@ -326,16 +341,43 @@ export class TeilnehmerGridComponent
   }
 
   public subscribeColumnData() {
+    /*
     this.registerSubscription(
       this.anlaesseAlle$.subscribe((anlaesse) => {
         this.alleAnlaesse = anlaesse;
         this.refreshAnlaesse();
       })
     );
+    */
+    const anlassExt$ = combineLatest([
+      this.anlaesseAlle$,
+      this.anlassSummaries$,
+    ]);
+
+    this.registerSubscription(
+      anlassExt$.subscribe(([anlaesse, anlassSummaries]) => {
+        this.anlaesseExtended = anlaesse.map((anlass) => {
+          // ReadOnly ???
+          const summary = anlassSummaries.find((anlassSummary) => {
+            return anlassSummary.anlassId === anlass.id;
+          });
+          const anlaesseExtended: IAnlassExtended = {
+            anlass,
+            summary,
+          };
+          return anlaesseExtended;
+        });
+        this.refreshAnlaesse();
+        console.log("AnlaesseExtended: ", this.anlaesseExtended);
+      })
+    );
   }
 
   registerSelects() {
-    this.anlaesseAlle$ = this.store.pipe(select(selectAnlaesse()));
+    this.anlaesseAlle$ = this.store.pipe(
+      select(selectAnlaesseSortedNew(this.authService.isAdministrator()))
+    );
+    this.anlassSummaries$ = this.store.pipe(select(selectAnlassSummaries()));
     this.jahresListeAnlaesse$ = this.store.pipe(select(selectJahre()));
     this.rowData$ = this.store.pipe(select(selectTeilnahmen()));
     this.ots$ = this.store.pipe(select(selectOts()));
@@ -352,11 +394,12 @@ export class TeilnehmerGridComponent
   }
 
   getSummaries() {
+    /*
     this.agGrid.api.getColumns().forEach((column) => {
       // this.agGrid.api.getColumnState().forEach((state) => {
       if (!column.getColId().startsWith("teil")) {
         const index = +column.getColId();
-        if (this.alleAnlaesse[index].aktiv) {
+        if (this.anlaesseExtended[index].anlass.aktiv) {
           const anlassSummary$ =
             this.anlassService.getAnlassOrganisationSummary(
               this.alleAnlaesse[index],
@@ -370,33 +413,37 @@ export class TeilnehmerGridComponent
         }
       }
     });
+    */
   }
   refreshAnlaesse() {
     var columnId = 0;
-    this.alleAnlaesse.forEach((anlass) => {
+    this.anlaesseExtended.forEach((anlassExt) => {
       this.columnDefs.push({
-        headerName: anlass.getCleaned(),
+        headerName: anlassExt.anlass.getCleaned(),
         valueGetter: this.talValueGetter,
         valueSetter: this.talValueSetter,
         minWidth: 100,
         maxWidth: 150,
         editable: function (params) {
-          return params.context.this.isEditable(params, anlass);
+          return params.context.this.isEditable(params, anlassExt);
         },
         cellRenderer: TeilnahmeStatusRenderer,
         cellEditor: TeilnahmeStatusEditor,
         tooltipValueGetter: function (params) {
-          return params.context.this.getKategorieTooltip(params, anlass);
+          return params.context.this.getKategorieTooltip(
+            params,
+            anlassExt.anlass
+          );
         },
         comparator: this.talComparator,
         cellEditorPopup: false,
         cellEditorParams: function (params) {
           return {
-            kats: params.context.this.getAvailableKValues(params, anlass),
-            mode: params.context.this.getMode(anlass),
+            kats: params.context.this.getAvailableKValues(params, anlassExt),
+            mode: params.context.this.getMode(anlassExt),
           };
         },
-        hide: !this.showAnlass(anlass),
+        hide: !this.showAnlass(anlassExt.anlass),
       });
       columnId++;
     });
@@ -430,23 +477,23 @@ export class TeilnehmerGridComponent
       if (!state.colId.startsWith("teil")) {
         var visbility = true;
         const index = +state.colId;
-        if (this.alleAnlaesse.length > index) {
+        if (this.anlaesseExtended.length > index) {
           if (
-            !this.alleAnlaesse[index].alleAnlass &&
+            !this.anlaesseExtended[index].anlass.alleAnlass &&
             this.selectedState === "Turner" &&
-            this.alleAnlaesse[index].tiAnlass
+            this.anlaesseExtended[index].anlass.tiAnlass
           ) {
             visbility = false;
           }
           if (
-            !this.alleAnlaesse[index].alleAnlass &&
+            !this.anlaesseExtended[index].anlass.alleAnlass &&
             this.selectedState === "Turnerin" &&
-            this.alleAnlaesse[index].tuAnlass
+            this.anlaesseExtended[index].anlass.tuAnlass
           ) {
             visbility = false;
           }
         }
-        const showAnlass = this.showAnlass(this.alleAnlaesse[index]);
+        const showAnlass = this.showAnlass(this.anlaesseExtended[index].anlass);
         if (visbility && !showAnlass) {
           visbility = showAnlass;
         }
@@ -466,34 +513,34 @@ export class TeilnehmerGridComponent
     return 0;
   }
 
-  getAvailableKValues(params: any, anlass: IAnlass): any[] {
+  getAvailableKValues(params: any, anlaesseExt: IAnlassExtended): any[] {
     const component: TeilnehmerGridComponent = params.context.this;
 
-    if (component.getMode(anlass) === 1) {
+    if (component.getMode(anlaesseExt) === 1) {
       const kats = KategorieEnumFunction.valuesAndGreater(
         //params.data.teilnehmer.letzteKategorie,
         KategorieEnum.K1,
         params.data.teilnehmer.tiTu,
-        anlass
+        anlaesseExt.anlass
       );
       return kats;
     }
-    if (component.getMode(anlass) === 4) {
+    if (component.getMode(anlaesseExt) === 4) {
       const kats = KategorieEnumFunction.valuesAndGreater(
         KategorieEnum.K1,
         params.data.teilnehmer.tiTu,
-        anlass
+        anlaesseExt.anlass
       );
       return kats;
     }
-    if (component.getMode(anlass) === 2) {
+    if (component.getMode(anlaesseExt) === 2) {
       const kats = KategorieEnumFunction.valuesAndGreater(
         //params.data.teilnehmer.letzteKategorie,
         KategorieEnum.K1,
         params.data.teilnehmer.tiTu,
-        anlass
+        anlaesseExt.anlass
       );
-      const ots = component.filterOts(anlass, component.otsData);
+      const ots = component.filterOts(anlaesseExt.anlass, component.otsData);
       if (ots) {
         const katsFiltered = kats.filter((kat) => {
           const meldeStati = ots.kategorieStati.find(
@@ -533,28 +580,46 @@ export class TeilnehmerGridComponent
     mode = 3 --> Wettkampf Anmeldung offen, Mutationen geschlossen // Kein Edit
     mode = 4 --> Admin Mode (Alles erlaubt)
   */
-  getMode(anlass: IAnlass): number {
+  getMode(anlassExt: IAnlassExtended): number {
     if (this.authService.isAdministrator()) {
       return 4;
     }
-    if (anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)) {
+    if (
+      anlassExt.anlass.anzeigeStatus.hasStatus(
+        AnzeigeStatusEnum.NOCH_NICHT_OFFEN
+      )
+    ) {
       return 0;
     }
-    if (anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.CLOSED)) {
+    if (anlassExt.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.CLOSED)) {
       return 0;
+    }
+    // Falls verlängert, nimm das Verlängerungsdatum
+    let asMoment = moment(anlassExt.anlass.erfassenGeschlossen).add(1, "days");
+    if (anlassExt.summary?.verlaengerungsDate) {
+      asMoment = moment(anlassExt.summary.verlaengerungsDate);
     }
     if (
-      !anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED) ||
-      anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.VERLAENGERT)
+      !anlassExt.anlass.anzeigeStatus.hasStatus(
+        AnzeigeStatusEnum.ERFASSEN_CLOSED
+      ) ||
+      asMoment.isSameOrAfter(moment())
     ) {
       return 1;
     }
     if (
-      !anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.IN_KATEGORIE_CLOSED)
+      !anlassExt.anlass.anzeigeStatus.hasStatus(
+        AnzeigeStatusEnum.IN_KATEGORIE_CLOSED
+      )
     ) {
       return 2;
     }
-    if (anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.IN_KATEGORIE_CLOSED)) {
+    //TODO Beides mal gleich
+    if (
+      anlassExt.anlass.anzeigeStatus.hasStatus(
+        AnzeigeStatusEnum.IN_KATEGORIE_CLOSED
+      )
+    ) {
       return 3;
     }
   }
@@ -564,9 +629,10 @@ export class TeilnehmerGridComponent
     //return this.authService.isAdministrat or();
   }
 
-  isEditable(params: any, anlass: IAnlass): boolean {
+  isEditable(params: any, anlassExt: IAnlassExtended): boolean {
     // check auf startet
-    if (this.anlassSummaries && this.anlassSummaries.length > 0) {
+    /*
+    if (anlassExt.summary && this.anlassSummaries.length > 0) {
       const summary = this.anlassSummaries.find((summary) => {
         if (summary.anlassId === anlass.id) {
           return true;
@@ -578,12 +644,16 @@ export class TeilnehmerGridComponent
     } else {
       return false;
     }
+    */
+    if (!anlassExt.summary || !anlassExt.summary.startet) {
+      return false;
+    }
 
     if (
       !(
-        (anlass.tiAnlass &&
+        (anlassExt.anlass.tiAnlass &&
           TiTuEnum.equals(params.data.teilnehmer.tiTu, TiTuEnum.Ti)) ||
-        (anlass.tuAnlass &&
+        (anlassExt.anlass.tuAnlass &&
           TiTuEnum.equals(params.data.teilnehmer.tiTu, TiTuEnum.Tu))
       )
     ) {
@@ -591,26 +661,43 @@ export class TeilnehmerGridComponent
     }
 
     const component: TeilnehmerGridComponent = params.context.this;
-    const letzteKategorie = component.kategorieValueGetter(params);
-
-    if (anlass.brevet1Anlass && !anlass.brevet2Anlass) {
-      if (!KategorieEnumFunction.isBrevet1(letzteKategorie)) {
-        return false;
+    let letzteKategorie = component.kategorieValueGetter(params);
+    if (letzteKategorie !== null && letzteKategorie !== "") {
+      if (anlassExt.anlass.brevet1Anlass && !anlassExt.anlass.brevet2Anlass) {
+        if (!KategorieEnumFunction.isBrevet1(letzteKategorie)) {
+          return false;
+        }
       }
-    }
-    if (!anlass.brevet1Anlass && anlass.brevet2Anlass) {
-      if (!KategorieEnumFunction.isBrevet2(letzteKategorie)) {
-        return false;
+      /* Funktion geht nicht, sonst kann kein Kategorie höher gestartet werden
+      if (!anlassExt.anlass.brevet1Anlass && anlassExt.anlass.brevet2Anlass) {
+        if (
+          !KategorieEnumFunction.isBrevet2(letzteKategorie) &&
+          !(
+            KategorieEnumFunction.isBrevet1(letzteKategorie) &&
+            KategorieEnumFunction.equals(KategorieEnum.K4, letzteKategorie)
+          )
+        ) {
+          return false;
+        }
       }
+      */
     }
-    if (this.getMode(anlass) === 0 || this.getMode(anlass) === 3) {
+    if (this.getMode(anlassExt) === 0 || this.getMode(anlassExt) === 3) {
       return false;
     }
-    if (this.getMode(anlass) === 1 || this.getMode(anlass) === 4) {
+    if (
+      this.getMode(anlassExt) === 1 ||
+      this.getMode(anlassExt) === 2 ||
+      this.getMode(anlassExt) === 4
+    ) {
       return true;
     }
 
-    const tal = component.getTal(params, anlass, params.data.talDTOList);
+    const tal = component.getTal(
+      params,
+      anlassExt.anlass,
+      params.data.talDTOList
+    );
     if (
       tal &&
       !KategorieEnumFunction.equals(
@@ -621,11 +708,11 @@ export class TeilnehmerGridComponent
       return true;
     }
     // Check if Abmeldung
-    const ots = component.filterOts(anlass, component.otsData);
+    const ots = component.filterOts(anlassExt.anlass, component.otsData);
     const possibleKategories = KategorieEnumFunction.valuesAndGreater(
       letzteKategorie,
       params.data.teilnehmer.tiTu,
-      anlass
+      anlassExt.anlass
     );
     if (component.hasAbmeldungenForKategories(possibleKategories, ots)) {
       return true;
@@ -657,15 +744,15 @@ export class TeilnehmerGridComponent
     }
     return retValue;
   }
-  getAnlassIdForColId(params: any): IAnlass {
+  getAnlassIdForColId(params: any): IAnlassExtended {
     const component: TeilnehmerGridComponent = params.context.this;
     const index = params.column.getColId();
-    const anlass = component.alleAnlaesse[index];
+    const anlass = component.anlaesseExtended[index];
     return anlass;
   }
 
   getTal(params: any, anlass: IAnlass, tals: IAnlassLink[]): IAnlassLink {
-    const component: TeilnehmerGridComponent = params.context.this;
+    // const component: TeilnehmerGridComponent = params.context.this;
 
     const tal: IAnlassLink = tals.find(
       (talInt) => talInt.anlassId === anlass.id
@@ -675,7 +762,7 @@ export class TeilnehmerGridComponent
 
   talValueSetter(params: ValueSetterParams): boolean {
     const component: TeilnehmerGridComponent = params.context.this;
-    const anlass = component.getAnlassIdForColId(params);
+    const anlassExt = component.getAnlassIdForColId(params);
 
     const newValue: ITeilnahmen = JSON.parse(JSON.stringify(params.data));
     if (!newValue.talDTOList) {
@@ -684,7 +771,7 @@ export class TeilnehmerGridComponent
     newValue.jahr = component.selectedJahr;
 
     const tal: IAnlassLink = newValue.talDTOList.find(
-      (talInt) => talInt.anlassId === anlass.id
+      (talInt) => talInt.anlassId === anlassExt.anlass.id
     );
     if (tal) {
       tal.kategorie = params.newValue.kategorie;
@@ -698,6 +785,11 @@ export class TeilnehmerGridComponent
     component.store.dispatch(
       TeilnahmenActions.updateTeilnahmenInvoked({ payload: newValue })
     );
+    component.store.dispatch(
+      OtsActions.loadAllOtsInvoked({
+        payload: component.selectedJahr,
+      })
+    );
 
     return true;
   }
@@ -708,8 +800,8 @@ export class TeilnehmerGridComponent
     if (params.data) {
       const tal = params.data.talDTOList?.find((element) => {
         if (
-          component.alleAnlaesse === undefined ||
-          component.alleAnlaesse[index] === undefined
+          component.anlaesseExtended === undefined ||
+          component.anlaesseExtended[index] === undefined
         ) {
           return component.emptyTal(
             params.data.teilnehmer.id,
@@ -717,14 +809,14 @@ export class TeilnehmerGridComponent
             undefined
           );
         }
-        return element.anlassId === component.alleAnlaesse[index].id;
+        return element.anlassId === component.anlaesseExtended[index].anlass.id;
       });
       if (tal !== undefined) {
         return tal;
       }
       return component.emptyTal(
         params.data.teilnehmer.id,
-        component.alleAnlaesse[index].id,
+        component.anlaesseExtended[index].anlass.id,
         component.authService.currentVerein.id
       );
     }
@@ -749,12 +841,12 @@ export class TeilnehmerGridComponent
     const index = Number(params.column.getColId());
     const tal = params.data.talDTOList.find((element) => {
       if (
-        component.alleAnlaesse === undefined ||
-        component.alleAnlaesse[index] === undefined
+        component.anlaesseExtended === undefined ||
+        component.anlaesseExtended[index] === undefined
       ) {
         return false;
       }
-      return element.anlassId === component.alleAnlaesse[index].id;
+      return element.anlassId === component.anlaesseExtended[index].anlass.id;
     });
     if (tal !== undefined) {
       return tal.kategorie;

@@ -98,7 +98,7 @@ public class TeilnahmenService {
 					anlassCache.put(anlass.getId(), anlass);
 				}
 				if (adjust) {
-					talDTO = adjustMeldeStatus(false, anlassCache.get(talDTO.getAnlassId()), talDTO);
+					talDTO = adjustMeldeStatus(false, anlassCache.get(talDTO.getAnlassId()), talDTO, null);
 				}
 				return talDTO;
 			}).collect(Collectors.toList());
@@ -126,11 +126,22 @@ public class TeilnahmenService {
 		return teilnahmenDtos;
 	}
 
-	private TeilnehmerAnlassLinkDTO adjustMeldeStatus(boolean fromUI, Anlass anlass, TeilnehmerAnlassLinkDTO talDto) {
+	private TeilnehmerAnlassLinkDTO adjustMeldeStatus(boolean fromUI, Anlass anlass, TeilnehmerAnlassLinkDTO talDto,
+			TeilnehmerAnlassLink persistedTalDto) {
 		// adjustStates
 		if (fromUI) {
 			if (talDto.getMeldeStatus() != null && talDto.getMeldeStatus().length() > 0) {
+				// Falls schon mit einem detaillierten Status Abgemeldet mach nichts
 				if (talDto.getMeldeStatus().equalsIgnoreCase("Abgemeldet")) {
+					if (persistedTalDto != null
+							&& (persistedTalDto.getMeldeStatus().equals(MeldeStatusEnum.KEINE_TEILNAHME)
+									|| persistedTalDto.getMeldeStatus().equals(MeldeStatusEnum.ABGEMELDET_1)
+									|| persistedTalDto.getMeldeStatus().equals(MeldeStatusEnum.ABGEMELDET_2)
+									|| persistedTalDto.getMeldeStatus().equals(MeldeStatusEnum.ABGEMELDET_3)
+									|| persistedTalDto.getMeldeStatus().equals(MeldeStatusEnum.ABGEMELDET_4))) {
+						return talDtoFactory(talDto, persistedTalDto.getMeldeStatus().name(),
+								persistedTalDto.getKategorie());
+					}
 					// Anlass noch nicht offen Kein Status
 					if (anlass.getAnmeldungBeginn().isAfter(LocalDateTime.now())) {
 						return talDtoFactory(talDto, MeldeStatusEnum.KEINE_TEILNAHME.name(), KategorieEnum.KEIN_START);
@@ -165,6 +176,11 @@ public class TeilnahmenService {
 					}
 				} else {
 					if (talDto.getMeldeStatus().equalsIgnoreCase("Startet")) {
+						if (persistedTalDto != null
+								&& persistedTalDto.getMeldeStatus().equals(MeldeStatusEnum.STARTET)) {
+							return talDtoFactory(talDto, persistedTalDto.getMeldeStatus().name(),
+									talDto.getKategorie());
+						}
 						if (anlass.getErfassenGeschlossen().isBefore(LocalDateTime.now())
 								&& anlass.getAenderungenInKategorieGeschlossen().isAfter(LocalDateTime.now())) {
 							return talDtoFactory(talDto, MeldeStatusEnum.NEUMELDUNG.name(), talDto.getKategorie());
@@ -209,36 +225,42 @@ public class TeilnahmenService {
 		// Teilnehmer wird nicht ersetzt
 
 		List<TeilnehmerAnlassLinkDTO> talDTOList = teilnahmenDto.getTalDTOList();
-		talDTOList.forEach(talDto -> {
-			if (!anlassCache.containsKey(talDto.getAnlassId())) {
-				Anlass anlass = anlassSrv.findAnlassById(talDto.getAnlassId());
-				anlassCache.put(anlass.getId(), anlass);
-			}
-			talDto = adjustMeldeStatus(true, anlassCache.get(talDto.getAnlassId()), talDto);
-			TeilnehmerAnlassLink talNeu = teilnehmerAnlassLinkMapper.toEntity(talDto);
-			Anlass anlass = anlassSrv.findAnlassById(talNeu.getAnlass().getId());
-			Optional<TeilnehmerAnlassLink> talOptional = teilnehmerAnlassLinkSrv
-					.findTeilnehmerAnlassLinkByAnlassAndTeilnehmer(anlass, teilnehmer);
-			talOptional.ifPresentOrElse((tal) -> {
-				// TODO Equals Methode überprüfen
-				if (!tal.equals(talNeu)) {
-					mergeTeilnehmerAnlassLink(tal, talNeu);
+		if (talDTOList != null) {
+			talDTOList.forEach(talDto -> {
+				if (!anlassCache.containsKey(talDto.getAnlassId())) {
+					Anlass anlass = anlassSrv.findAnlassById(talDto.getAnlassId());
+					anlassCache.put(anlass.getId(), anlass);
 				}
-			}, () -> {
-				int startNummer = teilnehmerAnlassLinkSrv.findMaxStartNummer();
-				talNeu.setStartnummer(startNummer);
-				saveAndSetAktivTal(talNeu);
+				Anlass anlass = anlassSrv.findAnlassById(talDto.getAnlassId());
+				Optional<TeilnehmerAnlassLink> talOptional = teilnehmerAnlassLinkSrv
+						.findTeilnehmerAnlassLinkByAnlassAndTeilnehmer(anlass, teilnehmer);
+				TeilnehmerAnlassLink talPersisted = talOptional.isPresent() ? talOptional.get() : null;
+
+				talDto = adjustMeldeStatus(true, anlassCache.get(talDto.getAnlassId()), talDto, talPersisted);
+				TeilnehmerAnlassLink talNeu = teilnehmerAnlassLinkMapper.toEntity(talDto);
+
+				talOptional.ifPresentOrElse((tal) -> {
+					// TODO Equals Methode überprüfen
+					if (!tal.equals(talNeu)) {
+						mergeTeilnehmerAnlassLink(tal, talNeu);
+					}
+				}, () -> {
+					int startNummer = teilnehmerAnlassLinkSrv.findMaxStartNummer();
+					talNeu.setStartnummer(startNummer);
+					saveAndSetAktivTal(talNeu);
+				});
 			});
-		});
+			teilnahmenDto.getTalDTOList().clear();
+		} else {
+			teilnahmenDto.setTalDTOList(new ArrayList<TeilnehmerAnlassLinkDTO>());
+		}
 		List<TeilnehmerAnlassLink> tals = teilnehmerAnlassLinkSrv.findTeilnehmerAnlassLinkByTeilnehmer(teilnehmer);
 		List<TeilnehmerAnlassLinkDTO> linksDto = tals.stream()
 				.filter(link -> anlassCache.containsKey(link.getAnlass().getId())).map(link -> {
 					var talDTO = teilnehmerAnlassLinkMapper.toDto(link);
-					talDTO = adjustMeldeStatus(false, anlassCache.get(talDTO.getAnlassId()), talDTO);
+					talDTO = adjustMeldeStatus(false, anlassCache.get(talDTO.getAnlassId()), talDTO, null);
 					return talDTO;
 				}).collect(Collectors.toList());
-
-		teilnahmenDto.getTalDTOList().clear();
 		teilnahmenDto.getTalDTOList().addAll(linksDto);
 
 		return teilnahmenDto;

@@ -1,4 +1,7 @@
-<div class="container" *ngIf="anlass$ | async; else loading">
+<div
+  class="container"
+  *ngIf="(anlass$ | async) && (anlassSummary$ | async); else loading"
+>
   <div class="row">
     <div class="col-7">
       <h2>{{ anlass.getCleaned() }}</h2>
@@ -51,7 +54,8 @@
   <hr />
   <app-anlass-statistik
     [anlass]="anlass"
-    (startetClicked)="startetClicked($event)"
+    [anlassSummary]="anlassSummary"
+    (startetChanged)="startetChanged($event)"
   ></app-anlass-statistik>
   <!-- neu Anlass Statistik
   <div class="row">
@@ -173,9 +177,8 @@
 -->
 
   <app-wertungsrichter-selektion
-    *ngIf="vereinStartet"
+    *ngIf="anlassSummary.startet"
     [anlass]="anlass"
-    [anlassSummary]="anlassSummary"
   ></app-wertungsrichter-selektion>
 
   <!-- neu Wertungsrichter Selektion
@@ -373,8 +376,9 @@
 -->
   <app-events-dates
     [anlass]="anlass"
+    [anlassSummary]="anlassSummary"
     [viewOnly]="isViewOnly()"
-    (verlaengertChange)="verlaengertChange($event)"
+    (verlaengertChanged)="verlaengertChanged($event)"
   ></app-events-dates>
 </div>
 

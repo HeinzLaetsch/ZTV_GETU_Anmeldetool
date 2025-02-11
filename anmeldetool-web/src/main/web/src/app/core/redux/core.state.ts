@@ -15,14 +15,14 @@ import { otsFeature } from "./organisation-teilnahmen/ots.reducer";
 import { OtsState } from "./organisation-teilnahmen";
 import { userFeature } from "./user/user.reducer";
 import { UserState } from "./user";
-import { anlassSummaryFeature } from "./anlass-summary/anlass-summary.reducer";
-import { AnlassSummaryState } from "./anlass-summary";
+import { anlassSummariesFeature } from "./anlass-summary/anlass-summary.reducer";
+import { AnlassSummariesState } from "./anlass-summary";
 
 export const reducers: ActionReducerMap<AppState> = {
   router: routerReducer,
   loading: loadingFeature.reducer,
   anlass: anlassFeature.reducer,
-  anlassSummary: anlassSummaryFeature.reducer,
+  // anlassSummary: anlassSummariesFeature.reducer,
   verein: vereinFeature.reducer,
   user: userFeature.reducer,
   oal: oalFeature.reducer,
@@ -41,7 +41,7 @@ export interface AppState {
   router: RouterReducerState<RouterStateUrl>;
   loading: LoadingState;
   anlass: AnlassState;
-  anlassSummary: AnlassSummaryState;
+  // anlassSummary: AnlassSummariesState;
   verein: VereinState;
   user: UserState;
   oal: OalState;

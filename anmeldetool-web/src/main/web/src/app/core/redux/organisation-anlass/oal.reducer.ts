@@ -8,6 +8,8 @@ export const oalFeature = createFeature({
     initialState,
     on(OalActions.loadAllOalSuccess, (state, action) => {
       const oals = action.payload;
+      console.log("Oals loaded: ", oals?.length);
+
       return oalAdapter.setAll(oals, state);
     })
   ),

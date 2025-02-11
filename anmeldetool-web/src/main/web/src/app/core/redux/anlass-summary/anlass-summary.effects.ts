@@ -1,9 +1,10 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { catchError, mergeMap, of, switchMap } from "rxjs";
+import { catchError, map, mergeMap, of, switchMap } from "rxjs";
 import { AuthService } from "../../service/auth/auth.service";
 import { AnlassService } from "../../service/anlass/anlass.service";
-import { AnlassSummaryActions } from "./anlass-summary.actions";
+import { AnlassSummariesActions } from "./anlass-summary.actions";
+import { IOrganisationAnlassLink } from "../../model/IOrganisationAnlassLink";
 
 @Injectable()
 export class AnlassSummaryEffects {
@@ -13,21 +14,23 @@ export class AnlassSummaryEffects {
     private anlassService: AnlassService
   ) {}
 
-  loadAnlassSummary$ = createEffect(() => {
+  loadAnlassSummaries$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(AnlassSummaryActions.loadAllAnlasssummaryInvoked),
+      ofType(AnlassSummariesActions.loadAllAnlasssummariesInvoked),
       mergeMap((action) => {
         return this.anlassService
           .getAnlassOrganisationSummaries(this.authService.currentVerein)
           .pipe(
             switchMap((anlassSummaries) => [
-              AnlassSummaryActions.loadAllAnlasssummarySuccess({
+              AnlassSummariesActions.loadAllAnlasssummariesSuccess({
                 payload: anlassSummaries,
               }),
             ]),
             catchError((error) => {
               return of(
-                AnlassSummaryActions.loadAllAnlasssummaryError({ error: error })
+                AnlassSummariesActions.loadAllAnlasssummariesError({
+                  error: error,
+                })
               );
             })
           );
@@ -35,9 +38,35 @@ export class AnlassSummaryEffects {
     );
   });
 
+  updateAnlassSummary$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(AnlassSummariesActions.updateAnlasssummaryInvoked),
+      mergeMap((action) => {
+        const newOal: IOrganisationAnlassLink = {
+          anlassId: String(action.payload.id),
+          organisationsId: this.authService.currentVerein.id,
+          verlaengerungsDate: action.payload.changes.verlaengerungsDate,
+          startet: action.payload.changes.startet,
+        };
+        return this.anlassService.updateVereinsStart(newOal).pipe(
+          map(() => {
+            return AnlassSummariesActions.updateAnlasssummarySuccess({
+              payload: action.payload,
+            });
+          }),
+          catchError((error) => {
+            return of(
+              AnlassSummariesActions.updateAnlasssummaryError({ error: error })
+            );
+          })
+        );
+      })
+    );
+  });
+
   refreshSingleAnlassSummary$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(AnlassSummaryActions.refreshAnlasssummaryInvoked),
+      ofType(AnlassSummariesActions.refreshAnlasssummaryInvoked),
       mergeMap((action) => {
         return this.anlassService
           .getAnlassOrganisationSummary(
@@ -46,13 +75,18 @@ export class AnlassSummaryEffects {
           )
           .pipe(
             switchMap((anlassSummary) => [
-              AnlassSummaryActions.refreshAnlasssummarySuccess({
+              AnlassSummariesActions.refreshAnlasssummarySuccess({
                 payload: anlassSummary,
               }),
             ]),
             catchError((error) => {
+              // 401 handlen
+              if (error.status === 401) {
+              }
               return of(
-                AnlassSummaryActions.refreshAnlasssummaryError({ error: error })
+                AnlassSummariesActions.refreshAnlasssummaryError({
+                  error: error,
+                })
               );
             })
           );

@@ -4,6 +4,7 @@ import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
+import { IAnlassExtended } from "src/app/core/model/IAnlassExtended";
 import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
 import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
 import { selectAktiveAnlaesse } from "src/app/core/redux/anlass";
@@ -23,10 +24,10 @@ export class EventThumbnailComponent
   extends SubscriptionHelper
   implements OnInit
 {
-  @Input() anlass: IAnlass;
+  @Input() anlassExtended: IAnlassExtended;
+
   @Output() anlassClick = new EventEmitter();
 
-  anlassSummary: IAnlassSummary;
   organisator: IVerein;
 
   constructor(
@@ -41,18 +42,10 @@ export class EventThumbnailComponent
 
   ngOnInit() {
     this.registerSubscription(
-      this.anlassService
-        .getAnlassOrganisationSummary(
-          this.anlass,
-          this.authService.currentVerein
-        )
-        .subscribe((result) => {
-          this.anlassSummary = result;
-        })
-    );
-    this.registerSubscription(
       this.store
-        .pipe(select(selectVereinById(this.anlass.organisatorId)))
+        .pipe(
+          select(selectVereinById(this.anlassExtended.anlass.organisatorId))
+        )
         .subscribe((result) => {
           this.organisator = result;
         })
@@ -60,18 +53,18 @@ export class EventThumbnailComponent
   }
 
   isEnabled(): boolean {
-    return true;
+    return this.authService.currentVerein.name != "ZTV";
   }
 
   getClassForAnzeigeStatus(anzeigeStatus: AnzeigeStatusEnum): string {
-    if (this.anlass.anzeigeStatus.hasStatus(anzeigeStatus)) {
+    if (this.anlassExtended.anlass.anzeigeStatus.hasStatus(anzeigeStatus)) {
       return "div-red";
     }
     return "div-green";
   }
 
   getStartedClass() {
-    if (!this.anlassSummary?.startet) {
+    if (!this.anlassExtended.summary?.startet) {
       return { redNoMargin: true };
     } else {
       return { greenNoMargin: true };
@@ -80,7 +73,9 @@ export class EventThumbnailComponent
 
   get hasTeilnehmer(): boolean {
     return (
-      this.anlassSummary.startendeBr1 + this.anlassSummary.startendeBr2 > 0
+      this.anlassExtended.summary.startendeBr1 +
+        this.anlassExtended.summary.startendeBr2 >
+      0
     );
   }
 
@@ -101,17 +96,17 @@ export class EventThumbnailComponent
   }
   handleClickMe(event: PointerEvent) {
     // this.anlassClick.emit(this.anlass.anlassBezeichnung);
-    this.router.navigate(["/anlaesse/", this.anlass?.id]);
+    this.router.navigate(["/anlaesse/", this.anlassExtended.anlass?.id]);
   }
 
   vereinStartedClicked(event: PointerEvent) {
     console.log(event);
     event.cancelBubble = true;
     const organisationAnlassLink: IOrganisationAnlassLink = {
-      anlassId: this.anlass.id,
+      anlassId: this.anlassExtended.anlass.id,
       organisationsId: this.authService.currentVerein.id,
-      startet: this.anlassSummary.startet,
-      verlaengerungsDate: this.anlassSummary.verlaengerungsDate,
+      startet: this.anlassExtended.summary.startet,
+      verlaengerungsDate: this.anlassExtended.summary.verlaengerungsDate,
     };
     // Sollte ersetzt werden
     this.registerSubscription(
@@ -125,7 +120,9 @@ export class EventThumbnailComponent
 
   get isWertungsrichterOk(): boolean {
     if (this.hasTeilnehmer) {
-      return this.anlassSummary.br1Ok && this.anlassSummary.br2Ok;
+      return (
+        this.anlassExtended.summary.br1Ok && this.anlassExtended.summary.br2Ok
+      );
     }
     return true;
   }

@@ -81,8 +81,8 @@ export class AnlassService {
   getAnlassOrganisationSummaries(
     verein: IVerein
   ): Observable<IAnlassSummary[]> {
-    const combinedUrl = this.url + "/summaries";
-    "organisationen" + "/" + verein?.id;
+    const combinedUrl =
+      this.url + "/organisationen" + "/" + verein?.id + "/summaries";
     if (!verein) {
       return of(undefined);
     }

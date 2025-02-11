@@ -1,193 +1,194 @@
-<!--div *ngIf="anlassSummary$ | async; else loading"-->
-<div>
-  <div class="row">
-    <h3 class="padding">Wertungsrichter</h3>
-  </div>
-  <div class="row">
-    <div class="col-12">
-      <mat-tab-group #tabs mat-align-tabs="start">
-        <mat-tab [disabled]="!isBrevet1Anlass()">
-          <ng-template mat-tab-label
-            >Brevet 1
-
-            <img
-              *ngIf="isWertungsrichter1Ok"
-              class="icon"
-              src="assets/images/skype/beaming-face.png"
-            />
-            <img
-              *ngIf="!isWertungsrichter1Ok"
-              class="icon"
-              src="assets/images/skype/pouting-face.png"
-            />
-          </ng-template>
-          <div class="row doubleRow">
-            <div class="col">Status Brevet 1: {{ statusBr1 }}</div>
-          </div>
-          <div class="row doubleRow">
-            <div
-              class="col-4 label-red"
-              *ngIf="isBrevet1Anlass() && !isBrevet2Anlass()"
-            >
-              <mat-checkbox
-                [(ngModel)]="useBrevet2"
-                (ngModelChange)="useBrevet2Clicked($event)"
-                >Brevet 2 als Brevet 1 einsetzen</mat-checkbox
-              >
-            </div>
-
-            <div class="col">
-              Benötigte Wertungsrichter Brevet 1:
-              {{ wertungsrichterPflichtBrevet1 }}
-            </div>
-          </div>
-          <div class="row doubleRow">
-            <div class="col">
-              <h3>Verfügbare Wertungsrichter Brevet 1</h3>
-            </div>
-            <div class="col">
-              <h3>Ausgewählte Wertungsrichter Brevet 1</h3>
-            </div>
-          </div>
-          <div class="row doubleRow">
-            <div class="col">
-              <div
-                cdkDropList
-                #allWr1sList="cdkDropList"
-                aria-label="Wertungsrichter"
-                class="drag-drop-list col"
-                [cdkDropListDisabled]="
-                  !anlassSummary?.startet || !isBrevet1Anlass()
-                "
-                [cdkDropListData]="availableWertungsrichter1"
-                [cdkDropListConnectedTo]="[assignedWr1List]"
-                cdkDropListOrientation="vertical"
-                (cdkDropListDropped)="drop($event, '1')"
-              >
-                <app-wertungsrichter-chip
-                  *ngFor="let wr of availableWertungsrichter1"
-                  [isAllWertungsrichterList]="true"
-                  [wertungsrichterUser]="wr"
-                  [anlass]="anlass"
-                  [useBrevet2]="false"
-                ></app-wertungsrichter-chip>
-              </div>
-            </div>
-            <div class="col">
-              <div
-                cdkDropList
-                #assignedWr1List="cdkDropList"
-                class="drag-drop-list col"
-                [cdkDropListDisabled]="
-                  !anlassSummary?.startet || !isBrevet1Anlass()
-                "
-                [cdkDropListData]="assignedWr1s"
-                [cdkDropListConnectedTo]="[allWr1sList]"
-                (cdkDropListDropped)="drop($event, '2')"
-              >
-                <app-wertungsrichter-chip
-                  *ngFor="let wr of assignedWr1s"
-                  [isAllWertungsrichterList]="false"
-                  [wertungsrichterUser]="wr"
-                  [anlass]="anlass"
-                  [useBrevet2]="useBrevet2"
-                  (wertungsrichterUserChange)="
-                    wertungsrichterUserChange($event)
-                  "
-                ></app-wertungsrichter-chip>
-              </div>
-            </div>
-          </div>
-        </mat-tab>
-
-        <mat-tab [disabled]="!isBrevet2Anlass()">
-          <ng-template mat-tab-label
-            >Brevet 2
-            <img
-              *ngIf="isWertungsrichter2Ok"
-              class="icon"
-              src="assets/images/skype/beaming-face.png"
-            />
-            <img
-              *ngIf="!isWertungsrichter2Ok"
-              class="icon"
-              src="assets/images/skype/pouting-face.png"
-            />
-          </ng-template>
-          <div class="row doubleRow">
-            <div class="col">Status Brevet 2: {{ statusBr2 }}</div>
-          </div>
-          <div class="row doubleRow">
-            <div class="col">
-              Benötigte Wertungsrichter Brevet 2:
-              {{ wertungsrichterPflichtBrevet2 }}
-            </div>
-          </div>
-          <div class="row doubleRow">
-            <div class="col">
-              <h3>Verfügbare Wertungsrichter Brevet 2</h3>
-            </div>
-            <div class="col">
-              <h3>Ausgewählte Wertungsrichter Brevet 2</h3>
-            </div>
-          </div>
-          <div class="row doubleRow scrollable">
-            <div class="col">
-              <div
-                cdkDropList
-                #allWr2sList="cdkDropList"
-                aria-label="Wertungsrichter"
-                class="drag-drop-list col"
-                [cdkDropListData]="availableWertungsrichter2"
-                [cdkDropListConnectedTo]="[assignedWr2List]"
-                cdkDropListOrientation="vertical"
-                (cdkDropListDropped)="drop($event, '1')"
-                [cdkDropListDisabled]="
-                  !anlassSummary?.startet || !isBrevet2Anlass()
-                "
-              >
-                <app-wertungsrichter-chip
-                  *ngFor="let wr of availableWertungsrichter2"
-                  [isAllWertungsrichterList]="true"
-                  [wertungsrichterUser]="wr"
-                  [anlass]="anlass"
-                >
-                </app-wertungsrichter-chip>
-              </div>
-            </div>
-            <div class="col">
-              <div
-                cdkDropList
-                #assignedWr2List="cdkDropList"
-                [cdkDropListData]="assignedWr2s"
-                [cdkDropListConnectedTo]="[allWr2sList]"
-                class="drag-drop-list col"
-                (cdkDropListDropped)="drop($event, '2')"
-                [cdkDropListDisabled]="
-                  !anlassSummary?.startet || !isBrevet2Anlass()
-                "
-              >
-                <app-wertungsrichter-chip
-                  *ngFor="let wr of assignedWr2s"
-                  [isAllWertungsrichterList]="false"
-                  [wertungsrichterUser]="wr"
-                  [anlass]="anlass"
-                  (wertungsrichterUserChange)="
-                    wertungsrichterUserChange($event)
-                  "
-                >
-                </app-wertungsrichter-chip>
-              </div>
-            </div>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
+<div *ngIf="anlassSummary$ | async; else loading">
+  <div>
+    <div class="row">
+      <h3 class="padding">Wertungsrichter</h3>
     </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <div [routerLink]="['/user/user']" class="well hoverwell">
-        Wertungsrichter bearbeiten
+    <div class="row">
+      <div class="col-12">
+        <mat-tab-group #tabs mat-align-tabs="start">
+          <mat-tab [disabled]="!isBrevet1Anlass()">
+            <ng-template mat-tab-label
+              >Brevet 1
+
+              <img
+                *ngIf="isWertungsrichter1Ok"
+                class="icon"
+                src="assets/images/skype/beaming-face.png"
+              />
+              <img
+                *ngIf="!isWertungsrichter1Ok"
+                class="icon"
+                src="assets/images/skype/pouting-face.png"
+              />
+            </ng-template>
+            <div class="row doubleRow">
+              <div class="col">Status Brevet 1: {{ statusBr1 }}</div>
+            </div>
+            <div class="row doubleRow">
+              <div
+                class="col-4 label-red"
+                *ngIf="isBrevet1Anlass() && !isBrevet2Anlass()"
+              >
+                <mat-checkbox
+                  [(ngModel)]="useBrevet2"
+                  (ngModelChange)="useBrevet2Clicked($event)"
+                  >Brevet 2 als Brevet 1 einsetzen</mat-checkbox
+                >
+              </div>
+
+              <div class="col">
+                Benötigte Wertungsrichter Brevet 1:
+                {{ wertungsrichterPflichtBrevet1 }}
+              </div>
+            </div>
+            <div class="row doubleRow">
+              <div class="col">
+                <h3>Verfügbare Wertungsrichter Brevet 1</h3>
+              </div>
+              <div class="col">
+                <h3>Ausgewählte Wertungsrichter Brevet 1</h3>
+              </div>
+            </div>
+            <div class="row doubleRow">
+              <div class="col">
+                <div
+                  cdkDropList
+                  #allWr1sList="cdkDropList"
+                  aria-label="Wertungsrichter"
+                  class="drag-drop-list col"
+                  [cdkDropListDisabled]="
+                    !anlassSummary?.startet || !isBrevet1Anlass()
+                  "
+                  [cdkDropListData]="availableWertungsrichter1"
+                  [cdkDropListConnectedTo]="[assignedWr1List]"
+                  cdkDropListOrientation="vertical"
+                  (cdkDropListDropped)="drop($event, '1')"
+                >
+                  <app-wertungsrichter-chip
+                    *ngFor="let wr of availableWertungsrichter1"
+                    [isAllWertungsrichterList]="true"
+                    [wertungsrichterUser]="wr"
+                    [anlass]="anlass"
+                    [useBrevet2]="false"
+                  ></app-wertungsrichter-chip>
+                </div>
+              </div>
+              <div class="col">
+                <div
+                  cdkDropList
+                  #assignedWr1List="cdkDropList"
+                  class="drag-drop-list col"
+                  [cdkDropListDisabled]="
+                    !anlassSummary?.startet || !isBrevet1Anlass()
+                  "
+                  [cdkDropListData]="assignedWr1s"
+                  [cdkDropListConnectedTo]="[allWr1sList]"
+                  (cdkDropListDropped)="drop($event, '2')"
+                >
+                  <app-wertungsrichter-chip
+                    *ngFor="let wr of assignedWr1s"
+                    [isAllWertungsrichterList]="false"
+                    [wertungsrichterUser]="wr"
+                    [anlass]="anlass"
+                    [useBrevet2]="useBrevet2"
+                    (wertungsrichterUserChange)="
+                      wertungsrichterUserChange($event)
+                    "
+                  ></app-wertungsrichter-chip>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+
+          <mat-tab [disabled]="!isBrevet2Anlass()">
+            <ng-template mat-tab-label
+              >Brevet 2
+              <img
+                *ngIf="isWertungsrichter2Ok"
+                class="icon"
+                src="assets/images/skype/beaming-face.png"
+              />
+              <img
+                *ngIf="!isWertungsrichter2Ok"
+                class="icon"
+                src="assets/images/skype/pouting-face.png"
+              />
+            </ng-template>
+            <div class="row doubleRow">
+              <div class="col">Status Brevet 2: {{ statusBr2 }}</div>
+            </div>
+            <div class="row doubleRow">
+              <div class="col">
+                Benötigte Wertungsrichter Brevet 2:
+                {{ wertungsrichterPflichtBrevet2 }}
+              </div>
+            </div>
+            <div class="row doubleRow">
+              <div class="col">
+                <h3>Verfügbare Wertungsrichter Brevet 2</h3>
+              </div>
+              <div class="col">
+                <h3>Ausgewählte Wertungsrichter Brevet 2</h3>
+              </div>
+            </div>
+            <div class="row doubleRow scrollable">
+              <div class="col">
+                <div
+                  cdkDropList
+                  #allWr2sList="cdkDropList"
+                  aria-label="Wertungsrichter"
+                  class="drag-drop-list col"
+                  [cdkDropListData]="availableWertungsrichter2"
+                  [cdkDropListConnectedTo]="[assignedWr2List]"
+                  cdkDropListOrientation="vertical"
+                  (cdkDropListDropped)="drop($event, '1')"
+                  [cdkDropListDisabled]="
+                    !anlassSummary?.startet || !isBrevet2Anlass()
+                  "
+                >
+                  <app-wertungsrichter-chip
+                    *ngFor="let wr of availableWertungsrichter2"
+                    [isAllWertungsrichterList]="true"
+                    [wertungsrichterUser]="wr"
+                    [anlass]="anlass"
+                  >
+                  </app-wertungsrichter-chip>
+                </div>
+              </div>
+              <div class="col">
+                <div
+                  cdkDropList
+                  #assignedWr2List="cdkDropList"
+                  [cdkDropListData]="assignedWr2s"
+                  [cdkDropListConnectedTo]="[allWr2sList]"
+                  class="drag-drop-list col"
+                  (cdkDropListDropped)="drop($event, '2')"
+                  [cdkDropListDisabled]="
+                    !anlassSummary?.startet || !isBrevet2Anlass()
+                  "
+                >
+                  <app-wertungsrichter-chip
+                    *ngFor="let wr of assignedWr2s"
+                    [isAllWertungsrichterList]="false"
+                    [wertungsrichterUser]="wr"
+                    [anlass]="anlass"
+                    (wertungsrichterUserChange)="
+                      wertungsrichterUserChange($event)
+                    "
+                  >
+                  </app-wertungsrichter-chip>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div [routerLink]="['/user/user']" class="well hoverwell">
+          Wertungsrichter bearbeiten
+        </div>
       </div>
     </div>
   </div>

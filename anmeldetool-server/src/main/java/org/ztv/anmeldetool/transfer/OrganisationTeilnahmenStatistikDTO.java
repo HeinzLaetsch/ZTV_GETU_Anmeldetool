@@ -22,8 +22,9 @@ public class OrganisationTeilnahmenStatistikDTO {
 	}
 
 	public void addTal(TeilnehmerAnlassLinkDTO tal) {
-		Optional<KategorieStatusDTO> kategorieStatusOpt = kategorieStati.stream()
-				.filter((status) -> status.getKategorie().equals(tal.getKategorie())).findFirst();
+		Optional<KategorieStatusDTO> kategorieStatusOpt = kategorieStati.stream().filter((status) -> status != null
+				&& tal != null && tal.getKategorie() != null && status.getKategorie().equals(tal.getKategorie()))
+				.findFirst();
 
 		kategorieStatusOpt.ifPresentOrElse(status -> status.addTal(tal), () -> {
 			KategorieStatusDTO status = new KategorieStatusDTO(tal.getKategorie());

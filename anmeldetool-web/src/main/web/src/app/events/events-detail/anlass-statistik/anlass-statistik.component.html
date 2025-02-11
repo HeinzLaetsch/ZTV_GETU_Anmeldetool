@@ -1,9 +1,9 @@
-<div *ngIf="anlassSummary$ | async">
+<div *ngIf="anlassSummary">
   Anlass Statistik
   <div class="row">
     <div class="col-12">
       <mat-checkbox
-        [(ngModel)]="anlassSummary.startet"
+        [(ngModel)]="startet"
         [disabled]="isStartedCheckboxDisabled()"
         (ngModelChange)="vereinStartedClicked($event)"
         >Verein startet</mat-checkbox

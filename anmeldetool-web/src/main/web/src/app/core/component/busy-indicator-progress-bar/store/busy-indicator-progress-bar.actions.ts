@@ -1,8 +1,12 @@
-import {createActionGroup, props} from '@ngrx/store';
+import { createActionGroup, props } from "@ngrx/store";
 
 export const LoadingActions = createActionGroup({
-  source: 'Loading',
+  source: "Loading",
   events: {
-    'Is Loading': props<{ isLoading: boolean }>()
-  }
+    "Is Loading": props<{
+      isLoading: boolean;
+      error: boolean;
+      message: string;
+    }>(),
+  },
 });

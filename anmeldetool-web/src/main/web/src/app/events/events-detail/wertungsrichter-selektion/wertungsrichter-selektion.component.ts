@@ -40,7 +40,7 @@ export class WertungsrichterSelektionComponent
   @Input()
   anlass: IAnlass;
 
-  @Input()
+  // @Input()
   anlassSummary: IAnlassSummary;
   anlassSummary$: Observable<IAnlassSummary>; // TODO REDUX
 
@@ -85,10 +85,12 @@ export class WertungsrichterSelektionComponent
   }
 
   ngAfterViewInit(): void {
-    if (this.isBrevet1Anlass()) {
-      this.tabGroup.selectedIndex = 0;
-    } else {
-      this.tabGroup.selectedIndex = 1;
+    if (this.tabGroup) {
+      if (this.isBrevet1Anlass()) {
+        this.tabGroup.selectedIndex = 0;
+      } else {
+        this.tabGroup.selectedIndex = 1;
+      }
     }
   }
 
@@ -148,6 +150,7 @@ export class WertungsrichterSelektionComponent
   }
   useBrevet2Clicked(check: boolean) {
     //console.log("Use Brevet 2: ", this.useBrevet2);
+    this.availableWertungsrichter1 = this.getAvailableWertungsrichter1();
   }
 
   wertungsrichterUserChange(wertungsrichterUser: IUser) {

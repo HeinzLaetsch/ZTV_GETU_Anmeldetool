@@ -39,7 +39,6 @@ import { Page404Component } from "../error/page404/page404.component";
 import { VereinActions, VereinEffects } from "./redux/verein";
 import { OalEffects } from "./redux/organisation-anlass";
 import { UserEffects } from "./redux/user";
-import { AnlassSummaryEffects } from "./redux/anlass-summary";
 
 export function initVereinservice(
   vereinService: CachingVereinService
@@ -92,7 +91,6 @@ registerLocaleData(localeDe, "de");
       VereinEffects,
       OalEffects,
       UserEffects,
-      AnlassSummaryEffects,
     ]),
 
     StoreRouterConnectingModule.forRoot({

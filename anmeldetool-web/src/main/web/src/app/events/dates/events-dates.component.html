@@ -46,13 +46,13 @@
         class="col-2 border small black"
         [ngClass]="getClassForAnzeigeStatusNochNichtOffen()"
       >
-        {{ anlass.anmeldungBeginn | date: "d-MM-y":"GMT+1":"DE-CH" }}
+        {{ anlass.anmeldungBeginn | date : "d-MM-y" : "GMT+1" : "DE-CH" }}
       </div>
       <div
         class="col-2 border small black"
         [ngClass]="getClassForAnzeigeStatusErfassenGeschlossen()"
       >
-        {{ anlass.erfassenGeschlossen | date: "d-MM-y":"GMT+1":"DE-CH" }}
+        {{ anlass.erfassenGeschlossen | date : "d-MM-y" : "GMT+1" : "DE-CH" }}
       </div>
       <div
         class="col-2 border small black"
@@ -60,7 +60,7 @@
       >
         {{
           anlass.crossKategorieAenderungenGeschlossen
-            | date: "d-MM-y":"GMT+1":"DE-CH"
+            | date : "d-MM-y" : "GMT+1" : "DE-CH"
         }}
       </div>
       <div
@@ -69,7 +69,7 @@
       >
         {{
           anlass.aenderungenInKategorieGeschlossen
-            | date: "d-MM-y":"GMT+1":"DE-CH"
+            | date : "d-MM-y" : "GMT+1" : "DE-CH"
         }}
       </div>
       <div
@@ -77,20 +77,23 @@
         [ngClass]="getClassForAnzeigeStatusAlleMutationenGeschlossen()"
       >
         {{
-          anlass.aenderungenNichtMehrErlaubt | date: "d-MM-y":"GMT+1":"DE-CH"
+          anlass.aenderungenNichtMehrErlaubt
+            | date : "d-MM-y" : "GMT+1" : "DE-CH"
         }}
       </div>
       <div
         class="col-2 border small black"
         [ngClass]="getClassForAnzeigeStatusGeschlossen()"
       >
-        {{ anlass.endDatum | date: "d-MM-y":"GMT+1":"DE-CH" }}
+        {{ anlass.endDatum | date : "d-MM-y" : "GMT+1" : "DE-CH" }}
       </div>
     </div>
     <div *ngIf="viewOnly && hasStatusVerlaengert()" class="row">
       <div class="col border small div-orange">
         Erfassen wurde verlängert bis
-        {{ anlass.erfassenVerlaengert | date: "d-MM-y":"GMT+1":"DE-CH" }}
+        {{
+          anlassSummary.verlaengerungsDate | date : "d-MM-y" : "GMT+1" : "DE-CH"
+        }}
       </div>
     </div>
     <!--             (dateInput)="addVerlaengerung('input', $event)" -->

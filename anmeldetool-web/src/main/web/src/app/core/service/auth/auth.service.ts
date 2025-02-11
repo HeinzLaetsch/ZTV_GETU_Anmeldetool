@@ -98,8 +98,13 @@ export class AuthService {
         emitter.emit(user);
       },
       (error) => {
-        console.error(error);
-        emitter.error("Fehler beim erstellen des Users");
+        if (error.status === 409) {
+          console.error(error.error);
+          emitter.error("User existiert: " + error.error);
+        } else {
+          console.error(error);
+          emitter.error("Fehler beim erstellen des Users: " + error.error);
+        }
       }
     );
     return emitter.asObservable();
