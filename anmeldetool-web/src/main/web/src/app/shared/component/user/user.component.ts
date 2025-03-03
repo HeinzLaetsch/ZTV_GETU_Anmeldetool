@@ -48,7 +48,7 @@ export class UserComponent implements OnInit, OnChanges {
   @Output()
   valid = new EventEmitter<boolean>();
 
-  user$: Observable<IUser[]>;
+  // user$: Observable<IUser[]>;
 
   //floatLabel = 'Always';
   appearance = "outline";
@@ -102,6 +102,7 @@ export class UserComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.updateUser(this.user);
+    this.validate();
     /*
     this.user$ = this.store.pipe(
       select(selectUserByBenutzername(this.user.benutzername))
@@ -232,7 +233,7 @@ export class UserComponent implements OnInit, OnChanges {
       );
     }
   }
-  private emitChange(includeUser: boolean) {
+  private validate(): boolean {
     let valid = true;
     if (this.showBenutzername) {
       const benutzerNameValid = this.form.controls.benutzernameControl.valid;
@@ -278,6 +279,10 @@ export class UserComponent implements OnInit, OnChanges {
     valid = valid && this.form.controls.mobilNummerControl.valid;
 
     this.valid.next(valid);
+    return valid;
+  }
+  private emitChange(includeUser: boolean) {
+    const valid = this.validate();
     if (includeUser && valid) {
       let userUpdate: Update<IUser> = undefined;
       if (this.showPassword) {
@@ -307,7 +312,6 @@ export class UserComponent implements OnInit, OnChanges {
         };
       }
       this.store.dispatch(UserActions.updateUser({ payload: userUpdate }));
-      //this.userChange.next(this.user);
     }
   }
 

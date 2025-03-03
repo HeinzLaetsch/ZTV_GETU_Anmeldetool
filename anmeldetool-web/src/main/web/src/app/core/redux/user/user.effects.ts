@@ -28,24 +28,6 @@ export class UserEffects {
       })
     );
   });
-  /*
-  addUser$ = createEffect(() => {
-    return this.actions$.pipe(
-      ofType(UserActions.addUserInvoked),
-      mergeMap((action) => {
-        return this.authService.createUser(action.payload).pipe(
-          switchMap((user) => [
-            UserActions.addUserSuccess({
-              payload: user,
-            }),
-          ]),
-          catchError((error) => {
-            return of(UserActions.addUserError({ error: error }));
-          })
-        );
-      })
-    );
-  });*/
   saveUser$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(UserActions.saveUserInvoked),

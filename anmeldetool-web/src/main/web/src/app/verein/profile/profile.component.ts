@@ -49,7 +49,8 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
     this.registerSubscription(
       this.user$.subscribe((users) => {
         if (users.length > 0) {
-          this.synchUsers(users);
+          // this.synchUsers(users);
+          this.processUsers(users);
 
           /* Produziert eine Menge leerer
           if (!this.tabGroup || !this.tabGroup.selectedIndex) {
@@ -69,6 +70,24 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
 
     //this._vereinsUser = this.userService.getUser();
     let index = 0;
+  }
+
+  processUsers(users: IUser[]) {
+    users.sort((a, b) => {
+      if (a.password === null) {
+        return a.benutzername.localeCompare(b.benutzername);
+      } else {
+        return -1;
+      }
+    });
+    this._changeEvents = [];
+    let index = 0;
+    this.vereinsUsers = users.map((user) => {
+      let asUString = JSON.stringify(user);
+      this._changeEvents.push(this.getNewChangeEvent(index));
+      index++;
+      return JSON.parse(asUString);
+    });
   }
 
   private synchUsers(users: IUser[]) {
@@ -133,6 +152,16 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
   isVereinsVerantwortlicher(): boolean {
     return true;
   }
+  isValid(): boolean {
+    let valid = true;
+    this._changeEvents.forEach((ce) => {
+      if (!ce.userValid) {
+        valid = false;
+      }
+    });
+    return valid;
+  }
+
   hasChanges(): boolean {
     if (this.dirtyUsers) {
       return this.dirtyUsers.length > 0;
@@ -210,6 +239,13 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
       this.getNewChangeEvent(this.tabGroup.selectedIndex)
     );
     */
+    this.tabGroup.selectedIndex = 0;
+    this.tabGroup.realignInkBar();
+  }
+  cancelUser(event: any) {
+    this.dirtyUsers.forEach((user) => {
+      this.store.dispatch(UserActions.cancelUser({ payload: user }));
+    });
   }
   saveUser(event: any) {
     this.dirtyUsers.forEach((user) => {
@@ -232,12 +268,5 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
       this._changeEvents = ce1;
       this._changeEvents.concat(ce2);
     }
-  }
-
-  getUserCopy(orgUser: IUser): IUser {
-    // console.log('Get user: ', this.currentUser);
-    // return this.deepCopy(this.currentUser);
-    //return JSON.parse(JSON.stringify(orgUser));
-    return orgUser;
   }
 }

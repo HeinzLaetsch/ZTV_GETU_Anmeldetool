@@ -1,18 +1,6 @@
-import {
-  Action,
-  createFeature,
-  createReducer,
-  createSelector,
-  on,
-} from "@ngrx/store";
-import {
-  initialState,
-  teilnahmenAdapter,
-  TeilnahmenState,
-} from "./teilnahmen.state";
+import { createFeature, createReducer, createSelector, on } from "@ngrx/store";
+import { initialState, teilnahmenAdapter } from "./teilnahmen.state";
 import { TeilnahmenActions } from "./teilnahmen.actions";
-import { ITeilnahmen } from "../../model/ITeilnahmen";
-import { Update } from "@ngrx/entity";
 
 export const teilnahmenFeature = createFeature({
   name: "teilnahmen",
@@ -51,16 +39,3 @@ export const { selectAll, selectEntities, selectIds, selectTotal } =
 
 export const selectEntityById = (id) =>
   createSelector(selectEntities, (entities) => entities[id]);
-/*
-const teilnahmeReducer = createReducer(
-  initialState,
-  on(loadAllTeilnahmenSuccess, (state, { payload }) => ({
-    ...state,
-    items: payload,
-  }))
-);
-
-export function reducer(state: TeilnahmeState | undefined, action: Action) {
-  return teilnahmeReducer(state, action);
-}
-*/

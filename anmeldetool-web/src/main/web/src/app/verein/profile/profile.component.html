@@ -14,7 +14,7 @@
             }}</span>
           </ng-template>
           <app-user-form
-            [currentUser]="getUserCopy(user)"
+            [currentUser]="user"
             [tabIndex]="i"
             (userChange)="userChange($event)"
           ></app-user-form>
@@ -40,6 +40,18 @@
   class="mat-fab-pos2"
   color="primary"
   [disabled]="!hasChanges()"
+  #tooltip="matTooltip"
+  matTooltip="Änderungen verwerfen"
+  matTooltipPosition="below"
+  matTooltipHideDelay="500"
+  (click)="cancelUser($event)"
+>
+  Verwerfen</button
+><button
+  mat-fab
+  class="mat-fab-pos3"
+  color="primary"
+  [disabled]="!hasChanges() || !isValid()"
   #tooltip="matTooltip"
   matTooltip="Änderungen speichern"
   matTooltipPosition="below"

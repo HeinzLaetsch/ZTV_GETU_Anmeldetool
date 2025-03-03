@@ -7,6 +7,7 @@ export const UserActions = createActionGroup({
   events: {
     "Add Dirty User": props<{ payload: IUser }>(),
     "Update User": props<{ payload: Update<IUser> }>(),
+    "Cancel User": props<{ payload: IUser }>(),
 
     "Load All User INVOKED": emptyProps(),
     "Load All User SUCCESS": props<{ payload: IUser[] }>(),
@@ -18,6 +19,6 @@ export const UserActions = createActionGroup({
 
     "Save User INVOKED": props<{ payload: IUser }>(),
     "Save User SUCCESS": props<{ payload: IUser }>(),
-    "save User ERROR": props<{ error: string }>(),
+    "Save User ERROR": props<{ error: string }>(),
   },
 });

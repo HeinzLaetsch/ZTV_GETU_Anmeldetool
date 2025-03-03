@@ -158,8 +158,9 @@ public class AdminController {
 
 	// http://localhost:8080/admin/organisationen
 	@GetMapping("/organisationen")
-	public ResponseEntity<Collection<OrganisationDTO>> getOrganisationen() {
+	public ResponseEntity getOrganisationen() {
 		return organisationSrv.getAllOrganisations();
+		// return ResponseEntity.badRequest().build();
 	}
 
 	@PostMapping("/organisationen")

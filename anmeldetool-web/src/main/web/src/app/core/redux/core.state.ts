@@ -15,8 +15,6 @@ import { otsFeature } from "./organisation-teilnahmen/ots.reducer";
 import { OtsState } from "./organisation-teilnahmen";
 import { userFeature } from "./user/user.reducer";
 import { UserState } from "./user";
-import { anlassSummariesFeature } from "./anlass-summary/anlass-summary.reducer";
-import { AnlassSummariesState } from "./anlass-summary";
 
 export const reducers: ActionReducerMap<AppState> = {
   router: routerReducer,

@@ -7,41 +7,37 @@ import { environment } from "src/environments/environment";
 import { IRolle } from "../../model/IRolle";
 import { IUser } from "../../model/IUser";
 import { IWertungsrichter } from "../../model/IWertungsrichter";
+import { ServiceHelper } from "src/app/utils/service-helper";
 
 @Injectable({
   providedIn: "root",
 })
-export class UserService {
+export class UserService extends ServiceHelper {
   apiHost = `${environment.apiHost}`;
   private url: string = this.apiHost + "/admin/user";
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    super();
+  }
 
   getUser(): Observable<IUser[]> {
     console.log("getUser called");
-    return this.http
-      .get<IUser[]>(this.url)
-      .pipe(catchError(this.handleError<IUser[]>("getUser", [])));
+    return this.http.get<IUser[]>(this.url).pipe(
+      catchError((err, caught) => {
+        return this.handleError("getUser", err, caught);
+      })
+    );
   }
   getUserByBenutzername(benutzername: string): Observable<IUser> {
     // console.log("getUser called");
     return this.http
       .get<IUser>(this.url + "/benutzernamen/" + benutzername)
-      .pipe(catchError(this.handleError<any>("getUserByBenutzername")));
+      .pipe(
+        catchError((err, caught) => {
+          return this.handleError("getUserByBenutzername", err, caught);
+        })
+      );
   }
-
-  /*
-  updateUser(user: IUser): Observable<IUser> {
-    const emitter: EventEmitter<IUser> = new EventEmitter();
-    this.http.patch<IUser>(this.userUrl, user).subscribe(
-      user => {
-        this.currentUser = user;
-        console.log('User: ' , user);
-        emitter.emit(user);
-      });
-      return emitter.asObservable();
-  }
-  */
   updateRoles(
     user: IUser,
     verein: IVerein,
@@ -57,16 +53,20 @@ export class UserService {
       verein.id +
       "/rollen";
     // console.log("updateRoles called: ", url, " , data: ", roles);
-    return this.http
-      .patch<IUser>(url, roles)
-      .pipe(catchError(this.handleError<IUser>("updateRoles")));
+    return this.http.patch<IUser>(url, roles).pipe(
+      catchError((err, caught) => {
+        return this.handleError("updateRoles", err, caught);
+      })
+    );
   }
 
   getWertungsrichter(id: string): Observable<IWertungsrichter> {
     return this.http
       .get<IWertungsrichter>(this.url + "/" + id + "/wertungsrichter")
       .pipe(
-        catchError(this.handleError<IWertungsrichter>("getWertungsrichter"))
+        catchError((err, caught) => {
+          return this.handleError("getWertungsrichter", err, caught);
+        })
       );
   }
 
@@ -80,7 +80,9 @@ export class UserService {
         wertungsrichter
       )
       .pipe(
-        catchError(this.handleError<IWertungsrichter>("updateWertungsrichter"))
+        catchError((err, caught) => {
+          return this.handleError("updateWertungsrichter", err, caught);
+        })
       );
   }
 
@@ -88,14 +90,13 @@ export class UserService {
     return this.http
       .delete<IWertungsrichter>(this.url + "/" + id + "/wertungsrichter")
       .pipe(
-        catchError(this.handleError<IWertungsrichter>("deleteWertungsrichter"))
+        catchError((err, caught) => {
+          return this.handleError(
+            "deleteWertungsrichterForUserId",
+            err,
+            caught
+          );
+        })
       );
-  }
-
-  private handleError<T>(operation = "operation", result?: T) {
-    return (error: any): Observable<T> => {
-      console.error("operation", operation, " , ", error);
-      return of(result as T);
-    };
   }
 }

@@ -23,12 +23,11 @@ export const userFeature = createFeature({
       const user = action.payload;
       return userAdapter.setAll(user, state);
     }),
-    /*
-    on(UserActions.addUserSuccess, (state, action) => {
+    on(UserActions.cancelUser, (state, action) => {
       const user = action.payload;
-      const newState = userAdapter.addOne(user, state);
+      const newState = userAdapter.removeOne(user.id, state);
       return newState;
-    }),*/
+    }),
     on(UserActions.saveUserSuccess, (state, action) => {
       const user: Update<IUser> = {
         id: action.payload.id,

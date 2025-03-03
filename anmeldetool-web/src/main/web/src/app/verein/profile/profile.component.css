@@ -39,7 +39,7 @@ em {
 }
 .mat-fab-pos1 {
   font-size: 12px;
-  right: 80px;
+  right: 140px;
   bottom: 10px;
     left: auto;
     position: absolute;
@@ -47,9 +47,17 @@ em {
 
 .mat-fab-pos2 {
   font-size: 12px;
-  right: 20px;
+  right: 80px;
   bottom: 10px;
     left: auto;
     position: absolute;
     z-index: 99;
+}
+.mat-fab-pos3 {
+  font-size: 12px;
+  right: 20px;
+  bottom: 10px;
+  left: auto;
+  position: absolute;
+  z-index: 99;
 }

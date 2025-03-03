@@ -2,7 +2,8 @@ import { Injectable } from "@angular/core";
 import { Actions, createEffect } from "@ngrx/effects";
 import { filter, map } from "rxjs/operators";
 import { LoadingActions } from "./busy-indicator-progress-bar.actions";
-import { Action } from "@ngrx/store";
+import { ILoading } from "./busy-indicator-progress-bar.state";
+import { Update } from "@ngrx/entity";
 
 @Injectable()
 export class BusyIndicatorProgressBarEffects {
@@ -13,12 +14,23 @@ export class BusyIndicatorProgressBarEffects {
       filter((action) => {
         return action.type.includes("INVOKED"); // Service Aufruf Action muss INVOKED beinhalten um Progressbar zu starten
       }),
-      map(() => {
-        // console.log("Action set isLoading : true");
-        return LoadingActions.isLoading({
-          error: false,
-          message: "success",
-          isLoading: true,
+      map((action) => {
+        console.log(
+          "Action set isLoading : true: ",
+          action.type.substring(0, action.type.indexOf("INVOKED"))
+        );
+        return LoadingActions.loadingEventStartet({
+          payload: {
+            id: action.type
+              .toUpperCase()
+              .substring(0, action.type.indexOf("INVOKED")),
+            creationDate: new Date(),
+            finishedDate: null,
+            isLoading: true,
+            isFinished: false,
+            hasError: false,
+            message: "invoked",
+          },
         });
       })
     );
@@ -29,12 +41,22 @@ export class BusyIndicatorProgressBarEffects {
       filter((action) => {
         return action.type.includes("SUCCESS"); // Service Aufruf Action muss SUCCESS oder ERROR beinhalten um Progressbar zu stoppen
       }),
-      map(() => {
+      map((action) => {
         // console.log("Action set isLoading : false");
-        return LoadingActions.isLoading({
-          error: false,
-          message: "success",
-          isLoading: false,
+        const updatedLoadingState: Update<ILoading> = {
+          id: action.type
+            .toUpperCase()
+            .substring(0, action.type.indexOf("SUCCESS")),
+          changes: {
+            finishedDate: new Date(),
+            isLoading: false,
+            isFinished: true,
+            hasError: false,
+            message: "success",
+          },
+        };
+        return LoadingActions.loadingEventFinished({
+          payload: updatedLoadingState,
         });
       })
     );
@@ -47,10 +69,20 @@ export class BusyIndicatorProgressBarEffects {
       }),
       map((action: any) => {
         console.log("Action ", action);
-        return LoadingActions.isLoading({
-          error: true,
-          message: action.error,
-          isLoading: false,
+        const updatedLoadingState: Update<ILoading> = {
+          id: action.type
+            .toUpperCase()
+            .substring(0, action.type.indexOf("ERROR")),
+          changes: {
+            finishedDate: new Date(),
+            isLoading: false,
+            isFinished: false,
+            hasError: true,
+            message: action.error?.message,
+          },
+        };
+        return LoadingActions.loadingEventFehler({
+          payload: updatedLoadingState,
         });
       })
     );

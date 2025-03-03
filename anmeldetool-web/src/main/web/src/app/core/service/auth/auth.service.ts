@@ -100,7 +100,9 @@ export class AuthService {
       (error) => {
         if (error.status === 409) {
           console.error(error.error);
-          emitter.error("User existiert: " + error.error);
+          emitter.error({
+            message: "User existiert: " + error.error,
+          });
         } else {
           console.error(error);
           emitter.error("Fehler beim erstellen des Users: " + error.error);
@@ -216,11 +218,5 @@ export class AuthService {
 
   isAnlassUser(): boolean {
     return this.isRechnungsbuero() || this.isSekretariat();
-  }
-  private handleError<T>(operation = "operation", result?: T) {
-    return (error: any): Observable<T> => {
-      console.error(error);
-      return of(result as T);
-    };
   }
 }

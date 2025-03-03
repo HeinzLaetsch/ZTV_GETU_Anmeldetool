@@ -250,6 +250,7 @@ export class UserFormComponent implements OnInit {
   */
   updateUserValid(valid: boolean) {
     this.changeEvent.userValid = valid;
+    this.userChange.next(this.changeEvent);
     // console.log("Valid changed: ", this.currentUser , ', ', valid);
   }
 

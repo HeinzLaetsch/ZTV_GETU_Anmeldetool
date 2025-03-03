@@ -109,7 +109,14 @@ public class TeilnahmenService {
 			} else {
 				Optional<TeilnehmerAnlassLink> res = entry.getValue().stream()
 						.filter(tal -> !KategorieEnum.KEIN_START.equals(tal.getKategorie())).max((tal1, tal2) -> {
-							return tal1.getKategorie().compareTo(tal2.getKategorie());
+							if (tal1 != null && tal1.getKategorie() != null) {
+								if (tal2 != null && tal2.getKategorie() != null) {
+									return tal1.getKategorie().compareTo(tal2.getKategorie());
+								} else {
+									return 1;
+								}
+							}
+							return 0;
 						});
 				if (res.isPresent()) {
 					letzteKategorie = res.get().getKategorie();
@@ -176,7 +183,7 @@ public class TeilnahmenService {
 					}
 				} else {
 					if (talDto.getMeldeStatus().equalsIgnoreCase("Startet")) {
-						if (persistedTalDto != null
+						if (persistedTalDto != null && persistedTalDto.getMeldeStatus() != null
 								&& persistedTalDto.getMeldeStatus().equals(MeldeStatusEnum.STARTET)) {
 							return talDtoFactory(talDto, persistedTalDto.getMeldeStatus().name(),
 									talDto.getKategorie());

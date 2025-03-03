@@ -4,7 +4,6 @@ import { AnlassService } from "../../service/anlass/anlass.service";
 import { AuthService } from "../../service/auth/auth.service";
 import { TeilnahmenActions } from "./teilnahmen.actions";
 import { catchError, map, mergeMap, of, switchMap } from "rxjs";
-import { AnlassActions } from "../anlass";
 import { TeilnehmerService } from "../../service/teilnehmer/teilnehmer.service";
 import { ITeilnahmen } from "../../model/ITeilnahmen";
 import { Update } from "@ngrx/entity";
@@ -32,6 +31,7 @@ export class TeilnahmenEffects {
               })
             ),
             catchError((error) => {
+              console.log(error);
               return of(
                 TeilnahmenActions.loadAllTeilnahmenError({ error: error })
               );

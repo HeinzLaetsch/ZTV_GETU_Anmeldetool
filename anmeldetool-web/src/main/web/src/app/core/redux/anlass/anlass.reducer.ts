@@ -11,16 +11,6 @@ export const anlassFeature = createFeature({
       return anlassAdapter.setAll(anlaesse, state);
     })
   ),
-  /*
-    on(AnlassActions.loadAllAnlaesseSuccess, (state, action) => {
-      const anlaesse = action.payload;
-      return {
-        items: anlaesse,
-        loadStatus: "LOADED",
-      };
-    })
-  ),
-  */
 });
 // Spread         ...state,
 
