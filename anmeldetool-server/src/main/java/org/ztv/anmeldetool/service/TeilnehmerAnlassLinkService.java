@@ -250,6 +250,9 @@ public class TeilnehmerAnlassLinkService {
 				case ABGEMELDET_3:
 					teilnahmeStatstic.incAbgemeldet_3();
 					break;
+				case ABGEMELDET_4:
+					teilnahmeStatstic.incAbgemeldet_4();
+					break;
 				case UMMELDUNG:
 					teilnahmeStatstic.incUmmeldung();
 					break;

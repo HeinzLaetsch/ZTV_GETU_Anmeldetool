@@ -160,8 +160,8 @@ public class TeilnahmenService {
 					}
 					// Anmeldung geschlossen erfassen zu, Mutationen erlaubt, Status auf
 					// Abgemeldet_1
-					if (anlass.getErfassenGeschlossen().isBefore(LocalDateTime.now())
-							&& anlass.getAenderungenInKategorieGeschlossen().isAfter(LocalDateTime.now())) {
+					if (anlass.getErfassenGeschlossen().isBefore(LocalDateTime.now()) && anlass
+							.getAenderungenInKategorieGeschlossen().plusHours(24).isAfter(LocalDateTime.now())) {
 						return talDtoFactory(talDto, MeldeStatusEnum.ABGEMELDET_1.name(), talDto.getKategorie());
 					}
 					// Anmeldung geschlossen erfassen zu, Mutationen zu, Status auf Abgemeldet_2

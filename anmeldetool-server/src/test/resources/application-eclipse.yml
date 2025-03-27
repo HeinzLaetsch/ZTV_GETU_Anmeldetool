@@ -8,8 +8,6 @@ spring:
   flyway:
     locations: ["classpath:/db/migration"]
     clean-on-validation-error: false
-    username: postgres
-    password: adrian2000
   jpa:
      database-platform: org.hibernate.dialect.PostgreSQLDialect
      show-sql: "false"
@@ -19,8 +17,6 @@ spring:
            jdbc:
               # time_zone: "Europe/Zurich"
               time_zone: "GMT+1"
-              
-     
   datasource:
     url: jdbc:postgresql://localhost:5432/getuwettkaempfe
     username: postgres
@@ -30,6 +26,16 @@ spring:
         adjust-dates-to-context-time-zone: true
      # time-zone: "Europe/Zurich"
      time-zone: "UTC"
+
+  mail:
+     enabled: "true"
+     username:  ${MAIL_USER}
+     password: ${MAIL_PASSWORD}
+     templates:
+        path: "mail-templates"
+     simulate:  "true"
+     simulateemail: "heinz.laetsch@gmx.ch"     
+
 # this info may be accessed via actuator
 info:
   app:

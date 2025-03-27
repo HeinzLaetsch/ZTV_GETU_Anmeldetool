@@ -30,6 +30,7 @@ spring:
      # time-zone: "Europe/Zurich"
      time-zone: "UTC"
   mail:
+     enabled: "false"
      username:  ${MAIL_USER}
      password: ${MAIL_PASSWORD}
      templates:
@@ -64,6 +65,8 @@ scheduler:
    mutationen:
       cron: "0/10 1 * * 12 *"
       daysbefore: 3
+   published:
+      cron: "0/10 1 * * 12 *" 
       
 management:
   endpoints:
