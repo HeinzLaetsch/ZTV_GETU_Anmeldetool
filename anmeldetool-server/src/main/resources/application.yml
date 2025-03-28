@@ -29,14 +29,15 @@ spring:
      time-zone: "Europe/Zurich"   
      # time-zone: "UTC"
   mail:
+     enabled: "true"
      host: "smtp.office365.com"
      # host: "mail.gmx.net"
      port: 587
      templates:
         path: "mail-templates"
-     username: "getu-wettkaempfe-tu1@ztv.ch"
+     username: "getu-wettkaempfe@ztv.ch"
      # username: "heinz.laetsch1@gmx.ch"
-     password: 
+     password: "GeTuWL@ztv.ch"
      properties:
         mail:
            smtp:
@@ -74,6 +75,8 @@ scheduler:
    mutationen:
       cron: "0 0 3 * * ?"
       daysbefore: 3
+   published:
+      cron: "0 0 4 * * ?"
 
       
 management:
