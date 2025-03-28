@@ -1,4 +1,3 @@
-import { compileDeclareClassMetadata } from "@angular/compiler";
 export enum TiTuEnum {
   Ti = "Turnerin",
   Tu = "Turner",
@@ -33,13 +32,10 @@ export namespace TiTuEnum {
     }
     return tiTu1String === tiTu2String;
   }
-  /*
-  export function getTiTuEnum(value: string): TiTuEnum {
-    const values = Object.entries(TiTuEnum);
-    const ret = values.filter((val) => {
-      const asString: string = val[1];
-      return asString === value;
-    });
-    return TiTuEnum[ret[0][0]] as TiTuEnum;
-  } */
+}
+export function getTiTuEnum(value: string): TiTuEnum | undefined {
+  const entry = Object.entries(TiTuEnum).find(([key, val]) => val === value);
+  return entry
+    ? (TiTuEnum[entry[0] as keyof typeof TiTuEnum] as TiTuEnum)
+    : undefined;
 }

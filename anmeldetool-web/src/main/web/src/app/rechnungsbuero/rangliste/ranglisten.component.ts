@@ -33,7 +33,7 @@ export class RanglistenComponent extends SubscriptionHelper implements OnInit {
   highlighted = false;
   config: IRanglistenConfiguration;
   lauflistenStatus: ILauflistenStatus;
-
+  git;
   constructor(
     private authService: AuthService,
     private store: Store<AppState>,

@@ -1,11 +1,8 @@
-import { Component, EventEmitter, OnInit } from "@angular/core";
-import { MatSelect, MatSelectChange } from "@angular/material/select";
-import { Observable, Subscription } from "rxjs";
-import { IAnlass } from "src/app/core/model/IAnlass";
+import { Component, OnInit } from "@angular/core";
+import { MatSelectChange } from "@angular/material/select";
 import { ISmQuali } from "src/app/core/model/ISmQuali";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { TiTuEnum, getTiTuEnum } from "src/app/core/model/TiTuEnum";
-import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
 import { SmQualiService } from "src/app/core/service/smquali/smquali.service";
 
 @Component({
