@@ -40,7 +40,7 @@
       <ng-container *ngIf="sprung">
         <div class="col-1 data centered">
           <span [ngClass]="getNotenStyle()">{{
-            eintrag.note_1 | number: "1.2-2"
+            eintrag.note_1 | number : "1.2-2"
           }}</span>
           <input
             #control1
@@ -52,7 +52,7 @@
         </div>
         <div class="col-1 data centered">
           <span [ngClass]="getNotenStyle()">{{
-            eintrag.note_2 | number: "1.2-2"
+            eintrag.note_2 | number : "1.2-2"
           }}</span>
           <input
             matInput
@@ -65,7 +65,7 @@
       <ng-container *ngIf="!sprung">
         <div class="col-1 data centered">
           <span [ngClass]="getNotenStyle()">{{
-            eintrag.note_1 | number: "1.2-2"
+            eintrag.note_1 | number : "1.2-2"
           }}</span>
         </div>
         <div class="col-1 data centered">

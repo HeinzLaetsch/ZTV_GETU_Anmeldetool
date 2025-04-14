@@ -28,11 +28,11 @@ export class ErfassenRowComponent implements OnInit {
   note_2_Cntr: UntypedFormControl;
   note_1_correct = false;
   note_2_correct = false;
+  //     private toastr: ToastrService
 
   constructor(
     private ranglistenService: RanglistenService,
-    public dialog: MatDialog,
-    private toastr: ToastrService
+    public dialog: MatDialog
   ) {
     this.note_1_Cntr = new UntypedFormControl("", {
       updateOn: "blur",
@@ -54,6 +54,7 @@ export class ErfassenRowComponent implements OnInit {
     });
   }
   ngOnInit(): void {
+    console.log("Row und Eintrag" + this.eintrag);
     if (this.modeErfassen) {
       this.note_1_Cntr.setValue(this.eintrag.note_1, { emitEvent: false });
       if (this.eintrag.erfasst) {
@@ -264,13 +265,14 @@ export class ErfassenRowComponent implements OnInit {
             this.note_1_Cntr.disable();
             this.note_2_Cntr.disable();
             this.update();
-            this.toasterInfo();
+            // this.toasterInfo();
           } else {
-            this.toasterError();
+            //this.toasterError();
           }
         });
     });
   }
+  /*
   private toasterInfo() {
     const options = this.toastr.toastrConfig;
     options.timeOut = 1000;
@@ -282,4 +284,5 @@ export class ErfassenRowComponent implements OnInit {
     options.disableTimeOut = true;
     this.toastr.error("Es ist ein Fehler aufgetreten");
   }
+  */
 }

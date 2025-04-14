@@ -5,10 +5,11 @@
   "scripts": {
     "ng": "ng",
     "start": "nx serve -c development --live-reload",
+    "startHalle": "nx serve -c halle --live-reload",
     "start-nx": "npx nx run at-app:build:halle",
     "build": "nx build",
-    "build-halle": "nx build -c halle",
-    "build-halle-nx": "nx run at-app:build:halle",
+    "build-halle": "npx nx run at-app:build:halle",
+    "build-halle-nx": "npx nx run at-app:build:halle",
     "test": "nx test",
     "lint": "nx lint",
     "e2e": "nx e2e",

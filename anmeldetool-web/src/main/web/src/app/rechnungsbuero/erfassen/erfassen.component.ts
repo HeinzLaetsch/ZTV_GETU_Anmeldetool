@@ -35,13 +35,16 @@ export class ErfassenComponent implements OnInit {
 
   laufliste: ILaufliste;
 
+  sortedEintraege: ILauflistenEintrag[];
+
   search: string;
 
   constructor(
     private authService: AuthService,
-    // private anlassService: CachingAnlassService,
     private ranglistenService: RanglistenService
-  ) {}
+  ) {
+    this.sortedEintraege = [];
+  }
 
   ngOnInit() {
     // const organisatorId: string = this.route.snapshot.params.id;
@@ -83,11 +86,14 @@ export class ErfassenComponent implements OnInit {
     this.ranglistenService
       .searchLauflisteByKey(this.anlass, this.search)
       .subscribe((laufliste) => {
-        this.laufliste = laufliste;
+        if (laufliste) {
+          this.sortedEintraege = this.getSortedEintraege(laufliste);
+          this.laufliste = laufliste;
+        }
       });
   }
-  get sortedEintraege() {
-    return this.laufliste.eintraege.sort((a, b) => {
+  getSortedEintraege(laufliste: ILaufliste): ILauflistenEintrag[] {
+    return laufliste.eintraege.sort((a, b) => {
       if (a.startOrder < b.startOrder) {
         return -1;
       }

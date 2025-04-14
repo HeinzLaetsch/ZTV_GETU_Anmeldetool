@@ -85,8 +85,14 @@ public class RanglistenService {
 				.sorted(Comparator.comparing(tw -> tw.getGesamtPunktzahl(), Comparator.reverseOrder()))
 				.collect(Collectors.toList());
 		int rang = 0;
+		float gesamtpunktzahl = 0.0f;
 		for (TeamwertungDTO tw : result) {
-			tw.setRang(++rang);
+			if (tw.getGesamtPunktzahl() == gesamtpunktzahl) {
+				tw.setRang(rang);
+			} else {
+				tw.setRang(++rang);
+			}
+			gesamtpunktzahl = tw.getGesamtPunktzahl();
 		}
 		return result;
 	}

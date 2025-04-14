@@ -2,7 +2,7 @@ package org.ztv.anmeldetool.models;
 
 public enum MeldeStatusEnum {
 	KEINE_TEILNAHME("Keine Teilnahme"), STARTET("Startet"), STARTET_VERLAENGERT("Startet_Verlaengert"),
-	ABGEMELDET_1("Abgemeldet_1"), ABGEMELDET_2("Abgemeldet_2"), ABGEMELDET_3("Abgemeldet_3"),
+	ABGEMELDET("Abgemeldet"), ABGEMELDET_1("Abgemeldet_1"), ABGEMELDET_2("Abgemeldet_2"), ABGEMELDET_3("Abgemeldet_3"),
 	ABGEMELDET_4("Abgemeldet_4"), UMMELDUNG("Ummeldung"), NEUMELDUNG("Neumeldung"), VERLETZT("Verletzt"),
 	NICHTGESTARTET("Nicht gestartet");
 
