@@ -26,6 +26,10 @@ import { StoreModule } from "@ngrx/store";
 import { anlassSummariesFeature } from "../core/redux/anlass-summary/anlass-summary.reducer";
 import { EffectsModule } from "@ngrx/effects";
 import { AnlassSummaryEffects } from "../core/redux/anlass-summary";
+import { teilnahmenFeature } from "../core/redux/teilnahmen/teilnahmen.reducer";
+import { TeilnahmenEffects } from "../core/redux/teilnahmen";
+import { teilnehmerFeature } from "../core/redux/teilnehmer/teilnehmer.reducer";
+import { TeilnehmerEffects } from "../core/redux/teilnehmer";
 
 export function checkDirtyState(component: CreateEventComponent) {
   if (component.isDirty) {
@@ -61,7 +65,13 @@ export function checkDirtyState(component: CreateEventComponent) {
     MaterialModule,
     EventsRoutingModule,
     StoreModule.forFeature(anlassSummariesFeature),
-    EffectsModule.forFeature([AnlassSummaryEffects]),
+    StoreModule.forFeature(teilnahmenFeature),
+    // StoreModule.forFeature(otsFeature),
+    EffectsModule.forFeature([
+      AnlassSummaryEffects,
+      TeilnahmenEffects,
+      // OtsEffects,
+    ]),
   ],
   providers: [],
 })

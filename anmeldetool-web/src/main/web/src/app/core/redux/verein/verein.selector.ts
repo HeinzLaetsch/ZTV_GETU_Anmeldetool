@@ -30,6 +30,7 @@ export const selectVereinByName = (name: string) =>
     vereine.filter((verein) => verein.name === name)
   );
 
+
 const strip = (org: string, pattern: string) => {
   const hasGetuA = org.indexOf(pattern);
   if (hasGetuA >= 0) {

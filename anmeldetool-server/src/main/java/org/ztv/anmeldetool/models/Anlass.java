@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -13,6 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.ztv.anmeldetool.util.KategorienSponsorenAttributeConverter;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -104,6 +108,10 @@ public class Anlass extends Base {
 	private boolean abteilungFix = false;
 	private boolean anlageFix = false;
 	private boolean toolSperren = false;
+
+	@Convert(converter = KategorienSponsorenAttributeConverter.class)
+	@Column(name = "KATEGORIEN_SPONSOREN", length = 1000)
+	private KategorienSponsoren kategorieSponsoren;
 
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "anlass")
 	@ToString.Exclude

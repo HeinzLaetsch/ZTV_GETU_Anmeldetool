@@ -151,7 +151,7 @@
     <div class="row border-bottom divider"></div>
     <div class="row divider"></div>
 
-    <div class="row">
+    <div *ngIf="!anlass.ausserkantonal" class="row">
       <div class="col-sm-3 total"><h3>Startgeld:</h3></div>
       <div class="col-sm-1 total">
         <h3>{{ totalTeilnehmer }}</h3>
@@ -159,6 +159,15 @@
       <div class="col-sm-2 total"><h3>x 26.00 sFr.</h3></div>
       <div class="col-sm total">
         <h3>{{ totalTeilnehmer * 26 }}.00 sFr.</h3>
+      </div>
+    </div>
+    <div *ngIf="anlass.ausserkantonal" class="row">
+      <div class="col-sm-3 total"><h3>Startgeld:</h3></div>
+      <div class="col-sm-1 total">
+        <h3>{{ totalTeilnehmer }}</h3>
+      </div>
+      <div class="col-sm-3 total">
+        <h3>x Betrag hängt vom Organisator ab</h3>
       </div>
     </div>
     <div class="row">

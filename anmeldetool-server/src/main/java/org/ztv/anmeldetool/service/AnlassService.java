@@ -411,8 +411,9 @@ public class AnlassService {
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		List<TeilnehmerAnlassLink> teilnahmen = null;
 		if (exclude) {
-			List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] { MeldeStatusEnum.ABGEMELDET_1,
-					MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.UMMELDUNG });
+			List<MeldeStatusEnum> exclusion = Arrays
+					.asList(new MeldeStatusEnum[] { MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.ABGEMELDET_1,
+							MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.UMMELDUNG });
 			teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndOrganisationExclude(anlass, organisation,
 					exclusion);
 		} else {

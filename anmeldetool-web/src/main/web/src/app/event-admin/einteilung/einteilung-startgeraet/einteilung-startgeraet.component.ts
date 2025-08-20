@@ -178,6 +178,8 @@ export class EinteilungStartgeraetComponent implements OnInit {
     anlagen.push(AnlageEnum.ANLAGE_2);
     anlagen.push(AnlageEnum.ANLAGE_3);
     anlagen.push(AnlageEnum.ANLAGE_4);
+    anlagen.push(AnlageEnum.ANLAGE_5);
+    anlagen.push(AnlageEnum.ANLAGE_6);
     return anlagen;
   }
   get alleAbteilungen(): AbteilungEnum[] {
@@ -186,6 +188,10 @@ export class EinteilungStartgeraetComponent implements OnInit {
     abteilungen.push(AbteilungEnum.ABTEILUNG_2);
     abteilungen.push(AbteilungEnum.ABTEILUNG_3);
     abteilungen.push(AbteilungEnum.ABTEILUNG_4);
+    abteilungen.push(AbteilungEnum.ABTEILUNG_5);
+    abteilungen.push(AbteilungEnum.ABTEILUNG_6);
+    abteilungen.push(AbteilungEnum.ABTEILUNG_7);
+    abteilungen.push(AbteilungEnum.ABTEILUNG_8);
     return abteilungen;
   }
   compareWith(value1, value2) {

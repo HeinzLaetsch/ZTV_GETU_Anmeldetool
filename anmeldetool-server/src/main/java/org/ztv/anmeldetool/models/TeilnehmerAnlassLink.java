@@ -56,9 +56,9 @@ public class TeilnehmerAnlassLink extends Base {
 	private Notenblatt notenblatt;
 
 	public Notenblatt getNotenblatt() {
-		if (this.notenblatt == null) {
-			return new Notenblatt();
-		}
+		/*
+		 * if (this.notenblatt == null) { return new Notenblatt(); }
+		 */
 		return notenblatt;
 	}
 

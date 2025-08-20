@@ -41,6 +41,18 @@ export const selectAktiveAnlaesse = (admin: boolean) =>
     const filtered = selectAnlaesseAdmin(true, admin, anlaesse);
     return filtered;
   });
+
+export const selectSperrenAnlaesse = () =>
+  createSelector(selectAllAnlaesse, (anlaesse) => {
+    if (anlaesse.length === 0) {
+      return undefined;
+    }
+    const filtered = anlaesse.filter((anlass) => {
+      return anlass.toolSperren;
+    });
+    return filtered;
+  });
+
 export const selectAnlassById = (id: string) =>
   createSelector(selectAnlaesseState, (anlaesseState) => {
     const ret = anlaesseState.ids.length

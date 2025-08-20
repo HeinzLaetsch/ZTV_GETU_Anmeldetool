@@ -1,5 +1,6 @@
 package org.ztv.anmeldetool.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -65,15 +66,17 @@ public class RanglistenService {
 			} else {
 				teamwertung = new TeamwertungDTO();
 				teamwertung.setVerein(entry.getVerein());
+				teamwertung.setGesamtPunktzahl(BigDecimal.ZERO);
 				teamwertungen.put(entry.getVerein(), teamwertung);
 			}
 			if ((teamwertung.getAnzahlResultate() <= 3 && kategorie.ordinal() <= KategorieEnum.K4.ordinal())
 					|| (teamwertung.getAnzahlResultate() <= 2 && kategorie.ordinal() > KategorieEnum.K4.ordinal())) {
 				teamwertung.setAnzahlResultate(teamwertung.getAnzahlResultate() + 1);
-				teamwertung.setGesamtPunktzahl(teamwertung.getGesamtPunktzahl() + entry.getGesamtPunktzahl());
+				teamwertung.setGesamtPunktzahl(
+						teamwertung.getGesamtPunktzahl().add(BigDecimal.valueOf(entry.getGesamtPunktzahl())));
 			}
 		}
-		List<TeamwertungDTO> result1 = teamwertungen.values().stream().filter(tw -> {
+		List<TeamwertungDTO> unsortedResult = teamwertungen.values().stream().filter(tw -> {
 			if (kategorie.ordinal() <= KategorieEnum.K4.ordinal()) {
 				return tw.getAnzahlResultate() == 4;
 			} else {
@@ -81,20 +84,19 @@ public class RanglistenService {
 			}
 		}).collect(Collectors.toList());
 
-		List<TeamwertungDTO> result = result1.stream()
-				.sorted(Comparator.comparing(tw -> tw.getGesamtPunktzahl(), Comparator.reverseOrder()))
-				.collect(Collectors.toList());
-		int rang = 0;
-		float gesamtpunktzahl = 0.0f;
-		for (TeamwertungDTO tw : result) {
-			if (tw.getGesamtPunktzahl() == gesamtpunktzahl) {
-				tw.setRang(rang);
-			} else {
-				tw.setRang(++rang);
-			}
-			gesamtpunktzahl = tw.getGesamtPunktzahl();
-		}
-		return result;
+		List<TeamwertungDTO> sortedResult = sortAndSetRank(unsortedResult);
+		return sortedResult;
+
+		/*
+		 * 
+		 * List<TeamwertungDTO> result = result1.stream()
+		 * .sorted(Comparator.comparing(tw -> tw.getGesamtPunktzahl(),
+		 * Comparator.reverseOrder())) .collect(Collectors.toList()); int rang = 0;
+		 * float gesamtpunktzahl = 0.0f; for (TeamwertungDTO tw : result) { if
+		 * (tw.getGesamtPunktzahl() == gesamtpunktzahl) { tw.setRang(rang); } else {
+		 * tw.setRang(++rang); } gesamtpunktzahl = tw.getGesamtPunktzahl(); } return
+		 * result;
+		 */
 	}
 
 	public List<TeamwertungDTO> getTeamwertungTu(UUID anlassId, KategorieEnum kategorie) throws ServiceException {
@@ -169,12 +171,13 @@ public class RanglistenService {
 		teamListe.values().forEach(team -> {
 			if (team.get(KategorieEnum.KEIN_START) != null && team.get(KategorieEnum.KEIN_START).size() >= teamSize) {
 				TeamwertungDTO teamWertungDto = new TeamwertungDTO();
+				teamWertungDto.setGesamtPunktzahl(BigDecimal.ZERO);
 				team.get(KategorieEnum.KEIN_START).forEach(entry -> {
 					teamWertungDto.setVerein(entry.getVerein());
 					if (teamWertungDto.getAnzahlResultate() < teamSize) {
 						teamWertungDto.setAnzahlResultate(teamWertungDto.getAnzahlResultate() + 1);
-						teamWertungDto
-								.setGesamtPunktzahl(teamWertungDto.getGesamtPunktzahl() + entry.getGesamtPunktzahl());
+						teamWertungDto.setGesamtPunktzahl(teamWertungDto.getGesamtPunktzahl()
+								.add(BigDecimal.valueOf(entry.getGesamtPunktzahl())));
 					}
 				});
 				if (teamWertungDto.getVerein() != null) {
@@ -219,15 +222,31 @@ public class RanglistenService {
 		List<TeamwertungDTO> result = unsortedResult.stream()
 				.sorted(Comparator.comparing(tw -> tw.getGesamtPunktzahl(), Comparator.reverseOrder()))
 				.collect(Collectors.toList());
+		int same = -1;
 		int rang = 0;
+		BigDecimal gesamtPunktzahl = BigDecimal.ZERO;
+
 		for (TeamwertungDTO tw : result) {
-			tw.setRang(++rang);
+			rang++;
+			if (gesamtPunktzahl.compareTo(tw.getGesamtPunktzahl()) != 0) {
+				tw.setRang(rang);
+				same = -1;
+			} else {
+				if (same == -1) {
+					same = rang - 1;
+				}
+				tw.setRang(same);
+			}
+			gesamtPunktzahl = tw.getGesamtPunktzahl();
 		}
 		return result;
 	}
 
 	public Notenblatt saveNotenblatt(Notenblatt notenblatt) {
-		return notenblaetterRepo.save(notenblatt);
+		if (notenblatt != null) {
+			return notenblaetterRepo.save(notenblatt);
+		}
+		return null;
 	}
 
 	public RanglisteConfiguration saveRanglisteConfiguration(RanglisteConfiguration rc) {
@@ -271,8 +290,9 @@ public class RanglistenService {
 			throws ServiceException {
 		List<TeilnehmerAnlassLink> tals = talService.findWettkampfTeilnahmenByKategorieAndTiTu(anlass, kategorie, titu);
 
-		tals = tals.stream().sorted(
-				Comparator.comparing(tal -> tal.getNotenblatt().getGesamtPunktzahl(), Comparator.reverseOrder()))
+		tals = tals
+				.stream().filter(tal -> tal.getNotenblatt() != null).sorted(Comparator
+						.comparing(tal -> tal.getNotenblatt().getGesamtPunktzahl(), Comparator.reverseOrder()))
 				.collect(Collectors.toList());
 
 		return tals;

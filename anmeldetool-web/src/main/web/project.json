@@ -132,6 +132,9 @@
         },
         "production": {
           "browserTarget": "at-app:build:production"
+        },
+          "halle": {
+          "browserTarget": "at-app:build:halle"
         }
       }
     },

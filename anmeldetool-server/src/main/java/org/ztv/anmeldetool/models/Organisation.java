@@ -26,6 +26,8 @@ public class Organisation extends Base {
 
 	private String name;
 
+	private String bezeichnung;
+
 	@Transient
 	private String cleanName = null;
 
@@ -85,19 +87,29 @@ public class Organisation extends Base {
 	}
 
 	public String cleanName() {
-		if (cleanName != null) {
+		return cleanName(true);
+	}
+
+	public String cleanName(boolean korrigiereEnde) {
+		if (!korrigiereEnde && cleanName != null) {
 			return cleanName;
 		}
 		int start = 0;
 		int endKorrektur = 0;
+		if (name.contains("GR")) {
+			start = "GR".length() + 1;
+		}
 		if (name.contains("GETU")) {
 			start = "GETU".length() + 1;
 		}
 		if (name.contains("Getu")) {
 			start = "Getu".length() + 1;
 		}
-		if (name.toUpperCase().contains("TV")) {
+		if (!name.toUpperCase().contains("ZTV") && name.toUpperCase().contains("TV")) {
 			start = "TV".length() + 1;
+		}
+		if (name.contains("Getu TV")) {
+			start = "Getu TV".length() + 1;
 		}
 		// Bindestrich durch +1 removed
 		if (name.toUpperCase().contains("TV ZH")) {
@@ -111,6 +123,9 @@ public class Organisation extends Base {
 		}
 		if (name.contains("Geräteriege")) {
 			start = "Geräteriege".length() + 1;
+		}
+		if (name.contains("Geräteturnen")) {
+			start = "Geräteturnen".length() + 1;
 		}
 		if (name.contains("Turnverein")) {
 			start = "Turnverein".length() + 1;
@@ -127,19 +142,22 @@ public class Organisation extends Base {
 		if (name.toUpperCase().contains("SATUS")) {
 			start = "SATUS".length() + 1;
 		}
-		if (name.contains("Mädchen")) {
-			endKorrektur = "Mädchen".length() + 1;
-		}
-		if (name.contains("GeTu")) {
-			endKorrektur = "GeTu".length() + 1;
-		}
-		if (name.contains("OTVG")) {
-			endKorrektur = "OTVG".length() + 1;
-		}
-		if (name.endsWith("ZH")) {
-			endKorrektur = "ZH".length() + 1;
+		if (korrigiereEnde) {
+			if (name.contains("Mädchen")) {
+				endKorrektur = "Mädchen".length() + 1;
+			}
+			if (name.contains("GeTu")) {
+				endKorrektur = "GeTu".length() + 1;
+			}
+			if (name.contains("OTVG")) {
+				endKorrektur = "OTVG".length() + 1;
+			}
+			if (name.endsWith("ZH")) {
+				endKorrektur = "ZH".length() + 1;
+			}
 		}
 		cleanName = name.substring(start, name.length() - endKorrektur);
+
 		// System.out.println("Name: " + name + " Clean: " + cleanName);
 		return cleanName;
 	}

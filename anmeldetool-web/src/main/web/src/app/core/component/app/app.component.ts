@@ -5,7 +5,6 @@ import {
   OnInit,
 } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { ActivatedRoute } from "@angular/router";
 import { IAnlass } from "../../model/IAnlass";
 import { AuthService } from "../../service/auth/auth.service";
 import { CachingAnlassService } from "../../service/caching-services/caching.anlass.service";
@@ -13,6 +12,10 @@ import { CachingVereinService } from "../../service/caching-services/caching.ver
 import { LoginDialogComponent } from "../login/login-dialog.component";
 import { NewAnmelderComponent } from "../new-anmelder/new-anmelder.component";
 import { NewVereinComponent } from "../new-verein/new-verein.component";
+import { AppState } from "../../redux/core.state";
+import { select, Store } from "@ngrx/store";
+import { SubscriptionHelper } from "src/app/utils/subscription-helper";
+import { selectSperrenAnlaesse } from "../../redux/anlass";
 
 /** @title Main Component */
 @Component({
@@ -21,6 +24,7 @@ import { NewVereinComponent } from "../new-verein/new-verein.component";
   styleUrls: ["app.component.css"],
 })
 export class AnmeldeToolComponent
+  extends SubscriptionHelper
   implements OnInit, AfterViewInit, AfterContentChecked
 {
   localeTextDE = {
@@ -36,20 +40,32 @@ export class AnmeldeToolComponent
 
   constructor(
     private authService: AuthService,
-    public vereinService: CachingVereinService,
-    private anlassService: CachingAnlassService,
+    // public vereinService: CachingVereinService,
+    // private anlassService: CachingAnlassService,
     // private router: ActivatedRoute,
+    private store: Store<AppState>,
+
     public dialog: MatDialog
-  ) {}
-  ngOnInit(): void {
-    this.anlass = this.anlassService.findetAnlassStatt();
-    if (this.anlass) {
-      this.appBlocked = true;
-    }
-    if (!this.appBlocked && !this.authService.isAuthenticated()) {
-      this.dialogOpen = true;
-    }
+  ) {
+    super();
+    this.registerSubscription(
+      this.store.pipe(select(selectSperrenAnlaesse())).subscribe((result) => {
+        if (result === undefined) {
+          return;
+        }
+        if (result.length > 0) {
+          this.appBlocked = true;
+          this.dialogOpen = false;
+        }
+        if (!this.appBlocked && !this.authService.isAuthenticated()) {
+          this.dialogOpen = true;
+          this.openLoginDialog();
+        }
+      })
+    );
   }
+
+  ngOnInit(): void {}
 
   ngAfterContentChecked(): void {
     if (
@@ -64,21 +80,24 @@ export class AnmeldeToolComponent
   }
 
   ngAfterViewInit(): void {
+    /*
     if (!this.appBlocked && !this.authService.isAuthenticated()) {
       console.log("AnmeldeToolComponent::ngAfterViewInit: ");
       this.openLoginDialog();
     }
+    */
   }
 
   get administrator(): boolean {
     return this.authService.isAdministrator();
   }
 
+  /* todo
   toolSperrenClicked(event: any): void {
     this.anlassService
       .updateAnlass(this.anlass)
       .subscribe((anlass) => (this.anlass = anlass));
-  }
+  }*/
 
   openLoginDialog() {
     // this.dialogOpen = true;

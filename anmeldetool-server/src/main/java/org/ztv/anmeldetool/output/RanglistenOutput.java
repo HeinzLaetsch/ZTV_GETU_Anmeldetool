@@ -144,7 +144,7 @@ public class RanglistenOutput {
 		Document doc = new Document(pdf, PageSize.A4);
 		TableHeaderEventHandler thEventHandler = new TableHeaderEventHandler(doc, anlass, turner, kategorie);
 		pdf.addEventHandler(PdfDocumentEvent.END_PAGE, thEventHandler);
-		pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new TextFooterEventHandler(doc, anlass));
+		pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new TextFooterEventHandler(doc, anlass, kategorie));
 
 		// Calculate top margin to be sure that the table will fit the margin.
 		float topMargin = 20 + thEventHandler.getTableHeight();
@@ -291,10 +291,12 @@ public class RanglistenOutput {
 		private float tableHeight;
 		private Document doc;
 		private Anlass anlass;
+		private String kategorie;
 
-		public TextFooterEventHandler(Document doc, Anlass anlass) {
+		public TextFooterEventHandler(Document doc, Anlass anlass, String kategorie) {
 			this.doc = doc;
 			this.anlass = anlass;
+			this.kategorie = kategorie;
 		}
 
 		@Override
@@ -314,13 +316,20 @@ public class RanglistenOutput {
 			float headerY = pageSize.getTop() - doc.getTopMargin() + 10;
 			float footerY = doc.getBottomMargin() - 5;
 
+			String sponsor = "";
+			if (anlass.getKategorieSponsoren() != null && anlass.getKategorieSponsoren().getSponsoren() != null
+					&& anlass.getKategorieSponsoren().getSponsoren().containsKey(kategorie)) {
+				sponsor = "Kategoriensponsor: " + anlass.getKategorieSponsoren().getSponsoren().get(kategorie);
+			}
 			Canvas canvas = new Canvas(docEvent.getPage(), pageSize);
 			canvas
 					// If the exception has been thrown, the font variable is not initialized.
 					// Therefore null will be set and iText will use the default font - Helvetica
 					.setFont(font).setFontSize(5)
 					// .showTextAligned("this is a header", coordX, headerY, TextAlignment.CENTER)
-					.showTextAligned(anlass.getRanglistenFooter(), coordX, footerY, TextAlignment.CENTER).close();
+					.showTextAligned(sponsor + "   " + anlass.getRanglistenFooter(), coordX, footerY,
+							TextAlignment.CENTER)
+					.close();
 		}
 
 		public float getTableHeight() {

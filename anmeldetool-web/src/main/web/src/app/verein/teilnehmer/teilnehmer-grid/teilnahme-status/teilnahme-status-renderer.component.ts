@@ -62,8 +62,13 @@ export class TeilnahmeStatusRenderer implements ICellRendererAngularComp {
 
   showKategorie(value: any) {
     if (value) {
+      let keinStart = KategorieEnum.KEIN_START;
       if (
-        !KategorieEnumFunction.equals(KategorieEnum.KEIN_START, value.kategorie)
+        !KategorieEnumFunction.equals(
+          KategorieEnum.KEIN_START,
+          value.kategorie
+        ) &&
+        keinStart !== value.kategorie
       ) {
         return true;
       }
@@ -73,10 +78,14 @@ export class TeilnahmeStatusRenderer implements ICellRendererAngularComp {
 
   showStatus(value: any): boolean {
     if (value && value.meldeStatus) {
-      if (value.meldeStatus.toUpperCase() === MeldeStatusEnum.ABGEMELDET) {
+      if (
+        value.meldeStatus.toUpperCase() === MeldeStatusEnum.ABGEMELDET
+      ) {
         return true;
       }
-      if (value.meldeStatus.toUpperCase() === "ABGEMELDET") {
+      if (
+        value.meldeStatus.toUpperCase() === "ABGEMELDET"
+      ) {
         return true;
       }
     }

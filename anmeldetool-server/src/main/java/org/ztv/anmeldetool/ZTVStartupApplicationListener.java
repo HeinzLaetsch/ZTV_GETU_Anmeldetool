@@ -32,8 +32,10 @@ import org.ztv.anmeldetool.repositories.RollenRepository;
 import org.ztv.anmeldetool.repositories.VerbandsRepository;
 import org.ztv.anmeldetool.repositories.WertungsrichterRepository;
 import org.ztv.anmeldetool.repositories.WertungsrichterSlotRepository;
+import org.ztv.anmeldetool.service.FlywayService;
 import org.ztv.anmeldetool.service.PersonService;
 import org.ztv.anmeldetool.service.TeilnehmerService;
+import org.ztv.anmeldetool.util.OrganisationBezeichnungTransformer;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,6 +66,9 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 
 	@Autowired
 	OrganisationAnlassLinkRepository orgAnlassLinkRepo;
+
+	@Autowired
+	FlywayService flywayService;
 
 	@Autowired
 	TeilnehmerService teilnehmerService;
@@ -99,6 +104,9 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 			// createTeilnahme();
 		} else {
 			log.info("Anmeldetool is ready to use");
+		}
+		if (flywayService.isJavaMigrationNeeded("1.0.23")) {
+			OrganisationBezeichnungTransformer.splitOrganisationName(orgRepo);
 		}
 	}
 

@@ -33,3 +33,19 @@ export const selectTiTeilnahmen = () =>
     );
     return ret;
   });
+
+export const selectTeilnahmenByAnlassId = (anlassId: String) =>
+  createSelector(selectAllTeilnahmen, (teilnahmenState) => {
+    const ret = teilnahmenState
+      .map((x) => {
+        const tals = x.talDTOList.filter((y) => y.anlassId === anlassId);
+        if (tals.length > 0) {
+          return {
+            ...x,
+            talDTOList: tals,
+          };
+        }
+      })
+      .filter((x) => x !== undefined);
+    return ret;
+  });

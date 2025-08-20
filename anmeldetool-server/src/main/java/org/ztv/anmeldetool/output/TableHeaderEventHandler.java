@@ -138,6 +138,7 @@ public class TableHeaderEventHandler implements IEventHandler {
 	private static void printTitelCell(Table table, PdfFont fontN, Anlass anlass, String kategorie, boolean turner)
 			throws IOException {
 		Cell cell = null;
+		int FONTSIZE = 13;
 		if (turner) {
 			cell = new Cell(2, 15);
 		} else {
@@ -146,17 +147,18 @@ public class TableHeaderEventHandler implements IEventHandler {
 		// cell = cell.setHeight(18);
 		cell = cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
 		cell.setBorder(Border.NO_BORDER);
-		Text text = new Text(anlass.getAnlassBezeichnung().replace("%", "")).setFont(fontN).setFontSize(13);
-		Text textOrt = new Text(" in " + anlass.getOrt()).setFont(fontN).setFontSize(13);
-		DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+		Text text = new Text(anlass.getAnlassBezeichnung().replace("%", "")).setFont(fontN).setFontSize(FONTSIZE);
+		Text textOrt = new Text(" in " + anlass.getOrt()).setFont(fontN).setFontSize(FONTSIZE);
+		DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM");
+		DateTimeFormatter formattersYear = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
 		String start = anlass.getStartDate().format(formatters);
-		String end = anlass.getEndDate().format(formatters);
+		String end = anlass.getEndDate().format(formattersYear);
 		Text textDate = null;
 		if (anlass.getStartDate().equals(anlass.getEndDate())) {
-			textDate = new Text(" , " + start).setFont(fontN).setFontSize(13);
+			textDate = new Text(", " + start).setFont(fontN).setFontSize(FONTSIZE);
 		} else {
-			textDate = new Text(" , " + start + " bis " + end).setFont(fontN).setFontSize(13);
+			textDate = new Text(", " + start + " bis " + end).setFont(fontN).setFontSize(FONTSIZE);
 		}
 		cell.add(new Paragraph(text).add(textOrt).add(textDate).setTextAlignment(TextAlignment.CENTER)
 				.setMultipliedLeading(1.2f));
@@ -166,7 +168,7 @@ public class TableHeaderEventHandler implements IEventHandler {
 		// cell = cell.setHeight(18);
 		cell = cell.setVerticalAlignment(VerticalAlignment.TOP);
 		cell.setBorder(Border.NO_BORDER);
-		text = new Text(kategorie).setFont(fontN).setFontSize(14);
+		text = new Text(kategorie).setFont(fontN).setFontSize(FONTSIZE + 1);
 		cell.add(new Paragraph(text).setTextAlignment(TextAlignment.RIGHT).setMultipliedLeading(0.0f));
 		table.addCell(cell);
 

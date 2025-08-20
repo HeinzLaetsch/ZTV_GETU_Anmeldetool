@@ -18,7 +18,7 @@ spring:
               # time_zone: "Europe/Zurich"
               time_zone: "GMT+1"
   datasource:
-    url: jdbc:postgresql://localhost:5432/getuwettkaempfe
+    url: jdbc:postgresql://localhost:5432/getuwettkaempfe23
     username: postgres
     password: getu@ztv
   jackson:
