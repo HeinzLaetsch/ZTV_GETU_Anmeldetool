@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.ztv.anmeldetool.exception.EntityNotFoundException;
 import org.ztv.anmeldetool.models.AbteilungEnum;
 import org.ztv.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.models.Anlass;
@@ -52,6 +55,7 @@ import org.ztv.anmeldetool.output.AnmeldeKontrolleOutput;
 import org.ztv.anmeldetool.output.WertungsrichterOutput;
 import org.ztv.anmeldetool.repositories.PersonAnlassLinkRepository;
 import org.ztv.anmeldetool.service.AnlassService;
+import org.ztv.anmeldetool.service.AnlassSummaryService;
 import org.ztv.anmeldetool.service.LoginService;
 import org.ztv.anmeldetool.service.OrganisationService;
 import org.ztv.anmeldetool.service.PersonService;
@@ -64,6 +68,7 @@ import org.ztv.anmeldetool.service.VerbandService;
 import org.ztv.anmeldetool.service.WertungsrichterEinsatzService;
 import org.ztv.anmeldetool.service.WertungsrichterService;
 import org.ztv.anmeldetool.transfer.AnlassDTO;
+import org.ztv.anmeldetool.transfer.AnlassSummaryDTO;
 import org.ztv.anmeldetool.transfer.AnmeldeKontrolleDTO;
 import org.ztv.anmeldetool.transfer.BenutzerDTO;
 import org.ztv.anmeldetool.transfer.OrganisationAnlassLinkDTO;
@@ -151,6 +156,9 @@ public class AnlassAdminController {
 	AnlassMapper anlassMapper;
 
 	@Autowired
+	AnlassSummaryService anlassSummaryService;
+
+	@Autowired
 	OrganisationMapper organisationMapper;
 
 	@Autowired
@@ -181,16 +189,91 @@ public class AnlassAdminController {
 
 	@GetMapping()
 	// @ResponseBody
-	public ResponseEntity<Collection<AnlassDTO>> getAnlaesse() {
-		List<Anlass> anlaesse = anlassSrv.getAllAnlaesse();
-		List<AnlassDTO> anlaesseDTO = anlaesse.stream().map(anlass -> {
-			return anlassMapper.toDto(anlass);
-		}).collect(Collectors.toList());
-		if (anlaesseDTO.size() == 0) {
-			return getNotFound();
-		} else {
-			return ResponseEntity.ok(anlaesseDTO);
+	public ResponseEntity<Collection<AnlassDTO>> getAnlaesse(@RequestParam Optional<Boolean> onlyAktiv) {
+		try {
+			AtomicBoolean onlyAktivBoolean = new AtomicBoolean();
+			onlyAktiv.ifPresentOrElse((value) -> onlyAktivBoolean.set(value), () -> onlyAktivBoolean.getAndSet(true));
+			List<Anlass> anlaesse = anlassSrv.getAnlaesse(onlyAktivBoolean.get());
+			List<AnlassDTO> anlaesseDTO = anlaesse.stream().map(anlass -> {
+				return anlassMapper.toDto(anlass);
+			}).collect(Collectors.toList());
+			if (anlaesseDTO.size() == 0) {
+				return getNotFound();
+			} else {
+				return ResponseEntity.ok(anlaesseDTO);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
+		return getNotFound();
+	}
+
+	@GetMapping("/organisationen/{orgId}/summaries")
+	public ResponseEntity<Collection<AnlassSummaryDTO>> getAnlassOrganisationSummaries(HttpServletRequest request,
+			@PathVariable UUID orgId) {
+		Collection<AnlassSummaryDTO> asDtos = anlassSummaryService.getAnlassSummaries(orgId, true);
+		if (asDtos == null || asDtos.size() == 0) {
+			return getNotFound();
+		}
+		return ResponseEntity.ok(asDtos);
+	}
+
+	@GetMapping("/{anlassId}/organisationen/{orgId}/summary")
+	public ResponseEntity<AnlassSummaryDTO> getAnlassOrganisationSummary(HttpServletRequest request,
+			@PathVariable UUID anlassId, @PathVariable UUID orgId) {
+		/*
+		 * OrganisationAnlassLink oalResult = anlassSrv.getVereinStart(anlassId, orgId);
+		 * 
+		 * if (oalResult == null) { AnlassSummaryDTO asDto =
+		 * AnlassSummaryDTO.builder().anlassId(anlassId).organisationsId(orgId).startet(
+		 * false)
+		 * .verlaengerungsDate(null).startendeBr1(0).startendeBr2(0).gemeldeteBr1(0).
+		 * gemeldeteBr2(0) .br1Ok(true).br2Ok(true).build(); return
+		 * ResponseEntity.ok(asDto); } int startBr1 = 0; int startK1 = 0; int startK2 =
+		 * 0; int startK3 = 0; int startK4 = 0; int startK5 = 0; int startK5A = 0; int
+		 * startK5B = 0; int startK6 = 0; int startK7 = 0; int startKD = 0; int startKH
+		 * = 0;
+		 * 
+		 * int startBr2 = 0; int gemeldeteBr1 = 0; int gemeldeteBr2 = 0; boolean br1Ok =
+		 * false; boolean br2Ok = false; if (oalResult.isAktiv()) {
+		 * List<TeilnehmerAnlassLink> links = anlassSrv.getTeilnahmen(anlassId, orgId,
+		 * false); startBr1 = (int) links.stream().filter(link -> { if
+		 * (link.getKategorie() != null) { return link.getKategorie().isJugend(); } else
+		 * { return false; } }).count(); startK1 = getStartendeForKategorie(links,
+		 * KategorieEnum.K1); startK2 = getStartendeForKategorie(links,
+		 * KategorieEnum.K2); startK3 = getStartendeForKategorie(links,
+		 * KategorieEnum.K3); startK4 = getStartendeForKategorie(links,
+		 * KategorieEnum.K4); startK5 = getStartendeForKategorie(links,
+		 * KategorieEnum.K5); startK5A = getStartendeForKategorie(links,
+		 * KategorieEnum.K5A); startK5B = getStartendeForKategorie(links,
+		 * KategorieEnum.K5B); startK6 = getStartendeForKategorie(links,
+		 * KategorieEnum.K6); startK7 = getStartendeForKategorie(links,
+		 * KategorieEnum.K7); startKD = getStartendeForKategorie(links,
+		 * KategorieEnum.KD); startKH = getStartendeForKategorie(links,
+		 * KategorieEnum.KH);
+		 * 
+		 * startBr2 = (int) links.stream().filter(link -> { if (link.getKategorie() !=
+		 * null) { return link.getKategorie().isAktiv(); } else { return false; }
+		 * }).count(); List<PersonAnlassLink> pals =
+		 * anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId,
+		 * WertungsrichterBrevetEnum.Brevet_1); gemeldeteBr1 = pals.size(); pals =
+		 * anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId,
+		 * WertungsrichterBrevetEnum.Brevet_2); gemeldeteBr2 = pals.size(); // TODO
+		 * check anzahl // TODO store anzahl within config br1Ok = (Math.ceil(startBr1 /
+		 * 15.0f)) <= gemeldeteBr1; br2Ok = (Math.ceil(startBr2 / 15.0f)) <=
+		 * gemeldeteBr2; } AnlassSummaryDTO asDto =
+		 * AnlassSummaryDTO.builder().anlassId(anlassId).organisationsId(orgId)
+		 * .startet(oalResult.isAktiv()).verlaengerungsDate(null).startendeBr1(startBr1)
+		 * .startendeK1(startK1)
+		 * .startendeK2(startK2).startendeK3(startK3).startendeK4(startK4).startendeK5(
+		 * startK5) .startendeK5A(startK5A).startendeK5B(startK5B).startendeK6(startK6).
+		 * startendeK7(startK7)
+		 * .startendeKD(startKD).startendeKH(startKH).startendeBr2(startBr2).
+		 * gemeldeteBr1(gemeldeteBr1)
+		 * .gemeldeteBr2(gemeldeteBr2).br1Ok(br1Ok).br2Ok(br2Ok).build();
+		 */
+		AnlassSummaryDTO asDto = anlassSummaryService.getAnlassSummary(anlassId, orgId);
+		return ResponseEntity.ok(asDto);
 	}
 
 	@GetMapping("/{anlassId}/organisationen/{orgId}")
@@ -324,7 +407,7 @@ public class AnlassAdminController {
 		}
 	}
 
-	@PatchMapping(value = "/{anlassId}/teilnehmer")
+	@PutMapping(value = "/{anlassId}/teilnehmer")
 	public ResponseEntity updateAnlassStart(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable UUID anlassId, @RequestBody TeilnehmerStartDTO ts) {
 
@@ -596,6 +679,16 @@ public class AnlassAdminController {
 		return ResponseEntity.ok(linksDto);
 	}
 
+	@PutMapping("/{anlassId}/organisationen/{orgId}/teilnehmer/{teilnehmerId}")
+	public @ResponseBody ResponseEntity<TeilnehmerAnlassLinkDTO> putAnlassTeilnehmer(HttpServletRequest request,
+			@PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable UUID teilnehmerId,
+			@RequestBody TeilnehmerAnlassLinkDTO talDto) {
+
+		TeilnehmerAnlassLink tal = teilnehmerSrv.updateAnlassTeilnahmen(anlassId, teilnehmerId, talDto);
+		talDto = teilnehmerAnlassMapper.toDto(tal);
+		return ResponseEntity.ok(talDto);
+	}
+
 	@GetMapping(value = "/{anlassId}/organisationen/{orgId}/anmeldekontrolle/", produces = "application/pdf")
 	public void getAnmeldeKontrollePDF(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable UUID anlassId, @PathVariable UUID orgId) {
@@ -640,12 +733,6 @@ public class AnlassAdminController {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate Anmeldekontrolle: ",
 					ex);
 		}
-	}
-
-	@PatchMapping("/{anlassId}/organisationen/{orgId}/teilnehmer/{teilnehmerId}")
-	public @ResponseBody ResponseEntity patchAnlassTeilnehmer(HttpServletRequest request, @PathVariable UUID anlassId,
-			@PathVariable UUID orgId, @PathVariable UUID teilnehmerId, @RequestBody TeilnehmerAnlassLinkDTO tal) {
-		return teilnehmerSrv.updateAnlassTeilnahmen(anlassId, teilnehmerId, tal);
 	}
 
 	@GetMapping("/{anlassId}/organisationen/{orgId}/wertungsrichter/{brevet}/verfuegbar")
@@ -761,5 +848,19 @@ public class AnlassAdminController {
 		wrEinsatz = this.wertungsrichterEinsatzSrv.update(wrEinsatz);
 		WertungsrichterEinsatzDTO dto = this.wertungsrichterEinsatzMapper.ToDto(wrEinsatz);
 		return ResponseEntity.ok(dto);
+	}
+
+	@ExceptionHandler(EntityNotFoundException.class)
+	public ResponseEntity<?> handlerEntityNotFound(EntityNotFoundException ex) {
+		this.log.warn(ex.getMessage());
+
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<?> handlerException(Exception ex) {
+		log.warn("Call failed", ex);
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
 	}
 }

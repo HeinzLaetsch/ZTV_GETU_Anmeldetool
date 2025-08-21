@@ -1,7 +1,18 @@
 <h1>ZTV Anlässe</h1>
 <hr />
-<div class="row">
-  <div *ngFor="let anlass of anlaesse" class="col-md-auto">
-    <app-event-thumbnail #thumbnail [anlass]="anlass"></app-event-thumbnail>
+<div class="row" *ngIf="anlaesse$ | async; else loading">
+  <div *ngIf="showEvents" class="row">
+    <div *ngFor="let anlass of anlaesseExtended" class="col-md-auto">
+      <app-event-thumbnail
+        #thumbnail
+        [anlassExtended]="anlass"
+      ></app-event-thumbnail>
+    </div>
   </div>
 </div>
+
+<ng-template #loading>
+  <div class="center">
+    <mat-spinner style="margin: 0 auto"></mat-spinner>
+  </div>
+</ng-template>

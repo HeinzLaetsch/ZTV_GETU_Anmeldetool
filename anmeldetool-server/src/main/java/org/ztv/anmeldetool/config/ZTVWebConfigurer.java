@@ -6,6 +6,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.ztv.anmeldetool.controller.util.StringToAbteilungEnumConverter;
 import org.ztv.anmeldetool.controller.util.StringToAnlageEnumConverter;
 import org.ztv.anmeldetool.controller.util.StringToGeraeteEnumConverter;
+import org.ztv.anmeldetool.controller.util.StringToKategorieEnumConverter;
 import org.ztv.anmeldetool.controller.util.StringToMeldeStatusEnumConverter;
 
 @Configuration
@@ -16,5 +17,6 @@ public class ZTVWebConfigurer implements WebMvcConfigurer {
 		registry.addConverter(new StringToAnlageEnumConverter());
 		registry.addConverter(new StringToGeraeteEnumConverter());
 		registry.addConverter(new StringToMeldeStatusEnumConverter());
+		registry.addConverter(new StringToKategorieEnumConverter());
 	}
 }

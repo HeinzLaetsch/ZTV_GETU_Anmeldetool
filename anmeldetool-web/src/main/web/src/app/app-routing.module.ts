@@ -1,49 +1,26 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
-import {
-  EventAdminComponent,
-  EventListComponent,
-  EventRegisterSummaryComponent,
-  EventRouteActivatorService,
-  EventsDetailComponent,
-  EventStartListComponent,
-} from "./events/index";
+import { AuthRouteActivatorService } from "./core/routing/auth-route-activator.service";
+import { EventRouteActivatorService } from "./events/index";
+import { Page404Component } from "./error/page404/page404.component";
 import { SmQualiViewerComponent } from "./smquali/smquali-viewer/smquali-viewer.component";
 
 const routes: Routes = [
-  //   {path: 'newVerein', component: NewVereinComponent},
-  //   {path: 'newAnmelder', component: NewAnmelderComponent},
   {
-    path: "anlass",
-    component: EventListComponent,
-  },
-  // {path: 'events', component: EventListComponent, resolve: [{activated: AuthServiceResolverService}, {events: EventListResolverService}]},
-  // {path: 'events/new', component: CreateEventComponent, canDeactivate: ['canDeactivateCreateEvent']},
-  {
-    path: "anlass/:id",
-    component: EventsDetailComponent,
-    canActivate: [EventRouteActivatorService],
-    data: { roles: [] },
+    path: "anlaesse",
+    loadChildren: () =>
+      import("./events/events.module").then((m) => m.EventsModule),
+    // canActivate: [AuthRouteActivatorService],
   },
   {
-    path: "anlass/:id/anmeldung",
-    component: EventRegisterSummaryComponent,
-    canActivate: [EventRouteActivatorService],
-    data: { roles: [] },
+    path: "admin",
+    loadChildren: () =>
+      import("./event-admin/events-admin.module").then(
+        (m) => m.EventsAdminModule
+      ),
+    // canActivate: [AuthRouteActivatorService],
   },
-  {
-    path: "anlass/:id/startliste",
-    component: EventStartListComponent,
-    canActivate: [EventRouteActivatorService],
-    data: { roles: [] },
-  },
-  {
-    path: "anlass/:id/admin",
-    component: EventAdminComponent,
-    canActivate: [EventRouteActivatorService],
-    data: { roles: ["SEKRETARIAT"] },
-  },
-  // {path: 'page404', component: Page404Component},
+
   {
     path: "teilnehmer",
     loadChildren: () =>
@@ -62,6 +39,16 @@ const routes: Routes = [
     path: "user",
     loadChildren: () =>
       import("./verein/user.module").then((m) => m.UserModule),
+  },
+  {
+    path: "page404",
+    component: Page404Component,
+  },
+  {
+    path: "",
+    redirectTo: "anlaesse",
+    pathMatch: "full",
+    // canActivate: [AuthRouteActivatorService],
   },
   {
     path: "smquali",

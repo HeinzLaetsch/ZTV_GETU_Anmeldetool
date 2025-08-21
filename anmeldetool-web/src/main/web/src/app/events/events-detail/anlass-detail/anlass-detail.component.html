@@ -1,0 +1,28 @@
+<div class="row">
+  <div class="col-sm-3">
+    <span *ngIf="anlass.startDatum === anlass.endDatum">am</span>
+    <span *ngIf="anlass.startDatum !== anlass.endDatum">von</span>:
+    {{ anlass.startDatum | date : "EEEE, d MMMM , yyyy" : "GMT+1" : "DE-CH" }}
+  </div>
+  <div class="col-sm-3" *ngIf="anlass.startDatum !== anlass.endDatum">
+    bis:
+    {{ anlass.endDatum | date : "EEEE, d MMMM , yyyy" : "GMT+1" : "DE-CH" }}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-3">
+    Geschlecht: <span style="font-weight: 550"> {{ anlass.tiTu }}</span>
+  </div>
+  <div class="col-sm-3">
+    Startberechtigt: {{ anlass.tiefsteKategorie }} bis
+    {{ anlass.hoechsteKategorie }}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-3">Ort: {{ anlass.ort }}</div>
+  <div class="col-sm-3">Halle: {{ anlass.halle }}</div>
+  <div class="col-sm-3">Organisator: {{ organisator?.name }}</div>
+  <div class="col-sm-3">IBAN: {{ anlass.iban }}</div>
+</div>

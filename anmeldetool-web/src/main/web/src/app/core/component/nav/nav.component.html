@@ -1,0 +1,132 @@
+<mat-toolbar id="main-menu">
+  <div class="main-nav-container">
+    <mat-nav-list class="list-horizontal">
+      <mat-list-item
+        routerLink="/anlaesse"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        matRipple
+      >
+        <button mat-button class="mainNav" disableRipple>Alle Anlässe</button>
+      </mat-list-item>
+
+      <mat-list-item
+        class="task-add-btn"
+        *ngIf="authService.isAdministrator() || authService.isSekretariat()"
+        data-cy="admin-funcs-nav-btn"
+      >
+        <button
+          mat-button
+          class="mainNav"
+          disableRipple
+          [matMenuTriggerFor]="menu"
+        >
+          Anlässe Verwalten
+          <mat-icon class="material-icons-outlined arrow-icon">
+            arrow_drop_down
+          </mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <div
+            *ngFor="let anlass of anlaesse"
+            class="dropdown-item"
+            data-cy="data-import-nav-btn"
+          >
+            <button
+              mat-button
+              class="mainNav small-text"
+              [routerLink]="['/admin', anlass.id, 'admin']"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              disableRipple
+            >
+              <div *ngIf="getOrganisator(anlass) | async; let org">
+                {{ anlass.getCleaned() }} - {{ org.name }}
+              </div>
+            </button>
+          </div>
+        </mat-menu>
+      </mat-list-item>
+      <mat-list-item routerLink="/teilnehmer" routerLinkActive="active">
+        <button mat-button class="mainNav" disableRipple>Teilnehmer</button>
+      </mat-list-item>
+
+      <!-- routerLink="/rechnungsbuero" routerLinkActive="active" -->
+      <mat-list-item
+        class="task-add-btn"
+        *ngIf="
+          (authService.isAdministrator() || authService.isRechnungsbuero()) &&
+          authService.currentVerein
+        "
+        data-cy="admin-funcs-nav-btn"
+      >
+        <button
+          mat-button
+          class="mainNav"
+          disableRipple
+          [matMenuTriggerFor]="RBmenu"
+        >
+          Rechnungsbüro
+          <mat-icon class="material-icons-outlined arrow-icon">
+            arrow_drop_down
+          </mat-icon>
+        </button>
+        <mat-menu #RBmenu="matMenu">
+          <div
+            *ngFor="let anlass of rechnungsbueroAnlaesse"
+            class="dropdown-item"
+            data-cy="data-import-nav-btn"
+          >
+            <button
+              mat-button
+              class="mainNav small-text"
+              [routerLink]="['/rechnungsbuero', anlass.id]"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              disableRipple
+            >
+              {{ anlass.getWithDatum() }}
+            </button>
+          </div>
+        </mat-menu>
+      </mat-list-item>
+      <mat-list-item
+        class="task-add-btn"
+        *ngIf="authService.isAdministrator()"
+        data-cy="admin-funcs-nav-btn"
+      >
+        <button
+          mat-button
+          class="mainNav"
+          disableRipple
+          [matMenuTriggerFor]="menu"
+        >
+          Verein auswählen ({{ authService.currentVerein.name }})
+          <mat-icon class="material-icons-outlined arrow-icon">
+            arrow_drop_down
+          </mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <div
+            *ngFor="let verein of vereine"
+            class="dropdown-item"
+            data-cy="data-import-nav-btn"
+            (click)="setVerein(verein)"
+          >
+            {{ verein.name }}
+          </div>
+        </mat-menu>
+      </mat-list-item>
+    </mat-nav-list>
+    <mat-nav-list class="list-horizontal">
+      <mat-list-item
+        routerLink="/user/user"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        matRipple
+      >
+        <button mat-button class="mainNav" disableRipple>Benutzerdaten</button>
+      </mat-list-item>
+    </mat-nav-list>
+  </div>
+</mat-toolbar>

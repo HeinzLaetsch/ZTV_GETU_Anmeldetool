@@ -30,6 +30,7 @@ spring:
      # time-zone: "Europe/Zurich"
      time-zone: "UTC"
   mail:
+     enabled: "false"
      username:  ${MAIL_USER}
      password: ${MAIL_PASSWORD}
      templates:
@@ -49,10 +50,10 @@ logging:
     org.springframework.cloud: INFO
     org.springframework.security: INFO
     org.flywaydb: INFO
-    org.springframework.web.cors: DEBUG
-    org.hibernate.SQL: WARN
+    org.springframework.web.cors: INFO
+    org.hibernate.SQL: INFO
     org.hibernate.type: WARN
-    org.ztv.anmeldetool: DEBUG
+    org.ztv.anmeldetool: INFO
 # Sec Min Hours Day_of_Month Month Day_of_week Year    
 scheduler:
    reminder:
@@ -64,6 +65,8 @@ scheduler:
    mutationen:
       cron: "0/10 1 * * 12 *"
       daysbefore: 3
+   published:
+      cron: "0/10 1 * * 12 *" 
       
 management:
   endpoints:

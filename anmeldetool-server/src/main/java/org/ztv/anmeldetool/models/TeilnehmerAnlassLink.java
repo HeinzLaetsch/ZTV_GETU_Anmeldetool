@@ -11,6 +11,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -19,6 +20,7 @@ import lombok.ToString;
 @Table(name = "teilnehmer_anlass_link")
 @Getter
 @Setter
+@EqualsAndHashCode
 public class TeilnehmerAnlassLink extends Base {
 
 	@Enumerated(EnumType.STRING)
@@ -54,9 +56,9 @@ public class TeilnehmerAnlassLink extends Base {
 	private Notenblatt notenblatt;
 
 	public Notenblatt getNotenblatt() {
-		if (this.notenblatt == null) {
-			return new Notenblatt();
-		}
+		/*
+		 * if (this.notenblatt == null) { return new Notenblatt(); }
+		 */
 		return notenblatt;
 	}
 

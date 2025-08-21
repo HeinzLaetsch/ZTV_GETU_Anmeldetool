@@ -29,6 +29,8 @@ public interface TeilnehmerAnlassLinkRepository extends JpaRepository<Teilnehmer
 
 	List<TeilnehmerAnlassLink> findByTeilnehmer(Teilnehmer teilnehmer);
 
+	Optional<TeilnehmerAnlassLink> findByAnlassAndTeilnehmer(Anlass anlass, Teilnehmer teilnehmer);
+
 	@Query("SELECT tal FROM TeilnehmerAnlassLink tal JOIN tal.teilnehmer teilnehmer WHERE tal.anlass = :anlass AND tal.kategorie= :kategorie AND teilnehmer.tiTu= :tiTu "
 			+ "AND tal.aktiv= :aktiv AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL) ORDER BY tal.organisation, tal.notenblatt.rang")
 	List<TeilnehmerAnlassLink> findByAnlassAndAktivAndKategorieAndTiTuOrderByOrganisation(Anlass anlass, boolean aktiv,

@@ -1,0 +1,42 @@
+mat-form-field {
+  width: 100%;
+}
+
+.label {
+  color: rgba(0, 0, 0, 0.54);
+  text-align: right;
+}
+
+.close-button {
+  float: right;
+  top: -24px;
+  right: -24px;
+}
+
+.close-icon {
+  transition: 1s ease-in-out;
+}
+
+.close-icon:hover {
+  transform: rotate(180deg);
+}
+
+::ng-deep .icon-outside .close-button {
+  float: right;
+  top: -52px;
+  right: -52px;
+}
+
+::ng-deep .icon-outside .mat-dialog-container {
+  overflow: unset
+}
+/*
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+*/
+.minimal {
+  min-width: 25em;
+}

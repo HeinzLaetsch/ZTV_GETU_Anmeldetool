@@ -96,7 +96,7 @@
 			</activation>
 			<properties>
 				<npm-build>run build-halle</npm-build>
-				<run-script>run-script build-halle</run-script>
+				<run-script>run-script build-halle-nx</run-script>
 			</properties>
 		</profile>
 		<profile>

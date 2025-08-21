@@ -13,8 +13,8 @@ import {
 import {
   AbstractControl,
   ControlValueAccessor,
-  FormBuilder,
-  FormGroup,
+  UntypedFormBuilder,
+  UntypedFormGroup,
   NgControl,
   ValidationErrors,
   Validators,
@@ -58,7 +58,7 @@ export class PhoneInput
   @ViewChild("part3") part3Input: HTMLInputElement;
   @ViewChild("part4") part4Input: HTMLInputElement;
 
-  parts: FormGroup;
+  parts: UntypedFormGroup;
   stateChanges = new Subject<void>();
   focused = false;
   touched = false;
@@ -81,30 +81,30 @@ export class PhoneInput
 
   @Input("aria-describedby") userAriaDescribedBy: string;
 
-  @Input()
   get placeholder(): string {
     return this._placeholder;
   }
+  @Input()
   set placeholder(value: string) {
     this._placeholder = value;
     this.stateChanges.next();
   }
   private _placeholder: string;
 
-  @Input()
   get required(): boolean {
     return this._required;
   }
+  @Input()
   set required(value: BooleanInput) {
     this._required = coerceBooleanProperty(value);
     this.stateChanges.next();
   }
   private _required = false;
 
-  @Input()
   get disabled(): boolean {
     return this._disabled;
   }
+  @Input()
   set disabled(value: BooleanInput) {
     this._disabled = coerceBooleanProperty(value);
     this._disabled ? this.parts.disable() : this.parts.enable();
@@ -112,7 +112,6 @@ export class PhoneInput
   }
   private _disabled = false;
 
-  @Input()
   get value(): MyTel | null {
     if (this.parts.valid) {
       const {
@@ -122,6 +121,7 @@ export class PhoneInput
     }
     return null;
   }
+  @Input()
   set value(tel: MyTel | null) {
     const { part1, part2, part3, part4 } = tel || new MyTel("", "", "", "");
     this.parts.setValue({ part1, part2, part3, part4 });
@@ -147,7 +147,7 @@ export class PhoneInput
   }
 
   constructor(
-    formBuilder: FormBuilder,
+    formBuilder: UntypedFormBuilder,
     private _focusMonitor: FocusMonitor,
     private _elementRef: ElementRef<HTMLElement>,
     @Optional() @Inject(MAT_FORM_FIELD) public _formField: MatFormField,

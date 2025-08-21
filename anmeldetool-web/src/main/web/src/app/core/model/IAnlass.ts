@@ -4,13 +4,15 @@ import { GeraeteEnum } from "./GeraeteEnum";
 import { IWertungsrichterSlot } from "./IWertungsrichterSlot";
 import { KategorieEnum } from "./KategorieEnum";
 import { TiTuEnum } from "./TiTuEnum";
+import { IOrganisationTeilnahmenStatistik } from "./IOrganisationTeilnahmenStatistik";
+import { IAnlassSummary } from "./IAnlassSummary";
 
 export class IAnlass {
   id: string;
   anlassBezeichnung: string;
   ort: string;
   halle: string;
-  organisator?: string;
+  organisator_?: string;
   organisatorId: string;
   iban: string;
   zuGunsten: string;
@@ -23,11 +25,49 @@ export class IAnlass {
   smQuali: boolean;
   ausserkantonal: boolean;
 
-  getCleaned(): string {
-    return this.anlassBezeichnung.replace("%", "");
+  tiefsteKategorie: KategorieEnum;
+  hoechsteKategorie: KategorieEnum;
+  wertungsrichterSlots?: IWertungsrichterSlot[];
+
+  anzeigeStatus?: Anzeigestatus;
+
+  constructor(source: Partial<IAnlass>) {
+    this.anzeigeStatus = new Anzeigestatus();
+    Object.assign(this, source);
   }
 
+  getCleaned(): string {
+    var step1 = this.anlassBezeichnung.replace("Zürcher Kantonaler ", "");
+    step1 = step1.replace("Zürcher Kantonale ", "");
+    step1 = step1.replace("Zürcher Kant. ", "");
+    return step1.replace("%", " ");
+  }
+
+  getWithDatum(): string {
+    const asMoment = moment(this.startDatum);
+    return asMoment.format("YY.MM.DD") + " " + this.getCleaned();
+  }
+
+  getPart(first: boolean): string {
+    if (this.anlassBezeichnung.lastIndexOf("%") === -1) {
+      return this.anlassBezeichnung;
+    }
+    if (first) {
+      return this.anlassBezeichnung.split("%")[0];
+    } else {
+      return this.anlassBezeichnung.split("%")[1];
+    }
+  }
+  set organisator(organisator: string) {
+    this.organisator_ = organisator;
+  }
+  get organisator(): string {
+    return this.organisator_;
+  }
   set startDatum(startDatum: Date) {
+    if (!(startDatum instanceof Date)) {
+      startDatum = new Date(startDatum);
+    }
     this.startDatum_ = startDatum;
   }
   get startDatum(): Date {
@@ -120,6 +160,17 @@ export class IAnlass {
   }
   published_: boolean;
 
+  // Anlass nicht anzeigen oder sperren kein Org
+  set aktiv(aktiv: boolean) {
+    this.aktiv_ = aktiv;
+    // console.log("Published gesetzt: ", published);
+    this.updateAnzeigeStatus();
+  }
+  get aktiv(): boolean {
+    return this.aktiv_;
+  }
+  aktiv_: boolean;
+
   tiTu: TiTuEnum;
   get tuAnlass(): boolean {
     const key = TiTuEnum[this.tiTu];
@@ -146,15 +197,6 @@ export class IAnlass {
     const br2 = this.hoechsteKategorie > KategorieEnum.K4;
     return br2;
   }
-  tiefsteKategorie: KategorieEnum;
-  hoechsteKategorie: KategorieEnum;
-  wertungsrichterSlots?: IWertungsrichterSlot[];
-
-  anzeigeStatus?: Anzeigestatus;
-
-  constructor() {
-    this.anzeigeStatus = new Anzeigestatus();
-  }
 
   getStartgeraete(): GeraeteEnum[] {
     const startgeraete = new Array<GeraeteEnum>();
@@ -169,7 +211,7 @@ export class IAnlass {
   }
 
   getKategorienRaw(): KategorieEnum[] {
-    let k5 = Object.keys(KategorieEnum).findIndex(
+    const k5Index = Object.keys(KategorieEnum).findIndex(
       (key) => key === KategorieEnum.K5
     );
     const start = Object.keys(KategorieEnum).findIndex(
@@ -180,8 +222,10 @@ export class IAnlass {
     );
     // Keine Teilnahme
     let filtered = Object.values(KategorieEnum).slice(0, 1);
-    if (end > k5) {
-      filtered = filtered.concat(Object.values(KategorieEnum).slice(start, k5));
+    if (end > k5Index) {
+      filtered = filtered.concat(
+        Object.values(KategorieEnum).slice(start, k5Index)
+      );
       if (this.tuAnlass || this.alleAnlass) {
         filtered.push(KategorieEnum.K5);
       }

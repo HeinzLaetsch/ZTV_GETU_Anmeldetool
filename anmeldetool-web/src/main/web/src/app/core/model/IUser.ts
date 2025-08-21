@@ -11,6 +11,7 @@ export interface IUser {
   email: string;
   handy: string;
   aktiv: boolean;
+  dirty?: boolean;
   password?: string;
   rollen?: IRolle[];
   wr?: IWertungsrichter;

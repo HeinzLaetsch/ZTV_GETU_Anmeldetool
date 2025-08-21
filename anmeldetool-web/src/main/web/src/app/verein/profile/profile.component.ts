@@ -3,43 +3,137 @@ import { MatTabGroup } from "@angular/material/tabs";
 import { IRolle } from "src/app/core/model/IRolle";
 import { IUser } from "src/app/core/model/IUser";
 import { AuthService } from "src/app/core/service/auth/auth.service";
-import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
 import { IVerein } from "../verein";
 import { IChangeEvent } from "./IChangeEvent";
+import { SubscriptionHelper } from "src/app/utils/subscription-helper";
+import { AppState } from "src/app/core/redux/core.state";
+import { select, Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import {
+  selectDirtyUser,
+  selectUser,
+  UserActions,
+} from "src/app/core/redux/user";
+import { v4 as uuidv4 } from "uuid";
 
 @Component({
   selector: "app-profile",
   templateUrl: "./profile.component.html",
   styleUrls: ["./profile.component.css"],
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent extends SubscriptionHelper implements OnInit {
   appearance = "outline";
+  user$: Observable<IUser[]>;
+  dirty$: Observable<IUser[]>;
   currentUser: IUser;
-  _vereinsUser: IUser[];
+  vereinsUsers: IUser[] = [];
+  dirtyUsers: IUser[];
   _changeEvents: IChangeEvent[];
 
   @ViewChild("tabs") tabGroup: MatTabGroup;
 
   constructor(
     private authService: AuthService,
-    private userService: CachingUserService
-  ) {}
+    private store: Store<AppState> // private userService: CachingUserService
+  ) {
+    super();
+    this._changeEvents = new Array();
+    this.store.dispatch(UserActions.loadAllUserInvoked());
+  }
 
   ngOnInit() {
     // console.log("ProfileComponent::ngOnInit: ", this.authService.currentUser);
     this.currentUser = this.authService.currentUser;
-    this._vereinsUser = this.userService.getUser();
+    this.user$ = this.store.pipe(select(selectUser()));
+    this.dirty$ = this.store.pipe(select(selectDirtyUser()));
+    this.registerSubscription(
+      this.user$.subscribe((users) => {
+        if (users.length > 0) {
+          // this.synchUsers(users);
+          this.processUsers(users);
+
+          /* Produziert eine Menge leerer
+          if (!this.tabGroup || !this.tabGroup.selectedIndex) {
+            // this.tabGroup.selectedIndex = 0;
+            this._changeEvents.push(this.getNewChangeEvent(0));
+          }
+          */
+        }
+      })
+    );
+
+    this.registerSubscription(
+      this.dirty$.subscribe((dirtyUsers) => {
+        this.dirtyUsers = dirtyUsers;
+      })
+    );
+
+    //this._vereinsUser = this.userService.getUser();
     let index = 0;
-    this._changeEvents = new Array();
-    this._vereinsUser.forEach(() => {
-      this._changeEvents.push(this.getNewChangeEvent(index++));
+  }
+
+  processUsers(users: IUser[]) {
+    users.sort((a, b) => {
+      if (a.password === null) {
+        return a.benutzername.localeCompare(b.benutzername);
+      } else {
+        return -1;
+      }
+    });
+    this._changeEvents = [];
+    let index = 0;
+    this.vereinsUsers = users.map((user) => {
+      let asUString = JSON.stringify(user);
+      this._changeEvents.push(this.getNewChangeEvent(index));
+      index++;
+      return JSON.parse(asUString);
     });
   }
+
+  private synchUsers(users: IUser[]) {
+    // Keine löschen und neu schreiben mehr!!
+    // Jedoch TODO wenn VereinUser > users dann abschneiden
+    /*
+    if (this.vereinsUsers) {
+      this.vereinsUsers = this.vereinsUsers.slice(0, 0);
+    } else {
+      this.vereinsUsers = [];
+    }*/
+
+    users.sort((a, b) => {
+      if (a.password === null) {
+        return a.benutzername.localeCompare(b.benutzername);
+      } else {
+        return -1;
+      }
+    });
+    let index = 0;
+    users.forEach((user) => {
+      let asVUString = "";
+      let asUString = JSON.stringify(user);
+      if (this.vereinsUsers[index]) {
+        asVUString = JSON.stringify(this.vereinsUsers[index]);
+        if (asUString !== asVUString) {
+          this.vereinsUsers[index] = JSON.parse(asUString);
+        }
+      } else {
+        this.vereinsUsers.push(JSON.parse(asUString));
+        this._changeEvents.push(this.getNewChangeEvent(index));
+      }
+      index++;
+    });
+    // this.vereinsUsers = users;
+    // Sollte keinen neuen brauchen wenn Daten geändert haben
+    /*
+    let index = 0;
+    this.vereinsUsers.forEach(() => {
+      this._changeEvents.push(this.getNewChangeEvent(index++));
+    });
+    */
+  }
+
   public disAllowTab(): boolean {
-    const changes = this._changeEvents.filter((ce) =>
-      this.hasUnsafedWork(ce.tabIndex)
-    );
-    return changes.length > 0;
+    return this.dirtyUsers.length > 0;
   }
   private getNewChangeEvent(index: number): IChangeEvent {
     const ce: IChangeEvent = {
@@ -54,12 +148,25 @@ export class ProfileComponent implements OnInit {
     };
     return ce;
   }
-  get vereinsUsers(): IUser[] {
-    return this._vereinsUser;
-  }
 
   isVereinsVerantwortlicher(): boolean {
     return true;
+  }
+  isValid(): boolean {
+    let valid = true;
+    this._changeEvents.forEach((ce) => {
+      if (!ce.userValid) {
+        valid = false;
+      }
+    });
+    return valid;
+  }
+
+  hasChanges(): boolean {
+    if (this.dirtyUsers) {
+      return this.dirtyUsers.length > 0;
+    }
+    return false;
   }
   get usertext(): string {
     return JSON.stringify(this.currentUser);
@@ -76,12 +183,12 @@ export class ProfileComponent implements OnInit {
   getTabIndex() {
     console.log(
       "Index: ",
-      this._vereinsUser[this._vereinsUser.length - 1].benutzername
+      this.vereinsUsers[this.vereinsUsers.length - 1].benutzername
     );
-    if (this._vereinsUser[this._vereinsUser.length - 1].benutzername) {
+    if (this.vereinsUsers[this.vereinsUsers.length - 1].benutzername) {
       return 0;
     }
-    return this._vereinsUser.length - 1;
+    return this.vereinsUsers.length - 1;
   }
 
   getTabName(name: string, tabIndex: number) {
@@ -91,25 +198,28 @@ export class ProfileComponent implements OnInit {
       return name;
     }
   }
-  hasUnsafedWork(tabIndex: number) {
+  hasUnsafedWork(tabIndex: number): boolean {
+    return this.vereinsUsers[tabIndex].dirty;
+    /*
     const ce = this._changeEvents[tabIndex];
-    if (ce.userHasChanged) {
+    if (ce.userHasChanged || this.vereinsUsers[tabIndex].dirty) {
       return true;
     }
     if (ce.rolesChanged) {
       return true;
     }
-    if (ce.userHasChanged) {
-      return true;
-    }
     if (ce.wrChanged) {
       return true;
     }
+    */
   }
 
   addUser(event: any) {
-    this._vereinsUser.push({
-      id: undefined,
+    //TODO Achtung add
+
+    //this.vereinsUser.push({
+    const newUser = {
+      id: uuidv4(),
       organisationids: [this.authService.currentVerein.id],
       benutzername: "",
       name: "",
@@ -117,25 +227,42 @@ export class ProfileComponent implements OnInit {
       email: "",
       handy: "",
       aktiv: true,
+      dirty: true,
       password: "getu",
       rollen: new Array<IRolle>(),
-    });
-    this.tabGroup.selectedIndex = this._vereinsUser.length - 1;
+    };
+    this.vereinsUsers.unshift(JSON.parse(JSON.stringify(newUser)));
+    this.store.dispatch(UserActions.addDirtyUser({ payload: newUser }));
+    /*
+    this.tabGroup.selectedIndex = this.vereinsUser.length - 1;
     this._changeEvents.push(
       this.getNewChangeEvent(this.tabGroup.selectedIndex)
     );
+    */
+    this.tabGroup.selectedIndex = 0;
+    this.tabGroup.realignInkBar();
   }
-
+  cancelUser(event: any) {
+    this.dirtyUsers.forEach((user) => {
+      this.store.dispatch(UserActions.cancelUser({ payload: user }));
+    });
+  }
+  saveUser(event: any) {
+    this.dirtyUsers.forEach((user) => {
+      this.store.dispatch(UserActions.saveUserInvoked({ payload: user }));
+    });
+  }
   userChange(changeEvent: IChangeEvent) {
+    //TODO Achtung change
     this._changeEvents[changeEvent.tabIndex] = changeEvent;
     if (changeEvent.saved) {
       // TODO reset dirty Flag
     }
-    if (changeEvent.canceled && !this._vereinsUser[changeEvent.tabIndex]?.id) {
-      const vu1 = this._vereinsUser.slice(0, changeEvent.tabIndex);
-      const vu2 = this._vereinsUser.slice(changeEvent.tabIndex + 1);
-      this._vereinsUser = vu1;
-      this._vereinsUser.concat(vu2);
+    if (changeEvent.canceled && !this.vereinsUsers[changeEvent.tabIndex]?.id) {
+      const vu1 = this.vereinsUsers.slice(0, changeEvent.tabIndex);
+      const vu2 = this.vereinsUsers.slice(changeEvent.tabIndex + 1);
+      this.vereinsUsers = vu1;
+      this.vereinsUsers.concat(vu2);
       const ce1 = this._changeEvents.slice(0, changeEvent.tabIndex);
       const ce2 = this._changeEvents.slice(changeEvent.tabIndex + 1);
       this._changeEvents = ce1;

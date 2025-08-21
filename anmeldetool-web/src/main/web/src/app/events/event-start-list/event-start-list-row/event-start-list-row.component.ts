@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
+import { ITeilnahmen } from "src/app/core/model/ITeilnahmen";
 import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
 import { AuthService } from "src/app/core/service/auth/auth.service";
 
@@ -13,7 +14,7 @@ export class EventStartListRowComponent implements OnInit {
   @Input()
   anlass: IAnlass;
   @Input()
-  teilnehmer: ITeilnehmer;
+  teilnahme: ITeilnahmen;
 
   constructor(public authService: AuthService) {}
 
@@ -41,32 +42,16 @@ export class EventStartListRowComponent implements OnInit {
   }
 
   get abteilung(): string {
-    if (this.teilnehmer.teilnahmen.anlassLinks[0].abteilung?.endsWith("1")) {
-      return "1";
-    }
-    if (this.teilnehmer.teilnahmen.anlassLinks[0].abteilung?.endsWith("2")) {
-      return "2";
-    }
-    if (this.teilnehmer.teilnahmen.anlassLinks[0].abteilung?.endsWith("3")) {
-      return "3";
-    }
-    if (this.teilnehmer.teilnahmen.anlassLinks[0].abteilung?.endsWith("4")) {
-      return "4";
+    const abtLength = "ABTEILUNG_".length;
+    if (this.teilnahme.talDTOList[0].abteilung) {
+      return this.teilnahme.talDTOList[0].abteilung.substring(abtLength);
     }
     return "-";
   }
   get anlage(): string {
-    if (this.teilnehmer.teilnahmen.anlassLinks[0].anlage?.endsWith("1")) {
-      return "1";
-    }
-    if (this.teilnehmer.teilnahmen.anlassLinks[0].anlage?.endsWith("2")) {
-      return "2";
-    }
-    if (this.teilnehmer.teilnahmen.anlassLinks[0].anlage?.endsWith("3")) {
-      return "3";
-    }
-    if (this.teilnehmer.teilnahmen.anlassLinks[0].anlage?.endsWith("4")) {
-      return "4";
+    const abtLength = "ANLAGE_".length;
+    if (this.teilnahme.talDTOList[0].anlage) {
+      return this.teilnahme.talDTOList[0].anlage.substring(abtLength);
     }
     return "-";
   }

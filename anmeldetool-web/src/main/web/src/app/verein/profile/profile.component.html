@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid" *ngIf="user$ | async; else loading">
   <div class="row">
     <div class="col-12">
       <h1 class="label">Vereinsadministration {{ verein.name }}</h1>
@@ -25,6 +25,7 @@
 </div>
 <button
   mat-fab
+  class="mat-fab-pos1"
   color="primary"
   #tooltip="matTooltip"
   matTooltip="Neuen Benutzer anlegen"
@@ -34,3 +35,29 @@
 >
   Neu
 </button>
+<button
+  mat-fab
+  class="mat-fab-pos2"
+  color="primary"
+  [disabled]="!hasChanges()"
+  #tooltip="matTooltip"
+  matTooltip="Änderungen verwerfen"
+  matTooltipPosition="below"
+  matTooltipHideDelay="500"
+  (click)="cancelUser($event)"
+>
+  Verwerfen</button
+><button
+  mat-fab
+  class="mat-fab-pos3"
+  color="primary"
+  [disabled]="!hasChanges() || !isValid()"
+  #tooltip="matTooltip"
+  matTooltip="Änderungen speichern"
+  matTooltipPosition="below"
+  matTooltipHideDelay="500"
+  (click)="saveUser($event)"
+>
+  Speichern
+</button>
+<ng-template #loading>Loading...</ng-template>

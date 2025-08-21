@@ -6,4 +6,8 @@ public enum KategorieEnum {
 	public boolean isJugend() {
 		return this.ordinal() < KategorieEnum.K5.ordinal();
 	}
+
+	public boolean isAktiv() {
+		return this.ordinal() > KategorieEnum.K4.ordinal() && this.ordinal() < KategorieEnum.KEIN_START.ordinal();
+	}
 }

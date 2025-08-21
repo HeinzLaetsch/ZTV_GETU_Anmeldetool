@@ -1,0 +1,34 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-6">
+      <app-user
+        [modify]="true"
+        [readOnly]="
+          !(isOwner() || isVereinsAnmelder || isVereinsVerantwortlicher)
+        "
+        [(user)]="currentUser"
+        [showPassword]="isOwner()"
+        [showBenutzername]="true"
+        [mustShowPassword]="false"
+        (valid)="updateUserValid($event)"
+      ></app-user>
+    </div>
+    <div class="col-6" [hidden]="isUserDirty()">
+      <app-role
+        [currentUser]="currentUser"
+        [isVereinsAnmelder]="isVereinsAnmelder"
+        [isVereinsVerantwortlicher]="isVereinsVerantwortlicher"
+        [(assignedRoles)]="assignedRoles"
+      >
+      </app-role>
+      <app-wertungsrichter
+        *ngIf="isWertungsrichter()"
+        [currentUser]="currentUser"
+        [(wertungsrichter)]="wertungsrichter"
+        [isVereinsAnmelder]="isVereinsAnmelder"
+        [isVereinsVerantwortlicher]="isVereinsVerantwortlicher"
+      >
+      </app-wertungsrichter>
+    </div>
+  </div>
+</div>

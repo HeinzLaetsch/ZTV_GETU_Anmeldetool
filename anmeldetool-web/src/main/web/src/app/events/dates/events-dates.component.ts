@@ -1,8 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { FormControl, FormGroup } from "@angular/forms";
+import { UntypedFormControl, UntypedFormGroup } from "@angular/forms";
 import { MatDatepickerInputEvent } from "@angular/material/datepicker";
+import * as moment from "moment";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
+import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
 
 @Component({
   selector: "app-events-dates",
@@ -11,24 +13,26 @@ import { IAnlass } from "src/app/core/model/IAnlass";
 })
 export class EventsDatesComponent implements OnInit {
   @Input() anlass: IAnlass;
+  @Input() anlassSummary: IAnlassSummary;
   @Input() viewOnly: boolean;
 
   @Output()
-  verlaengertChange: EventEmitter<Date>;
+  verlaengertChanged: EventEmitter<Date>;
 
-  verlaengerungGroup: FormGroup;
-  verlaengerungControl: FormControl;
+  verlaengerungGroup: UntypedFormGroup;
+  verlaengerungControl: UntypedFormControl;
 
   constructor() {
     // this.verlaengerungGroup = new FormGroup({
-    this.verlaengerungControl = new FormControl();
+    this.verlaengerungControl = new UntypedFormControl();
     // });
-    this.verlaengertChange = new EventEmitter<Date>();
+    this.verlaengertChanged = new EventEmitter<Date>();
   }
 
   ngOnInit() {
     console.log("Anlass verlaengert: ", this.anlass.erfassenVerlaengert);
-    this.verlaengerungControl.setValue(this.anlass.erfassenVerlaengert);
+    //this.verlaengerungControl.setValue(this.anlass.erfassenVerlaengert);
+    this.verlaengerungControl.setValue(this.anlassSummary.verlaengerungsDate);
   }
   /*
   ngOnChanges(changes: SimpleChanges): void {
@@ -78,10 +82,12 @@ export class EventsDatesComponent implements OnInit {
     return this.getClassForAnzeigeStatus(AnzeigeStatusEnum.VERLAENGERT);
   }
   hasStatusVerlaengert(): boolean {
-    return this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.VERLAENGERT);
+    const asMoment = moment(this.anlassSummary.verlaengerungsDate);
+    return asMoment.isSameOrAfter(moment.now());
+    //return this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.VERLAENGERT);
   }
 
   addVerlaengerung(type: string, event: MatDatepickerInputEvent<Date>): void {
-    this.verlaengertChange.next(event.value);
+    this.verlaengertChanged.next(event.value);
   }
 }

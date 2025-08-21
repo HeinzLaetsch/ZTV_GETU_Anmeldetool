@@ -4,18 +4,25 @@ import { IAnlass } from "../model/IAnlass";
 import { IUser } from "../model/IUser";
 import { WertungsrichterStatusEnum } from "../model/WertungsrichterStatusEnum";
 import { AuthService } from "./auth/auth.service";
-import { CachingAnlassService } from "./caching-services/caching.anlass.service";
-import { CachingUserService } from "./caching-services/caching.user.service";
+import { IAnlassSummary } from "../model/IAnlassSummary";
+import { select, Store } from "@ngrx/store";
+import { AppState } from "../redux/core.state";
+import { selectUserById, UserActions } from "../redux/user";
+import { AnlassService } from "./anlass/anlass.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class WertungsrichterService {
+  user$: Observable<IUser[]>;
+
   constructor(
     public authService: AuthService,
-    private anlassService: CachingAnlassService,
-    private userService: CachingUserService
-  ) {}
+    private store: Store<AppState>,
+    private anlassService: AnlassService //private userService: CachingUserService //private anlassService: CachingAnlassService,
+  ) {
+    this.store.dispatch(UserActions.loadAllUserInvoked());
+  }
 
   public getEingeteilteWertungsrichter(
     anlass: IAnlass,
@@ -34,12 +41,26 @@ export class WertungsrichterService {
       .subscribe(
         (result) => {
           if (result) {
+            var count = 0;
             result.map((link) => {
-              const user = this.userService.getUserById(link.personId);
-              user.pal = link;
-              assignedWrs.push(user);
+              const obs = this.store.pipe(
+                select(selectUserById(link.personId))
+              );
+              obs.subscribe((user) => {
+                // const user = this.userService.getUserById(link.personId);
+                const tmpUser = JSON.parse(JSON.stringify(user));
+                tmpUser.pal = link;
+                assignedWrs.push(tmpUser);
+                count++;
+                if (count === result.length) {
+                  eingteilteWrSubject.next(assignedWrs);
+                }
+              });
             });
+          } else {
+            eingteilteWrSubject.next([]);
           }
+          /*
           assignedWrs.sort((a, b) => {
             if (a.benutzername < b.benutzername) {
               return -1;
@@ -49,7 +70,7 @@ export class WertungsrichterService {
             }
             return 0;
           });
-          eingteilteWrSubject.next(assignedWrs);
+          */
         },
         (error) => {
           switch (error.status) {
@@ -63,9 +84,11 @@ export class WertungsrichterService {
           eingteilteWrSubject.next([]);
         }
       );
+
     return eingteilteWrSubject.asObservable();
   }
 
+  // TODO Logik ins Backend verschieben, wenn Redux AnlassSummary
   getStatusWertungsrichterBr(
     assignedWrs: IUser[],
     wertungsrichterPflicht: number
@@ -96,26 +119,28 @@ export class WertungsrichterService {
     return WertungsrichterStatusEnum.NOTOK;
   }
 
-  getWertungsrichterPflichtBrevet1(anlass: IAnlass): number {
-    const anzahlTeilnehmer = this.anlassService.getTeilnahmen(anlass, 1).length;
+  getWertungsrichterPflichtBrevet1(anlassSummary: IAnlassSummary): number {
+    // const anzahlTeilnehmer = this.anlassService.getTeilnahmen(anlass, 1).length;
+    const anzahlTeilnehmer = anlassSummary.startendeBr1;
     if (anzahlTeilnehmer > 0) return Math.ceil(anzahlTeilnehmer / 15);
     return 0;
   }
 
-  getWertungsrichterPflichtBrevet2(anlass: IAnlass): number {
-    const anzahlTeilnehmer = this.anlassService.getTeilnahmen(anlass, 2).length;
+  getWertungsrichterPflichtBrevet2(anlassSummary: IAnlassSummary): number {
+    //const anzahlTeilnehmer = this.anlassService.getTeilnahmen(anlass, 2).length;
+    const anzahlTeilnehmer = anlassSummary.startendeBr2;
     if (anzahlTeilnehmer > 0) return Math.ceil(anzahlTeilnehmer / 15);
     return 0;
   }
 
   // TODO abfüllen
   getStatusWertungsrichter(
-    anlass: IAnlass,
+    anlassSummary: IAnlassSummary,
     assignedWr1s: Array<IUser>,
     assignedWr2s: Array<IUser>
   ): WertungsrichterStatusEnum {
-    const pflichtBrevet1 = this.getWertungsrichterPflichtBrevet1(anlass);
-    const pflichtBrevet2 = this.getWertungsrichterPflichtBrevet2(anlass);
+    const pflichtBrevet1 = this.getWertungsrichterPflichtBrevet1(anlassSummary);
+    const pflichtBrevet2 = this.getWertungsrichterPflichtBrevet2(anlassSummary);
 
     const statusBrevet1 = this.getStatusWertungsrichterBr(
       assignedWr1s,

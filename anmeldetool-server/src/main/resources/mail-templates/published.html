@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+		body {background-color: white;}
+		h1   {color: #488dd6;}
+		h2   {color: #488dd6;}
+		h3   {color: #488dd6;}
+		td { padding-left: 10px}
+		.last {padding-bottom: 1.0em }
+		.ralign {text-align: right;}
+</style>
+  </head>
+  <body>
+    <h1 th:text="${titel}"></h1>
+    <h2 th:text="'Für Verein: ' + ${vereinsname}"></h2>
+    <h2 th:text="${datumText} + ' : ' + ${datum}"></h2>
+
+    <p>
+      <em th:text="'Für die Wettkampfleitung ' + ${senderName}"></em> <br />
+      <img src="cid:attachment.png"  width="179" height="84"/>
+    </p>
+    <span style="mso-fareast-language:DE-CH"><a
+          href="http://www.ztv.ch/"><span
+style="font-size:8.0pt;font-family:&quot;Arial&quot;,sans-serif;color:windowtext;text-decoration:none"
+            lang="EN-GB">www.ztv.ch</span></a></span>
+  </body>
+</html>

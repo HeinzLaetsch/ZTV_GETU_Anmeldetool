@@ -85,10 +85,10 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
   deleteTeilnehmer(
     verein: IVerein,
     teilnehmer: ITeilnehmer
-  ): Observable<boolean> {
+  ): Observable<string> {
     return this.teilnehmerService.deleteTeilnehmer(verein, teilnehmer);
   }
-  delete(filter: string, tiTu: TiTuEnum, row: number): Observable<boolean> {
+  delete(filter: string, tiTu: TiTuEnum, row: number): Observable<string> {
     return this.teilnehmerService.delete(
       this.verein,
       filter,
@@ -201,6 +201,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     if (!teilnehmer.teilnahmen) {
       const teilnahmen: IAnlassLinks = {
         dirty: true,
+        anlass: undefined,
         anlassLinks: new Array<IAnlassLink>(),
       };
       teilnehmer.teilnahmen = teilnahmen;
@@ -218,6 +219,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
       const newLink: IAnlassLink = {
         anlassId: anlass.id,
         teilnehmerId: teilnehmer.id,
+        organisationId: undefined,
         kategorie: undefined,
         meldeStatus: value,
         dirty: true,
@@ -256,6 +258,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     if (!teilnehmer.teilnahmen) {
       const teilnahmen: IAnlassLinks = {
         dirty: true,
+        anlass: undefined,
         anlassLinks: new Array<IAnlassLink>(),
       };
       teilnehmer.teilnahmen = teilnahmen;
@@ -271,7 +274,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     }
     let meldeStatus = MeldeStatusEnum.STARTET;
     if (erfassenDisabled) {
-      meldeStatus = MeldeStatusEnum.NEUMELDUNG;
+      meldeStatus = MeldeStatusEnum.STARTET; //TODO MeldeStatusEnum.Neumeldung;
     }
     if (filtered.length > 0) {
       filtered[0].kategorie = corrected;
@@ -281,6 +284,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
       const newLink: IAnlassLink = {
         anlassId: anlass.id,
         teilnehmerId: teilnehmer.id,
+        organisationId: undefined,
         kategorie: corrected,
         meldeStatus,
         dirty: true,

@@ -19,3 +19,6 @@ mat-form-field {
 .centered {
   text-align: center;
 }
+.toppadding {
+  padding-top: 10px;
+}

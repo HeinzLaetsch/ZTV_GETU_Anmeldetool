@@ -52,6 +52,8 @@ public class AnlassDTO {
 
 	private boolean published;
 
+	private boolean aktiv;
+
 	private boolean smQuali;
 
 	private boolean ausserkantonal;

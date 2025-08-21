@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, ViewChild } from "@angular/core";
-import { FormControl, Validators } from "@angular/forms";
+import { UntypedFormControl, Validators } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { MatPaginator, PageEvent } from "@angular/material/paginator";
 import { MatSort, Sort } from "@angular/material/sort";
@@ -23,7 +23,7 @@ import { IVerein } from "../../verein";
 import { DeleteUser } from "./delete-dialog/delete-user.component";
 
 interface TeilnahmeControl {
-  formControl: FormControl;
+  formControl: UntypedFormControl;
   anlassLink?: IAnlassLink;
 }
 /**
@@ -44,10 +44,10 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   populating = true;
   checked = new Array<IOrganisationAnlassLink>();
 
-  teilnahmenControls = new Array<Array<FormControl>>();
-  teilnehmerControls = new Array<Array<FormControl>>();
-  mutationsControls = new Array<Array<FormControl>>();
-  check1 = new FormControl();
+  teilnahmenControls = new Array<Array<UntypedFormControl>>();
+  teilnehmerControls = new Array<Array<UntypedFormControl>>();
+  mutationsControls = new Array<Array<UntypedFormControl>>();
+  check1 = new UntypedFormControl();
   pageSize = 15;
 
   allDisplayedColumns: string[];
@@ -161,17 +161,17 @@ export class TeilnehmerTableComponent implements AfterViewInit {
 
     let anzahlControls = this.pageSize;
     for (let i = 0; i <= anzahlControls; i++) {
-      const teilnehmerLineControls = new Array<FormControl>();
+      const teilnehmerLineControls = new Array<UntypedFormControl>();
       teilnehmerLineControls.push(this.getControl(i, 0));
       teilnehmerLineControls.push(this.getControl(i, 1));
       teilnehmerLineControls.push(this.getControl(i, 2));
       teilnehmerLineControls.push(this.getControl(i, 3));
       this.teilnehmerControls.push(teilnehmerLineControls);
 
-      const lineControls = new Array<FormControl>();
+      const lineControls = new Array<UntypedFormControl>();
       this.teilnahmenControls.push(lineControls);
 
-      const mutationsControls = new Array<FormControl>();
+      const mutationsControls = new Array<UntypedFormControl>();
       this.mutationsControls.push(mutationsControls);
     }
     this.loadTeilnehmerPage();
@@ -193,14 +193,14 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       // console.log("Prepare Anlass: ", anlass);
       if (createControl) {
         this.teilnahmenControls.forEach((line) => {
-          const cntr = new FormControl({
+          const cntr = new UntypedFormControl({
             value: KategorieEnum.KEINE_TEILNAHME,
             disabled: true,
           });
           line.push(cntr);
         });
         this.mutationsControls.forEach((line) => {
-          const cntr = new FormControl({
+          const cntr = new UntypedFormControl({
             value: undefined,
             disabled: true,
           });
@@ -229,6 +229,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
   }
 
   getMeldeStatus(): String[] {
+    /*
     let allMeldeStatus = Object.values(MeldeStatusEnum);
     allMeldeStatus = allMeldeStatus.filter(
       (meldeStatus) =>
@@ -236,6 +237,9 @@ export class TeilnehmerTableComponent implements AfterViewInit {
         meldeStatus !== MeldeStatusEnum.ABGEMELDET_3
     );
     return allMeldeStatus;
+    */
+    const stati = Object.keys(MeldeStatusEnum);
+    return stati;
   }
   getKategorien(anlass: IAnlass): String[] {
     if (this.isErfassenDisabled(anlass) && !this.administrator) {
@@ -318,11 +322,11 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       });
   }
 
-  getControl(row: number, col: number): FormControl {
-    let control: FormControl = undefined;
+  getControl(row: number, col: number): UntypedFormControl {
+    let control: UntypedFormControl = undefined;
     // TODO pattern für STV Nummer
     if (col === 0 || col === 1) {
-      control = new FormControl(row + ":", [
+      control = new UntypedFormControl(row + ":", [
         Validators.minLength(2),
         Validators.required,
         Validators.pattern(
@@ -331,7 +335,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       ]);
     }
     if (col === 2) {
-      control = new FormControl(row + ":", [
+      control = new UntypedFormControl(row + ":", [
         Validators.minLength(4),
         Validators.maxLength(4),
         Validators.required,
@@ -339,7 +343,7 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       ]);
     }
     if (col === 3) {
-      control = new FormControl(row + ":", [
+      control = new UntypedFormControl(row + ":", [
         Validators.minLength(5),
         Validators.maxLength(7),
         Validators.required,
@@ -616,10 +620,10 @@ export class TeilnehmerTableComponent implements AfterViewInit {
       if (!nno && !closed) {
         const abgemeldet =
           this.mutationsControls[rowIndex][colIndex].value ===
-          MeldeStatusEnum.ABGEMELDET_1;
+          MeldeStatusEnum.ABGEMELDET;
         const umgemeldet =
           this.mutationsControls[rowIndex][colIndex].value ===
-          MeldeStatusEnum.UMMELDUNG;
+          MeldeStatusEnum.STARTET; //TODO MeldeStatusEnum.Ummeldung;
         if (!abgemeldet && !umgemeldet) {
           const keinStart =
             this.teilnahmenControls[rowIndex][colIndex].value ===

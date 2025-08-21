@@ -36,6 +36,10 @@ public abstract class Base {
 	@Temporal(TemporalType.DATE)
 	private Calendar deletionDate = null;
 
+	public Base(UUID id) {
+		this.id = id;
+	}
+
 	public Base(Boolean aktiv) {
 		this.id = UUID.randomUUID();
 		this.aktiv = aktiv;
@@ -56,6 +60,9 @@ public abstract class Base {
 
 	@Override
 	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
 		Base other = (Base) obj;
 		if (id != null) {
 			if (other.id != null)

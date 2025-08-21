@@ -2,10 +2,10 @@ import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { MaterialModule } from "../material-module";
+import { MaterialModule } from "../shared/material-module";
 import { SharedComponentsModule } from "../shared/component/shared.components.module";
 import { ErfassenComponent } from "./erfassen/erfassen.component";
-import { RechnungsbueroRoutes } from "./rechnungsbuero.routes";
+import { RechnungsbueroRoutingModule } from "./rechnungsbuero.routes";
 import { ErfassenHeaderComponent } from "./erfassen/header/erfassen-header.component";
 import { ErfassenRowComponent } from "./erfassen/row/erfassen-row.component";
 import { AnlassStatusComponent } from "./erfassen/anlass-status/anlass-status.component";
@@ -14,9 +14,10 @@ import { AbteilungStatusComponent } from "./erfassen/anlass-status/abteilung-sta
 import { AnlageStatusComponent } from "./erfassen/anlass-status/anlage-status/anlage-status.component";
 import { LauflisteStatusComponent } from "./erfassen/anlass-status/laufliste-status/laufliste-status.component";
 import { NotenBlattZurueckZiehen } from "./erfassen/row/delete-dialog/delete-notenblatt.component";
-import { RechnungsbueroComponent } from "./rechnungsbuero/rechnungsbuero.component";
-import { RanglistenEntryComponent } from "./rechnungsbuero/entry/ranglisten-entry.component";
-import { RanglistenHeaderComponent } from "./rechnungsbuero/header/ranglisten-header.component";
+import { RanglistenEntryComponent } from "./rangliste/entry/ranglisten-entry.component";
+import { RanglistenHeaderComponent } from "./rangliste/header/ranglisten-header.component";
+import { RechnungsbueroComponent } from "./rechnungsbuero.component";
+import { RanglistenComponent } from "./rangliste/ranglisten.component";
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { RanglistenHeaderComponent } from "./rechnungsbuero/header/ranglisten-he
     LauflisteStatusComponent,
     NotenBlattZurueckZiehen,
     RechnungsbueroComponent,
+    RanglistenComponent,
     RanglistenEntryComponent,
     RanglistenHeaderComponent,
   ],
@@ -39,7 +41,7 @@ import { RanglistenHeaderComponent } from "./rechnungsbuero/header/ranglisten-he
     ReactiveFormsModule,
     MaterialModule,
     SharedComponentsModule,
-    RouterModule.forChild(RechnungsbueroRoutes),
+    RechnungsbueroRoutingModule,
   ],
   providers: [],
 })

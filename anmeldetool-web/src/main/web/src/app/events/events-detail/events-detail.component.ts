@@ -1,71 +1,192 @@
-import {
-  CdkDragDrop,
-  moveItemInArray,
-  transferArrayItem,
-} from "@angular/cdk/drag-drop";
-import { AfterViewInit, Component, OnInit, ViewChild } from "@angular/core";
-import { MatTabGroup } from "@angular/material/tabs";
+import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
+import { Update } from "@ngrx/entity";
+import { select, Store } from "@ngrx/store";
 import * as moment from "moment";
-import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
+import { Observable } from "rxjs";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IAnlassLink } from "src/app/core/model/IAnlassLink";
-import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
-import { IUser } from "src/app/core/model/IUser";
-import { IWertungsrichter } from "src/app/core/model/IWertungsrichter";
-import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { TiTuEnum } from "src/app/core/model/TiTuEnum";
-import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterStatusEnum";
+import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
+import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
+import { selectAnlassById } from "src/app/core/redux/anlass";
+import {
+  AnlassSummariesActions,
+  selectAnlassSummaryByAnlassId,
+} from "src/app/core/redux/anlass-summary";
+import { AppState } from "src/app/core/redux/core.state";
 import { AuthService } from "src/app/core/service/auth/auth.service";
-import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
-import { CachingTeilnehmerService } from "src/app/core/service/caching-services/caching.teilnehmer.service";
-import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
-import { WertungsrichterService } from "src/app/core/service/wertungsrichter.service";
+import { SubscriptionHelper } from "src/app/utils/subscription-helper";
 
 @Component({
   selector: "app-events-detail",
   templateUrl: "./events-detail.component.html",
   styleUrls: ["./events-detail.component.css"],
 })
-export class EventsDetailComponent implements OnInit, AfterViewInit {
-  @ViewChild("tabs") tabGroup: MatTabGroup;
+export class EventsDetailComponent
+  extends SubscriptionHelper
+  implements OnInit
+{
+  // @ViewChild("tabs") tabGroup: MatTabGroup;
 
   anlass: IAnlass;
-  orgAnlassLink: IOrganisationAnlassLink;
-  assignedWr1s = new Array<IUser>();
-  assignedWr2s = new Array<IUser>();
-  wr1s = new Array<IUser>();
-  wr2s = new Array<IUser>();
+  anlass$: Observable<IAnlass>;
+  anlassSummary$: Observable<IAnlassSummary>;
+  anlassSummary: IAnlassSummary;
+
+  // starts$: Observable<ReadonlyArray<IOrganisationAnlassLink>>;
+  teilnehmer$: Observable<ITeilnehmer[]>;
+  teilnahmenBrevet1$: Observable<ReadonlyArray<IAnlassLink>>;
+  teilnahmenBrevet2$: Observable<ReadonlyArray<IAnlassLink>>;
+
+  // starts: Array<IOrganisationAnlassLink>;
+  // orgAnlassLink: IOrganisationAnlassLink;
+
   // _wrEinsaetze: IWertungsrichterEinsatz[];
+  teilnehmer: ITeilnehmer[];
   teilnahmenBrevet1: IAnlassLink[];
   teilnahmenBrevet2: IAnlassLink[];
-  statusBr1: WertungsrichterStatusEnum;
-  statusBr2: WertungsrichterStatusEnum;
-  useBrevet2: boolean = false;
+
+  //vereinStartet = false;
 
   constructor(
     public authService: AuthService,
-    private anlassService: CachingAnlassService,
-    private userService: CachingUserService,
-    private wertungsrichterService: WertungsrichterService,
-    private teilnehmerService: CachingTeilnehmerService,
+    private store: Store<AppState>,
     private route: ActivatedRoute,
     private router: Router
-  ) {}
+  ) {
+    super();
+    // TODO REDUX store.dispatch(AnlassSummaryActions.loadAllAnlasssummaryInvoked());
+  }
 
   ngOnInit() {
     const anlassId: string = this.route.snapshot.params.id;
-    // console.log("url param: ", anlassId);
-    this.anlass = this.anlassService.getAnlassById(anlassId);
-    this.anlassService
-      .getVereinStart(this.anlass, this.authService.currentVerein)
-      .subscribe((result) => {
-        this.orgAnlassLink = result;
-        this.anlass.erfassenVerlaengert = result.verlaengerungsDate;
-      });
-    this.teilnahmenBrevet1 = this.anlassService.getTeilnahmen(this.anlass, 1);
-    this.teilnahmenBrevet2 = this.anlassService.getTeilnahmen(this.anlass, 2);
 
+    this.anlass$ = this.store.pipe(select(selectAnlassById(anlassId)));
+    this.anlassSummary$ = this.store.pipe(
+      select(selectAnlassSummaryByAnlassId(anlassId))
+    );
+
+    this.registerSubscription(
+      this.anlass$.subscribe((anlass) => {
+        this.anlass = anlass;
+      })
+    );
+    this.registerSubscription(
+      this.anlassSummary$.subscribe((anlassSummary) => {
+        this.anlassSummary = anlassSummary;
+        // this.vereinStartet = this.anlassSummary.startet;
+      })
+    );
+
+    /* TODO REDUX
+    this.anlassSummary$ = this.store.pipe(
+      select(selectAnlassSummaryByAnlassId(anlassId))
+    );
+    this.registerSubscription(
+      this.anlassSummary$.subscribe((anlassSummary) => {
+        this.anlassSummary = anlassSummary;
+      })
+    );
+*/
+    // wrInit();
+  }
+
+  handleClickMe(event: PointerEvent) {
+    this.router.navigate(["anlass/anmeldungen/", this.anlass?.id]);
+  }
+
+  startetChanged(start: boolean) {
+    // Hier update des via AnlassSummary
+    let anlassSummaryUpdate: Update<IAnlassSummary> = {
+      id: this.anlassSummary.anlassId,
+      changes: {
+        startet: start,
+        verlaengerungsDate: this.anlassSummary.verlaengerungsDate,
+      },
+    };
+
+    this.store.dispatch(
+      AnlassSummariesActions.updateAnlasssummaryInvoked({
+        payload: anlassSummaryUpdate,
+      })
+    );
+    // this.vereinStartet = start;
+    /*
+    const tempLink = JSON.parse(JSON.stringify(this.orgAnlassLink));
+    tempLink.startet = start;
+    this.store.dispatch(
+      OalActions.updateVereinsStartInvoked({ payload: tempLink })
+    );
+    */
+  }
+  verlaengertChanged(event: Date): void {
+    // Hier als update patch schicken sowie in die Subcomponente verschieben
+    const asMoment = moment(event);
+    /*
+    const tempLink = JSON.parse(JSON.stringify(this.orgAnlassLink));
+
+    tempLink.verlaengerungsDate = asMoment.add(1, "h").toDate();
+
+    this.store.dispatch(
+      OalActions.updateVereinsStartInvoked({ payload: tempLink })
+    );
+    */
+    let anlassSummaryUpdate: Update<IAnlassSummary> = {
+      id: this.anlassSummary.anlassId,
+      changes: {
+        startet: this.anlassSummary.startet,
+        verlaengerungsDate: asMoment.add(1, "h").toDate(),
+      },
+    };
+    this.store.dispatch(
+      AnlassSummariesActions.updateAnlasssummaryInvoked({
+        payload: anlassSummaryUpdate,
+      })
+    );
+    /*
+    let oalUpdate: Update<IOrganisationAnlassLink> = {
+      id:
+        this.orgAnlassLink.anlassId + "/" + this.orgAnlassLink.organisationsId,
+      changes: {
+        verlaengerungsDate: asMoment.add(1, "h").toDate(),
+      },
+    };
+
+    this.store.dispatch(OalActions.updateOalInvoked({ payload: oalUpdate }));
+*/
+    /*
+    this.anlassService
+      .updateVereinsStart(this.orgAnlassLink)
+      .subscribe((result) => {
+        this.anlass.erfassenVerlaengert = result.verlaengerungsDate;
+        console.log("verlaengertChange: ", event);
+      });
+      */
+  }
+  isViewOnly(): boolean {
+    return !this.authService.isAdministrator();
+  }
+  isTuAnlass(): boolean {
+    return this.anlass.tuAnlass;
+  }
+  isTiAnlass(): boolean {
+    return this.anlass.tiAnlass;
+  }
+  // TODO check with this.teilnahmenBrevet1 = this.anlassService.getTeilnahmen(this.anlass, 1);
+  get anzahlTeilnehmer(): number {
+    return this.teilnehmer?.length;
+  }
+
+  /*
+  storeInit() {
+    this.store.dispatch(OalActions.loadAllOalInvoked());
+    //TODO Old style ???
+    // Still needed?
+    // this.store.dispatch(loadAllTeilnahmenAction());
+  }
+  */
+  /*
+  wrInit() {
     this.wertungsrichterService
       .getEingeteilteWertungsrichter(this.anlass, 1)
       .subscribe((assignedWrs) => {
@@ -89,6 +210,39 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
     this.getVerfuegbareWertungsrichter(this.wr2s, 2);
     this.teilnehmerService.loadTeilnehmer(this.authService.currentVerein);
   }
+  */
+  /*
+  anlassInit() {
+    this.starts$ = this.store.pipe(
+      select(
+        selectOalForKeys(this.authService.currentVerein.id, this.anlass.id)
+      )
+    );
+
+    this.starts$.subscribe((oalLinks) => {
+      if (oalLinks !== undefined && oalLinks.length > 0) {
+        this.orgAnlassLink = oalLinks[1];
+        // TODO is readonly this.anlass.erfassenVerlaengert = this.orgAnlassLink.verlaengerungsDate;
+      }
+    });
+   */
+  /*
+    this.teilnahmenBrevet1$ = this.store.select(
+      getBrevet1Entries(this.anlass.id)
+    );
+    this.teilnahmenBrevet2$ = this.store.select(
+      getBrevet2Entries(this.anlass.id)
+    );
+    this.teilnehmer$ = this.store.select(
+      selectTeilnehmerForAnlassEntries(this.anlass.id)
+    );
+    this.teilnehmer$.subscribe((teilnehmer) => (this.teilnehmer = teilnehmer));
+    */
+  /*
+  }
+    */
+
+  /*
   ngAfterViewInit(): void {
     if (this.isBrevet1Anlass()) {
       this.tabGroup.selectedIndex = 0;
@@ -96,22 +250,9 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
       this.tabGroup.selectedIndex = 1;
     }
   }
+    */
 
-  isViewOnly(): boolean {
-    return !this.authService.isAdministrator();
-  }
-
-  verlaengertChange(event: Date): void {
-    const asMoment = moment(event);
-    this.orgAnlassLink.verlaengerungsDate = asMoment.add(1, "h").toDate();
-    this.anlassService
-      .updateVereinsStart(this.orgAnlassLink)
-      .subscribe((result) => {
-        this.anlass.erfassenVerlaengert = result.verlaengerungsDate;
-        console.log("verlaengertChange: ", event);
-      });
-  }
-
+  /*
   isStartedCheckboxDisabled(): boolean {
     if (
       !this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)
@@ -124,127 +265,70 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
     }
     return true;
   }
-  isTuAnlass(): boolean {
-    return this.anlass.tuAnlass;
-  }
-  isTiAnlass(): boolean {
-    return this.anlass.tiAnlass;
-  }
-  isBrevet1Anlass(): boolean {
-    // console.log("Brevet 1: ", this.anlass.tiefsteKategorie <= KategorieEnum.K4);
-    return this.anlass.brevet1Anlass;
-  }
-  isBrevet2Anlass(): boolean {
-    // console.log("Brevet 2: ", this.anlass.hoechsteKategorie > KategorieEnum.K4);
-    return this.anlass.brevet2Anlass;
-  }
-  private getVerfuegbareWertungsrichter(wrs: IUser[], brevet: number) {
-    this.anlassService
-      .getVerfuegbareWertungsrichter(
-        this.anlass,
-        this.authService.currentVerein,
-        brevet
-      )
-      .subscribe((allUser) => {
-        if (allUser) {
-          allUser.forEach((user) => wrs.push(user));
-          wrs.sort((a, b) => {
-            if (a.benutzername < b.benutzername) {
-              return -1;
-            }
-            if (a.benutzername > b.benutzername) {
-              return 1;
-            }
-            return 0;
-          });
-        }
-      });
-  }
-
-  get isWertungsrichter1Ok(): boolean {
-    return this.statusBr1 !== WertungsrichterStatusEnum.NOTOK;
-  }
-  get isWertungsrichter2Ok(): boolean {
-    return this.statusBr2 !== WertungsrichterStatusEnum.NOTOK;
-  }
-  wertungsrichterUserChange(wertungsrichterUser: IUser) {
-    this.statusBr1 = this.getStatusBr1();
-    this.statusBr2 = this.getStatusBr2();
-  }
-
-  getTeilnahmenForKategorieK1(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K1
+  */
+  /*
+  getTeilnahmenForKategorieK1(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K1)
     );
   }
-  getTeilnahmenForKategorieK2(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K2
+  getTeilnahmenForKategorieK2(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K2)
     );
   }
-  getTeilnahmenForKategorieK3(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K3
+  getTeilnahmenForKategorieK3(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K3)
     );
   }
-  getTeilnahmenForKategorieK4(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K4
+  getTeilnahmenForKategorieK4(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K4)
     );
   }
-  getTeilnahmenForKategorieK5(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K5
+  getTeilnahmenForKategorieK5(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K5)
     );
   }
-  getTeilnahmenForKategorieK5A(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K5A
+  getTeilnahmenForKategorieK5A(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K5A)
     );
   }
-  getTeilnahmenForKategorieK5B(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K5B
+  getTeilnahmenForKategorieK5B(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K5B)
     );
   }
-  getTeilnahmenForKategorieK6(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K6
+  getTeilnahmenForKategorieK6(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K6)
     );
   }
-  getTeilnahmenForKategorieKD(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.KD
+  getTeilnahmenForKategorieKD(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.KD)
     );
   }
-  getTeilnahmenForKategorieKH(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.KH
+  getTeilnahmenForKategorieKH(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.KH)
     );
   }
-  getTeilnahmenForKategorieK7(): IAnlassLink[] {
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K7
+  getTeilnahmenForKategorieK7(): Observable<IAnlassLink[]> {
+    return this.store.select(
+      getTeilnahmenForKategorie(this.anlass.id, KategorieEnum.K7)
     );
   }
 
   get anzahlTeilnehmerBrevet1(): number {
-    return this.teilnahmenBrevet1.length;
+    return this.teilnahmenBrevet1?.length;
   }
 
   get anzahlTeilnehmerBrevet2(): number {
-    return this.teilnahmenBrevet2.length;
+    return this.teilnahmenBrevet2?.length;
   }
 
   get wertungsrichterPflichtBrevet1(): number {
@@ -353,15 +437,5 @@ export class EventsDetailComponent implements OnInit, AfterViewInit {
   useBrevet2Clicked(check: boolean) {
     console.log("Use Brevet 2: ", this.useBrevet2);
   }
-  vereinStartedClicked(check: boolean) {
-    this.anlassService
-      .updateVereinsStart(this.orgAnlassLink)
-      .subscribe((result) => {
-        console.log("Clicked: ", result);
-      });
-  }
-
-  handleClickMe(event: PointerEvent) {
-    this.router.navigate(["anlass/anmeldungen/", this.anlass?.id]);
-  }
+*/
 }

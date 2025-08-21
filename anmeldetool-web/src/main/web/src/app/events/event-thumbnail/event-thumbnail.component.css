@@ -60,6 +60,10 @@
 h3 {
   margin: 10px 0px 0px 0px;
 }
+
+.double-hight {
+  height: 4rem;
+}
 .pad-left-right {
   padding: 0px 10px 0px 10px;
   margin: 0px;

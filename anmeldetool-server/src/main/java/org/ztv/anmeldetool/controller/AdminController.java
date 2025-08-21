@@ -11,11 +11,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.ztv.anmeldetool.exception.EntityNotFoundException;
 import org.ztv.anmeldetool.models.LoginData;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.Person;
@@ -43,6 +46,7 @@ import org.ztv.anmeldetool.service.TeilnehmerService;
 import org.ztv.anmeldetool.service.VerbandService;
 import org.ztv.anmeldetool.service.WertungsrichterEinsatzService;
 import org.ztv.anmeldetool.service.WertungsrichterService;
+import org.ztv.anmeldetool.transfer.OrganisationAnlassLinkDTO;
 import org.ztv.anmeldetool.transfer.OrganisationDTO;
 import org.ztv.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.transfer.RolleDTO;
@@ -50,6 +54,7 @@ import org.ztv.anmeldetool.transfer.TeilnehmerDTO;
 import org.ztv.anmeldetool.transfer.VerbandDTO;
 import org.ztv.anmeldetool.transfer.WertungsrichterDTO;
 import org.ztv.anmeldetool.util.AnlassMapper;
+import org.ztv.anmeldetool.util.OrganisationAnlassLinkHelper;
 import org.ztv.anmeldetool.util.OrganisationAnlassLinkMapper;
 import org.ztv.anmeldetool.util.OrganisationMapper;
 import org.ztv.anmeldetool.util.PersonAnlassLinkExportImportMapper;
@@ -153,8 +158,9 @@ public class AdminController {
 
 	// http://localhost:8080/admin/organisationen
 	@GetMapping("/organisationen")
-	public ResponseEntity<Collection<OrganisationDTO>> getOrganisationen() {
+	public ResponseEntity getOrganisationen() {
 		return organisationSrv.getAllOrganisations();
+		// return ResponseEntity.badRequest().build();
 	}
 
 	@PostMapping("/organisationen")
@@ -167,7 +173,7 @@ public class AdminController {
 	public ResponseEntity<Collection<TeilnehmerDTO>> getTeilnehmer(HttpServletRequest request, @PathVariable UUID orgId,
 			@RequestParam(name = "page") int page, @RequestParam(name = "size") int size) {
 		Pageable pageable = PageRequest.of(page, size);
-		return teilnehmerSrv.findTeilnehmerByOrganisation(orgId, pageable);
+		return teilnehmerSrv.findTeilnehmerDtoByOrganisation(orgId, pageable);
 	}
 
 	@GetMapping("/organisationen/{orgId}/teilnehmer/count")
@@ -178,19 +184,25 @@ public class AdminController {
 	@PostMapping("/organisationen/{orgId}/teilnehmer")
 	public ResponseEntity<TeilnehmerDTO> addNewTeilnehmer(HttpServletRequest request, @PathVariable UUID orgId,
 			@RequestBody TeilnehmerDTO teilnehmerDTO) {
-		return teilnehmerSrv.create(orgId, teilnehmerDTO.getTiTu());
+		return teilnehmerSrv.create(orgId, teilnehmerDTO);
 	}
 
 	@PatchMapping("/organisationen/{orgId}/teilnehmer")
 	public ResponseEntity<TeilnehmerDTO> updateNewTeilnehmer(HttpServletRequest request, @PathVariable UUID orgId,
-			@RequestBody TeilnehmerDTO teilnehmerDTO) {
-		return teilnehmerSrv.update(orgId, teilnehmerDTO);
+			@RequestBody TeilnehmerDTO teilnehmerDTO) throws EntityNotFoundException {
+		return ResponseEntity.ok(teilnehmerSrv.update(orgId, teilnehmerDTO));
 	}
 
 	@DeleteMapping("/organisationen/{orgId}/teilnehmer/{teilnehmerId}")
-	public ResponseEntity<Boolean> deleteTeilnehmer(HttpServletRequest request, @PathVariable UUID orgId,
+	public ResponseEntity<UUID> deleteTeilnehmer(HttpServletRequest request, @PathVariable UUID orgId,
 			@PathVariable UUID teilnehmerId) {
 		return teilnehmerSrv.delete(orgId, teilnehmerId);
+	}
+
+	@GetMapping("/organisationen/{orgId}/starts")
+	public ResponseEntity<Collection<OrganisationAnlassLinkDTO>> getStarts(HttpServletRequest request) {
+		return ResponseEntity
+				.ok(OrganisationAnlassLinkHelper.toDTO(this.oalMapper, anlassSrv.getOrganisationAnlassLinks()));
 	}
 
 	@GetMapping("/verbaende")
@@ -215,13 +227,18 @@ public class AdminController {
 			@RequestHeader("userid") String userId, @RequestHeader("vereinsid") UUID vereinsId,
 			@RequestBody PersonDTO personDTO) {
 		log.info("patch User");
-		return personSrv.update(personDTO, vereinsId);
+		if (personDTO.getId() == null) {
+			return personSrv.create(personDTO, null);
+		} else {
+			return personSrv.update(personDTO, vereinsId);
+		}
 	}
 
 	@PostMapping("/user")
-	public @ResponseBody ResponseEntity<PersonDTO> post(HttpServletRequest request, @RequestBody PersonDTO personDTO) {
+	public @ResponseBody ResponseEntity<PersonDTO> post(HttpServletRequest request,
+			@RequestHeader("vereinsid") UUID vereinsId, @RequestBody PersonDTO personDTO) {
 		log.info("post User");
-		return personSrv.create(personDTO, null);
+		return personSrv.create(personDTO, vereinsId);
 	}
 
 	@PostMapping("/user/{id}")
@@ -320,5 +337,12 @@ public class AdminController {
 	private String getEncodedPassword(String password) {
 		log.debug("passwordEncoder: " + passwordEncoder.toString() + " ,work: " + password);
 		return passwordEncoder.encode(password);
+	}
+
+	@ExceptionHandler(EntityNotFoundException.class)
+	public ResponseEntity<?> handlerEntityNotFound(EntityNotFoundException ex) {
+		this.log.warn(ex.getMessage());
+
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
 	}
 }

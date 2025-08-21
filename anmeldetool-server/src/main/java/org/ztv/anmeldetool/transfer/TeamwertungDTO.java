@@ -1,10 +1,12 @@
 package org.ztv.anmeldetool.transfer;
 
+import java.math.BigDecimal;
+
 import lombok.Data;
 
 @Data
 public class TeamwertungDTO {
-	private float gesamtPunktzahl;
+	private BigDecimal gesamtPunktzahl;
 	private int rang;
 	private String verein;
 	private int anzahlResultate;

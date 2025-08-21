@@ -12,9 +12,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.repositories.TeilnehmerRepository;
-import org.ztv.anmeldetool.service.AnlassService;
-import org.ztv.anmeldetool.service.TeilnehmerAnlassLinkService;
-import org.ztv.anmeldetool.service.TeilnehmerService;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.util.TeilnehmerAnlassLinkMapper;
 
@@ -41,7 +38,7 @@ public class TeilnehmerAnlassLinkServiceTests {
 	@Test
 	public void testGetTeilnehmer() throws Exception {
 
-		List<Anlass> anlaesse = anlassService.getAllAnlaesse();
+		List<Anlass> anlaesse = anlassService.getAnlaesse(true);
 		assertThat(anlaesse.size()).isGreaterThan(0);
 		List<TeilnehmerAnlassLink> tals = talService.findAnlassTeilnahmen(anlaesse.get(0).getId());
 		assertThat(tals.size()).isGreaterThan(0);
@@ -50,7 +47,7 @@ public class TeilnehmerAnlassLinkServiceTests {
 	@Test
 	public void testGetTeilnehmerWithStartnummer() throws Exception {
 
-		List<Anlass> anlaesse = anlassService.getAllAnlaesse();
+		List<Anlass> anlaesse = anlassService.getAnlaesse(true);
 		assertThat(anlaesse.size()).isGreaterThan(0);
 		List<TeilnehmerAnlassLink> talsStart = talService
 				.getAllTeilnehmerForAnlassAndUpdateStartnummern(anlaesse.get(0).getId());
@@ -59,7 +56,7 @@ public class TeilnehmerAnlassLinkServiceTests {
 
 	@Test
 	public void testTeilnehmerMapper() throws Exception {
-		List<Anlass> anlaesse = anlassService.getAllAnlaesse();
+		List<Anlass> anlaesse = anlassService.getAnlaesse(true);
 		assertThat(anlaesse.size()).isGreaterThan(0);
 		List<TeilnehmerAnlassLink> tals = talService.findAnlassTeilnahmen(anlaesse.get(0).getId());
 		TeilnehmerAnlassLink tal = tals.get(0);

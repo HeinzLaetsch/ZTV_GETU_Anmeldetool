@@ -1,67 +1,95 @@
 <!-- well hoverwell    [routerLink]="['/anlass/', anlass?.id]"
  -->
 <div
+  *ngIf="anlassExtended?.summary"
   hover
-  [status]="anlass.anzeigeStatus"
+  [status]="anlassExtended.anlass.anzeigeStatus"
   class="thumbnail"
   (click)="isEnabled() ? handleClickMe($event) : $event.stopPropagation()"
 >
   <div class="row">
-    <div class="col-sm-7">
-      <h2>{{ anlass.getCleaned() }}</h2>
+    <div class="col-sm-7 double-hight">
+      <h2>{{ anlassExtended.anlass.getCleaned() }}</h2>
     </div>
     <div class="col-sm-1">
-      <h2>{{ anlass.tiTu }}</h2>
+      <h2>{{ anlassExtended.anlass.tiTu }}</h2>
     </div>
     <div class="col-sm-1">
       <img
-        *ngIf="vereinStarted"
+        *ngIf="anlassExtended.summary.startet"
         class="icon"
         src="assets/images/skype/beaming-face.png"
       />
       <img
-        *ngIf="!vereinStarted"
+        *ngIf="!anlassExtended.summary.startet"
         class="icon"
         src="assets/images/skype/slightly-frowning-face.png"
       />
     </div>
-    <div *ngIf="vereinStarted" class="col-sm-3 verticalAlign">
+    <div *ngIf="anlassExtended.summary.startet" class="col-sm-3 verticalAlign">
       Dein Verein startet
     </div>
-    <div *ngIf="!vereinStarted" class="col-sm-3 verticalAlign">
+    <div *ngIf="!anlassExtended.summary.startet" class="col-sm-3 verticalAlign">
       Dein Verein startet nicht
     </div>
   </div>
 
   <div class="row">
     <div class="col-sm-4">
-      <span *ngIf="anlass.startDatum === anlass.endDatum">am</span>
-      <span *ngIf="anlass.startDatum !== anlass.endDatum">von</span>:
-      {{ anlass.startDatum | date: "EEE, d MMMM , y":"GMT+1":"DE-CH" }}
+      <span
+        *ngIf="
+          anlassExtended.anlass.startDatum === anlassExtended.anlass.endDatum
+        "
+        >am</span
+      >
+      <span
+        *ngIf="
+          anlassExtended.anlass.startDatum !== anlassExtended.anlass.endDatum
+        "
+        >von</span
+      >:
+      {{
+        anlassExtended.anlass.startDatum
+          | date : "EEE, d MMMM , y" : "GMT+1" : "DE-CH"
+      }}
     </div>
-    <div class="col-sm-4" *ngIf="anlass.startDatum !== anlass.endDatum">
-      bis: {{ anlass.endDatum | date: "EEE, d MMMM , y":"GMT+1":"DE-CH" }}
+    <div
+      class="col-sm-4"
+      *ngIf="
+        anlassExtended.anlass.startDatum !== anlassExtended.anlass.endDatum
+      "
+    >
+      bis:
+      {{
+        anlassExtended.anlass.endDatum
+          | date : "EEE, d MMMM , y" : "GMT+1" : "DE-CH"
+      }}
     </div>
   </div>
   <div class="row">
     <div class="col-sm-4">
-      Geschlecht: <span style="font-weight: 550"> {{ anlass.tiTu }}</span>
+      Geschlecht:
+      <span style="font-weight: 550"> {{ anlassExtended.anlass.tiTu }}</span>
     </div>
     <div class="col-sm-4">
-      Startberechtigt: {{ anlass.tiefsteKategorie }} bis
-      {{ anlass.hoechsteKategorie }}
+      Startberechtigt: {{ anlassExtended.anlass.tiefsteKategorie }} bis
+      {{ anlassExtended.anlass.hoechsteKategorie }}
     </div>
   </div>
   <div class="row">
-    <div class="col-sm-4">Ort: {{ anlass.ort }}</div>
-    <div class="col-sm-4">Halle: {{ anlass.halle }}</div>
-    <div class="col-sm-4">Organisator: {{ anlass.organisator }}</div>
+    <div class="col-sm-4">Ort: {{ anlassExtended.anlass.ort }}</div>
+    <div class="col-sm-4">Halle: {{ anlassExtended.anlass.halle }}</div>
+    <div class="col-sm-4">Organisator: {{ organisator?.name }}</div>
   </div>
 
-  <div *ngIf="vereinStarted" class="row">
+  <div *ngIf="anlassExtended.summary.startet" class="row">
     <div class="col-sm-8">
       <span class="verticalAlign margin-left"
-        >Teilnehmer: {{ anzahlTeilnehmer }}</span
+        >Teilnehmer:
+        {{
+          anlassExtended.summary.startendeBr1 +
+            anlassExtended.summary.startendeBr2
+        }}</span
       >
     </div>
     <div class="col-sm-1">
@@ -83,10 +111,10 @@
       kein Teilnehmer gemeldet
     </div>
   </div>
-  <div *ngIf="vereinStarted" class="row">
+  <div *ngIf="anlassExtended.summary.startet" class="row">
     <div class="col-sm-8">
       <span class="verticalAlign margin-left"
-        >Wertungsrichter: {{ statusWertungsrichter }}</span
+        >Wertungsrichter: {{ anlassExtended.summary.gemeldeteBr1 }}</span
       >
     </div>
     <div class="col-sm-1">
@@ -109,6 +137,10 @@
     </div>
   </div>
   <div class="correct-margin">
-    <app-events-dates [anlass]="anlass" [viewOnly]="true"></app-events-dates>
+    <app-events-dates
+      [anlass]="anlassExtended.anlass"
+      [anlassSummary]="anlassExtended.summary"
+      [viewOnly]="true"
+    ></app-events-dates>
   </div>
 </div>

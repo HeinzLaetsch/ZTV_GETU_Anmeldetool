@@ -1,0 +1,183 @@
+import {
+  AfterContentChecked,
+  AfterViewInit,
+  Component,
+  OnInit,
+} from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { IAnlass } from "../../model/IAnlass";
+import { AuthService } from "../../service/auth/auth.service";
+import { CachingAnlassService } from "../../service/caching-services/caching.anlass.service";
+import { CachingVereinService } from "../../service/caching-services/caching.verein.service";
+import { LoginDialogComponent } from "../login/login-dialog.component";
+import { NewAnmelderComponent } from "../new-anmelder/new-anmelder.component";
+import { NewVereinComponent } from "../new-verein/new-verein.component";
+import { AppState } from "../../redux/core.state";
+import { select, Store } from "@ngrx/store";
+import { SubscriptionHelper } from "src/app/utils/subscription-helper";
+import { selectSperrenAnlaesse } from "../../redux/anlass";
+
+/** @title Main Component */
+@Component({
+  selector: "app-anmelde-tool",
+  templateUrl: "app.component.html",
+  styleUrls: ["app.component.css"],
+})
+export class AnmeldeToolComponent
+  extends SubscriptionHelper
+  implements OnInit, AfterViewInit, AfterContentChecked
+{
+  localeTextDE = {
+    contains: "Beinhaltet",
+  };
+  private showPage = 0;
+  dialogOpen = false;
+  appBlocked = false;
+  _authenticated: boolean;
+  anlass: IAnlass;
+
+  fillerNav = Array.from({ length: 10 }, (_, i) => `Nav Item ${i + 1}`);
+
+  constructor(
+    private authService: AuthService,
+    // public vereinService: CachingVereinService,
+    // private anlassService: CachingAnlassService,
+    // private router: ActivatedRoute,
+    private store: Store<AppState>,
+
+    public dialog: MatDialog
+  ) {
+    super();
+    this.registerSubscription(
+      this.store.pipe(select(selectSperrenAnlaesse())).subscribe((result) => {
+        if (result === undefined) {
+          return;
+        }
+        if (result.length > 0) {
+          this.appBlocked = true;
+          this.dialogOpen = false;
+        }
+        if (!this.appBlocked && !this.authService.isAuthenticated()) {
+          this.dialogOpen = true;
+          this.openLoginDialog();
+        }
+      })
+    );
+  }
+
+  ngOnInit(): void {}
+
+  ngAfterContentChecked(): void {
+    if (
+      !this.appBlocked &&
+      !this.authService.isAuthenticated() &&
+      this._authenticated
+    ) {
+      this._authenticated = false;
+      console.log("AnmeldeToolComponent::ngAfterContentChecked");
+      this.openLoginDialog();
+    }
+  }
+
+  ngAfterViewInit(): void {
+    /*
+    if (!this.appBlocked && !this.authService.isAuthenticated()) {
+      console.log("AnmeldeToolComponent::ngAfterViewInit: ");
+      this.openLoginDialog();
+    }
+    */
+  }
+
+  get administrator(): boolean {
+    return this.authService.isAdministrator();
+  }
+
+  /* todo
+  toolSperrenClicked(event: any): void {
+    this.anlassService
+      .updateAnlass(this.anlass)
+      .subscribe((anlass) => (this.anlass = anlass));
+  }*/
+
+  openLoginDialog() {
+    // this.dialogOpen = true;
+
+    // console.log("Dialog open");
+
+    let dialogRef = this.dialog.open(LoginDialogComponent, {
+      height: "500px",
+      width: "500px",
+      disableClose: true,
+      autoFocus: true,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      // console.log("Dialog Closed", result);
+      if (result === "OK") {
+        this.dialogOpen = false;
+        this._authenticated = true;
+      }
+      if (result === 1) {
+        this.openNewVereinDialog();
+      }
+      if (result === 2) {
+        this.openNewAnmelderDialog();
+      }
+    });
+  }
+  openNewVereinDialog() {
+    let dialogRef1 = this.dialog.open(NewVereinComponent, {
+      height: "900px",
+      width: "500px",
+      disableClose: true,
+    });
+    dialogRef1.afterClosed().subscribe((result) => {
+      console.log("Dialog 1 Closed", result);
+      if (result !== "OK") {
+        this.openLoginDialog();
+      } else {
+        this.dialogOpen = false;
+      }
+    });
+  }
+  openNewAnmelderDialog() {
+    let dialogRef2 = this.dialog.open(NewAnmelderComponent, {
+      height: "770px",
+      width: "500px",
+      disableClose: true,
+    });
+    dialogRef2.afterClosed().subscribe((result) => {
+      console.log("Dialog 2 Closed", result);
+      this.openLoginDialog();
+    });
+  }
+  /*
+  get vereineLoaded(): Observable<boolean> {
+    return this.vereinService.isVereineLoaded();
+  }*/
+
+  get authenticated() {
+    // console.log('ngOnInit 2: ');
+    return this.authService.isAuthenticated();
+  }
+  onShowPage(showPage: number): void {
+    console.log("On ShowPage", showPage);
+    this.showPage = showPage;
+  }
+
+  isShowLogin(): boolean {
+    return this.showPage === 0;
+  }
+  isShowNewVerein(): boolean {
+    return this.showPage === 1;
+  }
+  isShowNewAnmelder(): boolean {
+    return this.showPage === 2;
+  }
+  getOverlayContentClass(): string {
+    if (this.authenticated) {
+      return "";
+    } else {
+      return "overlay-content-login";
+    }
+  }
+}

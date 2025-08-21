@@ -223,7 +223,7 @@ export class CachingAnlassService {
     anlass: IAnlass,
     teilnehmerStart: ITeilnehmerStart
   ): Observable<boolean> {
-    return this.anlassService.updateStartgeraet(anlass, teilnehmerStart);
+    return this.anlassService.updateTeilnehmerStart(anlass, teilnehmerStart);
   }
   getTeilnehmerForAnlass(anlass: IAnlass): IAnlassLink[] {
     if (this.teilnamen && this.teilnamen[anlass.id]?.anlassLinks) {
@@ -280,7 +280,7 @@ export class CachingAnlassService {
   loadAnlaesse(): Observable<boolean> {
     if (!this._loadRunning && !this.loaded) {
       this._loadRunning = true;
-      this.anlassService.getAnlaesse().subscribe((anlaesse) => {
+      this.anlassService.getAnlaesse(true).subscribe((anlaesse) => {
         // this.anlaesse = anlaesse;
         this.anlaesse = anlaesse.map((anlass) => {
           anlass.organisator = this.vereinService.getVereinById(
@@ -364,11 +364,11 @@ export class CachingAnlassService {
     const anlassLinks: IAnlassLinks = this.teilnamen[anlass.id];
     if (anlassLinks) {
       const anzahlUmmeldungen = anlassLinks.anlassLinks.filter((link) => {
-        const isUmmeldung = link.meldeStatus === MeldeStatusEnum.UMMELDUNG;
+        const isUmmeldung = link.meldeStatus === MeldeStatusEnum.STARTET; //TODO MeldeStatusEnum.Ummeldung;
         return isUmmeldung;
       }).length;
       const neuMeldungen = anlassLinks.anlassLinks.filter((link) => {
-        return link.meldeStatus === MeldeStatusEnum.NEUMELDUNG;
+        return link.meldeStatus === MeldeStatusEnum.STARTET; //TODO MeldeStatusEnum.Neumeldung;
       }).length;
       return anzahlUmmeldungen > neuMeldungen;
     }
@@ -381,12 +381,12 @@ export class CachingAnlassService {
     const anlassLinks: IAnlassLinks = this.teilnamen[anlass.id];
     const anzahlUmmeldungen = anlassLinks.anlassLinks.filter((link) => {
       const sameKat = link.kategorie === kategorie;
-      const isUmmeldung = link.meldeStatus === MeldeStatusEnum.UMMELDUNG;
+      const isUmmeldung = link.meldeStatus === MeldeStatusEnum.STARTET; //TODO MeldeStatusEnum.Ummeldung;
       return sameKat && isUmmeldung;
     }).length;
     const neuMeldungen = anlassLinks.anlassLinks.filter((link) => {
       const sameKat = link.kategorie === kategorie;
-      const isNeumeldung = link.meldeStatus === MeldeStatusEnum.NEUMELDUNG;
+      const isNeumeldung = link.meldeStatus === MeldeStatusEnum.STARTET; //TODO MeldeStatusEnum.Neumeldung;
       return sameKat && isNeumeldung;
     }).length;
     return anzahlUmmeldungen > neuMeldungen;
@@ -401,6 +401,7 @@ export class CachingAnlassService {
       .subscribe((anlassLinkArray) => {
         const anlassLinks: IAnlassLinks = {
           dirty: false,
+          anlass: anlass,
           anlassLinks: anlassLinkArray,
         };
         if (anlassLinks) {
@@ -454,9 +455,10 @@ export class CachingAnlassService {
       return new Array();
     }
   }
+  /*
   saveTeilnahme(verein: IVerein, anlassLink: IAnlassLink): Observable<boolean> {
     return this.anlassService.saveTeilnahme(verein, anlassLink);
-  }
+  } */
   getVereinAnmeldeKontrollePdf(
     anlass: IAnlass,
     verein: IVerein

@@ -1,76 +1,70 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Router } from "@angular/router";
+import { select, Store } from "@ngrx/store";
+import { Observable } from "rxjs";
 import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
+import { IAnlassExtended } from "src/app/core/model/IAnlassExtended";
+import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
 import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
-import { IUser } from "src/app/core/model/IUser";
-import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterStatusEnum";
+import { selectAktiveAnlaesse } from "src/app/core/redux/anlass";
+import { AppState } from "src/app/core/redux/core.state";
+import { selectVereinById } from "src/app/core/redux/verein";
+import { AnlassService } from "src/app/core/service/anlass/anlass.service";
 import { AuthService } from "src/app/core/service/auth/auth.service";
-import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
-import { WertungsrichterService } from "src/app/core/service/wertungsrichter.service";
+import { SubscriptionHelper } from "src/app/utils/subscription-helper";
+import { IVerein } from "src/app/verein/verein";
 
 @Component({
   selector: "app-event-thumbnail",
   templateUrl: "./event-thumbnail.component.html",
   styleUrls: ["./event-thumbnail.component.css"],
 })
-export class EventThumbnailComponent implements OnInit {
-  @Input() anlass: IAnlass;
+export class EventThumbnailComponent
+  extends SubscriptionHelper
+  implements OnInit
+{
+  @Input() anlassExtended: IAnlassExtended;
+
   @Output() anlassClick = new EventEmitter();
 
-  someProperty: any = "some Text";
-  organisationAnlassLink: IOrganisationAnlassLink;
-  anzahlTeilnehmer: number;
-  assignedWr1s = new Array<IUser>();
-  assignedWr2s = new Array<IUser>();
+  organisator: IVerein;
 
   constructor(
     public authService: AuthService,
-    private anlassService: CachingAnlassService,
-    private wertungsrichterService: WertungsrichterService,
-    private router: Router
-  ) {}
+    private store: Store<AppState>,
+    private router: Router,
+
+    private anlassService: AnlassService
+  ) {
+    super();
+  }
 
   ngOnInit() {
-    this.anlassService
-      .getVereinStart(this.anlass, this.authService.currentVerein)
-      .subscribe((result) => {
-        this.organisationAnlassLink = result;
-        this.anlass.erfassenVerlaengert = result.verlaengerungsDate;
-      });
-    this.anzahlTeilnehmer = 0;
-    this.anlassService
-      .loadTeilnahmen(this.anlass, this.authService.currentVerein, true)
-      .subscribe((result) => {
-        if (result) {
-          const links = this.anlassService.getTeilnehmerForAnlass(this.anlass);
-          if (links) {
-            this.anzahlTeilnehmer = links.filter((link) => {
-              return link.kategorie !== KategorieEnum.KEINE_TEILNAHME;
-            }).length;
-          }
-        }
-      });
-    this.fillassignedWrs();
+    this.registerSubscription(
+      this.store
+        .pipe(
+          select(selectVereinById(this.anlassExtended.anlass.organisatorId))
+        )
+        .subscribe((result) => {
+          this.organisator = result;
+        })
+    );
   }
 
-  get vereinStarted(): boolean {
-    return this.organisationAnlassLink?.startet;
-  }
   isEnabled(): boolean {
-    return true;
+    return this.authService.currentVerein.name != "ZTV";
   }
 
   getClassForAnzeigeStatus(anzeigeStatus: AnzeigeStatusEnum): string {
-    if (this.anlass.anzeigeStatus.hasStatus(anzeigeStatus)) {
+    if (this.anlassExtended.anlass.anzeigeStatus.hasStatus(anzeigeStatus)) {
       return "div-red";
     }
     return "div-green";
   }
 
   getStartedClass() {
-    if (!this.organisationAnlassLink?.startet) {
+    if (!this.anlassExtended.summary?.startet) {
       return { redNoMargin: true };
     } else {
       return { greenNoMargin: true };
@@ -78,19 +72,23 @@ export class EventThumbnailComponent implements OnInit {
   }
 
   get hasTeilnehmer(): boolean {
-    return this.anzahlTeilnehmer > 0;
+    return (
+      this.anlassExtended.summary.startendeBr1 +
+        this.anlassExtended.summary.startendeBr2 >
+      0
+    );
   }
 
   getTeilnehmerClass() {
-    if (this.anzahlTeilnehmer === 0) {
-      return { redNoMargin: true };
-    } else {
+    if (this.hasTeilnehmer) {
       return { greenNoMargin: true };
+    } else {
+      return { redNoMargin: true };
     }
   }
 
   getWertungsrichterClass() {
-    if (this.anzahlTeilnehmer !== 0) {
+    if (this.hasTeilnehmer) {
       return { redNoMargin: true };
     } else {
       return { greenNoMargin: true };
@@ -98,43 +96,34 @@ export class EventThumbnailComponent implements OnInit {
   }
   handleClickMe(event: MouseEvent) {
     // this.anlassClick.emit(this.anlass.anlassBezeichnung);
-    this.router.navigate(["/anlass/", this.anlass?.id]);
+    this.router.navigate(["/anlaesse/", this.anlassExtended.anlass?.id]);
   }
 
   vereinStartedClicked(event: MouseEvent) {
     console.log(event);
     event.cancelBubble = true;
-    this.anlassService
-      .updateVereinsStart(this.organisationAnlassLink)
-      .subscribe((result) => {
-        console.log("Clicked: ", result);
-      });
+    const organisationAnlassLink: IOrganisationAnlassLink = {
+      anlassId: this.anlassExtended.anlass.id,
+      organisationsId: this.authService.currentVerein.id,
+      startet: this.anlassExtended.summary.startet,
+      verlaengerungsDate: this.anlassExtended.summary.verlaengerungsDate,
+    };
+    // Sollte ersetzt werden
+    this.registerSubscription(
+      this.anlassService
+        .updateVereinsStart(organisationAnlassLink)
+        .subscribe((result) => {
+          console.log("Clicked: ", result);
+        })
+    );
   }
 
   get isWertungsrichterOk(): boolean {
     if (this.hasTeilnehmer) {
       return (
-        this.statusWertungsrichter === WertungsrichterStatusEnum.OK ||
-        this.statusWertungsrichter === WertungsrichterStatusEnum.KEINEPFLICHT
+        this.anlassExtended.summary.br1Ok && this.anlassExtended.summary.br2Ok
       );
     }
     return true;
-  }
-
-  get statusWertungsrichter(): WertungsrichterStatusEnum {
-    return this.wertungsrichterService.getStatusWertungsrichter(
-      this.anlass,
-      this.assignedWr1s,
-      this.assignedWr2s
-    );
-  }
-
-  fillassignedWrs() {
-    this.wertungsrichterService
-      .getEingeteilteWertungsrichter(this.anlass, 1)
-      .subscribe((assignedWrs) => (this.assignedWr1s = assignedWrs));
-    this.wertungsrichterService
-      .getEingeteilteWertungsrichter(this.anlass, 2)
-      .subscribe((assignedWrs) => (this.assignedWr2s = assignedWrs));
   }
 }

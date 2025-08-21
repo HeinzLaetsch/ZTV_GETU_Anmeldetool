@@ -16,8 +16,14 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.ztv.anmeldetool.models.Person;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service("EmailService")
+@Slf4j
 public class EmailServiceImpl implements EmailService {
+
+	@Value("${spring.mail.enabled}")
+	private boolean enableEmail;
 
 	@Value("${spring.mail.username}")
 	private String sender;
@@ -50,8 +56,11 @@ public class EmailServiceImpl implements EmailService {
 					helper.addAttachment(datasource.getName() + "_" + i, datasource);
 				}
 			}
-
-			emailSender.send(message);
+			if (enableEmail) {
+				emailSender.send(message);
+			} else {
+				log.warn("Mail Service is disabled");
+			}
 		} catch (MessagingException e) {
 			e.printStackTrace();
 		}

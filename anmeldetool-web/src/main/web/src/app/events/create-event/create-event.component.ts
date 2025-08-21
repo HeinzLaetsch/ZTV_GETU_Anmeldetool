@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormControl, UntypedFormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { IEvent } from "../shared";
 
@@ -12,19 +12,19 @@ export class CreateEventComponent implements OnInit {
   newEvent: IEvent;
   isDirty: boolean = true;
 
-  newEventForm: FormGroup;
-  name: FormControl;
-  startDate: FormControl;
-  endDate: FormControl;
+  newEventForm: UntypedFormGroup;
+  name: UntypedFormControl;
+  startDate: UntypedFormControl;
+  endDate: UntypedFormControl;
 
   constructor(private router: Router) {}
 
   ngOnInit() {
-    this.name = new FormControl("", Validators.required);
-    this.startDate = new FormControl("", Validators.required);
-    this.endDate = new FormControl("", Validators.required);
+    this.name = new UntypedFormControl("", Validators.required);
+    this.startDate = new UntypedFormControl("", Validators.required);
+    this.endDate = new UntypedFormControl("", Validators.required);
 
-    this.newEventForm = new FormGroup({
+    this.newEventForm = new UntypedFormGroup({
       name: this.name,
       start_date: this.startDate,
       end_date: this.endDate,
