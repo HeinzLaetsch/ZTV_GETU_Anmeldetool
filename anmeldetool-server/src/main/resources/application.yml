@@ -29,7 +29,7 @@ spring:
      port: 587
      templates.path: "mail-templates"
      username: "getu-wettkaempfe@ztv.ch"
-     password: "-GeTuWL@ztv.ch"
+     password: "secret"
      properties.mail.smtp:
           auth: "true"
           starttls.enable: "true"
