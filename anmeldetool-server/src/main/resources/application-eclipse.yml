@@ -3,8 +3,6 @@ server:
   servlet:
     context-path: /
 spring:
-  profiles:
-    active: "eclipse"
   flyway:
     locations: ["classpath:/db/migration"]
     clean-on-validation-error: false
@@ -77,8 +75,7 @@ management:
         allowed-methods: GET, POST, PUT
         allowed-headers: "*"
   server:
-    servlet:
-      context-path: /admin
+      base-path: /admin
   endpoint:
     beans:
       enabled: true

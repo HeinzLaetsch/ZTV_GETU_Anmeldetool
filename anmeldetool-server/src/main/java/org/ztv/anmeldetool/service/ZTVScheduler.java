@@ -10,12 +10,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.activation.DataSource;
-import javax.mail.util.ByteArrayDataSource;
-import javax.transaction.Transactional;
-import javax.transaction.Transactional.TxType;
-
-import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,6 +26,10 @@ import org.ztv.anmeldetool.output.WertungsrichterOutput;
 import org.ztv.anmeldetool.repositories.OrganisationAnlassLinkRepository;
 import org.ztv.anmeldetool.transfer.AnmeldeKontrolleDTO;
 
+import jakarta.activation.DataSource;
+import jakarta.mail.util.ByteArrayDataSource;
+import jakarta.transaction.Transactional;
+import jakarta.transaction.Transactional.TxType;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -282,7 +280,7 @@ public class ZTVScheduler {
 		ByteArrayOutputStream outAnmeldekontrolle = new ByteArrayOutputStream();
 		try {
 			AnmeldeKontrolleOutput.createAnmeldeKontrolle(outAnmeldekontrolle, anmeldeKontrolle);
-		} catch (DocumentException | IOException e) {
+		} catch (IOException e) {
 			log.warn("Could not create AnmeldeKontrolleOutput", e);
 			return false;
 		}
@@ -295,7 +293,7 @@ public class ZTVScheduler {
 		ByteArrayOutputStream outWertungsrichter = new ByteArrayOutputStream();
 		try {
 			WertungsrichterOutput.createWertungsrichter(outWertungsrichter, anmeldeKontrolle, palBr1, palBr2);
-		} catch (DocumentException | IOException e) {
+		} catch (IOException e) {
 			log.warn("Could not create WertungsrichterOutput", e);
 			return false;
 		}

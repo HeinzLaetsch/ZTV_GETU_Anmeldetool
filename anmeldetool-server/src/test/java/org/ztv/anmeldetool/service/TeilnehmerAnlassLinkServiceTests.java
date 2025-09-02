@@ -40,7 +40,7 @@ public class TeilnehmerAnlassLinkServiceTests {
 
 		List<Anlass> anlaesse = anlassService.getAnlaesse(true);
 		assertThat(anlaesse.size()).isGreaterThan(0);
-		List<TeilnehmerAnlassLink> tals = talService.findAnlassTeilnahmen(anlaesse.get(0).getId());
+		List<TeilnehmerAnlassLink> tals = talService.findAnlassTeilnahmen(anlaesse.getFirst().getId());
 		assertThat(tals.size()).isGreaterThan(0);
 	}
 
@@ -50,7 +50,7 @@ public class TeilnehmerAnlassLinkServiceTests {
 		List<Anlass> anlaesse = anlassService.getAnlaesse(true);
 		assertThat(anlaesse.size()).isGreaterThan(0);
 		List<TeilnehmerAnlassLink> talsStart = talService
-				.getAllTeilnehmerForAnlassAndUpdateStartnummern(anlaesse.get(0).getId());
+				.getAllTeilnehmerForAnlassAndUpdateStartnummern(anlaesse.getFirst().getId());
 		assertThat(talsStart.size()).isGreaterThan(0);
 	}
 
@@ -58,8 +58,8 @@ public class TeilnehmerAnlassLinkServiceTests {
 	public void testTeilnehmerMapper() throws Exception {
 		List<Anlass> anlaesse = anlassService.getAnlaesse(true);
 		assertThat(anlaesse.size()).isGreaterThan(0);
-		List<TeilnehmerAnlassLink> tals = talService.findAnlassTeilnahmen(anlaesse.get(0).getId());
-		TeilnehmerAnlassLink tal = tals.get(0);
+		List<TeilnehmerAnlassLink> tals = talService.findAnlassTeilnahmen(anlaesse.getFirst().getId());
+		TeilnehmerAnlassLink tal = tals.getFirst();
 		TeilnehmerAnlassLinkDTO talDto = talMapper.toDto(tal);
 		TeilnehmerAnlassLink tal2 = talMapper.toEntity(talDto);
 		assertThat(tal.getTeilnehmer().getId()).isEqualByComparingTo(tal2.getTeilnehmer().getId());

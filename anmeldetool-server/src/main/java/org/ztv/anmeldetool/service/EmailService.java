@@ -2,7 +2,7 @@ package org.ztv.anmeldetool.service;
 
 import java.util.Map;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 
 import org.ztv.anmeldetool.models.Person;
 

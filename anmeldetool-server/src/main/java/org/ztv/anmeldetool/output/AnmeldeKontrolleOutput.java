@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
-import org.dom4j.DocumentException;
 import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
@@ -38,7 +37,7 @@ public class AnmeldeKontrolleOutput {
 	public static float[] headerWidths = { 5.0f, 20.0f, 20.0f, 5.0f, 10.0f, 10.0f, 20.0f, 10.0f };
 
 	public static void createAnmeldeKontrolle(OutputStream out, AnmeldeKontrolleDTO anmeldeKontrolle)
-			throws DocumentException, IOException {
+			throws IOException {
 		PdfFont fontN = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 		PdfFont fontB = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
 
@@ -58,7 +57,7 @@ public class AnmeldeKontrolleOutput {
 		// doc.add(new Paragraph(text));
 
 		if (anmeldeKontrolle.getVereinsStart() != null && anmeldeKontrolle.getVereinsStart().size() > 0) {
-			VereinsStartDTO dto = anmeldeKontrolle.getVereinsStart().get(0);
+			VereinsStartDTO dto = anmeldeKontrolle.getVereinsStart().getFirst();
 
 			Table table = initTable(fontB);
 			fillTable(table, fontN, fontB, KategorieEnum.K1, TiTuEnum.Ti, dto.getTals_K1_Ti());
@@ -108,14 +107,14 @@ public class AnmeldeKontrolleOutput {
 				}
 				printCell(table, fontN, tal.getTeilnehmer().getName(), true);
 				printCell(table, fontN, tal.getTeilnehmer().getVorname(), true);
-				printCell(table, fontN, String.format("%d", tal.getTeilnehmer().getJahrgang()), true);
+				printCell(table, fontN, "%d".formatted(tal.getTeilnehmer().getJahrgang()), true);
 				if (tal.getAbteilung() != null && tal.getAnlass().isAbteilungFix()) {
-					printCell(table, fontN, String.format("%d", tal.getAbteilung().ordinal() + 1), true);
+					printCell(table, fontN, "%d".formatted(tal.getAbteilung().ordinal() + 1), true);
 				} else {
 					printCell(table, fontN, "", true);
 				}
 				if (tal.getAnlage() != null && tal.getAnlass().isAnlageFix()) {
-					printCell(table, fontN, String.format("%d", tal.getAnlage().ordinal() + 1), true);
+					printCell(table, fontN, "%d".formatted(tal.getAnlage().ordinal() + 1), true);
 				} else {
 					printCell(table, fontN, "", true);
 				}

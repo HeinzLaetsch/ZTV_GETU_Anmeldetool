@@ -33,7 +33,7 @@ public class WertungsrichterService {
 	public Optional<Wertungsrichter> getWertungsrichterByPersonId(UUID id) {
 		List<Wertungsrichter> wrList = wertungsrichterRepo.findByPersonId(id);
 		if (wrList != null && wrList.size() > 0)
-			return Optional.of(wrList.get(0));
+			return Optional.of(wrList.getFirst());
 		else
 			return Optional.empty();
 	}

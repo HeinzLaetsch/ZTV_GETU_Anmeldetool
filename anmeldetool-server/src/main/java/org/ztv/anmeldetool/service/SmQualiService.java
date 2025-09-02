@@ -219,7 +219,7 @@ public class SmQualiService {
 			List<TeilnehmerAnlassLink> toAdd = new ArrayList<TeilnehmerAnlassLink>();
 			besuchteAnlaesse.forEach((k, v) -> {
 				Anlass currentAnlass = anlaesse.stream().filter(anlass -> anlass.getId() == k)
-						.collect(Collectors.toList()).get(0);
+						.collect(Collectors.toList()).getFirst();
 				if (v != null && currentAnlass.isSmQuali()) {
 					TeilnehmerAnlassLink newTal = new TeilnehmerAnlassLink();
 					newTal.setTeilnehmer(orgTalFinal.getTeilnehmer());

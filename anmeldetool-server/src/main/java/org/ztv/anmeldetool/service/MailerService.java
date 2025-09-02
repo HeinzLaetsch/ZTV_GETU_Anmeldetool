@@ -25,7 +25,7 @@ public class MailerService {
 		VereinsStartDTO vereinsStart = null;
 
 		if (anmeldeKontrolle.getVereinsStart() != null && anmeldeKontrolle.getVereinsStart().size() == 1) {
-			vereinsStart = anmeldeKontrolle.getVereinsStart().get(0);
+			vereinsStart = anmeldeKontrolle.getVereinsStart().getFirst();
 			templateModel.put("startet", "Dein Verein startet");
 		} else {
 			vereinsStart = new VereinsStartDTO();

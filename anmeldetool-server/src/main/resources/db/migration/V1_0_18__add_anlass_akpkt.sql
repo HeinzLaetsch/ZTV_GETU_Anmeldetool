@@ -5,11 +5,4 @@ update ANLASS set SIEGER_TOTAL_K6='0';
 ALTER TABLE ANLASS ADD SIEGER_TOTAL_KH decimal(5,3);
 update ANLASS set SIEGER_TOTAL_KH='0';
 ALTER TABLE ANLASS ADD SIEGER_TOTAL_K7 decimal(5,3);
-<<<<<<< HEAD
 update ANLASS set SIEGER_TOTAL_K7='0';
-
-
-
-=======
-update ANLASS set SIEGER_TOTAL_K7='0';
->>>>>>> grid

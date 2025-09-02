@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "nx serve -c development --live-reload",
+    "start": "npx nx serve at-app --configuration=development --live-reload",
     "startHalle": "nx serve -c halle --live-reload",
     "start-nx": "npx nx run at-app:build:halle",
     "build": "nx build",

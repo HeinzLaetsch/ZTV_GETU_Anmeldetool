@@ -8,9 +8,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.dom4j.DocumentException;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.AnlassLauflisten;
 import org.ztv.anmeldetool.models.GeraetEnum;
@@ -37,10 +34,12 @@ import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 public class LauflistenOutput {
 
 	public static void createLaufListe(Anlass anlass, boolean onlyTi, AnlassLauflisten anlassLauflisten,
-			HttpServletResponse response) throws DocumentException, IOException {
+			HttpServletResponse response) throws IOException {
 
 		PdfDocument pdf = new PdfDocument(new PdfWriter(response.getOutputStream()));
 		Document document = new Document(pdf);
@@ -136,8 +135,8 @@ public class LauflistenOutput {
 		float[] headerWidths = { 10.0f, 30.0f, 60.0f };
 		Table headerTable = new Table(UnitValue.createPercentArray(headerWidths)).useAllAvailableWidth();
 		Text abt1 = new Text(
-				"Abteilung: " + laufliste.getLauflistenContainer().getTeilnehmerAnlassLinks().get(0).getAbteilung())
-						.setFont(fontN).setFontSize(12);
+				"Abteilung: " + laufliste.getLauflistenContainer().getTeilnehmerAnlassLinks().getFirst().getAbteilung())
+				.setFont(fontN).setFontSize(12);
 		Cell cell = new Cell(1, 2);
 		cell.add(new Paragraph(abt1));
 
@@ -145,8 +144,8 @@ public class LauflistenOutput {
 		headerTable.addCell(cell);
 
 		Text anlage = new Text(
-				"Anlage: " + laufliste.getLauflistenContainer().getTeilnehmerAnlassLinks().get(0).getAnlage())
-						.setFont(fontN).setFontSize(12);
+				"Anlage: " + laufliste.getLauflistenContainer().getTeilnehmerAnlassLinks().getFirst().getAnlage())
+				.setFont(fontN).setFontSize(12);
 		cell = new Cell();
 		cell.add(new Paragraph(anlage));
 		cell.setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.BOTTOM);
@@ -237,10 +236,10 @@ public class LauflistenOutput {
 	}
 
 	private static void addContainer(Document document, LauflistenContainer container, GeraetEnum geraet,
-			int currentIndex) throws DocumentException, IOException {
+			int currentIndex) throws IOException {
 		Laufliste laufliste = container.getGeraeteLauflisten().stream().filter(liste -> {
 			return liste.getGeraet().equals(geraet);
-		}).collect(Collectors.toList()).get(0);
+		}).collect(Collectors.toList()).getFirst();
 		addLaufliste(document, laufliste, currentIndex);
 	}
 

@@ -18,12 +18,12 @@ public class WertungsrichterToCsv extends AbstractCsvConverter {
 	public String convertToWrite(Object value) {
 		WertungsrichterEinsatzCsvDTO t = (WertungsrichterEinsatzCsvDTO) value;
 		if (t.getTag() != null) {
-			return String.format("%s,%s,%s,%s", t.getBrevet(),
+			return "%s,%s,%s,%s".formatted(t.getBrevet(),
 					t.getTag().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)),
 					t.getStart_zeit().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)),
 					t.getEnd_zeit().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)));
 		} else {
-			return String.format("%s,%s", t.getBrevet().brevet, t.getBeschreibung());
+			return "%s,%s".formatted(t.getBrevet().brevet, t.getBeschreibung());
 		}
 	}
 }

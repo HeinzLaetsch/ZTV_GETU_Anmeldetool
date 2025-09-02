@@ -2,6 +2,7 @@ package org.ztv.anmeldetool.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.ztv.anmeldetool.controller.util.StringToAbteilungEnumConverter;
 import org.ztv.anmeldetool.controller.util.StringToAnlageEnumConverter;

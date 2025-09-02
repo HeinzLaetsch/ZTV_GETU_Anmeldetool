@@ -26,7 +26,7 @@ public class DockerSecretsPasswordProcessor implements EnvironmentPostProcessor 
 
 				environment.getPropertySources().addLast(new PropertiesPropertySource("secrets", properties));
 			} else {
-				System.err.println(String.format("Secrets File %s not found, using default configuration",
+				System.err.println("Secrets File %s not found, using default configuration".formatted(
 						resource.getURI().toString()));
 			}
 		} catch (IOException e) {

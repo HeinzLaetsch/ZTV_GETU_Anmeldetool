@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -60,11 +61,11 @@ public interface TeilnehmerAnlassLinkRepository extends JpaRepository<Teilnehmer
 
 	Optional<TeilnehmerAnlassLink> findTopByStartnummerNotNullOrderByStartnummerDesc();
 
-	@Query(value = "SELECT DISTINCT tal.abteilung FROM teilnehmer_anlass_link tal WHERE tal.anlass_id = :anlass_id AND tal.aktiv= :aktiv AND tal.kategorie= :kategorie AND tal.abteilung IS NOT NULL ORDER BY tal.abteilung", nativeQuery = true)
+	@NativeQuery("SELECT DISTINCT tal.abteilung FROM teilnehmer_anlass_link tal WHERE tal.anlass_id = :anlass_id AND tal.aktiv= :aktiv AND tal.kategorie= :kategorie AND tal.abteilung IS NOT NULL ORDER BY tal.abteilung")
 	List<AbteilungEnum> findDistinctByAnlassAndAktivAndKategorie(@Param("anlass_id") UUID anlass_id,
 			@Param("aktiv") boolean aktiv, @Param("kategorie") String kategorie);
 
-	@Query(value = "SELECT DISTINCT tal.anlage FROM teilnehmer_anlass_link tal WHERE tal.anlass_id = :anlass_id AND tal.aktiv= :aktiv AND tal.kategorie= :kategorie AND tal.abteilung= :abteilung AND tal.anlage IS NOT NULL ORDER BY tal.anlage", nativeQuery = true)
+	@NativeQuery("SELECT DISTINCT tal.anlage FROM teilnehmer_anlass_link tal WHERE tal.anlass_id = :anlass_id AND tal.aktiv= :aktiv AND tal.kategorie= :kategorie AND tal.abteilung= :abteilung AND tal.anlage IS NOT NULL ORDER BY tal.anlage")
 	List<AnlageEnum> findDistinctByAnlassAndAktivAndKategorieAndAbteilung(@Param("anlass_id") UUID anlass_id,
 			@Param("aktiv") boolean aktiv, @Param("kategorie") String kategorie, @Param("abteilung") String abteilung);
 }

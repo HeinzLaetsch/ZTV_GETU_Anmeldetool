@@ -8,9 +8,6 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.dom4j.DocumentException;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.transfer.RanglistenEntryDTO;
@@ -46,11 +43,13 @@ import com.opencsv.bean.comparator.LiteralComparator;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 // https://github.com/itext/i7js-examples/tree/develop/src/main/java/com/itextpdf/samples/sandbox/events
 public class RanglistenOutput {
 
 	public static void createTeamwertung(HttpServletResponse response, List<TeamwertungDTO> twDTOs,
-			KategorieEnum kategorie, String titel, String subTitel) throws DocumentException, IOException {
+			KategorieEnum kategorie, String titel, String subTitel) throws IOException {
 		PdfDocument pdf = new PdfDocument(new PdfWriter(response.getOutputStream()));
 		// Document doc = new Document(pdf, PageSize.A4);
 		Document doc = new Document(pdf);
@@ -67,9 +66,9 @@ public class RanglistenOutput {
 		Table table = new Table(UnitValue.createPercentArray(cols)).useAllAvailableWidth();
 		for (TeamwertungDTO tw : twDTOs) {
 			if (tw.getAnzahlResultate() >= anzahl) {
-				printCell(table, String.format("%d", tw.getRang()), false, even);
+				printCell(table, "%d".formatted(tw.getRang()), false, even);
 				printCell(table, tw.getVerein(), true, even);
-				printCell(table, String.format("%.3f", tw.getGesamtPunktzahl()), false, even);
+				printCell(table, "%.3f".formatted(tw.getGesamtPunktzahl()), false, even);
 				even = !even;
 			}
 		}
@@ -78,7 +77,7 @@ public class RanglistenOutput {
 	}
 
 	public static void createRanglistePerVerein(HttpServletResponse response, List<RanglistenEntryDTO> ranglistenDTOs,
-			KategorieEnum kategorie) throws DocumentException, IOException {
+			KategorieEnum kategorie) throws IOException {
 		PdfDocument pdf = new PdfDocument(new PdfWriter(response.getOutputStream()));
 		Document doc = new Document(pdf);
 		PdfFont fontN = PdfFontFactory.createFont(StandardFonts.HELVETICA);
@@ -111,7 +110,7 @@ public class RanglistenOutput {
 				auszeichnungen++;
 			}
 		}
-		Text auszText = new Text("Anzahl Auszeichnungen: " + String.format("%d", auszeichnungen)).setFont(fontB)
+		Text auszText = new Text("Anzahl Auszeichnungen: " + "%d".formatted(auszeichnungen)).setFont(fontB)
 				.setFontSize(12);
 		doc.add(new Paragraph(auszText));
 		return pos;
@@ -123,9 +122,8 @@ public class RanglistenOutput {
 		if (auszeichnung) {
 			ausz = "*";
 		}
-		String name_vorname = String.format("%03d", ranglistenDTO.getRang()) + "  " + ausz + " "
-				+ ranglistenDTO.getName() + " " + ranglistenDTO.getVorname() + "  "
-				+ String.format("%2.3f", ranglistenDTO.getGesamtPunktzahl());
+		String name_vorname = "%03d".formatted(ranglistenDTO.getRang()) + "  " + ausz + " " + ranglistenDTO.getName()
+				+ " " + ranglistenDTO.getVorname() + "  " + "%2.3f".formatted(ranglistenDTO.getGesamtPunktzahl());
 		Text text = new Text(name_vorname).setFontSize(12);
 		if (ranglistenDTO.getRang() < 4) {
 			text = text.setFont(fontB);
@@ -139,7 +137,7 @@ public class RanglistenOutput {
 
 	public static void createRangliste(HttpServletResponse response, Anlass anlass,
 			List<RanglistenEntryDTO> ranglistenDTOs, boolean turner, boolean sprungAverage, String kategorie)
-			throws DocumentException, IOException {
+			throws IOException {
 		PdfDocument pdf = new PdfDocument(new PdfWriter(response.getOutputStream()));
 		Document doc = new Document(pdf, PageSize.A4);
 		TableHeaderEventHandler thEventHandler = new TableHeaderEventHandler(doc, anlass, turner, kategorie);
@@ -201,22 +199,22 @@ public class RanglistenOutput {
 			throws IOException {
 		boolean even = rang % 2 == 0;
 		if (rang == dto.getRang()) {
-			printCell(table, String.format("%d", dto.getRang()), false, even);
+			printCell(table, "%d".formatted(dto.getRang()), false, even);
 		} else {
 			printCell(table, "", even);
 		}
 		printCell(table, dto.getName() + " " + dto.getVorname(), even);
 		// printCell(table, );
-		printCell(table, String.format("%d", dto.getJahrgang()), false, even);
+		printCell(table, "%d".formatted(dto.getJahrgang()), false, even);
 		printCell(table, dto.getVerein(), even);
-		printCell(table, String.format("%.2f", dto.getNoteReck()), false, even);
-		printCell(table, String.format("%d", dto.getRangReck()), false, even);
-		printCell(table, String.format("%.2f", dto.getNoteBoden()), false, even);
-		printCell(table, String.format("%d", dto.getRangBoden()), false, even);
-		printCell(table, String.format("%.2f", dto.getNoteSchaukelringe()), false, even);
-		printCell(table, String.format("%d", dto.getRangSchaukelringe()), false, even);
-		printCell(table, String.format("%.2f", dto.getNoteSprung1()), false, even);
-		printCell(table, String.format("%.2f", dto.getNoteSprung2()), false, even);
+		printCell(table, "%.2f".formatted(dto.getNoteReck()), false, even);
+		printCell(table, "%d".formatted(dto.getRangReck()), false, even);
+		printCell(table, "%.2f".formatted(dto.getNoteBoden()), false, even);
+		printCell(table, "%d".formatted(dto.getRangBoden()), false, even);
+		printCell(table, "%.2f".formatted(dto.getNoteSchaukelringe()), false, even);
+		printCell(table, "%d".formatted(dto.getRangSchaukelringe()), false, even);
+		printCell(table, "%.2f".formatted(dto.getNoteSprung1()), false, even);
+		printCell(table, "%.2f".formatted(dto.getNoteSprung2()), false, even);
 		DecimalFormat df = new DecimalFormat("#0.00");
 		df.setRoundingMode(RoundingMode.HALF_UP);
 		printCell(table, df.format(dto.getNoteZaehlbar() + 0.0005f), false, even);
@@ -225,10 +223,10 @@ public class RanglistenOutput {
 		 * dto.getNoteZaehlbar()), false, even); } else { printCell(table,
 		 * String.format("%.2f", dto.getNoteZaehlbar()), false, even); }
 		 */
-		printCell(table, String.format("%d", dto.getRangSprung()), false, even);
+		printCell(table, "%d".formatted(dto.getRangSprung()), false, even);
 		if (turner) {
-			printCell(table, String.format("%.2f", dto.getNoteBarren()), false, even);
-			printCell(table, String.format("%d", dto.getRangBarren()), false, even);
+			printCell(table, "%.2f".formatted(dto.getNoteBarren()), false, even);
+			printCell(table, "%d".formatted(dto.getRangBarren()), false, even);
 		}
 		df.setRoundingMode(RoundingMode.HALF_UP);
 		String asText = df.format(dto.getGesamtPunktzahl() + 0.0005f);
@@ -239,7 +237,7 @@ public class RanglistenOutput {
 		 * String.format("%.2f", dto.getGesamtPunktzahl()), false, even); }
 		 */
 		if (rang == dto.getRang()) {
-			printCell(table, String.format("%d", dto.getRang()), false, even);
+			printCell(table, "%d".formatted(dto.getRang()), false, even);
 		} else {
 			printCell(table, "", even);
 		}

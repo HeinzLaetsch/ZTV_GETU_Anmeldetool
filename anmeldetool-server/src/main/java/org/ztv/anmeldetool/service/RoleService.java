@@ -24,8 +24,8 @@ public class RoleService {
 	@Autowired
 	OrganisationService orgService;
 
-	@Autowired
-	PersonService personenService;
+	// @Autowired
+	// PersonService personenService;
 
 	@Autowired
 	OrganisationPersonLinkRepository oplRepo;
@@ -45,12 +45,12 @@ public class RoleService {
 		return ResponseEntity.ok(rollenDTO);
 	}
 
-	public ResponseEntity<Collection<RolleDTO>> findAllForUser(String vereinsId, String userId) {
+	public ResponseEntity<Collection<RolleDTO>> findAllForUser(String vereinsId, Person person) {
 		Organisation org = orgService.findOrganisationById(UUID.fromString(vereinsId));
 		if (org == null) {
 			return ResponseEntity.notFound().build();
 		}
-		Person person = personenService.findPersonById(UUID.fromString(userId));
+		// Person person = personenService.findPersonById(UUID.fromString(userId));
 		Iterable<OrganisationPersonLink> opls = oplRepo.findByOrganisationAndPerson(org, person);
 		Collection<RolleDTO> rollenDTO = new ArrayList<RolleDTO>();
 		for (OrganisationPersonLink opl : opls) {

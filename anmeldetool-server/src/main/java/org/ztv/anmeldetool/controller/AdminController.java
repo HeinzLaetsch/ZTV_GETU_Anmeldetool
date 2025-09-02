@@ -6,14 +6,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -66,18 +63,19 @@ import org.ztv.anmeldetool.util.TeilnehmerAnlassLinkMapper;
 import org.ztv.anmeldetool.util.WertungsrichterEinsatzMapper;
 import org.ztv.anmeldetool.util.WertungsrichterMapper;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/admin")
 @Slf4j
-@CrossOrigin(origins = "*", allowedHeaders = "*", allowCredentials = "true")
+// @CrossOrigin(origins = {"http://localhost:8080", "http://localhost:4200"})
 public class AdminController {
 	@Autowired
 	LoginService loginSrv;
 
-	@Autowired
-	AuthenticationManager authenticationManager;
+	// @Autowired
+	// AuthenticationManager authenticationManager;
 
 	@Autowired
 	PersonService personSrv;
@@ -282,7 +280,8 @@ public class AdminController {
 			@RequestParam(name = "userId") String searchUserId) {
 		log.info("param {}", searchUserId);
 		if (searchUserId != null && searchUserId.length() > 0) {
-			return roleSrv.findAllForUser(vereinsId, searchUserId);
+			Person person = personSrv.findPersonById(UUID.fromString(searchUserId));
+			return roleSrv.findAllForUser(vereinsId, person);
 		} else {
 			return roleSrv.findAll();
 		}
@@ -341,7 +340,7 @@ public class AdminController {
 
 	@ExceptionHandler(EntityNotFoundException.class)
 	public ResponseEntity<?> handlerEntityNotFound(EntityNotFoundException ex) {
-		this.log.warn(ex.getMessage());
+		log.warn(ex.getMessage());
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
 	}

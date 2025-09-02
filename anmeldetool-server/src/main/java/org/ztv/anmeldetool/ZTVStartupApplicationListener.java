@@ -3,6 +3,7 @@ package org.ztv.anmeldetool;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -348,11 +349,11 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 	}
 
 	private void createTeilnehmer(Organisation verein, TiTuEnum tiTu, int i) {
-		int random_int = (int) Math.floor(Math.random() * 18);
+		int random_int = (int) Math.floor(ThreadLocalRandom.current().nextDouble() * 18);
 		String surname = SURNAMES[random_int] + "_" + tiTu;
-		random_int = (int) Math.floor(Math.random() * 19);
+		random_int = (int) Math.floor(ThreadLocalRandom.current().nextDouble() * 19);
 		String name = NAMES[random_int] + "_" + i;
-		random_int = (2021 - 45) + (int) Math.floor(Math.random() * 45);
+		random_int = (2021 - 45) + (int) Math.floor(ThreadLocalRandom.current().nextDouble() * 45);
 		Teilnehmer teilnehmer = Teilnehmer.builder().name(name).vorname(surname).jahrgang(random_int).tiTu(tiTu)
 				.organisation(verein).build();
 		teilnehmerService.create(teilnehmer);

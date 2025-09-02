@@ -55,7 +55,7 @@ public class StvContestService {
 		Anlass anlass = anlassSrv.findAnlassById(anlassId);
 		if (anlass == null) {
 			throw new ServiceException(this.getClass(),
-					String.format("Could not find Anlass with id: %s", anlassId.toString()));
+					"Could not find Anlass with id: %s".formatted(anlassId.toString()));
 		}
 
 		List<OrganisationAnlassLink> orgLinks = organisationAnlassLinkRepository.findByAnlassAndAktiv(anlass, true);
@@ -157,7 +157,7 @@ public class StvContestService {
 			return t.getOrganisation().equals(organisation);
 		}).collect(Collectors.toList());
 		if (filtered.size() == 1) {
-			return Optional.of(filtered.get(0));
+			return Optional.of(filtered.getFirst());
 		}
 		log.warn("Mehr als ein Teilnehmer gefunden {} {}", contestTeilnehmer.getNachname(),
 				contestTeilnehmer.getVorname());

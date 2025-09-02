@@ -352,7 +352,7 @@ public class AnlassService {
 		if (pals.size() == 0) {
 			return null;
 		}
-		return pals.get(0);
+		return pals.getFirst();
 	}
 
 	public PersonAnlassLink updateAnlassLink(PersonAnlassLink pal) {
@@ -429,13 +429,13 @@ public class AnlassService {
 		}).collect(Collectors.toList());
 
 		if (teilnahmen.size() > 0) {
-			log.debug("Teilnehmer {}", teilnahmen.get(0).getKategorie());
+			log.debug("Teilnehmer {}", teilnahmen.getFirst().getKategorie());
 			try {
-				log.debug("Teilnehmer {}", teilnahmen.get(0).getTeilnehmer().getName());
+				log.debug("Teilnehmer {}", teilnahmen.getFirst().getTeilnehmer().getName());
 			} catch (Exception ex) {
 				log.warn("Kein Teilnehmer message: {} ", ex.getMessage());
 			}
-			log.debug("Teilnehmer {}", teilnahmen.get(0).getOrganisation().getName());
+			log.debug("Teilnehmer {}", teilnahmen.getFirst().getOrganisation().getName());
 		}
 		return teilnahmen;
 	}
@@ -458,7 +458,7 @@ public class AnlassService {
 		List<OrganisationAnlassLink> teilnahmen = orgAnlassRepo.findByOrganisationAndAnlass(organisation, anlass);
 		if (teilnahmen != null && teilnahmen.size() >= 1) {
 			// TODO Check if Date stays
-			return teilnahmen.get(0);
+			return teilnahmen.getFirst();
 		}
 		return null;
 	}
@@ -499,7 +499,7 @@ public class AnlassService {
 		List<OrganisationAnlassLink> teilnahmen = orgAnlassRepo.findByOrganisationAndAnlass(organisation, anlass);
 		OrganisationAnlassLink organisationAnlassLink;
 		if (teilnahmen.size() != 0) {
-			organisationAnlassLink = teilnahmen.get(0);
+			organisationAnlassLink = teilnahmen.getFirst();
 			organisationAnlassLink.setAktiv(oal.isStartet());
 			organisationAnlassLink.setAnlass(anlass);
 			organisationAnlassLink.setOrganisation(organisation);

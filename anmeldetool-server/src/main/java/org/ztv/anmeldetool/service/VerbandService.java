@@ -32,7 +32,7 @@ public class VerbandService {
 
 	public Verband findByVerbandsKuerzel(String verbandAbkz) {
 		List<Verband> verbaende = verbandRepo.findByVerband(verbandAbkz);
-		return verbaende.get(0);
+		return verbaende.getFirst();
 	}
 
 	public ResponseEntity<Collection<VerbandDTO>> findByVerband(String verbandAbkz) {

@@ -121,7 +121,7 @@ public class PersonService {
 		}
 		Person existingPerson = persRepo.findByBenutzernameIgnoreCase(personDTO.getBenutzername());
 		if (existingPerson != null) {
-			String message = String.format("User existiert in anderem Verein: %s , %s , %s , %s",
+			String message = "User existiert in anderem Verein: %s , %s , %s , %s".formatted(
 					existingPerson.getId(), existingPerson.getEmail(), existingPerson.getName(),
 					existingPerson.getVorname());
 			log.warn(message);
@@ -131,7 +131,7 @@ public class PersonService {
 		// TODO check wenn in mehreren Vereinen !!
 		Organisation organisation = null;
 		if (organisationsId == null && personDTO.getOrganisationids().size() > 0) {
-			organisation = organisationSrv.findOrganisationById(personDTO.getOrganisationids().get(0));
+			organisation = organisationSrv.findOrganisationById(personDTO.getOrganisationids().getFirst());
 		} else {
 			organisation = organisationSrv.findOrganisationById(organisationsId);
 		}
@@ -180,7 +180,7 @@ public class PersonService {
 		if (filteredOpl.size() != 1) {
 			// error
 		}
-		Set<RollenLink> rollenSet = filteredOpl.get(0).getRollenLink();
+		Set<RollenLink> rollenSet = filteredOpl.getFirst().getRollenLink();
 		// check Delete
 		Set<RollenLink> deletedRollen = new HashSet();
 		for (RollenLink rl : rollenSet) {
@@ -207,13 +207,13 @@ public class PersonService {
 				rl.setAktiv(rolleDTO.isAktiv());
 				rl.setDeleted(false);
 				rl.setId(UUID.randomUUID());
-				rl.setLink(filteredOpl.get(0));
+				rl.setLink(filteredOpl.getFirst());
 				Rolle rolle = roleSrv.findByName(rolleDTO.getName());
 				rl.setRolle(rolle);
 				rollenLinkRep.save(rl);
-				filteredOpl.get(0).getRollenLink().add(rl);
+				filteredOpl.getFirst().getRollenLink().add(rl);
 			} else {
-				RollenLink rl = filtered.get(0);
+				RollenLink rl = filtered.getFirst();
 				if (rl.isAktiv() != rolleDTO.isAktiv()) {
 					rl.setAktiv(rolleDTO.isAktiv());
 					rollenLinkRep.save(rl);

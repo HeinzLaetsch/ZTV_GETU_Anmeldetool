@@ -407,7 +407,6 @@ public class RanglistenService {
 				tal.getNotenblatt().setAuszeichnung(false);
 			}
 		}
-		;
 		return tals;
 	}
 }

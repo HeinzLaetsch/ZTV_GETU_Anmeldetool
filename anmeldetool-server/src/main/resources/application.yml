@@ -1,10 +1,8 @@
 server:
   port: 8080
-  servlet:
-    context-path: /
+  servlet.context-path: /
 spring:
-  profiles:
-    active: "prod"
+  profiles.active: "prod"
   flyway:
     locations: ["classpath:/db/migration"]
     clean-on-validation-error: true
@@ -14,18 +12,14 @@ spring:
   jpa:
      database-platform: org.hibernate.dialect.PostgreSQLDialect
      show-sql: "false"
-     properties:
-        hibernate:
-           jdbc:
-              time_zone: "GMT+1"
+     properties.hibernate.jdbc.time_zone: "GMT+1"
               
   datasource:
     url: jdbc:postgresql://db:5432/getuwettkaempfe
     username: postgres
     password: getu@ztv
   jackson:
-     deserialization:
-        adjust-dates-to-context-time-zone: true
+     deserialization.adjust-dates-to-context-time-zone: true
      time-zone: "Europe/Zurich"   
      # time-zone: "UTC"
   mail:
@@ -33,44 +27,32 @@ spring:
      host: "smtp.office365.com"
      # host: "mail.gmx.net"
      port: 587
-     templates:
-        path: "mail-templates"
-<<<<<<< HEAD
-     username: "getu-wettkaempfe-tu@ztv.ch"
-     # username: "heinz.laetsch@gmx.ch"
-     password: secret
-     # password: "secret"
-=======
+     templates.path: "mail-templates"
      username: "getu-wettkaempfe@ztv.ch"
-     # username: "heinz.laetsch1@gmx.ch"
-     password: "GeTuWL@ztv.ch"
->>>>>>> grid
-     properties:
-        mail:
-           smtp:
-              auth: "true"
-              starttls:
-                 enable: "true"
+     password: "-GeTuWL@ztv.ch"
+     properties.mail.smtp:
+          auth: "true"
+          starttls.enable: "true"
      simulate:  "false"
      simulateemail: "heinz.laetsch@gmx.ch"
      
-  thymeleaf:
-      prefix: "classpath:/mail-templates/" 
+  thymeleaf.prefix: "classpath:/mail-templates/"
+  application.name: ztv-anmeldetool
+  cloud.config:
 # this info may be accessed via actuator
-info:
-  app:
-    name: Anmeldetool
-    version: "@version@"
-    buildtime: "@timestamp@"
+info.app:
+  name: Anmeldetool
+  version: "@version@"
+  buildtime: "@timestamp@"
 
-logging:
-  level:
-    org.springframework.cloud: INFO
-    org.springframework.security: INFO
-    org.flywaydb: INFO
-    org.springframework.web.cors: INFO
-    org.hibernate.SQL: INFO
-    org.ztv.anmeldetool.service: INFO
+logging.level.org:
+  springframework:
+    cloud: INFO
+    security: INFO
+    web.cors: INFO
+  flywaydb: INFO
+  hibernate.SQL: INFO
+  ztv.anmeldetool.service: INFO
 # 0 */5 * * * ?
 scheduler:
    reminder:
@@ -82,25 +64,17 @@ scheduler:
    mutationen:
       cron: "0 0 3 * * ?"
       daysbefore: 3
-   published:
-      cron: "0 0 4 * * ?"
+   published.cron: "0 0 4 * * ?"
 
       
 management:
-  endpoints:
-    web:
-      cors:
-        path-mappings: /**
-        allowed-origins: ${CORS_ALLOWED_ORIGINS}
-        allowed-methods: GET, POST, PUT
-        allowed-headers: "*"
-  server:
-    servlet:
-      context-path: /admin
+  endpoints.web.cors:
+    path-mappings: /**
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}
+    allowed-methods: GET, POST, PUT
+    allowed-headers: "*"
+  server.base-path: /admin
   endpoint:
-    beans:
-      enabled: true
-    health:
-      enabled: true
-    info:
-      enabled: true
+    beans.enabled: true
+    health.enabled: true
+    info.enabled: true

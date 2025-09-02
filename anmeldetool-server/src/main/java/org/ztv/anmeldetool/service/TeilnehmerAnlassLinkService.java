@@ -132,7 +132,7 @@ public class TeilnehmerAnlassLinkService {
 		Anlass anlass = anlassSrv.findAnlassById(anlassId);
 		if (anlass == null) {
 			throw new ServiceException(this.getClass(),
-					String.format("Could not find Anlass with id: %s", anlassId.toString()));
+					"Could not find Anlass with id: %s".formatted(anlassId.toString()));
 		}
 
 		List<OrganisationAnlassLink> orgLinks = organisationAnlassLinkRepository.findByAnlassAndAktiv(anlass, true);
@@ -176,7 +176,7 @@ public class TeilnehmerAnlassLinkService {
 
 		if (anlass == null) {
 			throw new ServiceException(this.getClass(),
-					String.format("Could not find Anlass with id: %s", anlassId.toString()));
+					"Could not find Anlass with id: %s".formatted(anlassId.toString()));
 		}
 		List<TeilnehmerAnlassLink> tals = null;
 		// TODO check wieso !

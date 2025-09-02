@@ -9,14 +9,10 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -97,18 +93,20 @@ import org.ztv.anmeldetool.util.WertungsrichterEinsatzMapper;
 import org.ztv.anmeldetool.util.WertungsrichterExport;
 import org.ztv.anmeldetool.util.WertungsrichterMapper;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/admin/anlaesse")
 @Slf4j
-@CrossOrigin(origins = "*", allowedHeaders = "*", allowCredentials = "true")
+//@CrossOrigin(origins = "*", allowedHeaders = "*", allowCredentials = "true")
 public class AnlassAdminController {
 	@Autowired
 	LoginService loginSrv;
 
-	@Autowired
-	AuthenticationManager authenticationManager;
+	// @Autowired
+	// AuthenticationManager authenticationManager;
 
 	@Autowired
 	PersonService personSrv;
@@ -299,7 +297,7 @@ public class AnlassAdminController {
 				return palExImMapper.fromEntity(pal);
 			}).collect(Collectors.toList());
 
-			String reportName = "Wertungsrichter_" + pals.get(0).getAnlass().getAnlassBezeichnung();
+			String reportName = "Wertungsrichter_" + pals.getFirst().getAnlass().getAnlassBezeichnung();
 
 			response.addHeader("Content-Disposition", "attachment; filename=" + reportName + ".csv");
 			response.addHeader("Content-Type", "text/csv");
@@ -545,7 +543,7 @@ public class AnlassAdminController {
 				return talExImMapper.fromEntity(tal);
 			}).collect(Collectors.toList());
 
-			String reportName = "Mutationen_" + tals.get(0).getAnlass().getAnlassBezeichnung();
+			String reportName = "Mutationen_" + tals.getFirst().getAnlass().getAnlassBezeichnung();
 
 			response.addHeader("Content-Disposition", "attachment; filename=" + reportName + ".csv");
 			response.addHeader("Content-Type", "text/csv");
@@ -584,7 +582,7 @@ public class AnlassAdminController {
 				return talExImMapper.fromEntity(tal);
 			}).collect(Collectors.toList());
 
-			String reportName = "Teilnehmer_" + tals.get(0).getAnlass().getAnlassBezeichnung();
+			String reportName = "Teilnehmer_" + tals.getFirst().getAnlass().getAnlassBezeichnung();
 
 			response.addHeader("Content-Disposition", "attachment; filename=" + reportName + ".csv");
 			response.addHeader("Content-Type", "text/csv");

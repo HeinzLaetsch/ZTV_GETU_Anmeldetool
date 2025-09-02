@@ -89,7 +89,7 @@ public class LauflistenService {
 				.findByAnlassAndKategorieOrderByStartgeraetAsc(anlass, kategorie);
 		containerList = containerList.stream().filter(container -> {
 			if (container.getTeilnehmerAnlassLinks() != null && container.getTeilnehmerAnlassLinks().size() > 0) {
-				TiTuEnum tiTuLocal = container.getTeilnehmerAnlassLinks().get(0).getTeilnehmer().getTiTu();
+				TiTuEnum tiTuLocal = container.getTeilnehmerAnlassLinks().getFirst().getTeilnehmer().getTiTu();
 				return titu.equals(tiTuLocal);
 			}
 			return false;
@@ -118,11 +118,11 @@ public class LauflistenService {
 				anlass.getAnlassBezeichnung(), kategorie.toString(), abteilung.toString(), anlage.toString());
 		existierende = existierende.stream().filter(container -> {
 			if (container.getTeilnehmerAnlassLinks() != null && container.getTeilnehmerAnlassLinks().size() > 0
-					&& container.getTeilnehmerAnlassLinks().get(0).getAbteilung() != null) {
+					&& container.getTeilnehmerAnlassLinks().getFirst().getAbteilung() != null) {
 				if (abteilung.equals(AbteilungEnum.UNDEFINED)
-						|| container.getTeilnehmerAnlassLinks().get(0).getAbteilung().equals(abteilung)) {
+						|| container.getTeilnehmerAnlassLinks().getFirst().getAbteilung().equals(abteilung)) {
 					if (anlage.equals(AnlageEnum.UNDEFINED)
-							|| container.getTeilnehmerAnlassLinks().get(0).getAnlage().equals(anlage)) {
+							|| container.getTeilnehmerAnlassLinks().getFirst().getAnlage().equals(anlage)) {
 						return true;
 					}
 				}
@@ -139,7 +139,7 @@ public class LauflistenService {
 				anlage);
 		if (existierende.size() > 0) {
 			throw new ServiceException(LauflistenService.class,
-					String.format("Es existieren schon Lauflisten für Anlass {} und Kategorie {}",
+					"Es existieren schon Lauflisten für Anlass {} und Kategorie {}".formatted(
 							anlass.getAnlassBezeichnung(), kategorie));
 		}
 		try {
@@ -167,7 +167,7 @@ public class LauflistenService {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new ServiceException(LauflistenService.class,
-					String.format("Fehler beim generieren von Lauflisten für Anlass {} und Kategorie {}, {}",
+					"Fehler beim generieren von Lauflisten für Anlass {} und Kategorie {}, {}".formatted(
 							anlass.getAnlassBezeichnung(), kategorie, ex.getMessage()));
 		}
 	}

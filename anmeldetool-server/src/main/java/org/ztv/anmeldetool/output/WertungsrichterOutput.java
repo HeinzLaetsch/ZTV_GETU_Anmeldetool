@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import org.dom4j.DocumentException;
 import org.ztv.anmeldetool.models.PersonAnlassLink;
 import org.ztv.anmeldetool.models.WertungsrichterEinsatz;
 import org.ztv.anmeldetool.transfer.AnmeldeKontrolleDTO;
@@ -31,7 +30,7 @@ public class WertungsrichterOutput {
 	public static float[] headerWidths = { 20.0f, 20.0f, 10.0f, 10.0f, 40.0f };
 
 	public static void createWertungsrichter(OutputStream out, AnmeldeKontrolleDTO anmeldeKontrolle,
-			List<PersonAnlassLink> palBr1, List<PersonAnlassLink> palBr2) throws DocumentException, IOException {
+			List<PersonAnlassLink> palBr1, List<PersonAnlassLink> palBr2) throws IOException {
 		PdfFont fontN = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 		PdfFont fontB = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
 

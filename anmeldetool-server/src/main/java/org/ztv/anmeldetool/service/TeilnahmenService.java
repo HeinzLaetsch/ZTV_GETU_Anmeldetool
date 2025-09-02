@@ -105,7 +105,7 @@ public class TeilnahmenService {
 
 			KategorieEnum letzteKategorie = null;
 			if (entry.getValue().size() == 1) {
-				letzteKategorie = entry.getValue().get(0).getKategorie();
+				letzteKategorie = entry.getValue().getFirst().getKategorie();
 			} else {
 				Optional<TeilnehmerAnlassLink> res = entry.getValue().stream()
 						.filter(tal -> !KategorieEnum.KEIN_START.equals(tal.getKategorie())).max((tal1, tal2) -> {
