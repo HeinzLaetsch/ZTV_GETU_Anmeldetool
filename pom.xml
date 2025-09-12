@@ -56,6 +56,5 @@
 	<modules>
 		<module>anmeldetool-web</module>
 		<module>anmeldetool-server</module>
-        <module>TestSecurity</module>
     </modules>
 </project>

@@ -1,70 +1,60 @@
 package org.ztv.anmeldetool.service;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.ztv.anmeldetool.exception.NotFoundException;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.Verband;
 import org.ztv.anmeldetool.repositories.OrganisationsRepository;
 import org.ztv.anmeldetool.transfer.OrganisationDTO;
-import org.ztv.anmeldetool.util.OrganisationHelper;
+import org.ztv.anmeldetool.util.OrganisationMapper;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 
+ *
  * @author heinz
  */
 @Service("organisationService")
 @Slf4j
+@AllArgsConstructor
 public class OrganisationService {
 
-	@Autowired
-	OrganisationsRepository orgRepo;
+	private static final List<String> ZUERCHER_VERBAND_KUERZEL = List.of("GLZ", "WTU", "AZO", "ZTV");
 
-	@Autowired
-	VerbandService verbandSrv;
+	private final OrganisationsRepository orgRepo;
+	private final VerbandService verbandSrv;
+	private final OrganisationMapper organisationMapper;
 
-	public ResponseEntity<Collection<OrganisationDTO>> getAllOrganisations() {
-		Collection<OrganisationDTO> orgsDto = new ArrayList<OrganisationDTO>();
-		Iterable<Organisation> orgs = orgRepo.findByAktivOrderByName(true);
-		for (Organisation org : orgs) {
-			log.debug("Organisation: " + orgs);
-			orgsDto.add(OrganisationHelper.createOrganisationDTO(org));
-		}
-		return ResponseEntity.ok(orgsDto);
+	public Collection<OrganisationDTO> getAllOrganisations() {
+		Collection<Organisation> orgs = orgRepo.findByAktivOrderByName(true);
+		return organisationMapper.toDtoList(orgs);
 	}
 
 	public List<Organisation> getAllZuercherOrganisationen() {
-		List<Verband> zh_verbaende = new ArrayList<Verband>();
-		zh_verbaende.add(verbandSrv.findByVerbandsKuerzel("GLZ"));
-		zh_verbaende.add(verbandSrv.findByVerbandsKuerzel("WTU"));
-		zh_verbaende.add(verbandSrv.findByVerbandsKuerzel("AZO"));
-		zh_verbaende.add(verbandSrv.findByVerbandsKuerzel("ZTV"));
-
-		List<Organisation> orgs = orgRepo.findZuercherOrganisationen(zh_verbaende);
-		return orgs;
+		List<Verband> zhVerbaende = ZUERCHER_VERBAND_KUERZEL.stream()
+				.map(verbandSrv::findByVerbandsKuerzel)
+				.toList();
+		return orgRepo.findZuercherOrganisationen(zhVerbaende);
 	}
 
 	public Organisation findOrganisationByName(String organisationName) {
-		return orgRepo.findByName(organisationName);
+		return orgRepo.findByName(organisationName).orElseThrow(() -> new NotFoundException(Organisation.class, organisationName));
 	}
 
 	public Organisation findOrganisationById(UUID organisationId) {
-		Optional<Organisation> optOrg = orgRepo.findById(organisationId);
-		return optOrg.get();
+		return orgRepo.findById(organisationId)
+				.orElseThrow(() -> new NotFoundException(Organisation.class, organisationId));
 	}
 
-	public ResponseEntity<OrganisationDTO> create(OrganisationDTO organisationDTO) {
+	public OrganisationDTO create(OrganisationDTO organisationDTO) {
 		Verband verband = verbandSrv.getVerband(organisationDTO.getVerbandId());
-		Organisation organisation = OrganisationHelper.createOrganisation(organisationDTO, verband);
-		organisation = orgRepo.save(organisation);
-		return ResponseEntity.ok(OrganisationHelper.createOrganisationDTO(organisation));
+		Organisation organisation = organisationMapper.toEntity(organisationDTO, verband);
+		Organisation savedOrganisation = orgRepo.save(organisation);
+		return organisationMapper.toDto(savedOrganisation);
 	}
 }

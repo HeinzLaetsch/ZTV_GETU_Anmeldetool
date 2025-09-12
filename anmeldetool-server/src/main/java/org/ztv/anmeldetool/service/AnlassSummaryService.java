@@ -1,11 +1,11 @@
 package org.ztv.anmeldetool.service;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.KategorieEnum;
@@ -16,22 +16,25 @@ import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.models.WertungsrichterBrevetEnum;
 import org.ztv.anmeldetool.transfer.AnlassSummaryDTO;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service("anlassSummaryService")
 @Slf4j
+@RequiredArgsConstructor
 public class AnlassSummaryService {
-	@Autowired
-	AnlassService anlassSrv;
+	private static final int ATHLETES_PER_WR = 15;
+
+	private final AnlassService anlassSrv;
 
 	public Collection<AnlassSummaryDTO> getAnlassSummaries(UUID orgId, boolean onlyAktiveAnlaesse) {
 		List<Anlass> anlaesse = anlassSrv.getAnlaesse(onlyAktiveAnlaesse);
 		if (anlaesse != null) {
-			return anlaesse.stream().map(anlass -> {
-				return getAnlassSummary(anlass.getId(), orgId);
-			}).collect(Collectors.toList());
+			return anlaesse.stream()
+					.map(anlass -> getAnlassSummary(anlass.getId(), orgId))
+					.collect(Collectors.toList());
 		}
-		return null;
+		return Collections.emptyList();
 	}
 
 	public AnlassSummaryDTO getAnlassSummary(UUID anlassId, UUID orgId) {
@@ -63,13 +66,11 @@ public class AnlassSummaryService {
 		boolean br2Ok = false;
 		if (oalResult.isAktiv()) {
 			List<TeilnehmerAnlassLink> links = anlassSrv.getTeilnahmen(anlassId, orgId, false);
-			startBr1 = (int) links.stream().filter(link -> {
-				if (link.getKategorie() != null) {
-					return link.getKategorie().isJugend();
-				} else {
-					return false;
-				}
-			}).count();
+
+			startBr1 = (int) links.stream()
+					.filter(l -> l.getKategorie() != null && l.getKategorie().isJugend())
+					.count();
+
 			startK1 = getStartendeForKategorie(links, KategorieEnum.K1);
 			startK2 = getStartendeForKategorie(links, KategorieEnum.K2);
 			startK3 = getStartendeForKategorie(links, KategorieEnum.K3);
@@ -82,13 +83,10 @@ public class AnlassSummaryService {
 			startKD = getStartendeForKategorie(links, KategorieEnum.KD);
 			startKH = getStartendeForKategorie(links, KategorieEnum.KH);
 
-			startBr2 = (int) links.stream().filter(link -> {
-				if (link.getKategorie() != null) {
-					return link.getKategorie().isAktiv();
-				} else {
-					return false;
-				}
-			}).count();
+			startBr2 = (int) links.stream()
+					.filter(l -> l.getKategorie() != null && l.getKategorie().isAktiv())
+					.count();
+
 			List<PersonAnlassLink> pals = anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId,
 					WertungsrichterBrevetEnum.Brevet_1);
 			gemeldeteBr1 = pals.size();
@@ -96,8 +94,8 @@ public class AnlassSummaryService {
 			gemeldeteBr2 = pals.size();
 			// TODO check anzahl
 			// TODO store anzahl within config
-			br1Ok = (Math.ceil(startBr1 / 15.0f)) <= gemeldeteBr1;
-			br2Ok = (Math.ceil(startBr2 / 15.0f)) <= gemeldeteBr2;
+			br1Ok = Math.ceil(startBr1 / (float) ATHLETES_PER_WR) <= gemeldeteBr1;
+			br2Ok = Math.ceil(startBr2 / (float) ATHLETES_PER_WR) <= gemeldeteBr2;
 		}
 		AnlassSummaryDTO asDto = AnlassSummaryDTO.builder().anlassId(anlassId).organisationsId(orgId)
 				.startet(oalResult.isAktiv()).verlaengerungsDate(oalResult.getVerlaengerungsDate())
@@ -110,14 +108,11 @@ public class AnlassSummaryService {
 	}
 
 	private int getStartendeForKategorie(List<TeilnehmerAnlassLink> links, KategorieEnum kategorie) {
-		return (int) links.stream().filter(link -> {
-			if (link.getKategorie() != null) {
-				return link.getKategorie().equals(kategorie) && (link.getMeldeStatus().equals(MeldeStatusEnum.STARTET)
-						|| link.getMeldeStatus().equals(MeldeStatusEnum.NEUMELDUNG));
-			} else {
-				return false;
-			}
-		}).count();
-
+		return (int) links.stream()
+				.filter(l -> l.getKategorie() != null
+						&& l.getKategorie().equals(kategorie)
+						&& (l.getMeldeStatus().equals(MeldeStatusEnum.STARTET)
+							|| l.getMeldeStatus().equals(MeldeStatusEnum.NEUMELDUNG)))
+				.count();
 	}
 }

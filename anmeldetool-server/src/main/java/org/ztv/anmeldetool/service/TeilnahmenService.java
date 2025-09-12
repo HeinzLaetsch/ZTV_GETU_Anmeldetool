@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.ztv.anmeldetool.exception.EntityNotFoundException;
+import org.ztv.anmeldetool.exception.NotFoundException;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.MeldeStatusEnum;
@@ -220,7 +220,7 @@ public class TeilnahmenService {
 	}
 
 	public TeilnahmenDTO updateTeilnahmen(int jahr, UUID orgId, TeilnahmenDTO teilnahmenDto)
-			throws EntityNotFoundException {
+			throws NotFoundException {
 		Map<UUID, Anlass> anlassCache = new HashMap<>();
 
 		TeilnehmerDTO teilnehmerDto = teilnahmenDto.getTeilnehmer();

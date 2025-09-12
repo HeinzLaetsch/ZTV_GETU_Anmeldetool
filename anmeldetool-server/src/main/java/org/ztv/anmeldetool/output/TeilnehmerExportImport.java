@@ -1,4 +1,4 @@
-package org.ztv.anmeldetool.util;
+package org.ztv.anmeldetool.output;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.ztv.anmeldetool.exception.EntityNotFoundException;
+import org.ztv.anmeldetool.exception.NotFoundException;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.MeldeStatusEnum;
@@ -29,38 +31,30 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service("teilnehmerService")
 @Slf4j
+@AllArgsConstructor
 public class TeilnehmerService {
+  private final OrganisationService organisationSrv;
+  private final AnlassService anlassSrv;
+  private final TeilnehmerRepository teilnehmerRepository;
 
-	@Autowired
-	OrganisationService organisationSrv;
+  private final TeilnehmerAnlassLinkRepository teilnehmerAnlassLinkRepository;
+  private final TeilnehmerAnlassLinkMapper talMapper;
 
-	@Autowired
-	AnlassService anlassSrv;
-
-	@Autowired
-	TeilnehmerRepository teilnehmerRepository;
-
-	@Autowired
-	TeilnehmerAnlassLinkRepository teilnehmerAnlassLinkRepository;
-
-	@Autowired
-	TeilnehmerAnlassLinkMapper talMapper;
-
-	public ResponseEntity<Integer> countTeilnehmerByOrganisation(UUID orgId) {
+	public long countTeilnehmerByOrganisation(UUID orgId) {
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		if (organisation == null) {
-			return ResponseEntity.notFound().build();
+			throw new NotFoundException(Organisation.class, orgId);
 		}
-		int anzahl = teilnehmerRepository.countByOrganisation(organisation);
-		return ResponseEntity.ok(anzahl);
+    long anzahl = teilnehmerRepository.countByOrganisation(organisation);
+		return anzahl;
 	}
 
-	public Collection<Teilnehmer> findTeilnehmerByOrganisation(UUID orgId, Pageable pageable) {
+	public Page<Teilnehmer> findTeilnehmerByOrganisation(UUID orgId, Pageable pageable) {
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		if (organisation == null) {
 			return null;
 		}
-		Collection<Teilnehmer> teilnehmerListe = teilnehmerRepository.findByOrganisation(organisation, pageable);
+		Page<Teilnehmer> teilnehmerListe = teilnehmerRepository.findByOrganisation(organisation, pageable);
 		return teilnehmerListe;
 	}
 
@@ -76,10 +70,7 @@ public class TeilnehmerService {
 				}
 				return tal1.getKategorie().compareTo(tal2.getKategorie());
 			});
-			KategorieEnum letzteKategorie = null;
-			if (res.isPresent()) {
-				letzteKategorie = res.get().getKategorie();
-			}
+			KategorieEnum letzteKategorie = res.map(TeilnehmerAnlassLink::getKategorie).orElse(null);
 			TeilnehmerDTO teilnehmerDTO = TeilnehmerHelper.createTeilnehmerDTO(teilnehmer, orgId, letzteKategorie);
 			teilnehmerDTOs.add(teilnehmerDTO);
 		}
@@ -87,11 +78,8 @@ public class TeilnehmerService {
 	}
 
 	public Teilnehmer findTeilnehmerById(UUID id) {
-		Optional<Teilnehmer> teilnehmerOptional = teilnehmerRepository.findById(id);
-		if (teilnehmerOptional.isEmpty()) {
-			return null;
-		}
-		return teilnehmerOptional.get();
+		return teilnehmerRepository.findById(id)
+				.orElseThrow(() -> new NotFoundException(Teilnehmer.class, id));
 	}
 
 	public List<Teilnehmer> findTeilnehmerByBenutzername(String name, String vorname) {
@@ -141,30 +129,30 @@ public class TeilnehmerService {
 		if (teilnehmerOptional.isEmpty()) {
 			return ResponseEntity.notFound().build();
 		}
-		List<TeilnehmerAnlassLink> links = this.teilnehmerAnlassLinkRepository
-				.findByTeilnehmer(teilnehmerOptional.get());
+		Teilnehmer teilnehmer = teilnehmerOptional.get();
+		List<TeilnehmerAnlassLink> links = this.teilnehmerAnlassLinkRepository.findByTeilnehmer(teilnehmer);
 		this.teilnehmerAnlassLinkRepository.deleteAll(links);
-		teilnehmerRepository.delete(teilnehmerOptional.get());
+		teilnehmerRepository.delete(teilnehmer);
 		return ResponseEntity.ok(teilnehmerId);
 	}
 
-	public TeilnehmerDTO update(UUID orgId, TeilnehmerDTO teilnehmerDTO) throws EntityNotFoundException {
+	public TeilnehmerDTO update(UUID orgId, TeilnehmerDTO teilnehmerDTO) throws NotFoundException {
 		Organisation organisation = organisationSrv.findOrganisationById(orgId);
 		if (organisation == null) {
-			throw new EntityNotFoundException(Organisation.class, orgId);// ResponseEntity.notFound().build();
+			throw new NotFoundException(Organisation.class, orgId);// ResponseEntity.notFound().build();
 		}
 		return update(organisation, teilnehmerDTO);
 	}
 
-	public TeilnehmerDTO update(TeilnehmerDTO teilnehmerDTO) throws EntityNotFoundException {
+	public TeilnehmerDTO update(TeilnehmerDTO teilnehmerDTO) throws NotFoundException {
 		return update(teilnehmerDTO.getOrganisationid(), teilnehmerDTO);
 	}
 
-	public TeilnehmerDTO update(Organisation organisation, TeilnehmerDTO teilnehmerDTO) throws EntityNotFoundException {
+	public TeilnehmerDTO update(Organisation organisation, TeilnehmerDTO teilnehmerDTO) throws NotFoundException {
 		Optional<Teilnehmer> teilnehmerOptional = teilnehmerRepository.findById(teilnehmerDTO.getId());
 		if (teilnehmerOptional.isEmpty()) {
 			log.warn("Could not find Teilnehmer with ID: {}", teilnehmerDTO.getId());
-			throw new EntityNotFoundException(Teilnehmer.class, teilnehmerDTO.getId()); // ResponseEntity.notFound().build();
+			throw new NotFoundException(Teilnehmer.class, teilnehmerDTO.getId()); // ResponseEntity.notFound().build();
 		}
 		Teilnehmer teilnehmer2 = TeilnehmerHelper.createTeilnehmer(teilnehmerDTO);
 
@@ -192,9 +180,10 @@ public class TeilnehmerService {
 		if (teilnehmerOptional.isEmpty()) {
 			return null;
 		}
+		Teilnehmer teilnehmer = teilnehmerOptional.get();
 
 		Iterable<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository
-				.findByTeilnehmerAndAnlass(teilnehmerOptional.get(), anlass);
+				.findByTeilnehmerAndAnlass(teilnehmer, anlass);
 		TeilnehmerAnlassLink teilnehmerAnlassLink;
 		if (teilnahmen.iterator().hasNext()) {
 			teilnehmerAnlassLink = teilnahmen.iterator().next();
@@ -203,8 +192,8 @@ public class TeilnehmerService {
 		}
 
 		teilnehmerAnlassLink.setAnlass(anlass);
-		teilnehmerAnlassLink.setOrganisation(teilnehmerOptional.get().getOrganisation());
-		teilnehmerAnlassLink.setTeilnehmer(teilnehmerOptional.get());
+		teilnehmerAnlassLink.setOrganisation(teilnehmer.getOrganisation());
+		teilnehmerAnlassLink.setTeilnehmer(teilnehmer);
 		teilnehmerAnlassLink.setAktiv(true);
 		if (KategorieEnum.KEIN_START.equals(tal.getKategorie())) {
 			teilnehmerAnlassLink.setAktiv(false);
