@@ -25,12 +25,13 @@ import lombok.experimental.SuperBuilder;
 public class WertungsrichterEinsatz extends Base {
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "PERSON_ANLASS_LINK_ID" + "", nullable = false, insertable = true, updatable = true)
+	@JoinColumn(name = "PERSON_ANLASS_LINK_ID", nullable = false, insertable = true, updatable = true)
 	@ToString.Exclude
 	private PersonAnlassLink personAnlassLink;
 
 	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "WERTUNGSRICHTER_SLOT_ID", referencedColumnName = "ID")
+	@JoinColumn(name = "WERTUNGSRICHTER_SLOT_ID")
+  // , referencedColumnName = "ID"
 	private WertungsrichterSlot wertungsrichterSlot;
 
 	private boolean eingesetzt;

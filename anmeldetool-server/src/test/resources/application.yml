@@ -1,0 +1,60 @@
+spring:
+  profiles:
+    active: test
+  flyway:
+    locations: classpath:/db/migration/test
+    url: jdbc:h2:mem:test;mode=postgresql;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;NON_KEYWORDS=KEY
+    user: sa
+    password:
+    enabled: false
+  jpa:
+    show-sql: true
+    properties.hibernate.jdbc.time_zone: "GMT+1"
+    properties.hibernate.globally_quoted_identifiers: true
+    hibernate:
+      ddl-auto: none
+    generate-ddl: false
+    defer-datasource-initialization: false
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:test;mode=postgresql;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;NON_KEYWORDS=KEY
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  mail:
+    enabled: "false"
+    host: ""
+    port: 587
+    templates.path: ""
+    username: ""
+    password: ""
+    properties.mail.smtp:
+      auth: "true"
+      starttls.enable: "true"
+    simulate:  "false"
+    simulateemail: ""
+scheduler:
+  reminder:
+    cron: "0 0 1 * * ?"
+    daysbefore: 3
+  closed:
+    cron: "0 0 2 * * ?"
+    daysafter: 1
+  mutationen:
+    cron: "0 0 3 * * ?"
+    daysbefore: 3
+  published.cron: "0 0 4 * * ?"
+logging:
+  level:
+    root: warn
+    org:
+      ztv: debug
+      flywaydb: info
+
+management:
+  endpoints:
+    web:
+      cors:
+        allowed-origins: http://localhost:4200

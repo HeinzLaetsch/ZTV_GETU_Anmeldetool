@@ -1,0 +1,12 @@
+[
+  {
+    "name": "ANMELDER",
+    "beschreibung": "Kann Anmeldungen für einen Verein vornehmen",
+    "publicAssignable": true
+  },
+  {
+    "name": "VEREINSVERANTWORTLICHER",
+    "beschreibung": "Hauptverantwortlicher für einen Verein",
+    "publicAssignable": false
+  }
+]

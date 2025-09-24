@@ -1,0 +1,17 @@
+[
+  {
+    "kategorie": "K5",
+    "tiTu": "Ti",
+    "maxAuszeichnungen": 10
+  },
+  {
+    "kategorie": "K5",
+    "tiTu": "Tu",
+    "maxAuszeichnungen": 8
+  },
+  {
+    "kategorie": "K6",
+    "tiTu": "Ti",
+    "maxAuszeichnungen": 5
+  }
+]

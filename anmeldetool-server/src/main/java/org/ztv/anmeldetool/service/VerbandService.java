@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.ztv.anmeldetool.exception.EntityNotFoundException;
 import org.ztv.anmeldetool.models.Verband;
 import org.ztv.anmeldetool.repositories.VerbandsRepository;
 import org.ztv.anmeldetool.transfer.VerbandDTO;
@@ -31,19 +32,15 @@ public class VerbandService {
 	}
 
 	public Verband findByVerbandsKuerzel(String verbandAbkz) {
-		List<Verband> verbaende = verbandRepo.findByVerband(verbandAbkz);
-		return verbaende.getFirst();
+		Verband verband = verbandRepo.findByVerband(verbandAbkz).orElseThrow();
+		return verband;
 	}
 
-	public ResponseEntity<Collection<VerbandDTO>> findByVerband(String verbandAbkz) {
-		Iterable<Verband> verbaende = verbandRepo.findByVerband(verbandAbkz);
-		Collection<VerbandDTO> verbaendeDTO = new ArrayList<VerbandDTO>();
-		for (Verband verband : verbaende) {
+	public ResponseEntity<VerbandDTO> findByVerband(String verbandAbkz) {
+		Verband verband = verbandRepo.findByVerband(verbandAbkz).orElseThrow();
 			VerbandDTO verbandDTO = VerbandDTO.builder().id(verband.getId()).verband(verband.getVerband())
 					.verband_long(verband.getVerbandLong()).build();
-			verbaendeDTO.add(verbandDTO);
-		}
-		return ResponseEntity.ok(verbaendeDTO);
+		return ResponseEntity.ok(verbandDTO);
 	}
 
 	public ResponseEntity<Collection<VerbandDTO>> getVerbaende() {

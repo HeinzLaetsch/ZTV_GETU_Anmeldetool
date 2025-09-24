@@ -1,0 +1,20 @@
+[
+  {
+    "geraet": "BODEN",
+    "note_1": 9.2,
+    "note_2": 9.0,
+    "zaehlbar": 9.1,
+    "erfasst": true,
+    "checked": true,
+    "startOrder": 1
+  },
+  {
+    "geraet": "RECK",
+    "note_1": 8.5,
+    "note_2": 8.7,
+    "zaehlbar": 8.6,
+    "erfasst": true,
+    "checked": false,
+    "startOrder": 2
+  }
+]

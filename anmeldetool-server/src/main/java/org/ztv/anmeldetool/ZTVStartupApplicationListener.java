@@ -7,6 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.ztv.anmeldetool.models.Anlass;
@@ -42,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@Profile("!test")
 public class ZTVStartupApplicationListener implements ApplicationListener<ContextRefreshedEvent> {
 
 	@Autowired
@@ -90,8 +92,7 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 		Organisation ztv = orgRepo.findAllByName("ZTV");
 		if (ztv == null) {
 			log.info("Anmeldetool needs initialising");
-			Iterable<Verband> verbaende = verbandRepo.findByVerband(VerbandEnum.STV.name());
-			Verband verband = verbaende.iterator().next();
+			Verband verband = verbandRepo.findByVerband(VerbandEnum.STV.name()).orElseThrow();
 
 			ztv = Organisation.builder().name("ZTV").verband(verband).build();
 			ztv = orgRepo.save(ztv);
@@ -197,8 +198,7 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 	private void createVerein1() {
 		log.info("Create Verein1");
 		String password = "pw";
-		Iterable<Verband> verbaende = verbandRepo.findByVerband(VerbandEnum.GLZ.name());
-		Verband verband = verbaende.iterator().next();
+		Verband verband = verbandRepo.findByVerband(VerbandEnum.GLZ.name()).orElseThrow();
 
 		// Verein erstellen
 		Organisation verein1 = Organisation.builder().name("TV Verein1").verband(verband).build();
