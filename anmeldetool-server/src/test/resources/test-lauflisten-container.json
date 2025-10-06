@@ -1,0 +1,23 @@
+[
+  {
+    "kategorie": "K1",
+    "startgeraet": "BODEN",
+    "erfasst": false,
+    "checked": false,
+    "key": 1001
+  },
+  {
+    "kategorie": "K1",
+    "startgeraet": "RECK",
+    "erfasst": true,
+    "checked": false,
+    "key": 1002
+  },
+  {
+    "kategorie": "K5",
+    "startgeraet": "SPRUNG",
+    "erfasst": false,
+    "checked": false,
+    "key": 2001
+  }
+]

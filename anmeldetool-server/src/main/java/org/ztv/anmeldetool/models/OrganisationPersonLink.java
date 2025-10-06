@@ -10,6 +10,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -18,6 +20,7 @@ import lombok.ToString;
 @Table(name = "organisation_person_link")
 @Getter
 @Setter
+@AllArgsConstructor
 public class OrganisationPersonLink extends Base {
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -34,9 +37,14 @@ public class OrganisationPersonLink extends Base {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "link")
 	@ToString.Exclude
 	private Set<RollenLink> rollenLink;
-	// private Set<RollenEnum> rollen;
 
+  @Builder
 	public OrganisationPersonLink() {
-		this.rollenLink = new HashSet<RollenLink>();
+		this.rollenLink = new HashSet<>();
 	}
+  public OrganisationPersonLink(Organisation organisation, Person person) {
+    this.organisation = organisation;
+    this.person = person;
+    this.rollenLink = new HashSet<>();
+  }
 }

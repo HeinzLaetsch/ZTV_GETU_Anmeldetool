@@ -1,0 +1,16 @@
+[
+  {
+    "key": "1234",
+    "geraet": "BARREN",
+    "abloesung": 1,
+    "erfasst": false,
+    "checked": false
+  },
+  {
+    "key": "1235",
+    "geraet": "BODEN",
+    "abloesung": 2,
+    "erfasst": true,
+    "checked": true
+  }
+]

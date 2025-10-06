@@ -18,7 +18,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity()
-@Table(name = "PERSON")
+@Table(name = "person")
 @Getter
 @Setter
 public class Person extends Base {

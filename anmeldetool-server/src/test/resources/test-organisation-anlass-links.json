@@ -1,0 +1,12 @@
+[
+  {
+    "reminderMeldeschlussSent": false,
+    "anmeldeKontrolleSent": false,
+    "reminderMutationsschlussSent": false
+  },
+  {
+    "reminderMeldeschlussSent": true,
+    "anmeldeKontrolleSent": true,
+    "reminderMutationsschlussSent": false
+  }
+]

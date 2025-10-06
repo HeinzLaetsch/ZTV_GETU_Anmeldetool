@@ -5,6 +5,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.ztv.anmeldetool.models.FlywayHistory;
 import org.ztv.anmeldetool.repositories.FlywayRepository;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service("flywayService")
 @Slf4j
+@Profile("!test")
 public class FlywayService {
 
 	private FlywayRepository flywayRepository;

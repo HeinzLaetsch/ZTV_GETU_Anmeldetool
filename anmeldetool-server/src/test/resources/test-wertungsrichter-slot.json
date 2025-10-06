@@ -1,0 +1,20 @@
+[
+  {
+    "reihenfolge": 1,
+    "brevet": "Brevet_1",
+    "tag": "2024-07-20",
+    "start_zeit": "09:00:00",
+    "end_zeit": "12:00:00",
+    "beschreibung": "Vormittag Brevet 1",
+    "egalSlot": false
+  },
+  {
+    "reihenfolge": 2,
+    "brevet": "Brevet_2",
+    "tag": "2024-07-20",
+    "start_zeit": "13:00:00",
+    "end_zeit": "17:00:00",
+    "beschreibung": "Nachmittag Brevet 2",
+    "egalSlot": true
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "benutzername": "jdoe_from_file",
+    "name": "Doe",
+    "vorname": "John",
+    "email": "john.doe.file@example.com",
+    "password": "secret_from_file"
+  },
+  {
+    "benutzername": "asmith_from_file",
+    "name": "Smith",
+    "vorname": "Anna",
+    "email": "anna.smith.file@example.com",
+    "password": "another_secret"
+  },
+  {
+    "benutzername": "1aaa_from_file",
+    "name": "Aaa",
+    "vorname": "John",
+    "email": "john.aaa.file@example.com",
+    "password": "secret_from_file"
+  },
+  {
+    "benutzername": "2bbb_from_file",
+    "name": "Bbb",
+    "vorname": "John",
+    "email": "john.bbb.file@example.com",
+    "password": "secret_from_file"
+  },
+  {
+    "benutzername": "3ccc_from_file",
+    "name": "Ccc",
+    "vorname": "John",
+    "email": "john.ccc.file@example.com",
+    "password": "secret_from_file"
+  },
+  {
+    "benutzername": "4ddd_from_file",
+    "name": "Ddd",
+    "vorname": "John",
+    "email": "john.ddd.file@example.com",
+    "password": "secret_from_file"
+  }
+]

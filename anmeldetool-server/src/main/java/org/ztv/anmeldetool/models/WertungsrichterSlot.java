@@ -20,7 +20,7 @@ import lombok.ToString;
 public class WertungsrichterSlot extends Base {
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "ANLASS_ID" + "", nullable = false, insertable = true, updatable = true)
+	@JoinColumn(name = "ANLASS_ID", nullable = false, insertable = true, updatable = true)
 	@ToString.Exclude
 	private Anlass anlass;
 

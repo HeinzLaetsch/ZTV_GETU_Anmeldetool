@@ -1,0 +1,12 @@
+[
+  {
+    "brevet": "Brevet_1",
+    "gueltig": true,
+    "letzterFk": "2023-10-15"
+  },
+  {
+    "brevet": "Brevet_2",
+    "gueltig": false,
+    "letzterFk": "2020-05-20"
+  }
+]

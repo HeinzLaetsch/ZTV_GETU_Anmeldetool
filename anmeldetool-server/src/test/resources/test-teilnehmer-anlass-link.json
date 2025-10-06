@@ -1,0 +1,34 @@
+[
+  {
+    "kategorie": "K1",
+    "meldeStatus": "STARTET",
+    "abteilung": "ABTEILUNG_1",
+    "anlage": "ANLAGE_1",
+    "startgeraet": "BODEN",
+    "startnummer": 101
+  },
+  {
+    "kategorie": "K1",
+    "meldeStatus": "STARTET",
+    "abteilung": "ABTEILUNG_1",
+    "anlage": "ANLAGE_1",
+    "startgeraet": "RECK",
+    "startnummer": 102
+  },
+  {
+    "kategorie": "K5",
+    "meldeStatus": "NEUMELDUNG",
+    "abteilung": "ABTEILUNG_2",
+    "anlage": "ANLAGE_2",
+    "startgeraet": "SPRUNG",
+    "startnummer": 201
+  },
+  {
+    "kategorie": "K5",
+    "meldeStatus": "VERLETZT",
+    "abteilung": "ABTEILUNG_2",
+    "anlage": "ANLAGE_2",
+    "startgeraet": "BARREN",
+    "startnummer": 202
+  }
+]

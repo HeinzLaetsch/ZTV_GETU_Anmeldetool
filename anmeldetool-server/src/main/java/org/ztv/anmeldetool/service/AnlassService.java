@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -48,6 +50,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Service("anlassService")
 @Slf4j
+@AllArgsConstructor
 public class AnlassService {
 
 	@Autowired
