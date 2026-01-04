@@ -1,6 +1,7 @@
 package org.ztv.anmeldetool.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.NotSupportedException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -24,8 +25,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.ztv.anmeldetool.models.LoginData;
+import org.ztv.anmeldetool.models.Organisation;
+import org.ztv.anmeldetool.models.Person;
 import org.ztv.anmeldetool.service.AnlassService;
 import org.ztv.anmeldetool.service.LoginService;
+import org.ztv.anmeldetool.service.OrganisationPersonLinkService;
 import org.ztv.anmeldetool.service.OrganisationService;
 import org.ztv.anmeldetool.service.PersonService;
 import org.ztv.anmeldetool.service.RoleService;
@@ -50,9 +54,9 @@ public class AdminController {
   private final PersonService personSrv;
   private final RoleService roleSrv;
   private final OrganisationService organisationSrv;
+  private final OrganisationPersonLinkService orgPersLinkSrv;
   private final VerbandService verbandsSrv;
   private final WertungsrichterService wertungsrichterSrv;
-  private final AnlassService anlassSrv;
   private final TeilnehmerService teilnehmerSrv;
 
   @PostMapping("/login")
@@ -75,11 +79,12 @@ public class AdminController {
   public ResponseEntity<Collection<TeilnehmerDTO>> getTeilnehmer(@PathVariable UUID orgId,
       @RequestParam int page, @RequestParam int size) {
     Pageable pageable = PageRequest.of(page, size);
-    return teilnehmerSrv.findTeilnehmerDtoByOrganisation(orgId, pageable);
+    Organisation organisation = organisationSrv.findById(orgId);
+    return teilnehmerSrv.findTeilnehmerDtoByOrganisation(organisation, pageable);
   }
 
   @GetMapping("/organisationen/{orgId}/teilnehmer/count")
-  public ResponseEntity<Integer> countTeilnehmer(@PathVariable UUID orgId) {
+  public long countTeilnehmer(@PathVariable UUID orgId) {
     return teilnehmerSrv.countTeilnehmerByOrganisation(orgId);
   }
 
@@ -104,7 +109,11 @@ public class AdminController {
 
   @GetMapping("/organisationen/{orgId}/starts")
   public ResponseEntity<Collection<OrganisationAnlassLinkDTO>> getStarts(@PathVariable UUID orgId) {
+    /*
     return ResponseEntity.ok(organisationSrv.getStarts(orgId));
+
+     */
+    throw new UnsupportedOperationException("Not implemented yet");
   }
 
   @GetMapping("/verbaende")
@@ -136,7 +145,7 @@ public class AdminController {
   @GetMapping("/user")
   public ResponseEntity<Collection<PersonDTO>> getUsersInOrganisation(
       @RequestHeader("vereinsid") UUID vereinsId) {
-    return ResponseEntity.ok(personSrv.findPersonsByOrganisation(vereinsId));
+    return ResponseEntity.ok(personSrv.findPersonsByOrganisationDTO(vereinsId));
   }
 
   @GetMapping("/user/benutzernamen/{benutzername}")
@@ -147,25 +156,30 @@ public class AdminController {
 
   @GetMapping("/role")
   public ResponseEntity<Collection<RolleDTO>> getRoles(
-      @RequestHeader("vereinsid") String vereinsId,
-      @RequestParam Optional<String> userId) {
-    return ResponseEntity.ok(roleSrv.findRolesForUser(vereinsId, userId));
+      @RequestHeader("vereinsid") UUID vereinsId,
+      @RequestParam Optional<UUID> userId) {
+    Organisation organisation = organisationSrv.findById(vereinsId);
+    return userId.map(uuid -> ResponseEntity.ok(orgPersLinkSrv.findRolesForUser(organisation, personSrv.findPersonById(uuid))))
+        .orElseGet(() -> ResponseEntity.ok(roleSrv.findAll()));
   }
 
   @GetMapping("/user/{id}/wertungsrichter")
   public ResponseEntity<WertungsrichterDTO> getWertungsrichterForUser(@PathVariable UUID id) {
-    return ResponseEntity.ok(wertungsrichterSrv.getWertungsrichterDtoByPersonId(id));
-  }
+    Person person = personSrv.findPersonById(id);
+    WertungsrichterDTO wertungsrichterDTO = wertungsrichterSrv.getWertungsrichterByPerson(person);
+    return ResponseEntity.ok(wertungsrichterDTO);
+}
 
   @PutMapping("/user/{id}/wertungsrichter")
   public ResponseEntity<WertungsrichterDTO> updateWertungsrichter(@PathVariable UUID id,
       @RequestBody WertungsrichterDTO wertungsrichterDTO) {
-    return ResponseEntity.ok(wertungsrichterSrv.updateWertungsrichter(id, wertungsrichterDTO));
+    return ResponseEntity.ok(wertungsrichterSrv.update(id, wertungsrichterDTO));
   }
 
   @DeleteMapping("/user/{id}/wertungsrichter")
   public ResponseEntity<Void> deleteWertungsrichter(@PathVariable UUID id) {
-    wertungsrichterSrv.deleteWertungsrichterByPersonId(id);
+    Person person = personSrv.findPersonById(id);
+    wertungsrichterSrv.deleteWertungsrichterByPerson(person);
     return ResponseEntity.noContent().build();
   }
 }

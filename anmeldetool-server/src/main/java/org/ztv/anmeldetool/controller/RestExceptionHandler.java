@@ -1,6 +1,7 @@
 
 package org.ztv.anmeldetool.controller;
 
+import java.util.NoSuchElementException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -20,7 +21,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         log.warn(ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
-
+  @ExceptionHandler(NoSuchElementException.class)
+  protected ResponseEntity<Object> handleElementNotFound(NotFoundException ex) {
+    log.warn(ex.getMessage());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+  }
     @ExceptionHandler(ServiceException.class)
     protected ResponseEntity<Object> handleServiceException(ServiceException ex) {
         log.warn("Service exception: {}", ex.getMessage());

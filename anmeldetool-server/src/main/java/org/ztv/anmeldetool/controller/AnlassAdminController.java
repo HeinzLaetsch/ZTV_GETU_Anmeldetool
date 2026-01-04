@@ -9,6 +9,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,11 +22,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.ztv.anmeldetool.models.AbteilungEnum;
 import org.ztv.anmeldetool.models.AnlageEnum;
+import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.GeraetEnum;
 import org.ztv.anmeldetool.models.KategorieEnum;
+import org.ztv.anmeldetool.models.Organisation;
+import org.ztv.anmeldetool.models.Person;
+import org.ztv.anmeldetool.models.PersonAnlassLink;
 import org.ztv.anmeldetool.models.WertungsrichterBrevetEnum;
+import org.ztv.anmeldetool.output.AnmeldeKontrolleExport;
 import org.ztv.anmeldetool.output.AnmeldeKontrolleOutput;
 import org.ztv.anmeldetool.output.BenutzerExport;
 import org.ztv.anmeldetool.output.TeilnehmerExportImport;
@@ -33,9 +40,16 @@ import org.ztv.anmeldetool.output.WertungsrichterExport;
 import org.ztv.anmeldetool.output.WertungsrichterOutput;
 import org.ztv.anmeldetool.service.AnlassService;
 import org.ztv.anmeldetool.service.AnlassSummaryService;
+import org.ztv.anmeldetool.service.AnmeldekontrolService;
+import org.ztv.anmeldetool.service.OrganisationAnlassLinkService;
+import org.ztv.anmeldetool.service.OrganisationService;
+import org.ztv.anmeldetool.service.PersonAnlassLinkService;
+import org.ztv.anmeldetool.service.PersonService;
 import org.ztv.anmeldetool.service.StvContestService;
 import org.ztv.anmeldetool.service.TeilnehmerAnlassLinkService;
+import org.ztv.anmeldetool.service.TeilnehmerService;
 import org.ztv.anmeldetool.service.WertungsrichterEinsatzService;
+import org.ztv.anmeldetool.service.WertungsrichterService;
 import org.ztv.anmeldetool.transfer.AnlassDTO;
 import org.ztv.anmeldetool.transfer.AnlassSummaryDTO;
 import org.ztv.anmeldetool.transfer.AnmeldeKontrolleDTO;
@@ -59,81 +73,106 @@ import org.ztv.anmeldetool.transfer.WertungsrichterEinsatzDTO;
 public class AnlassAdminController {
 
   private final AnlassService anlassSrv;
-  private final AnlassSummaryService anlassSummaryService;
+  private final OrganisationService organisationSrv;
+  private final AnlassSummaryService anlassSummarySrv;
+  private final AnmeldekontrolService anmeldekontrolSrv;
   private final TeilnehmerAnlassLinkService teilnehmerAnlassLinkSrv;
-  private final StvContestService stvContestService;
+  private final TeilnehmerService teilnehmerSrv;
+  private final StvContestService stvContestSrv;
+  private final WertungsrichterService wertungsrichterSrv;
   private final WertungsrichterEinsatzService wertungsrichterEinsatzSrv;
-  private final AnmeldeKontrolleOutput anmeldeKontrolleOutput;
-  private final WertungsrichterOutput wertungsrichterOutput;
-  private final BenutzerExport benutzerExport;
-  private final WertungsrichterExport wertungsrichterExport;
-  private final TeilnehmerExportImport teilnehmerExportImport;
+  private final OrganisationAnlassLinkService organisationAnlassLinkSrv;
+  private final PersonAnlassLinkService personAnlassLinkSrv;
+  private final PersonService personSrv;
+  //private final BenutzerExport benutzerExport;
+  //private final WertungsrichterExport wertungsrichterExport;
+  //private final TeilnehmerExportImport teilnehmerExportImport;
 
   @GetMapping
-  public ResponseEntity<Collection<AnlassDTO>> getAnlaesse(
+  public ResponseEntity<List<AnlassDTO>> getAnlaesse(
       @RequestParam(defaultValue = "true") boolean onlyAktiv) {
-    return ResponseEntity.ok(anlassSrv.getAnlaesseDTOs(onlyAktiv));
+    return ResponseEntity.ok(anlassSrv.getAnlaesseDto(onlyAktiv));
   }
 
   @GetMapping("/organisationen/{orgId}/summaries")
   public ResponseEntity<Collection<AnlassSummaryDTO>> getAnlassOrganisationSummaries(
       @PathVariable UUID orgId) {
-    return ResponseEntity.ok(anlassSummaryService.getAnlassSummaries(orgId, true));
+    Organisation organisation = organisationSrv.findById(orgId);
+    return ResponseEntity.ok(anlassSummarySrv.getAnlassSummaries(organisation, true));
   }
 
   @GetMapping("/{anlassId}/organisationen/{orgId}/summary")
   public ResponseEntity<AnlassSummaryDTO> getAnlassOrganisationSummary(@PathVariable UUID anlassId,
       @PathVariable UUID orgId) {
-    return ResponseEntity.ok(anlassSummaryService.getAnlassSummary(anlassId, orgId));
+    Anlass anlass = anlassSrv.findById(anlassId);
+    Organisation organisation = organisationSrv.findById(orgId);
+    return ResponseEntity.ok(anlassSummarySrv.getAnlassSummary(anlass, organisation));
   }
 
   @GetMapping("/{anlassId}/organisationen/{orgId}")
   public ResponseEntity<OrganisationAnlassLinkDTO> getVereinStart(@PathVariable UUID anlassId,
       @PathVariable UUID orgId) {
-    return anlassSrv.getVereinStartDTO(anlassId, orgId).map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
+
+    Anlass anlass = anlassSrv.findById(anlassId);
+    Organisation organisation = organisationSrv.findById(orgId);
+    return ResponseEntity.ok(organisationAnlassLinkSrv.getVereinStartDTO(anlass, organisation));
   }
 
   @GetMapping(value = "/{anlassId}/wertungsrichter/", produces = "text/csv;charset=UTF-8")
-  public void getWertungsrichter(HttpServletResponse response, @PathVariable UUID anlassId)
-      throws IOException {
-    List<PersonAnlassLinkCsvDTO> palsCsv = anlassSrv.getEingeteilteWertungsrichterAsCsv(anlassId);
+  public void getWertungsrichter(HttpServletResponse response, @PathVariable UUID anlassId) {
+    Anlass anlass = anlassSrv.findById(anlassId);
+    List<PersonAnlassLinkCsvDTO> palsCsv = personAnlassLinkSrv.getWertungsrichterForAnlassAsCsvDTO(
+        anlass);
     if (palsCsv.isEmpty()) {
       return;
     }
-    String reportName = "Wertungsrichter_" + anlassSrv.getAnlassBezeichnung(anlassId);
-    response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + reportName + ".csv");
+    String reportName = "Wertungsrichter_" + anlassSrv.findById(anlassId).getAnlassBezeichnung();
+    response.addHeader(HttpHeaders.CONTENT_DISPOSITION,
+        "attachment; filename=" + reportName + ".csv");
     response.addHeader(HttpHeaders.CONTENT_TYPE, "text/csv");
     response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
-    wertungsrichterExport.csvWriteToWriter(palsCsv, response.getWriter());
+    WertungsrichterExport.csvWriteToWriter(palsCsv, response);
   }
 
   @GetMapping(value = "/{anlassId}/benutzer/", produces = "text/csv;charset=UTF-8")
-  public void getAnmelderUndVerantwortliche(HttpServletResponse response, @PathVariable UUID anlassId)
-      throws IOException {
-    List<BenutzerDTO> benutzerList = anlassSrv.getAnmelderAndVerantwortliche(anlassId);
-    String reportName = "Verantwortliche_Anmelder_" + anlassSrv.getAnlassBezeichnung(anlassId);
-    response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + reportName + ".csv");
+  public void getAnmelderUndVerantwortliche(HttpServletResponse response,
+      @PathVariable UUID anlassId) {
+    Anlass anlass = anlassSrv.findById(anlassId);
+    List<BenutzerDTO> benutzerList = anlassSrv.getAnmelderAndVerantwortliche(anlass);
+    String reportName =
+        "Verantwortliche_Anmelder_" + anlassSrv.findById(anlassId).getAnlassBezeichnung();
+    response.addHeader(HttpHeaders.CONTENT_DISPOSITION,
+        "attachment; filename=" + reportName + ".csv");
     response.addHeader(HttpHeaders.CONTENT_TYPE, "text/csv");
     response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
-    benutzerExport.csvWriteToWriter(benutzerList, response.getWriter());
+    BenutzerExport.csvWriteToWriter(benutzerList, response);
   }
 
   @GetMapping(value = "/{anlassId}", produces = "text/csv;charset=UTF-8")
   public void getAnmeldeDatenExport(HttpServletResponse response, @PathVariable UUID anlassId)
       throws IOException {
-    AnmeldeKontrolleDTO anmeldekontrolle = anlassSrv.getAnmeldeKontrolle(anlassId, null);
-    response.addHeader(HttpHeaders.CONTENT_DISPOSITION,
-        "attachment; filename=Anmeldekontrolle_" + anmeldekontrolle.getAnlass().getOrt() + ".csv");
-    response.addHeader(HttpHeaders.CONTENT_TYPE, "text/csv");
-    response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
-    anmeldeKontrolleOutput.csvWriteToWriter(anmeldekontrolle, response.getWriter());
+    try {
+      Anlass anlass = anlassSrv.findById(anlassId);
+      AnmeldeKontrolleDTO anmeldekontrolle = anmeldekontrolSrv.getAnmeldeKontrolle(anlass, null);
+      response.addHeader(HttpHeaders.CONTENT_DISPOSITION,
+          "attachment; filename=Anmeldekontrolle_" + anmeldekontrolle.getAnlass().getOrt()
+              + ".csv");
+      response.addHeader(HttpHeaders.CONTENT_TYPE, "text/csv");
+      response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS,
+          HttpHeaders.CONTENT_DISPOSITION);
+      AnmeldeKontrolleExport.csvWriteToWriter(anmeldekontrolle, response);
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+          "Unable to generate Anmeldekontrolle: ",
+          ex);
+    }
   }
 
   @PutMapping("/{anlassId}")
   public ResponseEntity<AnlassDTO> updateAnlass(@PathVariable UUID anlassId,
       @RequestBody AnlassDTO anlassDTO) {
-    return ResponseEntity.ok(anlassSrv.updateAnlass(anlassId, anlassDTO));
+    return ResponseEntity.ok(anlassSrv.updateAnlass(anlassDTO));
   }
 
   @PutMapping("/{anlassId}/teilnehmer")
@@ -202,33 +241,35 @@ public class AnlassAdminController {
   }
 
   @GetMapping(value = "/{anlassId}/teilnehmer/mutationen", produces = "text/csv;charset=UTF-8")
-  public void getMutationen(HttpServletResponse response, @PathVariable UUID anlassId)
-      throws IOException {
-    List<TeilnehmerAnlassLinkCsvDTO> talsCsv = teilnehmerAnlassLinkSrv.getMutationenForAnlassAsCsv(
+  public ResponseEntity<Void> getMutationen(HttpServletResponse response, @PathVariable UUID anlassId) {
+    List<TeilnehmerAnlassLinkCsvDTO> talsCsv = teilnehmerAnlassLinkSrv.getMutationenDTOForAnlass(
         anlassId);
     if (talsCsv.isEmpty()) {
-      return;
+      return ResponseEntity.notFound().build();
     }
-    String reportName = "Mutationen_" + anlassSrv.getAnlassBezeichnung(anlassId);
-    response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + reportName + ".csv");
+    String reportName = "Mutationen_" + anlassSrv.findById(anlassId).getAnlassBezeichnung();
+    response.addHeader(HttpHeaders.CONTENT_DISPOSITION,
+        "attachment; filename=" + reportName + ".csv");
     response.addHeader(HttpHeaders.CONTENT_TYPE, "text/csv");
     response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
-    teilnehmerExportImport.csvWriteToWriter(talsCsv, response.getWriter());
+    TeilnehmerExportImport.csvWriteToWriter(talsCsv, response);
+    return ResponseEntity.ok().build();
   }
 
   @GetMapping(value = "/{anlassId}/teilnehmer/", produces = "text/csv;charset=UTF-8")
-  public void getTeilnehmer(HttpServletResponse response, @PathVariable UUID anlassId)
-      throws IOException {
+  public ResponseEntity<Void> getTeilnehmer(HttpServletResponse response, @PathVariable UUID anlassId) {
     List<TeilnehmerAnlassLinkCsvDTO> talsCsv = teilnehmerAnlassLinkSrv.getAllTeilnehmerForAnlassAsCsv(
         anlassId);
     if (talsCsv.isEmpty()) {
-      return;
+      return ResponseEntity.notFound().build();
     }
-    String reportName = "Teilnehmer_" + anlassSrv.getAnlassBezeichnung(anlassId);
-    response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + reportName + ".csv");
+    String reportName = "Teilnehmer_" + anlassSrv.findById(anlassId).getAnlassBezeichnung();
+    response.addHeader(HttpHeaders.CONTENT_DISPOSITION,
+        "attachment; filename=" + reportName + ".csv");
     response.addHeader(HttpHeaders.CONTENT_TYPE, "text/csv");
     response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
-    teilnehmerExportImport.csvWriteToWriter(talsCsv, response.getWriter());
+    TeilnehmerExportImport.csvWriteToWriter(talsCsv, response);
+    return ResponseEntity.ok().build();
   }
 
   @PostMapping("/{anlassId}/teilnehmer/")
@@ -236,7 +277,7 @@ public class AnlassAdminController {
       @RequestParam("teilnehmer") MultipartFile teilnehmer) throws IOException {
     log.info("Importing teilnehmer: {}, size: {}", teilnehmer.getOriginalFilename(),
         teilnehmer.getSize());
-    List<TeilnehmerAnlassLinkCsvDTO> tals = teilnehmerExportImport.csvToDto(
+    List<TeilnehmerAnlassLinkCsvDTO> tals = TeilnehmerExportImport.csvToDto(
         teilnehmer.getInputStream());
     teilnehmerAnlassLinkSrv.updateAnlassTeilnahmen(anlassId, tals);
     return ResponseEntity.ok().build();
@@ -244,97 +285,140 @@ public class AnlassAdminController {
 
   @PostMapping("/{anlassId}/teilnehmer/contest")
   public ResponseEntity<Void> updateTeilnehmerFromContest(@PathVariable UUID anlassId,
-      @RequestParam("teilnehmer") MultipartFile teilnehmer) throws IOException {
+      @RequestParam("teilnehmer") MultipartFile teilnehmer) {
     log.info("Importing from contest: {}, size: {}", teilnehmer.getOriginalFilename(),
         teilnehmer.getSize());
-    List<TeilnehmerCsvContestDTO> contestTeilnehmer = teilnehmerExportImport.csvContestToDto(
-        teilnehmer.getInputStream());
-    stvContestService.updateAnlassTeilnahmen(anlassId, contestTeilnehmer);
+    List<TeilnehmerCsvContestDTO> contestTeilnehmer = TeilnehmerExportImport.csvContestToDto(
+        teilnehmer);
+    stvContestSrv.updateAnlassTeilnahmen(anlassId, contestTeilnehmer);
     log.info("Imported {} contest teilnehmer", contestTeilnehmer.size());
     return ResponseEntity.ok().build();
   }
 
   @GetMapping("/{anlassId}/organisationen/")
   public ResponseEntity<Collection<OrganisationDTO>> getVereinsStarts(@PathVariable UUID anlassId) {
-    return ResponseEntity.ok(anlassSrv.getVereinsStartsDTOs(anlassId));
+    Anlass anlass = anlassSrv.findById(anlassId);
+    return ResponseEntity.ok(organisationAnlassLinkSrv.getVereinsStartsDTOs(anlass));
   }
 
   @PatchMapping("/{anlassId}/organisationen/{orgId}")
   public ResponseEntity<OrganisationAnlassLinkDTO> patchAnlassVereine(@PathVariable UUID anlassId,
       @PathVariable UUID orgId, @RequestBody OrganisationAnlassLinkDTO oal) {
-    return anlassSrv.updateTeilnehmendeVereine(anlassId, orgId, oal).map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
+    Anlass anlass = anlassSrv.findById(anlassId);
+    Organisation organisation = organisationSrv.findById(orgId);
+
+    return ResponseEntity.ok(
+        organisationAnlassLinkSrv.updateTeilnehmendeVereine(anlass, organisation, oal));
   }
 
   @GetMapping("/{anlassId}/organisationen/{orgId}/teilnehmer/")
-  public ResponseEntity<Collection<TeilnehmerAnlassLinkDTO>> getTeilnehmer(@PathVariable UUID anlassId,
+  public ResponseEntity<Collection<TeilnehmerAnlassLinkDTO>> getTeilnehmer(
+      @PathVariable UUID anlassId,
       @PathVariable UUID orgId) {
-    return ResponseEntity.ok(anlassSrv.getTeilnahmenDTOs(anlassId, orgId, false));
+    return ResponseEntity.ok(
+        teilnehmerAnlassLinkSrv.getTeilnahmenDTOByAnlassOrg(anlassId, orgId, false));
   }
 
   @PutMapping("/{anlassId}/organisationen/{orgId}/teilnehmer/{teilnehmerId}")
   public ResponseEntity<TeilnehmerAnlassLinkDTO> putAnlassTeilnehmer(@PathVariable UUID anlassId,
       @PathVariable UUID teilnehmerId, @RequestBody TeilnehmerAnlassLinkDTO talDto) {
     return ResponseEntity.ok(
-        teilnehmerAnlassLinkSrv.updateAnlassTeilnahme(anlassId, teilnehmerId, talDto));
+        teilnehmerSrv.updateAnlassTeilnahmen(anlassId, teilnehmerId, talDto));
   }
 
   @GetMapping(value = "/{anlassId}/organisationen/{orgId}/anmeldekontrolle/", produces = "application/pdf")
   public void getAnmeldeKontrollePDF(HttpServletResponse response, @PathVariable UUID anlassId,
-      @PathVariable UUID orgId) throws IOException {
-    AnmeldeKontrolleDTO anmeldeKontrolle = anlassSrv.getAnmeldeKontrolle(anlassId, orgId);
+      @PathVariable UUID orgId)  {
+    Anlass anlass = anlassSrv.findById(anlassId);
+    Organisation organisation = organisationSrv.findById(orgId);
+
+    AnmeldeKontrolleDTO anmeldeKontrolle = anmeldekontrolSrv.getAnmeldeKontrolle(anlass,
+        organisation);
     response.addHeader(HttpHeaders.CONTENT_DISPOSITION,
         "attachment; filename=Anmeldekontrolle-" + anmeldeKontrolle.getAnlass()
             .getAnlassBezeichnung() + "-" + anmeldeKontrolle.getOrganisator().getName() + ".pdf");
     response.addHeader(HttpHeaders.CONTENT_TYPE, "application/pdf");
     response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
-    anmeldeKontrolleOutput.createAnmeldeKontrolle(response.getOutputStream(), anmeldeKontrolle);
+    AnmeldeKontrolleOutput.csvWriteToWriter(anmeldeKontrolle, response);
   }
 
   @GetMapping(value = "/{anlassId}/organisationen/{orgId}/wertungsrichterkontrolle/", produces = "application/pdf")
-  public void getWertungsrichterKontrollePDF(HttpServletResponse response, @PathVariable UUID anlassId,
+  public void getWertungsrichterKontrollePDF(HttpServletResponse response,
+      @PathVariable UUID anlassId,
       @PathVariable UUID orgId) throws IOException {
-    AnmeldeKontrolleDTO anmeldeKontrolle = anlassSrv.getAnmeldeKontrolle(anlassId, orgId);
+    Anlass anlass = anlassSrv.findById(anlassId);
+    Organisation organisation = organisationSrv.findById(orgId);
+    AnmeldeKontrolleDTO anmeldeKontrolle = anmeldekontrolSrv.getAnmeldeKontrolle(anlass,
+        organisation);
+    List<PersonAnlassLink> palBr1 = personAnlassLinkSrv.getEingeteilteWertungsrichter(anlass,
+        organisation,
+        WertungsrichterBrevetEnum.Brevet_1);
+    List<PersonAnlassLink> palBr2 = personAnlassLinkSrv.getEingeteilteWertungsrichter(anlass,
+        organisation,
+        WertungsrichterBrevetEnum.Brevet_2);
     response.addHeader(HttpHeaders.CONTENT_DISPOSITION,
         "attachment; filename=Wertungsrichter-Einsaetze-" + anmeldeKontrolle.getAnlass()
             .getAnlassBezeichnung() + "-" + anmeldeKontrolle.getOrganisator().getName() + ".pdf");
     response.addHeader(HttpHeaders.CONTENT_TYPE, "application/pdf");
     response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
-    wertungsrichterOutput.createWertungsrichter(response.getOutputStream(), anmeldeKontrolle);
+    WertungsrichterOutput.createWertungsrichter(response, anmeldeKontrolle, palBr1, palBr2);
   }
 
   @GetMapping("/{anlassId}/organisationen/{orgId}/wertungsrichter/{brevet}/verfuegbar")
-  public ResponseEntity<Collection<PersonDTO>> getVerfuegbareWertungsrichter(@PathVariable UUID anlassId,
+  public ResponseEntity<Collection<PersonDTO>> getVerfuegbareWertungsrichter(
+      @PathVariable UUID anlassId,
       @PathVariable UUID orgId, @PathVariable int brevet) {
     WertungsrichterBrevetEnum brevetEnum = WertungsrichterBrevetEnum.fromInt(brevet);
-    return ResponseEntity.ok(anlassSrv.getVerfuegbareWertungsrichterDTOs(anlassId, orgId, brevetEnum));
+    Anlass anlass = anlassSrv.findById(anlassId);
+    Organisation organisation = organisationSrv.findById(orgId);
+    List<Person> personen = personSrv.findPersonsByOrganisation(organisation.getId());
+    List<PersonAnlassLink> eingeteilteWrs = personAnlassLinkSrv.getEingeteilteWertungsrichter(
+        anlass, organisation,
+        brevetEnum);
+    return ResponseEntity.ok(
+        wertungsrichterSrv.getVerfuegbareWertungsrichterDTOs(personen, eingeteilteWrs, brevetEnum));
   }
 
   @GetMapping("/{anlassId}/organisationen/{orgId}/wertungsrichter/{brevet}/eingeteilt")
   public ResponseEntity<Collection<PersonAnlassLinkDTO>> getEingeteilteWertungsrichter(
       @PathVariable UUID anlassId, @PathVariable UUID orgId, @PathVariable int brevet) {
     WertungsrichterBrevetEnum brevetEnum = WertungsrichterBrevetEnum.fromInt(brevet);
-    return ResponseEntity.ok(anlassSrv.getEingeteilteWertungsrichterDTOs(anlassId, orgId, brevetEnum));
+    Anlass anlass = anlassSrv.findById(anlassId);
+    Organisation organisation = organisationSrv.findById(orgId);
+    return ResponseEntity.ok(
+        personAnlassLinkSrv.getEingeteilteWertungsrichterDTOs(anlass, organisation, brevetEnum));
   }
 
   @GetMapping("/{anlassId}/organisationen/{orgId}/wertungsrichter/{personId}/einsaetze")
   public ResponseEntity<PersonAnlassLinkDTO> getEinsaetze(@PathVariable UUID anlassId,
       @PathVariable UUID orgId, @PathVariable UUID personId) {
-    return ResponseEntity.ok(anlassSrv.getOrGenerateEinsaetzeDTO(anlassId, orgId, personId));
+    Anlass anlass = anlassSrv.findById(anlassId);
+    Organisation organisation = organisationSrv.findById(orgId);
+    Person person = personSrv.findPersonById(personId);
+    return ResponseEntity.ok(
+        personAnlassLinkSrv.getPersonAnlassLinkDTO(person, organisation, anlass));
   }
 
   @PostMapping("/{anlassId}/organisationen/{orgId}/wertungsrichter/{personId}")
-  public ResponseEntity<PersonAnlassLinkDTO> postEingeteilteWertungsrichter(@PathVariable UUID anlassId,
+  public ResponseEntity<PersonAnlassLinkDTO> postEingeteilteWertungsrichter(
+      @PathVariable UUID anlassId,
       @PathVariable UUID orgId, @PathVariable UUID personId,
       @RequestBody PersonAnlassLinkDTO personAnlassLinkDTO) {
-    return anlassSrv.createOrUpdateEingeteilteWertungsrichter(anlassId, orgId, personId, personAnlassLinkDTO)
-        .map(ResponseEntity::ok).orElse(ResponseEntity.badRequest().build());
+    Anlass anlass = anlassSrv.findById(anlassId);
+    Organisation organisation = organisationSrv.findById(orgId);
+    Person person = personSrv.findPersonById(personId);
+    return ResponseEntity.ok(
+        personAnlassLinkSrv.createOrUpdateEingeteilteWertungsrichter(anlass, organisation, person,
+            personAnlassLinkDTO));
   }
 
   @DeleteMapping("/{anlassId}/organisationen/{orgId}/wertungsrichter/{personId}")
   public ResponseEntity<Void> deleteEingeteilteWertungsrichter(@PathVariable UUID anlassId,
       @PathVariable UUID orgId, @PathVariable UUID personId) {
-    anlassSrv.deleteEingeteilteWertungsrichter(anlassId, orgId, personId);
+    Anlass anlass = anlassSrv.findById(anlassId);
+    Organisation organisation = organisationSrv.findById(orgId);
+    Person person = personSrv.findPersonById(personId);
+    personAnlassLinkSrv.deleteEingeteilteWertungsrichter(anlass, organisation, person);
     return ResponseEntity.noContent().build();
   }
 

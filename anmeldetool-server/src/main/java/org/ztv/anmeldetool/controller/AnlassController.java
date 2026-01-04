@@ -1,5 +1,7 @@
 package org.ztv.anmeldetool.controller;
 
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
@@ -19,12 +21,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.ztv.anmeldetool.models.AbteilungEnum;
 import org.ztv.anmeldetool.models.AnlageEnum;
+import org.ztv.anmeldetool.models.Anlass;
+import org.ztv.anmeldetool.models.AnlassLauflisten;
 import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.output.LauflistenOutput;
 import org.ztv.anmeldetool.output.RanglistenOutput;
+import org.ztv.anmeldetool.service.AnlassService;
 import org.ztv.anmeldetool.service.LauflistenService;
 import org.ztv.anmeldetool.service.RanglistenService;
+import org.ztv.anmeldetool.service.ServiceException;
 import org.ztv.anmeldetool.service.TeilnehmerAnlassLinkService;
 import org.ztv.anmeldetool.transfer.LauflisteDTO;
 import org.ztv.anmeldetool.transfer.LauflistenEintragDTO;
@@ -43,13 +49,14 @@ public class AnlassController {
   private final LauflistenService lauflistenService;
   private final RanglistenService ranglistenService;
   private final TeilnehmerAnlassLinkService teilnehmerAnlassLinkService;
-  private final RanglistenOutput ranglistenOutput;
-  private final LauflistenOutput lauflistenOutput;
+  private final AnlassService anlassService;
+  // private final RanglistenOutput ranglistenOutput;
+  // private final LauflistenOutput lauflistenOutput;
 
   @PutMapping("/{anlassId}/ranglisten/{tiTu}/{kategorie}/config")
   public ResponseEntity<RanglisteConfigurationDTO> putRanglistenConfig(
       @RequestBody RanglisteConfigurationDTO dto) {
-    return ResponseEntity.ok(ranglistenService.saveRanglisteConfiguration(dto));
+    return ResponseEntity.ok(ranglistenService.saveRanglisteConfigurationDto(dto));
   }
 
   @GetMapping("/{anlassId}/ranglisten/{tiTu}/{kategorie}/config")
@@ -68,7 +75,7 @@ public class AnlassController {
   @GetMapping("/{anlassId}/ranglisten/{tiTu}/{kategorie}")
   public ResponseEntity<List<RanglistenEntryDTO>> getRangliste(@PathVariable UUID anlassId,
       @PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie,
-      @RequestParam Optional<Integer> maxAuszeichnungen) {
+      @RequestParam Optional<Integer> maxAuszeichnungen) throws ServiceException {
     List<RanglistenEntryDTO> rangliste = ranglistenService.generateRangliste(anlassId, tiTu, kategorie,
         maxAuszeichnungen);
     return ResponseEntity.ok(rangliste);
@@ -77,7 +84,7 @@ public class AnlassController {
   @GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}", produces = "application/pdf")
   public void getRanglistenPdf(HttpServletResponse response, @PathVariable UUID anlassId,
       @PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie,
-      @RequestParam Optional<Integer> maxAuszeichnungen) throws IOException {
+      @RequestParam Optional<Integer> maxAuszeichnungen) throws IOException, ServiceException {
 
     List<RanglistenEntryDTO> ranglistenDTOs = ranglistenService.generateRangliste(anlassId, tiTu,
         kategorie, maxAuszeichnungen);
@@ -86,15 +93,16 @@ public class AnlassController {
         "attachment; filename=Rangliste-" + kategorie + "-" + tiTu + ".pdf");
     response.addHeader(HttpHeaders.CONTENT_TYPE, "application/pdf");
     response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
-
-    ranglistenOutput.createRangliste(response.getOutputStream(), anlassId, ranglistenDTOs, tiTu,
+    Anlass anlass = anlassService.findById(anlassId);
+    RanglistenOutput.createRangliste(response.getOutputStream(), anlass, ranglistenDTOs, tiTu,
         kategorie);
   }
 
   @GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}", produces = "text/csv;charset=UTF-8")
   public void getRanglistenCsv(HttpServletResponse response, @PathVariable UUID anlassId,
       @PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie,
-      @RequestParam Optional<Integer> maxAuszeichnungen) throws IOException {
+      @RequestParam Optional<Integer> maxAuszeichnungen)
+      throws IOException, ServiceException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
 
     List<RanglistenEntryDTO> ranglistenDTOs = ranglistenService.generateRangliste(anlassId, tiTu,
         kategorie, maxAuszeichnungen);
@@ -104,19 +112,20 @@ public class AnlassController {
     response.addHeader(HttpHeaders.CONTENT_TYPE, "text/csv");
     response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
 
-    ranglistenOutput.csvWriteToWriter(response.getWriter(), ranglistenDTOs, tiTu, kategorie);
+    RanglistenOutput.csvWriteToWriter(response.getOutputStream(), ranglistenDTOs);
   }
 
   @GetMapping("/{anlassId}/ranglisten/{tiTu}/{kategorie}/vereine")
   public ResponseEntity<List<RanglistenEntryDTO>> getRanglistePerVerein(@PathVariable UUID anlassId,
-      @PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie) {
+      @PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie) throws ServiceException {
     return ResponseEntity.ok(
         ranglistenService.getRanglistenPerVereinDtos(anlassId, tiTu, kategorie));
   }
 
   @GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}/vereine", produces = "application/pdf")
   public void getRanglistePerVereinPdf(HttpServletResponse response, @PathVariable UUID anlassId,
-      @PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie) throws IOException {
+      @PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie)
+      throws IOException, ServiceException {
 
     List<RanglistenEntryDTO> ranglistenDTOs = ranglistenService.getRanglistenPerVereinDtos(anlassId,
         tiTu, kategorie);
@@ -126,27 +135,28 @@ public class AnlassController {
     response.addHeader(HttpHeaders.CONTENT_TYPE, "application/pdf");
     response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
 
-    ranglistenOutput.createRanglistePerVerein(response.getOutputStream(), ranglistenDTOs, kategorie);
+    RanglistenOutput.createRanglistePerVerein(response.getOutputStream(), ranglistenDTOs, kategorie);
   }
 
   @GetMapping(value = "/{anlassId}/ranglisten/{tiTu}/{kategorie}/teamwertung", produces = "application/pdf")
   public void getTeamwertungPdf(HttpServletResponse response, @PathVariable UUID anlassId,
-      @PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie) throws IOException {
+      @PathVariable TiTuEnum tiTu, @PathVariable KategorieEnum kategorie)
+      throws IOException, ServiceException {
 
     List<TeamwertungDTO> twList = ranglistenService.getTeamwertung(anlassId, tiTu, kategorie);
 
-    String reportName = ranglistenService.getTeamwertungReportName(kategorie, tiTu);
-    response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + reportName + ".pdf");
+    List<String> reportName = RanglistenOutput.getTeamwertungReportName(kategorie, tiTu);
+    response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + reportName.get(0) + ".pdf");
     response.addHeader(HttpHeaders.CONTENT_TYPE, "application/pdf");
     response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
 
-    ranglistenOutput.createTeamwertung(response.getOutputStream(), twList, kategorie, tiTu);
+    RanglistenOutput.createTeamwertung(response.getOutputStream(), twList, kategorie, tiTu);
   }
 
   @DeleteMapping("/{anlassId}/lauflisten/{kategorie}/{abteilung}/{anlage}")
   public ResponseEntity<Void> deleteLauflisten(@PathVariable UUID anlassId,
       @PathVariable KategorieEnum kategorie, @PathVariable AbteilungEnum abteilung,
-      @PathVariable AnlageEnum anlage) {
+      @PathVariable AnlageEnum anlage) throws ServiceException {
     lauflistenService.deleteLauflistenForAnlassAndKategorie(anlassId, kategorie, abteilung, anlage);
     return ResponseEntity.noContent().build();
   }
@@ -154,7 +164,7 @@ public class AnlassController {
   @GetMapping("/{anlassId}/lauflisten")
   public ResponseEntity<LauflisteDTO> getLaufliste(@PathVariable UUID anlassId,
       @RequestParam String search) {
-    return ResponseEntity.ok(lauflistenService.findLauflisteDtoByAnlassAndSearch(anlassId, search));
+    return ResponseEntity.ok(lauflistenService.findLauflisteDtoBySearch(search));
   }
 
   @GetMapping("/{anlassId}/lauflisten/{kategorie}")
@@ -177,24 +187,28 @@ public class AnlassController {
       @PathVariable KategorieEnum kategorie, @PathVariable AbteilungEnum abteilung,
       @PathVariable AnlageEnum anlage) {
     return ResponseEntity.ok(
-        lauflistenService.getLauflistenDtosForAnlassAndKategorie(anlassId, kategorie, abteilung,
+        lauflistenService.getLauflistenDtosForFilter(anlassId, kategorie, abteilung,
             anlage));
   }
 
   @GetMapping(value = "/{anlassId}/lauflisten/{kategorie}/{abteilung}/{anlage}", produces = "application/pdf")
   public void getLauflistenPdf(HttpServletResponse response, @PathVariable UUID anlassId,
       @PathVariable KategorieEnum kategorie, @PathVariable AbteilungEnum abteilung,
-      @PathVariable AnlageEnum anlage, @RequestParam(defaultValue = "false") boolean onlyTi)
-      throws IOException {
+      @PathVariable AnlageEnum anlage, @RequestParam(defaultValue = "false") Optional<Boolean> onlyTi)
+      throws IOException, ServiceException {
 
     response.addHeader(HttpHeaders.CONTENT_DISPOSITION,
         "attachment; filename=Lauflisten-" + kategorie + "-" + abteilung + "-" + anlage + ".pdf");
     response.addHeader(HttpHeaders.CONTENT_TYPE, "application/pdf");
     response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
 
-    byte[] pdfBytes = lauflistenService.generateLauflistenPdfForAnlassAndKategorie(anlassId,
+    //byte[] pdfBytes
+    AnlassLauflisten anlassLauflisten = lauflistenService.generateLauflistenPdfForAnlassAndKategorie(anlassId,
         kategorie, abteilung, anlage, onlyTi);
-    response.getOutputStream().write(pdfBytes);
+    Anlass anlass = this.anlassService.findById(anlassId);
+    LauflistenOutput.createLaufListe(response.getOutputStream(), anlass, onlyTi, anlassLauflisten);
+
+    //response.getOutputStream().write(pdfBytes);
   }
 
   @PutMapping("/{anlassId}/lauflisten/{lauflistenId}")
@@ -206,7 +220,7 @@ public class AnlassController {
   @PutMapping("/{anlassId}/lauflisten/{lauflistenId}/lauflisteneintraege/{lauflisteneintragId}")
   public ResponseEntity<LauflistenEintragDTO> putLauflistenEintrag(
       @PathVariable UUID lauflisteneintragId, @RequestBody LauflistenEintragDTO eintragDto) {
-    return ResponseEntity.ok(lauflistenService.updateEinzelnote(lauflisteneintragId, eintragDto));
+    return ResponseEntity.ok(lauflistenService.saveLauflistenEintrag(lauflisteneintragId, eintragDto));
   }
 
   @DeleteMapping("/{anlassId}/lauflisten/{lauflistenId}/lauflisteneintraege/{lauflisteneintragId}")
