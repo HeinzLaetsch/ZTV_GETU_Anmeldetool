@@ -12,14 +12,8 @@ import org.ztv.anmeldetool.transfer.VereinsStartDTO;
 @Service
 public class MailerService {
 
-	@Autowired
-	AnlassService anlassSrv;
-
 	public Map<String, Object> getAnmeldeDaten(AnmeldeKontrolleDTO anmeldeKontrolle, Organisation organisation,
 			String subject) {
-
-		// AnmeldeKontrolleDTO anmeldeKontrolle =
-		// anlassSrv.getAnmeldeKontrolle(anlass.getId(), organisation.getId());
 
 		Map<String, Object> templateModel = new HashMap();
 		VereinsStartDTO vereinsStart = null;
@@ -60,15 +54,15 @@ public class MailerService {
 		templateModel.put("k4Ti", vereinsStart.getK4_Ti());
 		templateModel.put("k4Tu", vereinsStart.getK4_Tu());
 
-		templateModel.put("k5A", vereinsStart.getK5A());
-		templateModel.put("k5B", vereinsStart.getK5B());
-		templateModel.put("k5", vereinsStart.getK5());
+		templateModel.put("k5A", vereinsStart.getK5A_Ti());
+		templateModel.put("k5B", vereinsStart.getK5B_Ti());
+		templateModel.put("k5", vereinsStart.getK5_Tu());
 
 		templateModel.put("k6Ti", vereinsStart.getK6_Ti());
 		templateModel.put("k6Tu", vereinsStart.getK6_Tu());
 
-		templateModel.put("kD", vereinsStart.getKD());
-		templateModel.put("kH", vereinsStart.getKH());
+		templateModel.put("kD", vereinsStart.getKD_Ti());
+		templateModel.put("kH", vereinsStart.getKH_Tu());
 
 		templateModel.put("k7Ti", vereinsStart.getK7_Ti());
 		templateModel.put("k7Tu", vereinsStart.getK7_Tu());
@@ -78,9 +72,6 @@ public class MailerService {
 
 	public Map<String, Object> getPublishedDaten(AnmeldeKontrolleDTO anlassKontrolle, String subject,
 			Organisation org) {
-
-		// AnmeldeKontrolleDTO anmeldeKontrolle =
-		// anlassSrv.getAnmeldeKontrolle(anlass.getId(), organisation.getId());
 
 		Map<String, Object> templateModel = new HashMap();
 
@@ -92,5 +83,4 @@ public class MailerService {
 
 		return templateModel;
 	}
-
 }

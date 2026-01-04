@@ -34,7 +34,7 @@ public class LauflistenServiceTests {
 	// @Transactional
 	public void testDeleteAllLauflistenForAnlassAndKategorie() throws Exception {
 		Iterable<Anlass> iterable = anlassRepo.findAll();
-		int anzahl = lauflistenService.deleteLauflistenForAnlassAndKategorie(iterable.iterator().next(),
+		int anzahl = lauflistenService.deleteLauflistenForAnlassAndKategorie(iterable.iterator().next().getId(),
 				KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1);
 	}
 
@@ -42,7 +42,7 @@ public class LauflistenServiceTests {
 	public void testFindLauflistenForAnlassAndKategorie() throws Exception {
 		Iterable<Anlass> iterable = anlassRepo.findAll();
 		List<LauflistenContainer> allContainer = lauflistenService.findLauflistenForAnlassAndKategorie(
-				iterable.iterator().next(), KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1);
+				iterable.iterator().next().getId(), KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1);
 		assertThat(allContainer.size()).isGreaterThan(0);
 	}
 
@@ -51,7 +51,7 @@ public class LauflistenServiceTests {
 	public void testDeleteLauflistenForAnlassAndKategorie() throws Exception {
 		testGenerateLauflistenForAnlassAndKategorie();
 		Iterable<Anlass> iterable = anlassRepo.findAll();
-		int anzahl = lauflistenService.deleteLauflistenForAnlassAndKategorie(iterable.iterator().next(),
+		int anzahl = lauflistenService.deleteLauflistenForAnlassAndKategorie(iterable.iterator().next().getId(),
 				KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1);
 		assertThat(anzahl).isEqualTo(5);
 	}
@@ -61,7 +61,7 @@ public class LauflistenServiceTests {
 	public void testGenerateLauflistenForAnlassAndKategorie() throws Exception {
 		Iterable<Anlass> iterable = anlassRepo.findAll();
 		AnlassLauflisten anlassContainer = lauflistenService.generateLauflistenForAnlassAndKategorie(
-				iterable.iterator().next(), KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1, false);
+				iterable.iterator().next().getId(), KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1, false);
 		assertThat(anlassContainer).isNotNull();
 		assertThat(anlassContainer.getLauflistenContainer().size()).isEqualTo(5);
 	}

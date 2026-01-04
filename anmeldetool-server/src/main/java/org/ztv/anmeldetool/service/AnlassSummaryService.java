@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.MeldeStatusEnum;
+import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.OrganisationAnlassLink;
 import org.ztv.anmeldetool.models.PersonAnlassLink;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
@@ -18,6 +19,7 @@ import org.ztv.anmeldetool.transfer.AnlassSummaryDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ztv.anmeldetool.transfer.OrganisationAnlassLinkDTO;
 
 @Service("anlassSummaryService")
 @Slf4j
@@ -26,22 +28,24 @@ public class AnlassSummaryService {
 	private static final int ATHLETES_PER_WR = 15;
 
 	private final AnlassService anlassSrv;
+  private final OrganisationAnlassLinkService organisationAnlassLinkSrv;
+  private final PersonAnlassLinkService personAnlassLinkSrv;
 
-	public Collection<AnlassSummaryDTO> getAnlassSummaries(UUID orgId, boolean onlyAktiveAnlaesse) {
+	public Collection<AnlassSummaryDTO> getAnlassSummaries(Organisation organisation, boolean onlyAktiveAnlaesse) {
 		List<Anlass> anlaesse = anlassSrv.getAnlaesse(onlyAktiveAnlaesse);
 		if (anlaesse != null) {
 			return anlaesse.stream()
-					.map(anlass -> getAnlassSummary(anlass.getId(), orgId))
+					.map(anlass -> getAnlassSummary(anlass, organisation))
 					.collect(Collectors.toList());
 		}
 		return Collections.emptyList();
 	}
 
-	public AnlassSummaryDTO getAnlassSummary(UUID anlassId, UUID orgId) {
-		OrganisationAnlassLink oalResult = anlassSrv.getVereinStart(anlassId, orgId);
+	public AnlassSummaryDTO getAnlassSummary(Anlass anlass, Organisation organisation) {
+		OrganisationAnlassLinkDTO oalResultDto = organisationAnlassLinkSrv.getVereinStartDTO(anlass, organisation);
 
-		if (oalResult == null) {
-			AnlassSummaryDTO asDto = AnlassSummaryDTO.builder().anlassId(anlassId).organisationsId(orgId).startet(false)
+		if (oalResultDto == null) {
+			AnlassSummaryDTO asDto = AnlassSummaryDTO.builder().anlassId(anlass.getId()).organisationsId(organisation.getId()).startet(false)
 					.verlaengerungsDate(null).startendeBr1(0).startendeBr2(0).gemeldeteBr1(0).gemeldeteBr2(0)
 					.br1Ok(true).br2Ok(true).build();
 			return asDto;
@@ -64,8 +68,8 @@ public class AnlassSummaryService {
 		int gemeldeteBr2 = 0;
 		boolean br1Ok = false;
 		boolean br2Ok = false;
-		if (oalResult.isAktiv()) {
-			List<TeilnehmerAnlassLink> links = anlassSrv.getTeilnahmen(anlassId, orgId, false);
+		if (oalResultDto.isStartet()) {
+			List<TeilnehmerAnlassLink> links = anlassSrv.getTeilnahmen(anlass, organisation, false);
 
 			startBr1 = (int) links.stream()
 					.filter(l -> l.getKategorie() != null && l.getKategorie().isJugend())
@@ -87,24 +91,23 @@ public class AnlassSummaryService {
 					.filter(l -> l.getKategorie() != null && l.getKategorie().isAktiv())
 					.count();
 
-			List<PersonAnlassLink> pals = anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId,
+			List<PersonAnlassLink> pals = personAnlassLinkSrv.getEingeteilteWertungsrichter(anlass, organisation,
 					WertungsrichterBrevetEnum.Brevet_1);
 			gemeldeteBr1 = pals.size();
-			pals = anlassSrv.getEingeteilteWertungsrichter(anlassId, orgId, WertungsrichterBrevetEnum.Brevet_2);
+			pals = personAnlassLinkSrv.getEingeteilteWertungsrichter(anlass, organisation, WertungsrichterBrevetEnum.Brevet_2);
 			gemeldeteBr2 = pals.size();
 			// TODO check anzahl
 			// TODO store anzahl within config
 			br1Ok = Math.ceil(startBr1 / (float) ATHLETES_PER_WR) <= gemeldeteBr1;
 			br2Ok = Math.ceil(startBr2 / (float) ATHLETES_PER_WR) <= gemeldeteBr2;
 		}
-		AnlassSummaryDTO asDto = AnlassSummaryDTO.builder().anlassId(anlassId).organisationsId(orgId)
-				.startet(oalResult.isAktiv()).verlaengerungsDate(oalResult.getVerlaengerungsDate())
+		return AnlassSummaryDTO.builder().anlassId(anlass.getId()).organisationsId(organisation.getId())
+				.startet(oalResultDto.isStartet()).verlaengerungsDate(oalResultDto.getVerlaengerungsDate())
 				.startendeBr1(startBr1).startendeK1(startK1).startendeK2(startK2).startendeK3(startK3)
 				.startendeK4(startK4).startendeK5(startK5).startendeK5A(startK5A).startendeK5B(startK5B)
 				.startendeK6(startK6).startendeK7(startK7).startendeKD(startKD).startendeKH(startKH)
 				.startendeBr2(startBr2).gemeldeteBr1(gemeldeteBr1).gemeldeteBr2(gemeldeteBr2).br1Ok(br1Ok).br2Ok(br2Ok)
 				.build();
-		return asDto;
 	}
 
 	private int getStartendeForKategorie(List<TeilnehmerAnlassLink> links, KategorieEnum kategorie) {

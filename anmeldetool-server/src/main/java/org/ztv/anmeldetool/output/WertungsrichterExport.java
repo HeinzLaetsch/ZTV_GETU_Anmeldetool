@@ -21,27 +21,31 @@ import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 public class WertungsrichterExport {
 
-	public static void csvWriteToWriter(List<PersonAnlassLinkCsvDTO> pals, HttpServletResponse response)
-			throws CsvDataTypeMismatchException, CsvRequiredFieldEmptyException, IOException {
+	public static void csvWriteToWriter(List<PersonAnlassLinkCsvDTO> pals, HttpServletResponse response) {
 
 		final byte[] bom = new byte[] { (byte) 239, (byte) 187, (byte) 191 };
-		OutputStream os = response.getOutputStream();
-		os.write(bom);
-		os.write(bom);
+    try {
+      OutputStream os = response.getOutputStream();
+      os.write(bom);
+      os.write(bom);
 
-		final PrintWriter responseWriter = new PrintWriter(new OutputStreamWriter(os, "UTF-8"));
+      final PrintWriter responseWriter = new PrintWriter(new OutputStreamWriter(os, "UTF-8"));
 
-		HeaderColumnNameMappingStrategy<PersonAnlassLinkCsvDTO> strategy = new HeaderColumnNameMappingStrategyBuilder<PersonAnlassLinkCsvDTO>()
-				.build();
-		strategy.setType(PersonAnlassLinkCsvDTO.class);
-		strategy.setColumnOrderOnWrite(new LiteralComparator(PersonAnlassLinkCsvDTO.FIELDS_ORDER));
+      HeaderColumnNameMappingStrategy<PersonAnlassLinkCsvDTO> strategy = new HeaderColumnNameMappingStrategyBuilder<PersonAnlassLinkCsvDTO>()
+          .build();
+      strategy.setType(PersonAnlassLinkCsvDTO.class);
+      strategy.setColumnOrderOnWrite(new LiteralComparator(PersonAnlassLinkCsvDTO.FIELDS_ORDER));
 
-		StatefulBeanToCsv<PersonAnlassLinkCsvDTO> writer = new StatefulBeanToCsvBuilder<PersonAnlassLinkCsvDTO>(
-				responseWriter).withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(';')
-						.withEscapechar(CSVWriter.NO_ESCAPE_CHARACTER).withOrderedResults(true)
-						.withMappingStrategy(strategy).build();
-		writer.write(pals);
-		responseWriter.flush();
-		responseWriter.close();
+      StatefulBeanToCsv<PersonAnlassLinkCsvDTO> writer = new StatefulBeanToCsvBuilder<PersonAnlassLinkCsvDTO>(
+          responseWriter).withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(';')
+          .withEscapechar(CSVWriter.NO_ESCAPE_CHARACTER).withOrderedResults(true)
+          .withMappingStrategy(strategy).build();
+      writer.write(pals);
+      responseWriter.flush();
+      responseWriter.close();
+    } catch (Exception e) {
+      //ToDO replace with proper exception handling ServiceException
+      throw new RuntimeException(e);
+    }
 	}
 }

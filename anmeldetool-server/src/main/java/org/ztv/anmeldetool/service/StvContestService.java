@@ -52,7 +52,7 @@ public class StvContestService {
 
 	public List<TeilnehmerAnlassLink> findAnlassTeilnahmen(UUID anlassId, List<MeldeStatusEnum> exclusion,
 			boolean linkStatus) throws ServiceException {
-		Anlass anlass = anlassSrv.findAnlassById(anlassId);
+		Anlass anlass = anlassSrv.findById(anlassId);
 		if (anlass == null) {
 			throw new ServiceException(this.getClass(),
 					"Could not find Anlass with id: %s".formatted(anlassId.toString()));
@@ -67,9 +67,8 @@ public class StvContestService {
 		return teilnahmen;
 	}
 
-	public void updateAnlassTeilnahmen(UUID anlassId, List<TeilnehmerCsvContestDTO> contestTeilnehmer)
-			throws ServiceException {
-		Anlass anlass = this.anlassSrv.findAnlassById(anlassId);
+	public void updateAnlassTeilnahmen(UUID anlassId, List<TeilnehmerCsvContestDTO> contestTeilnehmer) {
+		Anlass anlass = this.anlassSrv.findById(anlassId);
 		List<OrganisationAnlassLink> orgAlList = new ArrayList<>();
 		List<TeilnehmerAnlassLink> contestTals = contestTeilnehmer.stream().map(t -> {
 			TeilnehmerAnlassLink tal = new TeilnehmerAnlassLink();

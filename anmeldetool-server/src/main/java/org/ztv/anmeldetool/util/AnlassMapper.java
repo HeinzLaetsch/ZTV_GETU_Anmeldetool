@@ -29,9 +29,13 @@ public abstract class AnlassMapper {
 	@Mapping(source = "organisator.id", target = "organisatorId")
 	public abstract AnlassDTO toDto(Anlass anlass);
 
+  @Mapping(source = "startDatum", target = "startDate")
+  @Mapping(source = "endDatum", target = "endDate")
+  public abstract Anlass toEntity(AnlassDTO anlassDTO);
+
 	public List<OrganisationDTO> mapOrganisationenDTO(List<OrganisationAnlassLink> links) {
 		return links.stream().map(link -> {
-			return organisationMapper.ToDto(link.getOrganisation());
+			return organisationMapper.toDto(link.getOrganisation());
 		}).collect(Collectors.toList());
 	}
 

@@ -35,6 +35,8 @@ public class LoginService {
 
   private final OrganisationService organisationSrv;
 
+  private final OrganisationPersonLinkService orgPersLinkSrv;
+
 	public ResponseEntity<PersonDTO> login(HttpServletRequest request, LoginData loginData) {
 		log.debug("Submitted Password:" + loginData.getPassword());
 
@@ -42,11 +44,11 @@ public class LoginService {
 		if (person == null) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		Organisation organisation = organisationSrv.findOrganisationById(loginData.getOrganisationId());
+		Organisation organisation = organisationSrv.findById(loginData.getOrganisationId());
 		if (organisation == null) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		if (!PersonHelper.isPersonMemberOfOrganisation(person, organisation)) {
+		if (!orgPersLinkSrv.isPersonMemberOfOrganisation(person, organisation)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 		UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken(
