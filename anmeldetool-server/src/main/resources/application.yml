@@ -37,7 +37,7 @@ spring:
         path: "mail-templates"
      username: "getu-wettkaempfe@ztv.ch"
      # username: "heinz.laetsch1@gmx.ch"
-     password: "GeTuWL@ztv.ch"
+     password: ""
      properties:
         mail:
            smtp:
@@ -97,3 +97,4 @@ management:
       enabled: true
     info:
       enabled: true
+
