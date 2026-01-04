@@ -3,9 +3,7 @@ package org.ztv.anmeldetool.repositories;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -32,40 +30,82 @@ public interface TeilnehmerAnlassLinkRepository extends JpaRepository<Teilnehmer
 
 	Optional<TeilnehmerAnlassLink> findByAnlassAndTeilnehmer(Anlass anlass, Teilnehmer teilnehmer);
 
-	@Query("SELECT tal FROM TeilnehmerAnlassLink tal JOIN tal.teilnehmer teilnehmer WHERE tal.anlass = :anlass AND tal.kategorie= :kategorie AND teilnehmer.tiTu= :tiTu "
-			+ "AND tal.aktiv= :aktiv AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL) ORDER BY tal.organisation, tal.notenblatt.rang")
+	@Query("""
+			SELECT tal FROM TeilnehmerAnlassLink tal
+			JOIN tal.teilnehmer t
+			WHERE tal.anlass = :anlass
+			  AND tal.kategorie = :kategorie
+			  AND t.tiTu = :tiTu
+			  AND tal.aktiv = :aktiv
+			  AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL)
+			ORDER BY tal.organisation, tal.notenblatt.rang
+			""")
 	List<TeilnehmerAnlassLink> findByAnlassAndAktivAndKategorieAndTiTuOrderByOrganisation(Anlass anlass, boolean aktiv,
 			List<MeldeStatusEnum> exclusion, KategorieEnum kategorie, TiTuEnum tiTu);
 
-	@Query("SELECT tal FROM TeilnehmerAnlassLink tal WHERE tal.anlass = :anlass AND tal.kategorie= :kategorie AND tal.aktiv= :aktiv AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL)")
+	@Query("""
+			SELECT tal FROM TeilnehmerAnlassLink tal
+			WHERE tal.anlass = :anlass
+			  AND tal.kategorie = :kategorie
+			  AND tal.aktiv = :aktiv
+			  AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL)
+			""")
 	List<TeilnehmerAnlassLink> findByAnlassAndAktivAndKategorie(Anlass anlass, boolean aktiv,
 			List<MeldeStatusEnum> exclusion, KategorieEnum kategorie);
 
-	@Query("SELECT tal FROM TeilnehmerAnlassLink tal WHERE tal.anlass = :anlass AND tal.kategorie= :kategorie AND tal.teilnehmer.tiTu= :tiTu AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL)")
+	@Query("""
+			SELECT tal FROM TeilnehmerAnlassLink tal
+			JOIN tal.teilnehmer t
+			WHERE tal.anlass = :anlass
+			  AND tal.kategorie = :kategorie
+			  AND t.tiTu = :tiTu
+			  AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL)
+			""")
 	List<TeilnehmerAnlassLink> findByAnlassAndKategorieAndTiTu(Anlass anlass, List<MeldeStatusEnum> exclusion,
 			KategorieEnum kategorie, TiTuEnum tiTu);
 
-	@Query("SELECT tal FROM TeilnehmerAnlassLink tal WHERE tal.anlass = :anlass AND tal.aktiv= :aktiv AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL) AND tal.kategorie!='KEIN_START' AND tal.organisation IN (:orgs)")
+	@Query("""
+			SELECT tal FROM TeilnehmerAnlassLink tal
+			WHERE tal.anlass = :anlass
+			  AND tal.aktiv = :aktiv
+			  AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL)
+			  AND tal.kategorie <> org.ztv.anmeldetool.models.KategorieEnum.KEIN_START
+			  AND tal.organisation IN (:orgs)
+			""")
 	List<TeilnehmerAnlassLink> findByAnlassAndAktiv(Anlass anlass, boolean aktiv, List<MeldeStatusEnum> exclusion,
 			List<Organisation> orgs);
 
-	@Query("SELECT tal FROM TeilnehmerAnlassLink tal WHERE tal.anlass = :anlass AND tal.aktiv= true AND tal.kategorie <> 'KEIN_START' AND (:kategorie is null or tal.kategorie = :kategorie) AND (:abteilung is null or tal.abteilung = :abteilung) AND (:anlage is null or tal.anlage = :anlage) AND (:geraet is null or tal.startgeraet = :geraet)")
+	@Query("""
+			SELECT tal FROM TeilnehmerAnlassLink tal
+			WHERE tal.anlass = :anlass
+			  AND tal.aktiv = true
+			  AND tal.kategorie <> org.ztv.anmeldetool.models.KategorieEnum.KEIN_START
+			  AND (:kategorie IS NULL OR tal.kategorie = :kategorie)
+			  AND (:abteilung IS NULL OR tal.abteilung = :abteilung)
+			  AND (:anlage IS NULL OR tal.anlage = :anlage)
+			  AND (:geraet IS NULL OR tal.startgeraet = :geraet)
+			""")
 	List<TeilnehmerAnlassLink> findByAnlass(Anlass anlass, KategorieEnum kategorie, AbteilungEnum abteilung,
 			AnlageEnum anlage, GeraetEnum geraet);
 
 	List<TeilnehmerAnlassLink> findByAnlassAndOrganisation(Anlass anlass, Organisation organisation);
 
-	@Query("SELECT tal FROM TeilnehmerAnlassLink tal WHERE tal.anlass = :anlass AND tal.organisation = :organisation AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL)")
+	@Query("""
+			SELECT tal FROM TeilnehmerAnlassLink tal
+			WHERE tal.anlass = :anlass
+			  AND tal.organisation = :organisation
+			  AND (tal.meldeStatus NOT IN (:exclusion) OR tal.meldeStatus IS NULL)
+			""")
 	List<TeilnehmerAnlassLink> findByAnlassAndOrganisationExclude(Anlass anlass, Organisation organisation,
 			List<MeldeStatusEnum> exclusion);
 
 	Optional<TeilnehmerAnlassLink> findTopByStartnummerNotNullOrderByStartnummerDesc();
 
-	@NativeQuery("SELECT DISTINCT tal.abteilung FROM teilnehmer_anlass_link tal WHERE tal.anlass_id = :anlass_id AND tal.aktiv= :aktiv AND tal.kategorie= :kategorie AND tal.abteilung IS NOT NULL ORDER BY tal.abteilung")
-	List<AbteilungEnum> findDistinctByAnlassAndAktivAndKategorie(@Param("anlass_id") UUID anlass_id,
-			@Param("aktiv") boolean aktiv, @Param("kategorie") String kategorie);
+	@Query("SELECT DISTINCT tal.abteilung FROM TeilnehmerAnlassLink tal WHERE tal.anlass.id = :anlassId AND tal.aktiv = :aktiv AND tal.kategorie = :kategorie AND tal.abteilung IS NOT NULL ORDER BY tal.abteilung")
+	List<AbteilungEnum> findDistinctAbteilungenByAnlassAndKategorie(@Param("anlassId") UUID anlassId,
+			@Param("aktiv") boolean aktiv, @Param("kategorie") KategorieEnum kategorie);
 
-	@NativeQuery("SELECT DISTINCT tal.anlage FROM teilnehmer_anlass_link tal WHERE tal.anlass_id = :anlass_id AND tal.aktiv= :aktiv AND tal.kategorie= :kategorie AND tal.abteilung= :abteilung AND tal.anlage IS NOT NULL ORDER BY tal.anlage")
-	List<AnlageEnum> findDistinctByAnlassAndAktivAndKategorieAndAbteilung(@Param("anlass_id") UUID anlass_id,
-			@Param("aktiv") boolean aktiv, @Param("kategorie") String kategorie, @Param("abteilung") String abteilung);
+	@Query("SELECT DISTINCT tal.anlage FROM TeilnehmerAnlassLink tal WHERE tal.anlass.id = :anlassId AND tal.aktiv = :aktiv AND tal.kategorie = :kategorie AND tal.abteilung = :abteilung AND tal.anlage IS NOT NULL ORDER BY tal.anlage")
+	List<AnlageEnum> findDistinctAnlagenByAnlassAndKategorieAndAbteilung(@Param("anlassId") UUID anlassId,
+			@Param("aktiv") boolean aktiv, @Param("kategorie") KategorieEnum kategorie, @Param("abteilung") AbteilungEnum abteilung);
 }

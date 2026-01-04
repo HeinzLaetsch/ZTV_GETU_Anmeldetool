@@ -39,7 +39,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
-import org.ztv.anmeldetool.exception.EntityNotFoundException;
+import org.ztv.anmeldetool.exception.NotFoundException;
 import org.ztv.anmeldetool.models.AbteilungEnum;
 import org.ztv.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.models.Anlass;
@@ -52,7 +52,10 @@ import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.models.WertungsrichterBrevetEnum;
 import org.ztv.anmeldetool.models.WertungsrichterEinsatz;
 import org.ztv.anmeldetool.models.WertungsrichterSlot;
+import org.ztv.anmeldetool.output.AnmeldeKontrolleExport;
 import org.ztv.anmeldetool.output.AnmeldeKontrolleOutput;
+import org.ztv.anmeldetool.output.BenutzerExport;
+import org.ztv.anmeldetool.output.TeilnehmerExportImport;
 import org.ztv.anmeldetool.output.WertungsrichterOutput;
 import org.ztv.anmeldetool.service.AnlassService;
 import org.ztv.anmeldetool.service.AnlassSummaryService;
@@ -71,10 +74,6 @@ import org.ztv.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerStartDTO;
 import org.ztv.anmeldetool.transfer.WertungsrichterEinsatzDTO;
-import org.ztv.anmeldetool.util.AnmeldeKontrolleExport;
-import org.ztv.anmeldetool.util.BenutzerExport;
-import org.ztv.anmeldetool.util.TeilnehmerExportImport;
-import org.ztv.anmeldetool.util.WertungsrichterExport;
 
 // ...existing code...
 
@@ -568,10 +567,10 @@ public class AnlassAdminControllerTest {
         public void write(int b) {
         }
       });*/
-      try (MockedStatic<org.ztv.anmeldetool.util.TeilnehmerExportImport> ms = Mockito.mockStatic(
-          org.ztv.anmeldetool.util.TeilnehmerExportImport.class)) {
+      try (MockedStatic<TeilnehmerExportImport> ms = Mockito.mockStatic(
+          TeilnehmerExportImport.class)) {
         controller.getMutationen(mock(HttpServletRequest.class), response, id);
-        ms.verify(() -> org.ztv.anmeldetool.util.TeilnehmerExportImport.csvWriteToWriter(anyList(),
+        ms.verify(() -> TeilnehmerExportImport.csvWriteToWriter(anyList(),
             eq(response)));
       }
     }
@@ -762,7 +761,7 @@ public class AnlassAdminControllerTest {
       when(anlassSrv.getTeilnahmen(anlassId, orgId, false)).thenReturn(List.of(tal));
       when(teilnehmerAnlassMapper.toDto(tal)).thenReturn(mock(TeilnehmerAnlassLinkDTO.class));
       ResponseEntity<Collection<org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkDTO>> resp = controller.getTeilnehmer(
-          mock(HttpServletRequest.class), anlassId, orgId);
+          anlassId, orgId);
       assertEquals(200, resp.getStatusCodeValue());
     }
 
@@ -779,7 +778,7 @@ public class AnlassAdminControllerTest {
         when(builderMock.build()).thenReturn(uriComp);
         mocked.when(ServletUriComponentsBuilder::fromCurrentRequest).thenReturn(builderMock);
         ResponseEntity<Collection<org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkDTO>> resp = controller.getTeilnehmer(
-            mock(HttpServletRequest.class), anlassId, orgId);
+            anlassId, orgId);
         assertEquals(404, resp.getStatusCodeValue());
       }
     }
@@ -1113,7 +1112,7 @@ public class AnlassAdminControllerTest {
 
     @Test
     void entityNotFound_returns404AndMessage() {
-      EntityNotFoundException ex = new EntityNotFoundException(WertungsrichterEinsatz.class,
+      NotFoundException ex = new NotFoundException(WertungsrichterEinsatz.class,
           UUID.randomUUID());
       ResponseEntity<?> resp = controller.handlerEntityNotFound(ex);
       assertEquals(404, resp.getStatusCodeValue());

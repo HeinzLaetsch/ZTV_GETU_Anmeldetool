@@ -5,7 +5,11 @@ public enum WertungsrichterBrevetEnum {
 
 	public final int brevet;
 
-	private WertungsrichterBrevetEnum(int brevet) {
+  public static WertungsrichterBrevetEnum fromInt(int brevet) {
+    return WertungsrichterBrevetEnum.values()[brevet - 1];
+  }
+
+	WertungsrichterBrevetEnum(int brevet) {
 		this.brevet = brevet;
 	}
 }

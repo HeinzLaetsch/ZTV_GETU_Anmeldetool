@@ -11,5 +11,5 @@ import org.ztv.anmeldetool.models.FlywayHistory;
 public interface FlywayRepository extends JpaRepository<FlywayHistory, Integer> {
 	List<FlywayHistory> findByOrderByInstalledRank();
 
-	Optional<FlywayHistory> findByVersionAndSuccess(String version, boolean sucess);
+	Optional<FlywayHistory> findByVersionAndSuccess(String version, boolean success);
 }

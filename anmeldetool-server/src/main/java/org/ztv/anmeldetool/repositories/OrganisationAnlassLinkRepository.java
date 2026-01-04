@@ -1,6 +1,7 @@
 package org.ztv.anmeldetool.repositories;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,7 +13,7 @@ import org.ztv.anmeldetool.models.OrganisationAnlassLink;
 @Repository
 public interface OrganisationAnlassLinkRepository extends JpaRepository<OrganisationAnlassLink, UUID> {
 
-	List<OrganisationAnlassLink> findByOrganisationAndAnlass(Organisation organisation, Anlass anlass);
+	Optional<OrganisationAnlassLink> findByOrganisationAndAnlass(Organisation organisation, Anlass anlass);
 
 	List<OrganisationAnlassLink> findByAnlass(Anlass anlass);
 

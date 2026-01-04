@@ -15,6 +15,6 @@ public interface VerbandsRepository extends JpaRepository<Verband, UUID> {
 
 	List<Verband> findAllByAktiv(boolean aktiv);
 
-	Optional<Verband> findByVerband(String verbandAbkz);
+	Optional<Verband> findByVerband(String verband);
 
 }

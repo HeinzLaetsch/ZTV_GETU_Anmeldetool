@@ -28,8 +28,8 @@ public class MeldeStatusStatusDTO {
 	 */
 	@Override
 	public boolean equals(Object other) {
-		if (other instanceof MeldeStatusStatusDTO tO) {
-			return tO.meldeStatus.equals(this.meldeStatus);
+		if (other instanceof MeldeStatusStatusDTO) {
+      return ((MeldeStatusStatusDTO)other).meldeStatus.equals(this.meldeStatus);
 		}
 		return false;
 	}

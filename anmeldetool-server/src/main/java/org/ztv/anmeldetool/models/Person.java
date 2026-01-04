@@ -16,11 +16,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 @Entity()
 @Table(name = "person")
 @Getter
 @Setter
+@Slf4j
 public class Person extends Base {
 
 	private String benutzername;
@@ -44,7 +46,7 @@ public class Person extends Base {
 	private Wertungsrichter wertungsrichter;
 
 	public Person() {
-		this.organisationenLinks = new HashSet<OrganisationPersonLink>();
+		this.organisationenLinks = new HashSet<>();
 	}
 
 	@Builder
@@ -57,7 +59,7 @@ public class Person extends Base {
 		this.handy = handy;
 		this.email = email;
 		this.password = password;
-		this.organisationenLinks = new HashSet<OrganisationPersonLink>();
+		this.organisationenLinks = new HashSet<>();
 	}
 
 	public void addToOrganisationenLink(OrganisationPersonLink organisationenLink) {
@@ -67,4 +69,19 @@ public class Person extends Base {
 		}
 	}
 	// Wertungsrichter Info bei WR's
+  /**
+   * Checks if a person is an active member of a specific organisation.
+   * This is done by streaming through the person's organisation links and checking for a match.
+   *
+   * @param organisation The organisation to check for membership.
+   * @return {@code true} if the person is an active member of the organisation, {@code false} otherwise.
+   */
+  public boolean isPersonMemberOfOrganisation(Organisation organisation) {
+    if (organisation == null) {
+      log.info("Organisation is null. Person: {}, Organisation: {}", this, organisation);
+      return false;
+    }
+    return getOrganisationenLinks().stream()
+        .anyMatch(opLink -> opLink.isAktiv() && organisation.equals(opLink.getOrganisation()));
+  }
 }

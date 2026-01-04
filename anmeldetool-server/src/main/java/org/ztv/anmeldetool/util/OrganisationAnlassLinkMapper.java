@@ -15,10 +15,10 @@ public interface OrganisationAnlassLinkMapper {
 	@Mapping(source = "anlass.id", target = "anlassId")
 	@Mapping(source = "organisation.id", target = "organisationsId")
 	@Mapping(source = "aktiv", target = "startet")
-	public abstract OrganisationAnlassLinkDTO toDto(OrganisationAnlassLink organisationAnlassLink);
+	OrganisationAnlassLinkDTO toDto(OrganisationAnlassLink organisationAnlassLink);
 
 	@Mapping(source = "organisationAnlassLinkDto.startet", target = "aktiv")
 	@Mapping(source = "anlassId", target = "anlass")
 	@Mapping(source = "organisationsId", target = "organisation")
-	public abstract OrganisationAnlassLink toEntity(OrganisationAnlassLinkDTO organisationAnlassLinkDto);
+	OrganisationAnlassLink toEntity(OrganisationAnlassLinkDTO organisationAnlassLinkDto);
 }

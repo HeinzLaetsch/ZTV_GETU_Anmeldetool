@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.ztv.anmeldetool.exception.NotFoundException;
 import org.ztv.anmeldetool.models.AbteilungEnum;
 import org.ztv.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.models.Anlass;
@@ -25,209 +27,371 @@ import org.ztv.anmeldetool.repositories.EinzelnotenRepository;
 import org.ztv.anmeldetool.repositories.LauflistenContainerRepository;
 import org.ztv.anmeldetool.repositories.LauflistenRepository;
 import org.ztv.anmeldetool.repositories.NotenblaetterRepository;
+import org.ztv.anmeldetool.transfer.LauflisteDTO;
+import org.ztv.anmeldetool.transfer.LauflistenEintragDTO;
 import org.ztv.anmeldetool.transfer.LauflistenStatusDTO;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Service("lauflistenService")
 @Slf4j
+@AllArgsConstructor
 public class LauflistenService {
 
-	@Autowired
-	LauflistenRepository lauflistenRepo;
+  private final LauflistenRepository lauflistenRepo;
 
-	@Autowired
-	LauflistenContainerRepository lauflistenContainerRepo;
+  private final LauflistenContainerRepository lauflistenContainerRepo;
 
-	@Autowired
-	NotenblaetterRepository notenblaetterRepo;
+  private final NotenblaetterRepository notenblaetterRepo;
 
-	@Autowired
-	EinzelnotenRepository einzelnotenRepo;
+  private final EinzelnotenRepository einzelnotenRepo;
 
-	@Autowired
-	TeilnehmerAnlassLinkService talService;
+  private final TeilnehmerAnlassLinkService talService;
 
-	@Autowired
-	TeilnehmerService teilnehmerService;
+  private final AnlassService anlassService;
 
-	public Optional<Laufliste> findLauflisteById(UUID id) {
-		return this.lauflistenRepo.findById(id);
-	}
+  public Optional<Laufliste> findLauflisteById(UUID id) {
+    return this.lauflistenRepo.findById(id);
+  }
 
-	public Optional<Einzelnote> findEinzelnoteById(UUID id) {
-		return this.einzelnotenRepo.findById(id);
-	}
+  public Optional<Einzelnote> findEinzelnoteById(UUID id) {
+    return this.einzelnotenRepo.findById(id);
+  }
 
-	public Notenblatt saveNotenblatt(Notenblatt notenblatt) {
-		return notenblaetterRepo.save(notenblatt);
-	}
+  public Notenblatt saveNotenblatt(Notenblatt notenblatt) {
+    return notenblaetterRepo.save(notenblatt);
+  }
 
-	public Einzelnote saveEinzelnote(Einzelnote einzelnote) {
-		return einzelnotenRepo.save(einzelnote);
-	}
+  public Einzelnote saveEinzelnote(Einzelnote einzelnote) {
+    return einzelnotenRepo.save(einzelnote);
+  }
 
-	public List<Einzelnote> saveAllEinzelnoten(List<Einzelnote> einzelnoten) {
-		return einzelnotenRepo.saveAll(einzelnoten);
-	}
+  public List<Einzelnote> saveAllEinzelnoten(List<Einzelnote> einzelnoten) {
+    return einzelnotenRepo.saveAll(einzelnoten);
+  }
 
-	public Laufliste saveLaufliste(Laufliste laufliste) {
-		return lauflistenRepo.save(laufliste);
-	}
+  public LauflisteDTO updateLauflisteStatus(UUID lauflistenId, LauflisteDTO lauflisteDto) {
+    Optional<Laufliste> lauflisteOpt = findLauflisteById(lauflistenId);
+    if (lauflisteOpt.isPresent()) {
+      Laufliste laufliste = lauflisteOpt.get();
+      laufliste.setErfasst(lauflisteDto.isErfasst());
+      laufliste.setChecked(lauflisteDto.isChecked());
+      saveLaufliste(laufliste);
+      return lauflisteDto;
+    } else {
+      throw new NotFoundException(Laufliste.class, lauflisteDto.getId().toString());
+    }
+  }
 
-	public List<Laufliste> saveAllLauflisten(List<Laufliste> lauflisten) {
-		return lauflistenRepo.saveAll(lauflisten);
-	}
+  public LauflistenEintragDTO saveLauflistenEintrag(UUID lauflisteneintragId,
+      LauflistenEintragDTO lauflistenEintragDto) {
+    Optional<TeilnehmerAnlassLink> talOpt = talService.findTeilnehmerAnlassLinkById(
+        lauflistenEintragDto.getTal_id());
+    Optional<Laufliste> lauflisteOpt = findLauflisteById(lauflistenEintragDto.getLaufliste_id());
+    if (talOpt.isPresent() && lauflisteOpt.isPresent()) {
+      TeilnehmerAnlassLink tal = talOpt.get();
+      Laufliste laufliste = lauflisteOpt.get();
+      Einzelnote einzelnote = tal.getNotenblatt().getEinzelnoteForGeraet(laufliste.getGeraet());
+      einzelnote.setChecked(lauflistenEintragDto.isChecked());
+      if (GeraetEnum.BARREN.equals(laufliste.getGeraet()) && TiTuEnum.Ti.equals(
+          tal.getTeilnehmer().getTiTu())) {
+        einzelnote.setNote_1(0);
+        einzelnote.setNote_2(0);
+        einzelnote.setErfasst(true);
+        einzelnote.setChecked(true);
+      } else {
+        einzelnote.setNote_1(lauflistenEintragDto.getNote_1());
+        einzelnote.setNote_2(lauflistenEintragDto.getNote_2());
+        if (einzelnote.getNote_1() >= 0
+            && ((einzelnote.getNote_2() >= 0) || !GeraetEnum.SPRUNG.equals(
+            laufliste.getGeraet()))) {
+          einzelnote.setErfasst(true);
+        } else {
+          einzelnote.setErfasst(false);
+        }
+      }
+      einzelnote = saveEinzelnote(einzelnote);
+      if (!(GeraetEnum.BARREN.equals(laufliste.getGeraet())
+          && TiTuEnum.Ti.equals(tal.getTeilnehmer().getTiTu()))) {
+        Notenblatt notenblatt = updateNotenblatt(tal.getNotenblatt(), tal.getKategorie());
+        saveNotenblatt(notenblatt);
+      }
+      if (tal.isDeleted() && !lauflistenEintragDto.isDeleted()) {
+        tal.setDeleted(false);
+        tal.setMeldeStatus(MeldeStatusEnum.STARTET);
+        talService.save(tal);
+      }
+      return LauflistenEintragDTO.builder().id(tal.getId())
+          .laufliste_id(laufliste.getId())
+          .startnummer(tal.getStartnummer()).verein(tal.getOrganisation().getName())
+          .name(tal.getTeilnehmer().getName()).vorname(tal.getTeilnehmer().getVorname())
+          .note_1(einzelnote.getNote_1()).note_2(einzelnote.getNote_2())
+          .checked(einzelnote.isChecked())
+          .erfasst(einzelnote.isErfasst()).tal_id(tal.getId()).deleted(tal.isDeleted()).build();
+    } else {
+      throw new NotFoundException(Laufliste.class,
+          lauflistenEintragDto.getLaufliste_id().toString());
+    }
+  }
 
-	public LauflistenContainer saveLaufliste(LauflistenContainer lauflistenContainer) {
-		return lauflistenContainerRepo.save(lauflistenContainer);
-	}
+  private Notenblatt updateNotenblatt(Notenblatt notenblatt, KategorieEnum kategorie) {
+    List<Einzelnote> einzelnoten = notenblatt.getEinzelnoten();
+    float gesamtPunktzahl = 0.0f;
+    for (Einzelnote einzelnote : einzelnoten) {
+      float note = einzelnote.getNote_1();
+      if (GeraetEnum.SPRUNG.equals(einzelnote.getGeraet())) {
+        if (kategorie.ordinal() == KategorieEnum.K6.ordinal()
+            || kategorie.ordinal() == KategorieEnum.K7.ordinal()) {
+          note += einzelnote.getNote_2();
+          note = note / 2;
+        } else {
+          if (note < einzelnote.getNote_2()) {
+            note = einzelnote.getNote_2();
+          }
+        }
+        einzelnote.setZaehlbar(note);
+      }
+      gesamtPunktzahl += note;
+    }
+    notenblatt.setGesamtPunktzahl(gesamtPunktzahl);
+    return notenblatt;
+  }
 
-	public LauflistenStatusDTO findLauflistenStatusForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie,
-			TiTuEnum titu) {
-		List<LauflistenContainer> containerList = lauflistenContainerRepo
-				.findByAnlassAndKategorieOrderByStartgeraetAsc(anlass, kategorie);
-		containerList = containerList.stream().filter(container -> {
-			if (container.getTeilnehmerAnlassLinks() != null && container.getTeilnehmerAnlassLinks().size() > 0) {
-				TiTuEnum tiTuLocal = container.getTeilnehmerAnlassLinks().getFirst().getTeilnehmer().getTiTu();
-				return titu.equals(tiTuLocal);
-			}
-			return false;
-		}).collect(Collectors.toList());
-		long checkedCount = containerList.stream().filter(container -> {
-			return container.getGeraeteLauflisten().stream().filter(laufliste -> {
-				return !laufliste.isChecked();
-			}).count() == 0;
-		}).count();
-		long erfasstCount = containerList.stream().filter(container -> {
-			return container.getGeraeteLauflisten().stream().filter(laufliste -> {
-				return !laufliste.isErfasst();
-			}).count() == 0;
-		}).count();
-		LauflistenStatusDTO lauflistenStatusDto = new LauflistenStatusDTO();
-		lauflistenStatusDto.setAllChecked(containerList.size() == checkedCount);
-		lauflistenStatusDto.setAllErfasst(containerList.size() == erfasstCount);
-		return lauflistenStatusDto;
-	}
+ @Transactional
+  public Laufliste saveLaufliste(Laufliste laufliste) {
+    return lauflistenRepo.save(laufliste);
+  }
 
-	public List<LauflistenContainer> findLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie,
-			AbteilungEnum abteilung, AnlageEnum anlage) {
-		List<LauflistenContainer> existierende = lauflistenContainerRepo
-				.findByAnlassAndKategorieOrderByStartgeraetAsc(anlass, kategorie);
-		log.debug("Found {} Lauflisten for Anlass {} , Kategorie {} , Abteilung {} , Anlage {}", existierende.size(),
-				anlass.getAnlassBezeichnung(), kategorie.toString(), abteilung.toString(), anlage.toString());
-		existierende = existierende.stream().filter(container -> {
-			if (container.getTeilnehmerAnlassLinks() != null && container.getTeilnehmerAnlassLinks().size() > 0
-					&& container.getTeilnehmerAnlassLinks().getFirst().getAbteilung() != null) {
-				if (abteilung.equals(AbteilungEnum.UNDEFINED)
-						|| container.getTeilnehmerAnlassLinks().getFirst().getAbteilung().equals(abteilung)) {
-					if (anlage.equals(AnlageEnum.UNDEFINED)
-							|| container.getTeilnehmerAnlassLinks().getFirst().getAnlage().equals(anlage)) {
-						return true;
-					}
-				}
-			}
-			return false;
-		}).collect(Collectors.toList());
-		return existierende;
-	}
+  @Transactional
+  public List<Laufliste> saveAllLauflisten(List<Laufliste> lauflisten) {
+    return lauflistenRepo.saveAll(lauflisten);
+  }
 
-	public AnlassLauflisten generateLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie,
-			AbteilungEnum abteilung, AnlageEnum anlage, boolean tiOnly) throws ServiceException {
+  @Transactional
+  public LauflistenContainer saveLauflistenContainer(LauflistenContainer lauflistenContainer) {
+    return lauflistenContainerRepo.save(lauflistenContainer);
+  }
 
-		List<LauflistenContainer> existierende = findLauflistenForAnlassAndKategorie(anlass, kategorie, abteilung,
-				anlage);
-		if (existierende.size() > 0) {
-			throw new ServiceException(LauflistenService.class,
-					"Es existieren schon Lauflisten für Anlass {} und Kategorie {}".formatted(
-							anlass.getAnlassBezeichnung(), kategorie));
-		}
-		try {
-			List<TeilnehmerAnlassLink> tals = talService.findAnlassTeilnahmenByKategorie(anlass, kategorie);
-			AnlassLauflisten anlasslaufListen = new AnlassLauflisten();
-			for (TeilnehmerAnlassLink tal : tals) {
-				if (tal.getAbteilung() != null && tal.getAnlage() != null && tal.getStartgeraet() != null
-						&& (abteilung.equals(AbteilungEnum.UNDEFINED) || tal.getAbteilung().equals(abteilung))
-						&& (anlage.equals(AnlageEnum.UNDEFINED) || tal.getAnlage().equals(anlage))
-						&& tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET_1
-						&& tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET_2
-						&& tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET_3
-						&& tal.getMeldeStatus() != MeldeStatusEnum.UMMELDUNG) {
-					tal = this.createNotenblatt(tal);
-					TiTuEnum titu = anlass.getTiTu();
-					if (tiOnly) {
-						titu = TiTuEnum.Ti;
-					}
-					anlasslaufListen.createFromTal(lauflistenRepo, titu, tal, abteilung, anlage);
-				}
-			}
-			// anlasslaufListen.getLauflistenContainer().get(0).getTeilnehmerAnlassLinks();
-			persistLauflisten(anlasslaufListen);
-			return anlasslaufListen;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			throw new ServiceException(LauflistenService.class,
-					"Fehler beim generieren von Lauflisten für Anlass {} und Kategorie {}, {}".formatted(
-							anlass.getAnlassBezeichnung(), kategorie, ex.getMessage()));
-		}
-	}
+  public LauflistenStatusDTO findLauflistenStatusForAnlassAndKategorie(UUID anlassId,
+      KategorieEnum kategorie,
+      TiTuEnum titu) {
+    Anlass anlass = anlassService.findById(anlassId);
+    List<LauflistenContainer> containerList = lauflistenContainerRepo
+        .findByAnlassAndKategorieOrderByStartgeraetAsc(anlass, kategorie);
+    containerList = containerList.stream().filter(container -> {
+      if (container.getTeilnehmerAnlassLinks() != null
+          && !container.getTeilnehmerAnlassLinks().isEmpty()) {
+        TiTuEnum tiTuLocal = container.getTeilnehmerAnlassLinks().getFirst().getTeilnehmer()
+            .getTiTu();
+        return titu.equals(tiTuLocal);
+      }
+      return false;
+    }).toList();
+    long checkedCount = containerList.stream()
+        .filter(container -> container.getGeraeteLauflisten().stream().allMatch(
+            Laufliste::isChecked)).count();
+    long erfasstCount = containerList.stream().filter(container ->
+        container.getGeraeteLauflisten().stream().allMatch(Laufliste::isErfasst)).count();
+    LauflistenStatusDTO lauflistenStatusDto = new LauflistenStatusDTO();
+    lauflistenStatusDto.setAllChecked(containerList.size() == checkedCount);
+    lauflistenStatusDto.setAllErfasst(containerList.size() == erfasstCount);
+    return lauflistenStatusDto;
+  }
 
-	public List<LauflistenContainer> getLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie,
-			AbteilungEnum abteilung, AnlageEnum anlage) {
-		List<LauflistenContainer> existierende = findLauflistenForAnlassAndKategorie(anlass, kategorie, abteilung,
-				anlage);
-		return existierende;
-	}
+  public List<LauflistenContainer> findLauflistenForAnlassAndKategorie(UUID anlassId,
+      KategorieEnum kategorie,
+      AbteilungEnum abteilung, AnlageEnum anlage) {
+    Anlass anlass = anlassService.findById(anlassId);
+    List<LauflistenContainer> existierende = lauflistenContainerRepo
+        .findByAnlassAndKategorieOrderByStartgeraetAsc(anlass, kategorie);
+    log.debug("Found {} Lauflisten for Anlass {} , Kategorie {} , Abteilung {} , Anlage {}",
+        existierende.size(),
+        anlass.getAnlassBezeichnung(), kategorie.toString(), abteilung.toString(),
+        anlage.toString());
+    existierende = existierende.stream().filter(container -> {
+      if (container.getTeilnehmerAnlassLinks() != null
+          && !container.getTeilnehmerAnlassLinks().isEmpty()
+          && container.getTeilnehmerAnlassLinks().getFirst().getAbteilung() != null) {
+        if (abteilung.equals(AbteilungEnum.UNDEFINED)
+            || container.getTeilnehmerAnlassLinks().getFirst().getAbteilung().equals(abteilung)) {
+          if (anlage.equals(AnlageEnum.UNDEFINED)
+              || container.getTeilnehmerAnlassLinks().getFirst().getAnlage().equals(anlage)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }).toList();
+    return existierende;
+  }
 
-	public int deleteLauflistenForAnlassAndKategorie(Anlass anlass, KategorieEnum kategorie, AbteilungEnum abteilung,
-			AnlageEnum anlage) throws ServiceException {
-		List<LauflistenContainer> existierende = findLauflistenForAnlassAndKategorie(anlass, kategorie, abteilung,
-				anlage);
-		List<Notenblatt> notenblaetter = new ArrayList<Notenblatt>();
-		existierende.forEach(container -> {
-			container.getTeilnehmerAnlassLinks().forEach(tal -> {
-				if (abteilung.equals(AbteilungEnum.UNDEFINED) || tal.getAbteilung().equals(abteilung)) {
-					tal.setLauflistenContainer(null);
-					talService.save(tal);
-					notenblaetter.add(tal.getNotenblatt());
-					tal.setNotenblatt(null);
-				}
-			});
-		});
-		notenblaetterRepo.deleteAll(notenblaetter);
-		lauflistenContainerRepo.deleteAll(existierende);
-		return existierende.size();
-	}
+  public AnlassLauflisten generateLauflistenForAnlassAndKategorie(UUID anlassId,
+      KategorieEnum kategorie,
+      AbteilungEnum abteilung, AnlageEnum anlage, boolean tiOnly) throws ServiceException {
+    Anlass anlass = anlassService.findById(anlassId);
+    List<LauflistenContainer> existierende = findLauflistenForAnlassAndKategorie(anlassId,
+        kategorie,
+        abteilung,
+        anlage);
+    if (!existierende.isEmpty()) {
+      throw new ServiceException(LauflistenService.class,
+          "Es existieren schon Lauflisten für Anlass {} und Kategorie {}".formatted(
+              anlass.getAnlassBezeichnung(), kategorie));
+    }
+    try {
+      List<TeilnehmerAnlassLink> tals = talService.findAnlassTeilnahmenByKategorie(anlass,
+          kategorie);
+      AnlassLauflisten anlasslaufListen = new AnlassLauflisten();
+      for (TeilnehmerAnlassLink tal : tals) {
+        if (tal.getAbteilung() != null && tal.getAnlage() != null && tal.getStartgeraet() != null
+            && (abteilung.equals(AbteilungEnum.UNDEFINED) || tal.getAbteilung().equals(abteilung))
+            && (anlage.equals(AnlageEnum.UNDEFINED) || tal.getAnlage().equals(anlage))
+            && tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET_1
+            && tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET_2
+            && tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET_3
+            && tal.getMeldeStatus() != MeldeStatusEnum.UMMELDUNG) {
+          tal = this.createNotenblatt(tal);
+          TiTuEnum titu = anlass.getTiTu();
+          if (tiOnly) {
+            titu = TiTuEnum.Ti;
+          }
+          anlasslaufListen.createFromTal(lauflistenRepo, titu, tal, abteilung, anlage);
+        }
+      }
+      persistLauflisten(anlasslaufListen);
+      return anlasslaufListen;
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      throw new ServiceException(LauflistenService.class,
+          "Fehler beim generieren von Lauflisten für Anlass {} und Kategorie {}, {}".formatted(
+              anlass.getAnlassBezeichnung(), kategorie, ex.getMessage()));
+    }
+  }
 
-	private TeilnehmerAnlassLink createNotenblatt(TeilnehmerAnlassLink tal) {
-		Notenblatt notenblatt = new Notenblatt();
-		List<Einzelnote> einzelnoten = new ArrayList<Einzelnote>();
-		notenblatt.setEinzelnoten(einzelnoten);
-		notenblatt.setTal(tal);
-		tal.setNotenblatt(notenblatt);
-		GeraetEnum[] values = GeraetEnum.values();
-		for (GeraetEnum value : values) {
-			if (GeraetEnum.UNDEFINED.equals(value)) {
-				continue;
-			}
-			Einzelnote einzelnote = new Einzelnote();
-			einzelnote.setNotenblatt(notenblatt);
-			einzelnote.setGeraet(value);
-			einzelnoten.add(einzelnote);
-		}
-		return tal;
-	}
+  public List<LauflistenContainer> getLauflistenForAnlassAndKategorie(UUID anlassId,
+      KategorieEnum kategorie,
+      AbteilungEnum abteilung, AnlageEnum anlage) {
+    return findLauflistenForAnlassAndKategorie(anlassId, kategorie,
+        abteilung,
+        anlage);
+  }
 
-	public Optional<Laufliste> findLauflistenForAnlassAndSearch(Anlass anlass, String search) {
-		List<Laufliste> lauflisten = lauflistenRepo.findByKey(search);
-		return lauflisten.stream().filter(liste -> {
-			return liste.getLauflistenContainer().getAnlass().equals(anlass);
-		}).findFirst();
-	}
+  public int deleteLauflistenForAnlassAndKategorie(UUID anlassId, KategorieEnum kategorie,
+      AbteilungEnum abteilung,
+      AnlageEnum anlage) throws ServiceException {
+    List<LauflistenContainer> existierende = findLauflistenForAnlassAndKategorie(anlassId,
+        kategorie,
+        abteilung,
+        anlage);
+    List<Notenblatt> notenblaetter = new ArrayList<Notenblatt>();
+    existierende.forEach(container -> {
+      container.getTeilnehmerAnlassLinks().forEach(tal -> {
+        if (abteilung.equals(AbteilungEnum.UNDEFINED) || tal.getAbteilung().equals(abteilung)) {
+          tal.setLauflistenContainer(null);
+          talService.save(tal);
+          notenblaetter.add(tal.getNotenblatt());
+          tal.setNotenblatt(null);
+        }
+      });
+    });
+    notenblaetterRepo.deleteAll(notenblaetter);
+    lauflistenContainerRepo.deleteAll(existierende);
+    return existierende.size();
+  }
 
-	private void persistLauflisten(AnlassLauflisten anlassLaufListen) {
-		List<LauflistenContainer> concated = anlassLaufListen.getLauflistenContainer();
-		log.debug("Anzahl Elements {}", concated.size());
-		lauflistenContainerRepo.saveAll(concated);
-	}
+  private TeilnehmerAnlassLink createNotenblatt(TeilnehmerAnlassLink tal) {
+    Notenblatt notenblatt = new Notenblatt();
+    List<Einzelnote> einzelnoten = new ArrayList<>();
+    notenblatt.setEinzelnoten(einzelnoten);
+    notenblatt.setTal(tal);
+    tal.setNotenblatt(notenblatt);
+    GeraetEnum[] values = GeraetEnum.values();
+    for (GeraetEnum value : values) {
+      if (GeraetEnum.UNDEFINED.equals(value)) {
+        continue;
+      }
+      Einzelnote einzelnote = new Einzelnote();
+      einzelnote.setNotenblatt(notenblatt);
+      einzelnote.setGeraet(value);
+      einzelnoten.add(einzelnote);
+    }
+    return tal;
+  }
+
+  public Laufliste findLauflistenForSearch(String search) {
+    Optional<Laufliste> lauflistenOpt = lauflistenRepo.findByKey(search);
+    return lauflistenOpt.orElseThrow(() -> new NotFoundException(Laufliste.class, search));
+  }
+
+  public AnlassLauflisten generateLauflistenPdfForAnlassAndKategorie(UUID anlassId,
+      KategorieEnum kategorie, AbteilungEnum abteilung, AnlageEnum anlage,
+      Optional<Boolean> optOnlyTi)
+      throws ServiceException {
+    boolean onlyTi = optOnlyTi.orElse(false);
+    AnlassLauflisten anlassLauflisten = generateLauflistenForAnlassAndKategorie(anlassId, kategorie,
+        abteilung, anlage, onlyTi);
+    anlassLauflisten.getLauflistenContainer().stream().forEach(container -> {
+      saveAllLauflisten(container.getGeraeteLauflisten());
+      container.getGeraeteLauflisten().stream().forEach(laufliste -> {
+        laufliste.getEinzelnoten().stream().forEach(einzelnote -> {
+          Einzelnote note = findEinzelnoteById(einzelnote.getId()).get();
+          note.setStartOrder(einzelnote.getStartOrder());
+          saveEinzelnote(note);
+        });
+      });
+    });
+    return anlassLauflisten;
+  }
+
+  public List<LauflisteDTO> getLauflistenDtosForFilter(UUID anlassId, KategorieEnum kategorie,
+      AbteilungEnum abteilung, AnlageEnum anlage) {
+    List<LauflistenContainer> listen = getLauflistenForAnlassAndKategorie(
+        anlassId, kategorie,
+        abteilung, anlage);
+    List<Laufliste> alle = new ArrayList<>();
+    for (LauflistenContainer container : listen) {
+      alle.addAll(container.getGeraeteLauflisten());
+    }
+
+    return alle.stream()
+        .map(laufliste -> LauflisteDTO.builder().laufliste(laufliste.getKey()).abteilung(abteilung)
+            .anlage(anlage)
+            .geraet(laufliste.getGeraet()).id(laufliste.getId()).erfasst(laufliste.isErfasst())
+            .checked(laufliste.isChecked()).abloesung(laufliste.getAbloesung()).build())
+        .collect(Collectors.toList());
+  }
+
+  private void persistLauflisten(AnlassLauflisten anlassLaufListen) {
+    List<LauflistenContainer> concated = anlassLaufListen.getLauflistenContainer();
+    log.debug("Anzahl Elements {}", concated.size());
+    lauflistenContainerRepo.saveAll(concated);
+  }
+
+  public LauflisteDTO findLauflisteDtoBySearch(String search) {
+    Laufliste laufliste = findLauflistenForSearch(search);
+
+    List<TeilnehmerAnlassLink> tals = laufliste.getLauflistenContainer()
+        .getTeilnehmerAnlassLinks();
+    if (tals == null || tals.size() == 0) {
+      throw new NotFoundException(TeilnehmerAnlassLink.class,
+          "Tals not found for Laufliste " + search);
+    }
+    TeilnehmerAnlassLink firstTal = tals.getFirst();
+
+    List<LauflistenEintragDTO> eintraege = tals.stream().map(tal -> {
+      Einzelnote einzelnote = tal.getNotenblatt().getEinzelnoteForGeraet(laufliste.getGeraet());
+
+      return LauflistenEintragDTO.builder().id(tal.getId()).laufliste_id(laufliste.getId())
+          .startnummer(tal.getStartnummer()).startOrder(einzelnote.getStartOrder())
+          .verein(tal.getOrganisation().getName()).name(tal.getTeilnehmer().getName())
+          .vorname(tal.getTeilnehmer().getVorname()).note_1(einzelnote.getNote_1())
+          .note_2(einzelnote.getNote_2()).checked(einzelnote.isChecked())
+          .erfasst(einzelnote.isErfasst())
+          .tal_id(tal.getId()).deleted(tal.isDeleted()).build();
+    }).collect(Collectors.toList());
+
+    return LauflisteDTO.builder().laufliste(laufliste.getKey())
+        .abteilung(firstTal.getAbteilung()).anlage(firstTal.getAnlage())
+        .geraet(laufliste.getGeraet())
+        .id(laufliste.getId()).eintraege(eintraege).erfasst(laufliste.isErfasst())
+        .checked(laufliste.isChecked()).abloesung(laufliste.getAbloesung()).build();
+  }
 }
