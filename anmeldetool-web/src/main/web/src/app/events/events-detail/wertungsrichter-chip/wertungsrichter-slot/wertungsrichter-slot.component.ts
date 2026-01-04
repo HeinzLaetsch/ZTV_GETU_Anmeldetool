@@ -42,7 +42,7 @@ export class WertungsrichterSlotComponent implements OnInit {
     private datePipe: DatePipe
   ) {}
   ngOnInit(): void {
-    // console.log("Einsatz: ", this.einsatz);
+    console.log("Einsatz: ", this.einsatz);
   }
 
   isCheckboxDisabled() {

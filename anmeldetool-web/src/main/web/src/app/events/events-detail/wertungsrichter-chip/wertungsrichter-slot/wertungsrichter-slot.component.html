@@ -1,4 +1,4 @@
-<div *ngIf="einsatz; else loading" class="slot">
+<div *ngIf="einsatz !== undefined; else loading" class="slot">
   <mat-checkbox
     [ngClass]="{
       'label-green': einsatz.eingesetzt,
@@ -12,6 +12,7 @@
 </div>
 
 <ng-template #loading>
+  Einsatz
   <div class="center">
     <mat-spinner style="margin: 0 auto"></mat-spinner>
   </div>

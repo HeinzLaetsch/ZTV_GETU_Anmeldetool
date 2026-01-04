@@ -50,8 +50,8 @@ export class WertungsrichterSelektionComponent
 
   assignedWr1s = new Array<IUser>();
   assignedWr2s = new Array<IUser>();
-  wr1s = new Array<IUser>();
-  wr2s = new Array<IUser>();
+  //wr1s = new Array<IUser>();
+  //wr2s = new Array<IUser>();
 
   wertungsrichterPflichtBrevet1: number;
   wertungsrichterPflichtBrevet2: number;
@@ -117,8 +117,8 @@ export class WertungsrichterSelektionComponent
         this.availableWertungsrichter2 = this.getAvailableWertungsrichter2();
       });
     // ist asynchron
-    this.getVerfuegbareWertungsrichter(this.wr1s, 1);
-    this.getVerfuegbareWertungsrichter(this.wr2s, 2);
+    this.getVerfuegbareWertungsrichter(this.availableWertungsrichter1, 1); // this.wr1s
+    this.getVerfuegbareWertungsrichter(this.availableWertungsrichter2, 2); // this.wr2s
 
     this.wertungsrichterPflichtBrevet1 =
       this.getWertungsrichterPflichtBrevet1();
@@ -186,13 +186,15 @@ export class WertungsrichterSelektionComponent
 
   getAvailableWertungsrichter1(): IUser[] {
     if (this.useBrevet2) {
-      return this.wr1s.concat(this.wr2s);
+      return this.availableWertungsrichter1.concat(
+        this.availableWertungsrichter2
+      );
     }
-    return this.wr1s;
+    return this.availableWertungsrichter1;
   }
 
   getAvailableWertungsrichter2(): IUser[] {
-    return this.wr2s;
+    return this.availableWertungsrichter2;
   }
 
   drop(event: CdkDragDrop<String[]>, liste: string) {
