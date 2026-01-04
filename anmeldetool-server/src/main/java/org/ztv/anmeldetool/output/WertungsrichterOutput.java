@@ -1,5 +1,6 @@
 package org.ztv.anmeldetool.output;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.format.DateTimeFormatter;
@@ -28,7 +29,10 @@ import com.itextpdf.layout.properties.UnitValue;
 public class WertungsrichterOutput {
 
 	public static float[] headerWidths = { 20.0f, 20.0f, 10.0f, 10.0f, 40.0f };
-
+  public static void createWertungsrichter(HttpServletResponse response, AnmeldeKontrolleDTO anmeldeKontrolle,
+      List<PersonAnlassLink> palBr1, List<PersonAnlassLink> palBr2) throws IOException {
+    WertungsrichterOutput.createWertungsrichter(response.getOutputStream(), anmeldeKontrolle, palBr1, palBr2);
+  }
 	public static void createWertungsrichter(OutputStream out, AnmeldeKontrolleDTO anmeldeKontrolle,
 			List<PersonAnlassLink> palBr1, List<PersonAnlassLink> palBr2) throws IOException {
 		PdfFont fontN = PdfFontFactory.createFont(StandardFonts.HELVETICA);

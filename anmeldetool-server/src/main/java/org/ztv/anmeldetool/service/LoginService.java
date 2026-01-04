@@ -1,5 +1,6 @@
 package org.ztv.anmeldetool.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,19 +20,22 @@ import org.ztv.anmeldetool.util.PersonHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.ztv.anmeldetool.util.PersonMapper;
 
 @Slf4j
 @Service("loginService")
+@AllArgsConstructor
 public class LoginService {
 
-	@Autowired
-  AuthenticationManager authenticationManager;
+  private final AuthenticationManager authenticationManager;
 
-	@Autowired
-	PersonService personSrv;
+  private final PersonService personSrv;
 
-	@Autowired
-	OrganisationService organisationSrv;
+  private final PersonMapper personMapper;
+
+  private final OrganisationService organisationSrv;
+
+  private final OrganisationPersonLinkService orgPersLinkSrv;
 
 	public ResponseEntity<PersonDTO> login(HttpServletRequest request, LoginData loginData) {
 		log.debug("Submitted Password:" + loginData.getPassword());
@@ -40,11 +44,11 @@ public class LoginService {
 		if (person == null) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		Organisation organisation = organisationSrv.findOrganisationById(loginData.getOrganisationId());
+		Organisation organisation = organisationSrv.findById(loginData.getOrganisationId());
 		if (organisation == null) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		if (!PersonHelper.isPersonMemberOfOrganisation(person, organisation)) {
+		if (!orgPersLinkSrv.isPersonMemberOfOrganisation(person, organisation)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 		UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken(

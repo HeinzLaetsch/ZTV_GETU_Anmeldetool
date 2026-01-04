@@ -1,4 +1,4 @@
-package org.ztv.anmeldetool.util;
+package org.ztv.anmeldetool.output;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -53,6 +53,7 @@ public class AnmeldeKontrolleExport {
 		responseWriter.close();
 	}
 
+	//TODO wird wohl nicht mehr gebraucht
 	public static List<TeilnehmerAnlassLinkCsvDTO> csvWriteToWriter(InputStream inputStream) throws IOException {
 		byte[] cachedBody = StreamUtils.copyToByteArray(inputStream);
 		int start = 0;

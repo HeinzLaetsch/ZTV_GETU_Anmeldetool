@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,14 +46,15 @@ public class ZtvUserDetailService implements UserDetailsService {
 		String[] parts = LoginData.splitCombinedUsername(benutzername);
 		log.debug("CombinedUsername is: " + benutzername + " , parts: " + parts.length);
 
-		Person person = personenRepository.findByBenutzernameIgnoreCase(parts[0]);
-		if (person == null) {
+		Optional<Person> personOpt = personenRepository.findByBenutzernameIgnoreCase(parts[0]);
+		if (personOpt.isEmpty()) {
 			return new org.springframework.security.core.userdetails.User(" ", " ", true, true, true, true,
-					getAuthorities(Arrays.asList(roleRepository.findByName(RollenEnum.BENUTZER.name()))));
+					getAuthorities(List.of(roleRepository.findByName(RollenEnum.BENUTZER.name()).orElseThrow())));
 		}
-		Organisation organisation = null;
+    Person person = personOpt.get();
+		Organisation organisation;
 		if (parts.length > 1) {
-			organisation = organisationSrv.findOrganisationById(UUID.fromString(parts[1]));
+			organisation = organisationSrv.findById(UUID.fromString(parts[1]));
 		} else {
 			organisation = organisationSrv.findOrganisationByName("ZTV");
 		}

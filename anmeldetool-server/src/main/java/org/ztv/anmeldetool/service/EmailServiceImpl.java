@@ -1,8 +1,8 @@
 package org.ztv.anmeldetool.service;
 
+import java.util.Collections;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -15,10 +15,12 @@ import org.ztv.anmeldetool.models.Person;
 import jakarta.activation.DataSource;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service("EmailService")
 @Slf4j
+@RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
 	@Value("${spring.mail.enabled}")
@@ -33,11 +35,9 @@ public class EmailServiceImpl implements EmailService {
 	@Value("${spring.mail.simulate}")
 	private boolean simulate;
 
-	@Autowired
-	private JavaMailSender emailSender;
+	private final JavaMailSender emailSender;
 
-	@Autowired
-	private SpringTemplateEngine thymeleafTemplateEngine;
+	private final SpringTemplateEngine thymeleafTemplateEngine;
 
 	@Value("classpath:/ZTV_Logo_CMYK_freigestellt.png")
 	private Resource resourceFile;
@@ -49,10 +49,11 @@ public class EmailServiceImpl implements EmailService {
 			MimeMessage message = emailSender.createMimeMessage();
 			MimeMessageHelper helper = generateHtmlMessage(message, to, subject, mailTemplate, templateModel);
 
-			if (null != dataSourceArray) {
+			if (dataSourceArray != null) {
 				int i = 1;
 				for (DataSource datasource : dataSourceArray) {
 					helper.addAttachment(datasource.getName() + "_" + i, datasource);
+					i++;
 				}
 			}
 			if (enableEmail) {
@@ -61,13 +62,13 @@ public class EmailServiceImpl implements EmailService {
 				log.warn("Mail Service is disabled");
 			}
 		} catch (MessagingException e) {
-			e.printStackTrace();
+			log.error("Failed to send email to {} with subject {} using template {}", to != null ? to.getEmail() : null, subject, mailTemplate, e);
 		}
 	}
 
 	private String getHtmlBody(String mailTemplate, Map<String, Object> templateModel) {
 		Context thymeleafContext = new Context();
-		thymeleafContext.setVariables(templateModel);
+		thymeleafContext.setVariables(templateModel != null ? templateModel : Collections.emptyMap());
 
 		String htmlBody = thymeleafTemplateEngine.process(mailTemplate, thymeleafContext);
 		return htmlBody;

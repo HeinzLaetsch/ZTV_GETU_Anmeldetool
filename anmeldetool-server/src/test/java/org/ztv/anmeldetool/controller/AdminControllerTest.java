@@ -24,7 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
-import org.ztv.anmeldetool.exception.EntityNotFoundException;
+import org.ztv.anmeldetool.exception.NotFoundException;
 import org.ztv.anmeldetool.models.Person;
 import org.ztv.anmeldetool.models.Wertungsrichter;
 import org.ztv.anmeldetool.models.LoginData;
@@ -118,7 +118,7 @@ public class AdminControllerTest {
             ResponseEntity<PersonDTO> serviceResp = ResponseEntity.ok(dto);
             when(loginSrv.login(any(HttpServletRequest.class), any(LoginData.class))).thenReturn(serviceResp);
 
-            ResponseEntity<PersonDTO> resp = controller.post(req, ld);
+            ResponseEntity<PersonDTO> resp = controller.login(req, ld);
             assertSame(serviceResp, resp);
         }
 
@@ -127,7 +127,7 @@ public class AdminControllerTest {
             HttpServletRequest req = mock(HttpServletRequest.class);
             org.ztv.anmeldetool.models.LoginData ld = new org.ztv.anmeldetool.models.LoginData();
             when(loginSrv.login(any(HttpServletRequest.class), any(LoginData.class))).thenThrow(new RuntimeException("boom"));
-            assertThrows(RuntimeException.class, () -> controller.post(req, ld));
+            assertThrows(RuntimeException.class, () -> controller.login(req, ld));
         }
     }
 
@@ -146,7 +146,7 @@ public class AdminControllerTest {
             OrganisationDTO dto = mock(OrganisationDTO.class);
             ResponseEntity<OrganisationDTO> svcResp = ResponseEntity.ok(dto);
             when(organisationSrv.create(dto)).thenReturn(svcResp);
-            ResponseEntity<OrganisationDTO> resp = controller.post(mock(HttpServletRequest.class), dto);
+            ResponseEntity<OrganisationDTO> resp = controller.login(mock(HttpServletRequest.class), dto);
             assertSame(svcResp, resp);
         }
     }
@@ -167,7 +167,7 @@ public class AdminControllerTest {
             UUID orgId = UUID.randomUUID();
             ResponseEntity<Integer> svcResp = ResponseEntity.ok(5);
             when(teilnehmerSrv.countTeilnehmerByOrganisation(orgId)).thenReturn(svcResp);
-            ResponseEntity<Integer> resp = controller.count(mock(HttpServletRequest.class), orgId);
+            ResponseEntity<Integer> resp = controller.countTeilnehmer(mock(HttpServletRequest.class), orgId);
             assertSame(svcResp, resp);
         }
 
@@ -182,7 +182,7 @@ public class AdminControllerTest {
         }
 
         @Test
-        void updateNewTeilnehmer_positive_returnsOk() throws EntityNotFoundException {
+        void updateNewTeilnehmer_positive_returnsOk() throws NotFoundException {
             UUID orgId = UUID.randomUUID();
             TeilnehmerDTO dto = mock(TeilnehmerDTO.class);
             doReturn(dto).when(teilnehmerSrv).update(orgId, dto);
@@ -192,11 +192,11 @@ public class AdminControllerTest {
         }
 
         @Test
-        void updateNewTeilnehmer_negative_throwsEntityNotFound() throws EntityNotFoundException {
+        void updateNewTeilnehmer_negative_throwsEntityNotFound() throws NotFoundException {
             UUID orgId = UUID.randomUUID();
             TeilnehmerDTO dto = mock(TeilnehmerDTO.class);
-            doThrow(new EntityNotFoundException(Object.class, UUID.randomUUID())).when(teilnehmerSrv).update(orgId, dto);
-            assertThrows(EntityNotFoundException.class, () -> controller.updateNewTeilnehmer(mock(HttpServletRequest.class), orgId, dto));
+            doThrow(new NotFoundException(Object.class, UUID.randomUUID())).when(teilnehmerSrv).update(orgId, dto);
+            assertThrows(NotFoundException.class, () -> controller.updateNewTeilnehmer(mock(HttpServletRequest.class), orgId, dto));
         }
 
         @Test

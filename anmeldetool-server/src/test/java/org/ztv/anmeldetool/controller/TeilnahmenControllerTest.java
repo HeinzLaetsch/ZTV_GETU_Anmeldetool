@@ -20,7 +20,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
-import org.ztv.anmeldetool.exception.EntityNotFoundException;
+import org.ztv.anmeldetool.exception.NotFoundException;
 import org.ztv.anmeldetool.service.TeilnahmenService;
 import org.ztv.anmeldetool.transfer.OrganisationTeilnahmenStatistikDTO;
 import org.ztv.anmeldetool.transfer.TeilnahmenDTO;
@@ -76,7 +76,7 @@ public class TeilnahmenControllerTest {
     @Nested
     class UpdateTeilnahmenTests {
         @Test
-        void positive_updatesAndReturnsDto() throws EntityNotFoundException {
+        void positive_updatesAndReturnsDto() throws NotFoundException {
             UUID orgId = UUID.randomUUID();
             int jahr = 2025;
             UUID teilnehmerId = UUID.randomUUID();
@@ -89,14 +89,14 @@ public class TeilnahmenControllerTest {
         }
 
         @Test
-        void negative_serviceThrows_propagatesEntityNotFound() throws EntityNotFoundException {
+        void negative_serviceThrows_propagatesEntityNotFound() throws NotFoundException {
             UUID orgId = UUID.randomUUID();
             int jahr = 2025;
             UUID teilnehmerId = UUID.randomUUID();
             TeilnahmenDTO dto = mock(TeilnahmenDTO.class);
-            doThrow(new EntityNotFoundException(Object.class, UUID.randomUUID())).when(teilnahmenSrv).updateTeilnahmen(eq(jahr), eq(orgId), eq(dto));
+            doThrow(new NotFoundException(Object.class, UUID.randomUUID())).when(teilnahmenSrv).updateTeilnahmen(eq(jahr), eq(orgId), eq(dto));
 
-            assertThrows(EntityNotFoundException.class, () -> controller.updateTeilnahmen(mock(HttpServletRequest.class), jahr, orgId, teilnehmerId, dto));
+            assertThrows(NotFoundException.class, () -> controller.updateTeilnahmen(mock(HttpServletRequest.class), jahr, orgId, teilnehmerId, dto));
         }
     }
 
@@ -138,7 +138,7 @@ public class TeilnahmenControllerTest {
     class ExceptionHandlerTests {
         @Test
         void entityNotFoundHandler_returns404_andMessage() {
-            EntityNotFoundException ex = new EntityNotFoundException(Object.class, UUID.randomUUID());
+            NotFoundException ex = new NotFoundException(Object.class, UUID.randomUUID());
             ResponseEntity<?> resp = controller.handlerEntityNotFound(ex);
             assertEquals(HttpStatus.NOT_FOUND, resp.getStatusCode());
             assertEquals(ex.getMessage(), resp.getBody());

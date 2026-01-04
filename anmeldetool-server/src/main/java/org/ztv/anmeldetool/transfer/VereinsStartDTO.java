@@ -68,16 +68,16 @@ public class VereinsStartDTO {
 	private List<TeilnehmerAnlassLink> tals_K4_Tu;
 
 	@CsvBindByName(column = "K5")
-	private int k5;
-	private List<TeilnehmerAnlassLink> tals_K5;
+	private int k5_Tu;
+	private List<TeilnehmerAnlassLink> tals_K5_Tu;
 
 	@CsvBindByName(column = "K5A")
-	private int k5A;
-	private List<TeilnehmerAnlassLink> tals_K5A;
+	private int k5A_Ti;
+	private List<TeilnehmerAnlassLink> tals_K5A_Ti;
 
 	@CsvBindByName(column = "K5B")
-	private int k5B;
-	private List<TeilnehmerAnlassLink> tals_K5B;
+	private int k5B_Ti;
+	private List<TeilnehmerAnlassLink> tals_K5B_Ti;
 
 	@CsvBindByName(column = "K6TI")
 	private int k6_Ti;
@@ -88,12 +88,12 @@ public class VereinsStartDTO {
 	private List<TeilnehmerAnlassLink> tals_K6_Tu;
 
 	@CsvBindByName(column = "KH")
-	private int kH;
-	private List<TeilnehmerAnlassLink> tals_KH;
+	private int kH_Tu;
+	private List<TeilnehmerAnlassLink> tals_KH_Tu;
 
 	@CsvBindByName(column = "KD")
-	private int kD;
-	private List<TeilnehmerAnlassLink> tals_KD;
+	private int kD_Ti;
+	private List<TeilnehmerAnlassLink> tals_KD_Ti;
 
 	@CsvBindByName(column = "K7TI")
 	private int k7_Ti;

@@ -3,22 +3,21 @@ package org.ztv.anmeldetool.repositories;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.ListCrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.Teilnehmer;
 
 @Repository
-public interface TeilnehmerRepository
-		extends PagingAndSortingRepository<Teilnehmer, UUID>, ListCrudRepository<Teilnehmer, UUID> {
+public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, UUID> {
 
-	public List<Teilnehmer> findByNameAndVorname(String name, String vorname);
+	List<Teilnehmer> findByNameAndVorname(String name, String vorname);
 
-	public List<Teilnehmer> findByOrganisation(Organisation organisation, Pageable pageable);
+	Page<Teilnehmer> findByOrganisation(Organisation organisation, Pageable pageable);
 
-	public int countByOrganisation(Organisation organisation);
+	long countByOrganisation(Organisation organisation);
 
 	// public List<Teilnehmer> findByOrganisation(UUID orgId);
 }
