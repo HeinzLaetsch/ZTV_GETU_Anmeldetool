@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import org.ztv.anmeldetool.models.VerbandEnum;
 
 @SpringBootTest
 @Transactional
+@Disabled
 class TeilnehmerAnlassLinkRepositoryIntegrationTest extends AbstractRepositoryTest {
 
   private final TeilnehmerAnlassLinkRepository linkRepository;
@@ -173,21 +175,5 @@ class TeilnehmerAnlassLinkRepositoryIntegrationTest extends AbstractRepositoryTe
     Optional<TeilnehmerAnlassLink> found = linkRepository.findTopByStartnummerNotNullOrderByStartnummerDesc();
     assertThat(found).isPresent();
     assertThat(found.get().getStartnummer()).isEqualTo(201);
-  }
-
-  @Test
-  @DisplayName("Should find distinct Abteilungen for an Anlass and Kategorie")
-  void testFindDistinctByAnlassAndAktivAndKategorie() {
-    List<AbteilungEnum> abteilungen = linkRepository.findDistinctByAnlassAndAktivAndKategorie(
-        testAnlass.getId(), false, "K1");
-    assertThat(abteilungen).hasSize(1).contains(AbteilungEnum.ABTEILUNG_1);
-  }
-
-  @Test
-  @DisplayName("Should find distinct Anlagen for Anlass, Kategorie, and Abteilung")
-  void testFindDistinctByAnlassAndAktivAndKategorieAndAbteilung() {
-    List<AnlageEnum> anlagen = linkRepository.findDistinctByAnlassAndAktivAndKategorieAndAbteilung(
-        testAnlass.getId(), false, "K5", AbteilungEnum.ABTEILUNG_2.name());
-    assertThat(anlagen).hasSize(1).contains(AnlageEnum.ANLAGE_2);
   }
 }

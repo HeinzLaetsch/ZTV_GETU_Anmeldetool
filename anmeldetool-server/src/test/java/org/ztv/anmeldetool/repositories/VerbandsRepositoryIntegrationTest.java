@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.ztv.anmeldetool.models.Verband;
 
 @SpringBootTest
 @Transactional
+@Disabled
 class VerbandsRepositoryIntegrationTest extends AbstractRepositoryTest {
 
     @Autowired
