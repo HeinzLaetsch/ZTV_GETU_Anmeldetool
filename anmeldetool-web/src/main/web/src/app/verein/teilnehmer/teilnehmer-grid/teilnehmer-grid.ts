@@ -189,7 +189,7 @@ export class TeilnehmerGridComponent
   constructor(
     public dialog: MatDialog,
     private store: Store<AppState>,
-    private authService: AuthService // private anlassService: AnlassService
+    private authService: AuthService, // private anlassService: AnlassService
   ) {
     super();
     this.selectedJahr = moment(Date.now()).year();
@@ -221,7 +221,7 @@ export class TeilnehmerGridComponent
     const kats = KategorieEnumFunction.valuesAndGreater(
       KategorieEnum.K1,
       params.data.teilnehmer.tiTu,
-      undefined
+      undefined,
     );
     return kats;
   }
@@ -283,7 +283,7 @@ export class TeilnehmerGridComponent
       }
     }
     component.store.dispatch(
-      TeilnahmenActions.updateTeilnahmenInvoked({ payload: rowValue })
+      TeilnahmenActions.updateTeilnahmenInvoked({ payload: rowValue }),
     );
     return false;
   }
@@ -298,12 +298,12 @@ export class TeilnehmerGridComponent
     this.store.dispatch(
       TeilnahmenActions.loadAllTeilnahmenInvoked({
         payload: this.selectedJahr,
-      })
+      }),
     );
     this.store.dispatch(
       OtsActions.loadAllOtsInvoked({
         payload: this.selectedJahr,
-      })
+      }),
     );
   }
 
@@ -319,7 +319,7 @@ export class TeilnehmerGridComponent
         if (!this.gridApi.isDestroyed()) {
           this.gridApi.setGridOption("rowData", data);
         }
-      })
+      }),
     );
     this.sortByNameAsc();
     this.getSummaries();
@@ -369,13 +369,13 @@ export class TeilnehmerGridComponent
         });
         this.refreshAnlaesse();
         console.log("AnlaesseExtended: ", this.anlaesseExtended);
-      })
+      }),
     );
   }
 
   registerSelects() {
     this.anlaesseAlle$ = this.store.pipe(
-      select(selectAnlaesseSortedNew(this.authService.isAdministrator()))
+      select(selectAnlaesseSortedNew(this.authService.isAdministrator())),
     );
     this.anlassSummaries$ = this.store.pipe(select(selectAnlassSummaries()));
     this.jahresListeAnlaesse$ = this.store.pipe(select(selectJahre()));
@@ -384,12 +384,12 @@ export class TeilnehmerGridComponent
     this.registerSubscription(
       this.ots$.subscribe((data) => {
         this.otsData = data;
-      })
+      }),
     );
     this.registerSubscription(
       this.jahresListeAnlaesse$.subscribe((anlaesse) => {
         this.jahresListe$ = of(anlaesse.map((anlass) => this.getYear(anlass)));
-      })
+      }),
     );
   }
 
@@ -432,7 +432,7 @@ export class TeilnehmerGridComponent
         tooltipValueGetter: function (params) {
           return params.context.this.getKategorieTooltip(
             params,
-            anlassExt.anlass
+            anlassExt.anlass,
           );
         },
         comparator: this.talComparator,
@@ -457,22 +457,13 @@ export class TeilnehmerGridComponent
     //return "Dein Verein startet nicht! Kein Ändern möglich";
   }
   private showAnlass(anlass: IAnlass): boolean {
-    const asMoment = moment(anlass.endDatum);
+    const asMoment = moment(anlass.endDatum).endOf("day");
     if (!this.showOldAnlaesse) {
-      if (asMoment.isBefore()) {
-        return false;
-      } else {
-        return true;
-      }
+      return asMoment.isSameOrAfter(moment().startOf("day"));
     }
-    if (asMoment.year() === this.selectedJahr) {
-      return true;
-    }
-    return false;
+    return asMoment.year() === this.selectedJahr;
   }
   redraw() {
-    const allState = this.agGrid.api.getColumnState();
-    const dateNow = Date.now();
     this.agGrid.api.getColumnState().forEach((state) => {
       if (!state.colId.startsWith("teil")) {
         var visbility = true;
@@ -521,7 +512,7 @@ export class TeilnehmerGridComponent
         //params.data.teilnehmer.letzteKategorie,
         KategorieEnum.K1,
         params.data.teilnehmer.tiTu,
-        anlaesseExt.anlass
+        anlaesseExt.anlass,
       );
       return kats;
     }
@@ -529,7 +520,7 @@ export class TeilnehmerGridComponent
       const kats = KategorieEnumFunction.valuesAndGreater(
         KategorieEnum.K1,
         params.data.teilnehmer.tiTu,
-        anlaesseExt.anlass
+        anlaesseExt.anlass,
       );
       return kats;
     }
@@ -538,27 +529,27 @@ export class TeilnehmerGridComponent
         //params.data.teilnehmer.letzteKategorie,
         KategorieEnum.K1,
         params.data.teilnehmer.tiTu,
-        anlaesseExt.anlass
+        anlaesseExt.anlass,
       );
       const ots = component.filterOts(anlaesseExt.anlass, component.otsData);
       if (ots) {
         const katsFiltered = kats.filter((kat) => {
           const meldeStati = ots.kategorieStati.find(
-            (kategorieStatus) => kat === kategorieStatus.kategorie
+            (kategorieStatus) => kat === kategorieStatus.kategorie,
           );
           const neumeldungen = meldeStati?.meldeStati.filter((m) => {
             return m.meldeStatus === MeldeStatusEnum.NEUMELDUNG;
-          }).length;
+          });
           const abmeldungen = meldeStati?.meldeStati.filter((m) => {
             return m.meldeStatus.toUpperCase().startsWith("ABGEMELDET");
-          }).length;
+          });
           console.log(
             "Kategorie: %s , Abmeldungen: %d, Neumeldungen: %d",
             kat,
-            abmeldungen,
-            neumeldungen
+            abmeldungen[0]?.count || 0,
+            neumeldungen[0]?.count || 0,
           );
-          return neumeldungen < abmeldungen;
+          return (neumeldungen[0]?.count || 0) < (abmeldungen[0]?.count || 0);
         });
         return katsFiltered;
       }
@@ -568,7 +559,7 @@ export class TeilnehmerGridComponent
 
   private filterOts(
     anlass: IAnlass,
-    otsData: IOrganisationTeilnahmenStatistik[]
+    otsData: IOrganisationTeilnahmenStatistik[],
   ): IOrganisationTeilnahmenStatistik {
     return otsData.find((ots) => ots.anlassId === anlass.id);
   }
@@ -586,7 +577,7 @@ export class TeilnehmerGridComponent
     }
     if (
       anlassExt.anlass.anzeigeStatus.hasStatus(
-        AnzeigeStatusEnum.NOCH_NICHT_OFFEN
+        AnzeigeStatusEnum.NOCH_NICHT_OFFEN,
       )
     ) {
       return 0;
@@ -601,7 +592,7 @@ export class TeilnehmerGridComponent
     }
     if (
       !anlassExt.anlass.anzeigeStatus.hasStatus(
-        AnzeigeStatusEnum.ERFASSEN_CLOSED
+        AnzeigeStatusEnum.ERFASSEN_CLOSED,
       ) ||
       asMoment.isSameOrAfter(moment())
     ) {
@@ -609,7 +600,7 @@ export class TeilnehmerGridComponent
     }
     if (
       !anlassExt.anlass.anzeigeStatus.hasStatus(
-        AnzeigeStatusEnum.IN_KATEGORIE_CLOSED
+        AnzeigeStatusEnum.IN_KATEGORIE_CLOSED,
       )
     ) {
       return 2;
@@ -617,7 +608,7 @@ export class TeilnehmerGridComponent
     //TODO Beides mal gleich
     if (
       anlassExt.anlass.anzeigeStatus.hasStatus(
-        AnzeigeStatusEnum.IN_KATEGORIE_CLOSED
+        AnzeigeStatusEnum.IN_KATEGORIE_CLOSED,
       )
     ) {
       return 3;
@@ -696,13 +687,13 @@ export class TeilnehmerGridComponent
     const tal = component.getTal(
       params,
       anlassExt.anlass,
-      params.data.talDTOList
+      params.data.talDTOList,
     );
     if (
       tal &&
       !KategorieEnumFunction.equals(
         KategorieEnum.KEIN_START,
-        KategorieEnumFunction.parse(tal.kategorie)
+        KategorieEnumFunction.parse(tal.kategorie),
       )
     ) {
       return true;
@@ -712,7 +703,7 @@ export class TeilnehmerGridComponent
     const possibleKategories = KategorieEnumFunction.valuesAndGreater(
       letzteKategorie,
       params.data.teilnehmer.tiTu,
-      anlassExt.anlass
+      anlassExt.anlass,
     );
     if (component.hasAbmeldungenForKategories(possibleKategories, ots)) {
       return true;
@@ -722,7 +713,7 @@ export class TeilnehmerGridComponent
 
   hasAbmeldungenForKategories(
     kategories: KategorieEnum[],
-    ots: IOrganisationTeilnahmenStatistik
+    ots: IOrganisationTeilnahmenStatistik,
   ): any {
     if (!ots || !ots.kategorieStati) {
       return false;
@@ -730,11 +721,11 @@ export class TeilnehmerGridComponent
     var retValue = false;
     for (const kategorie of kategories) {
       const kats = ots.kategorieStati.find(
-        (kats) => kats.kategorie === kategorie
+        (kats) => kats.kategorie === kategorie,
       );
       if (kats) {
         const ms = kats.meldeStati.find((ms) =>
-          ms.meldeStatus.toUpperCase().startsWith("ABGEMELDET")
+          ms.meldeStatus.toUpperCase().startsWith("ABGEMELDET"),
         );
         if (ms) {
           retValue = true;
@@ -755,7 +746,7 @@ export class TeilnehmerGridComponent
     // const component: TeilnehmerGridComponent = params.context.this;
 
     const tal: IAnlassLink = tals.find(
-      (talInt) => talInt.anlassId === anlass.id
+      (talInt) => talInt.anlassId === anlass.id,
     );
     return tal;
   }
@@ -771,7 +762,7 @@ export class TeilnehmerGridComponent
     newValue.jahr = component.selectedJahr;
 
     const tal: IAnlassLink = newValue.talDTOList.find(
-      (talInt) => talInt.anlassId === anlassExt.anlass.id
+      (talInt) => talInt.anlassId === anlassExt.anlass.id,
     );
     if (tal) {
       tal.kategorie = params.newValue.kategorie;
@@ -783,12 +774,12 @@ export class TeilnehmerGridComponent
       newValue.talDTOList.push(params.newValue);
     }
     component.store.dispatch(
-      TeilnahmenActions.updateTeilnahmenInvoked({ payload: newValue })
+      TeilnahmenActions.updateTeilnahmenInvoked({ payload: newValue }),
     );
     component.store.dispatch(
       OtsActions.loadAllOtsInvoked({
         payload: component.selectedJahr,
-      })
+      }),
     );
 
     return true;
@@ -806,7 +797,7 @@ export class TeilnehmerGridComponent
           return component.emptyTal(
             params.data.teilnehmer.id,
             undefined,
-            undefined
+            undefined,
           );
         }
         return element.anlassId === component.anlaesseExtended[index].anlass.id;
@@ -817,7 +808,7 @@ export class TeilnehmerGridComponent
       return component.emptyTal(
         params.data.teilnehmer.id,
         component.anlaesseExtended[index].anlass.id,
-        component.authService.currentVerein.id
+        component.authService.currentVerein.id,
       );
     }
   }
@@ -825,7 +816,7 @@ export class TeilnehmerGridComponent
   private emptyTal(
     teilnehmerId: string,
     anlassId: string,
-    organisationId: string
+    organisationId: string,
   ) {
     const tal = {
       teilnehmerId,
@@ -909,12 +900,12 @@ export class TeilnehmerGridComponent
         if (result) {
           console.log(`Dialog result: ${result}`);
           this.store.dispatch(
-            TeilnahmenActions.addTeilnehmerInvoked({ payload: result })
+            TeilnahmenActions.addTeilnehmerInvoked({ payload: result }),
           );
         } else {
           console.log(`Dialog Abbruch: ${result}`);
         }
-      })
+      }),
     );
   }
   openTeilnehmerGridHelp() {

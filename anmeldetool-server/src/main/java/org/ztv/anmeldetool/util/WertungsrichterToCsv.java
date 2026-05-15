@@ -23,7 +23,7 @@ public class WertungsrichterToCsv extends AbstractCsvConverter {
 					t.getStart_zeit().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)),
 					t.getEnd_zeit().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)));
 		} else {
-			return "%s,%s".formatted(t.getBrevet().brevet, t.getBeschreibung());
+			return "%s,%s,%s".formatted(t.getBrevet().brevet, t.isEingesetzt(), t.getBeschreibung());
 		}
 	}
 }

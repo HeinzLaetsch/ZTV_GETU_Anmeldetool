@@ -99,9 +99,9 @@ export class TeilnehmerService extends ServiceHelper {
   patch(verein: IVerein, teilnehmer: ITeilnehmer): Observable<ITeilnehmer> {
     console.log("Service save: ", teilnehmer);
     const combinedUrl = this.url + verein.id + "/teilnehmer";
-    return this.http.patch<ITeilnehmer>(combinedUrl, teilnehmer).pipe(
+    return this.http.put<ITeilnehmer>(combinedUrl, teilnehmer).pipe(
       catchError((err, caught) => {
-        return this.handleError("patch", err, caught);
+        return this.handleError("put", err, caught);
       })
     );
   }

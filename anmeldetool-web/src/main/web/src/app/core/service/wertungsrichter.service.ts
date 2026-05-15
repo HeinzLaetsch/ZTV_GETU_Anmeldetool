@@ -60,17 +60,6 @@ export class WertungsrichterService {
           } else {
             eingteilteWrSubject.next([]);
           }
-          /*
-          assignedWrs.sort((a, b) => {
-            if (a.benutzername < b.benutzername) {
-              return -1;
-            }
-            if (a.benutzername > b.benutzername) {
-              return 1;
-            }
-            return 0;
-          });
-          */
         },
         (error) => {
           switch (error.status) {

@@ -2,9 +2,13 @@ package org.ztv.anmeldetool.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.NotSupportedException;
+
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -13,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -24,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.ztv.anmeldetool.exception.NotFoundException;
 import org.ztv.anmeldetool.models.LoginData;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.Person;
@@ -61,8 +67,8 @@ public class AdminController {
 
   @PostMapping("/login")
   public ResponseEntity<PersonDTO> login(HttpServletRequest request, @RequestBody LoginData loginData) {
-    log.info("Login attempt");
-    return loginSrv.login(request, loginData);
+    log.info("Login attempt {}", loginData.getUsername());
+    return ResponseEntity.ok(loginSrv.login(request, loginData));
   }
 
   @GetMapping("/organisationen")
@@ -94,17 +100,16 @@ public class AdminController {
     return teilnehmerSrv.create(orgId, teilnehmerDTO);
   }
 
-  @PatchMapping("/organisationen/{orgId}/teilnehmer")
+  @PutMapping("/organisationen/{orgId}/teilnehmer")
   public ResponseEntity<TeilnehmerDTO> updateTeilnehmer(@PathVariable UUID orgId,
       @RequestBody TeilnehmerDTO teilnehmerDTO) {
-    return ResponseEntity.ok(teilnehmerSrv.update(orgId, teilnehmerDTO));
+    return ResponseEntity.ok().body(teilnehmerSrv.update(orgId, teilnehmerDTO));
   }
 
   @DeleteMapping("/organisationen/{orgId}/teilnehmer/{teilnehmerId}")
-  public ResponseEntity<Void> deleteTeilnehmer(@PathVariable UUID orgId,
+  public ResponseEntity<UUID> deleteTeilnehmer(@PathVariable UUID orgId,
       @PathVariable UUID teilnehmerId) {
-    teilnehmerSrv.delete(orgId, teilnehmerId);
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.ok(teilnehmerSrv.delete(orgId, teilnehmerId));
   }
 
   @GetMapping("/organisationen/{orgId}/starts")
@@ -124,15 +129,16 @@ public class AdminController {
   @PutMapping("/user/{userId}")
   public ResponseEntity<PersonDTO> putUser(@RequestHeader("vereinsid") UUID vereinsId,@PathVariable UUID userId,
       @RequestBody PersonDTO personDTO) {
-    log.info("Patching user");
+    log.info("Patching user: {}, {}, {}", userId, personDTO.benutzername(), vereinsId);
     return ResponseEntity.ok(personSrv.update(userId, personDTO, vereinsId));
   }
 
   @PostMapping("/user")
   public ResponseEntity<PersonDTO> createUser(@RequestHeader("vereinsid") UUID vereinsId,
       @RequestBody PersonDTO personDTO) throws URISyntaxException {
-    log.info("Creating user");
-    URI location =  new URI("/admin/user" + personDTO.getId().toString());
+    log.info("Creating user {}, {}, {}", personDTO.id(),personDTO.benutzername(), vereinsId);
+    personSrv.create(personDTO, vereinsId);
+    URI location =  new URI("/admin/user" + personDTO.id().toString());
     return ResponseEntity.created(location).body(personDTO);
   }
 
@@ -145,13 +151,19 @@ public class AdminController {
   @GetMapping("/user")
   public ResponseEntity<Collection<PersonDTO>> getUsersInOrganisation(
       @RequestHeader("vereinsid") UUID vereinsId) {
-    return ResponseEntity.ok(personSrv.findPersonsByOrganisationDTO(vereinsId));
+    return ResponseEntity.ok(personSrv.findPersonsDtoByOrganisationId(vereinsId));
   }
 
   @GetMapping("/user/benutzernamen/{benutzername}")
   public ResponseEntity<PersonDTO> getPersonByBenutzername(
-      @PathVariable("benutzername") String benutzername) {
-    return ResponseEntity.ok(personSrv.findPersonDtoByBenutzername(benutzername));
+      @PathVariable("benutzername") String benutzernameEndcoded ) {
+    try {
+      String benutzername = java.net.URLDecoder.decode(benutzernameEndcoded, StandardCharsets.UTF_8.name());
+      return ResponseEntity.ok(personSrv.findPersonDtoByBenutzername(benutzername));
+    } catch (UnsupportedEncodingException e) {
+      // not going to happen - value came from JDK's own StandardCharsets
+      return ResponseEntity.notFound().build();
+    }
   }
 
   @GetMapping("/role")
@@ -166,9 +178,17 @@ public class AdminController {
   @GetMapping("/user/{id}/wertungsrichter")
   public ResponseEntity<WertungsrichterDTO> getWertungsrichterForUser(@PathVariable UUID id) {
     Person person = personSrv.findPersonById(id);
-    WertungsrichterDTO wertungsrichterDTO = wertungsrichterSrv.getWertungsrichterByPerson(person);
-    return ResponseEntity.ok(wertungsrichterDTO);
-}
+    try {
+      WertungsrichterDTO wertungsrichterDTO = wertungsrichterSrv.getWertungsrichterByPerson(person);
+      return ResponseEntity.ok(wertungsrichterDTO);
+    } catch (NotFoundException ex) {
+      // Kann vorkommen, wenn Person kein Wertungsrichter ist
+      return ResponseEntity.notFound().build();
+    } catch (NoSuchElementException ex) {
+      // Kann vorkommen, wenn Person kein Wertungsrichter ist
+      return ResponseEntity.notFound().build();
+    }
+  }
 
   @PutMapping("/user/{id}/wertungsrichter")
   public ResponseEntity<WertungsrichterDTO> updateWertungsrichter(@PathVariable UUID id,

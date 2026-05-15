@@ -179,6 +179,7 @@
   <app-wertungsrichter-selektion
     *ngIf="anlassSummary.startet"
     [anlass]="anlass"
+    [changeAllowed]="isChangeAllowed()"
   ></app-wertungsrichter-selektion>
 
   <!-- neu Wertungsrichter Selektion

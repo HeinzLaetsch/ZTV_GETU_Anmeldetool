@@ -31,7 +31,7 @@ export class NavComponent extends SubscriptionHelper implements OnInit {
   constructor(
     public authService: AuthService,
     private store: Store<AppState>,
-    private router: Router
+    private router: Router,
   ) {
     super();
     this.anlaesse$ = this.store.pipe(select(selectAnlaesseSortedNew(true)));
@@ -45,26 +45,28 @@ export class NavComponent extends SubscriptionHelper implements OnInit {
     this.registerSubscription(
       this.anlaesse$.subscribe((data) => {
         this.anlaesse = data;
-      })
+      }),
     );
     this.registerSubscription(
       this.vereine$.subscribe((data) => {
         this.vereine = data;
-      })
+      }),
     );
   }
 
-  get rechnungsbueroAnlaesse(): IAnlass[] {
-    if (
-      this.authService.isRechnungsbuero() ||
-      this.authService.isAdministrator()
-    ) {
+  get eigeneAnlaesse(): IAnlass[] {
+    if (this.authService.isAnlassUser()) {
       return this.anlaesse.filter((anlass) => {
         if (anlass.organisatorId === this.authService.currentVerein.id) {
           return true;
         }
         return false;
       });
+    } else {
+      if (this.authService.isAdministrator()) {
+        return this.anlaesse;
+      }
+      return [];
     }
   }
 

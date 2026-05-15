@@ -460,8 +460,8 @@ public class AnlassControllerTest {
       LauflistenContainer cont = new LauflistenContainer();
       cont.setTeilnehmerAnlassLinks(new java.util.LinkedList<>());
       cont.getTeilnehmerAnlassLinks().add(new TeilnehmerAnlassLink());
-      when(lauflistenService.getLauflistenForAnlassAndKategorie(any(), any(), any(),
-          any())).thenReturn(List.of(cont));
+      when(lauflistenService.getLauflistenContainerForAnlassAndKategorie(any(), any(), any(),
+          any(), any())).thenReturn(List.of(cont));
 
       ResponseEntity<List<LauflisteDTO>> resp = controller.getLauflisten( anlassId,
           KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1);
@@ -474,8 +474,8 @@ public class AnlassControllerTest {
     @Test
     void whenServiceThrows_thenResponseStatusException() {
       UUID anlassId = UUID.randomUUID();
-      when(lauflistenService.getLauflistenForAnlassAndKategorie(any(), any(), any(),
-          any())).thenThrow(new RuntimeException("boom"));
+      when(lauflistenService.getLauflistenContainerForAnlassAndKategorie(any(), any(), any(),
+          any(), any())).thenThrow(new RuntimeException("boom"));
       ResponseStatusException ex = assertThrows(ResponseStatusException.class,
           () -> controller.getLauflisten( anlassId, KategorieEnum.K1,
               AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1));
@@ -583,7 +583,7 @@ public class AnlassControllerTest {
       when(anlassService.findById(anlassId)).thenReturn(new Anlass());
       try {
         doThrow(new RuntimeException("boom")).when(lauflistenService)
-            .deleteLauflistenForAnlassAndKategorie(any(), any(), any(), any());
+            .deleteLauflistenContainerForAnlassAndKategorie(any(), any(), any(), any());
       } catch (ServiceException e) {
         throw new RuntimeException(e);
       }

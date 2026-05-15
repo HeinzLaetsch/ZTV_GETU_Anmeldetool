@@ -20,5 +20,9 @@ export const UserActions = createActionGroup({
     "Save User INVOKED": props<{ payload: IUser }>(),
     "Save User SUCCESS": props<{ payload: IUser }>(),
     "Save User ERROR": props<{ error: string }>(),
+
+    "Update User INVOKED": props<{ payload: IUser }>(),
+    "Update User SUCCESS": props<{ payload: IUser }>(),
+    "Update User ERROR": props<{ error: string }>(),
   },
 });

@@ -8,7 +8,7 @@
       <ng-template mat-tab-label>Überprüfen </ng-template>
       <app-erfassen [anlass]="anlass" [modeErfassen]="false"></app-erfassen>
     </mat-tab>
-    <mat-tab>
+    <mat-tab *ngIf="authService.isAdministrator()">
       <ng-template mat-tab-label>Ranglisten </ng-template>
       <app-ranglisten></app-ranglisten>
     </mat-tab>

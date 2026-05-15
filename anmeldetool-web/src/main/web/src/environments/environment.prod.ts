@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiHost: "http://laetsch.homelinux.net/ztv-anmeldetool",
+  apiHost: "https://ztv-anmeldetool.duckdns.org/ztv-anmeldetool/services",
 };

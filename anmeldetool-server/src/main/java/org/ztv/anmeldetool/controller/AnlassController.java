@@ -2,8 +2,11 @@ package org.ztv.anmeldetool.controller;
 
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +27,9 @@ import org.ztv.anmeldetool.models.AbteilungEnum;
 import org.ztv.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.AnlassLauflisten;
+import org.ztv.anmeldetool.models.GeraetEnum;
 import org.ztv.anmeldetool.models.KategorieEnum;
+import org.ztv.anmeldetool.models.LauflistenContainer;
 import org.ztv.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.output.LauflistenOutput;
 import org.ztv.anmeldetool.output.RanglistenOutput;
@@ -39,6 +45,7 @@ import org.ztv.anmeldetool.transfer.RanglisteConfigurationDTO;
 import org.ztv.anmeldetool.transfer.RanglistenEntryDTO;
 import org.ztv.anmeldetool.transfer.TeamwertungDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
+import org.ztv.anmeldetool.transfer.TeilnehmerStartDTO;
 
 @RestController
 @RequestMapping("/anlaesse")
@@ -157,7 +164,7 @@ public class AnlassController {
   public ResponseEntity<Void> deleteLauflisten(@PathVariable UUID anlassId,
       @PathVariable KategorieEnum kategorie, @PathVariable AbteilungEnum abteilung,
       @PathVariable AnlageEnum anlage) throws ServiceException {
-    lauflistenService.deleteLauflistenForAnlassAndKategorie(anlassId, kategorie, abteilung, anlage);
+    lauflistenService.deleteLauflistenContainerForAnlassAndKategorie(anlassId, kategorie, abteilung, anlage);
     return ResponseEntity.noContent().build();
   }
 
@@ -206,7 +213,8 @@ public class AnlassController {
     AnlassLauflisten anlassLauflisten = lauflistenService.generateLauflistenPdfForAnlassAndKategorie(anlassId,
         kategorie, abteilung, anlage, onlyTi);
     Anlass anlass = this.anlassService.findById(anlassId);
-    LauflistenOutput.createLaufListe(response.getOutputStream(), anlass, onlyTi, anlassLauflisten);
+    LauflistenOutput.createLaufListe(response.getOutputStream(), anlass, onlyTi, anlassLauflisten, lauflistenService);
+
 
     //response.getOutputStream().write(pdfBytes);
   }
@@ -228,5 +236,18 @@ public class AnlassController {
       @PathVariable UUID lauflisteneintragId, @RequestParam String grund) {
     return ResponseEntity.ok(
         teilnehmerAnlassLinkService.markAsDeleted(lauflisteneintragId, grund));
+  }
+  @PutMapping("/{anlassId}/teilnehmer/{kategorie}/{abteilung}/{anlage}/{geraet}/{teilnehmerId}")
+  public ResponseEntity<?> addTeilnehmerToStartgeraet(HttpServletRequest request,
+      @PathVariable UUID anlassId,
+      @PathVariable KategorieEnum kategorie,
+      @PathVariable AbteilungEnum abteilung,
+      @PathVariable AnlageEnum anlage,
+      @PathVariable GeraetEnum geraet,
+      @PathVariable UUID teilnehmerId)
+      throws URISyntaxException {
+    LauflistenContainer container = lauflistenService.addTeilnehmerToLauflistenContainer(anlassId, kategorie, abteilung, anlage, geraet, teilnehmerId);
+    URI location =  new URI(request.getRequestURI().toString()+ "/" + container.getId().toString());
+    return ResponseEntity.created(location).build();
   }
 }

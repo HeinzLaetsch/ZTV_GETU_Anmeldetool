@@ -12,4 +12,5 @@ export interface ITeilnehmerStart {
   anlage: string;
   startgeraet: string;
   meldeStatus: string;
+  laufliste: boolean;
 }

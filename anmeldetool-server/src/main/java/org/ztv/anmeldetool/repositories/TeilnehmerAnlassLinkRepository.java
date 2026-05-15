@@ -108,4 +108,13 @@ public interface TeilnehmerAnlassLinkRepository extends JpaRepository<Teilnehmer
 	@Query("SELECT DISTINCT tal.anlage FROM TeilnehmerAnlassLink tal WHERE tal.anlass.id = :anlassId AND tal.aktiv = :aktiv AND tal.kategorie = :kategorie AND tal.abteilung = :abteilung AND tal.anlage IS NOT NULL ORDER BY tal.anlage")
 	List<AnlageEnum> findDistinctAnlagenByAnlassAndKategorieAndAbteilung(@Param("anlassId") UUID anlassId,
 			@Param("aktiv") boolean aktiv, @Param("kategorie") KategorieEnum kategorie, @Param("abteilung") AbteilungEnum abteilung);
+	@Query("SELECT DISTINCT tal.abteilung FROM TeilnehmerAnlassLink tal WHERE tal.anlass = :anlass AND tal.kategorie = :kategorie AND tal.abteilung IS NOT NULL " +
+			"AND tal.teilnehmer.tiTu = :tiTu  ORDER BY tal.abteilung")
+	List<AbteilungEnum> findDistinctAbteilungenByAnlassAndKategorieAndTiTu(@Param("anlass") Anlass anlass,
+			@Param("kategorie") KategorieEnum kategorie, @Param("tiTu") TiTuEnum tiTu );
+
+	@Query("SELECT DISTINCT tal.organisation, tal.abteilung, tal.anlage, tal.startgeraet FROM TeilnehmerAnlassLink tal WHERE tal.anlass = :anlass " +
+			"AND tal.kategorie = :kategorie AND tal.abteilung IS NOT NULL AND tal.teilnehmer.tiTu = :tiTu ORDER BY tal.abteilung")
+	List<Object[]> findDistinctAbteilungenUndOrganisatorenByAnlassAndKategorie(@Param("anlass") Anlass anlass, @Param("kategorie") KategorieEnum kategorie, @Param("tiTu") TiTuEnum tiTu);
+
 }

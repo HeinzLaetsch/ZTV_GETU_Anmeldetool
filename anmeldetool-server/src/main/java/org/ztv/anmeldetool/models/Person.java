@@ -37,7 +37,7 @@ public class Person extends Base {
 
 	private String password;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "person")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "person", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	@ToString.Exclude
 	private Set<OrganisationPersonLink> organisationenLinks;
 

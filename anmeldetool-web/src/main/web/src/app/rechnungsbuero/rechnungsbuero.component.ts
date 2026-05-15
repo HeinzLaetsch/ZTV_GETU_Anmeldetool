@@ -23,7 +23,7 @@ export class RechnungsbueroComponent
   anlass$: Observable<IAnlass>;
 
   constructor(
-    private authService: AuthService,
+    public authService: AuthService,
     private store: Store<AppState>,
     private route: ActivatedRoute
   ) {

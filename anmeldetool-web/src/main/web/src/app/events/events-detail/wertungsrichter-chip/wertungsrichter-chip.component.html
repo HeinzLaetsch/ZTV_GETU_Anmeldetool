@@ -51,9 +51,11 @@
             placeholder="Kommentar"
             [(ngModel)]="wertungsrichterUser.pal.kommentar"
             (change)="kommentarChange($event)"
+            [disabled]="!changeAllowed"
           />
           <button
             *ngIf="wertungsrichterUser.pal.kommentar"
+            [disabled]="!changeAllowed"
             matSuffix
             mat-icon-button
             aria-label="leeren"

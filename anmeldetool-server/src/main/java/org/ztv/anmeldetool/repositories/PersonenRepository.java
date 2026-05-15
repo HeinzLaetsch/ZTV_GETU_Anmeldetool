@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.Person;
 
 @Repository
@@ -21,7 +22,7 @@ public interface PersonenRepository extends JpaRepository<Person, UUID> {
 	@Query("""
 			SELECT p FROM Person p
 			JOIN p.organisationenLinks opl
-			WHERE opl.organisation.id = :orgId
+			WHERE opl.organisation = :organisation
 			""")
-	List<Person> findByOrganisationId(UUID orgId);
+	List<Person> findByOrganisation(Organisation organisation);
 }

@@ -19,6 +19,9 @@ export class UserFormComponent implements OnInit {
   currentUser: IUser;
   @Input()
   tabIndex: number;
+  @Input()
+  userDirty: boolean;
+
   @Output()
   userChange: EventEmitter<IChangeEvent>;
 
@@ -34,7 +37,7 @@ export class UserFormComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private userService: CachingUserService,
-    private roleService: CachingRoleService
+    private roleService: CachingRoleService,
   ) {
     this.userChange = new EventEmitter<IChangeEvent>();
     this._wertungsrichter = this.getEmptyWertungsrichter();
@@ -112,7 +115,7 @@ export class UserFormComponent implements OnInit {
   }
 
   isUserDirty(): boolean {
-    return this.currentUser.dirty;
+    return this.userDirty;
   }
 
   isWertungsrichter() {
@@ -135,7 +138,7 @@ export class UserFormComponent implements OnInit {
   private hasRole(roleName: string): boolean {
     if (this._assignedRoles) {
       const rollen = this._assignedRoles.filter(
-        (role) => role.name === roleName
+        (role) => role.name === roleName,
       );
       // console.log('Rollen: ' , rollen, ' , Name: ', roleName);
       if (rollen && rollen.length > 0) {
@@ -200,7 +203,7 @@ export class UserFormComponent implements OnInit {
       .updateRoles(
         this.currentUser,
         this.authService.currentVerein,
-        this.assignedRoles
+        this.assignedRoles,
       )
       .subscribe((user) => {
         this.currentUser = user;
@@ -209,118 +212,11 @@ export class UserFormComponent implements OnInit {
         this.changeEvent.rolesChanged = false;
       });
   }
-  /*
-
-  get user(): IUser {
-    // console.log('Get user: ', this.currentUser);
-    // return this.deepCopy(this.currentUser);
-    return JSON.parse(JSON.stringify(this.currentUser));
-  }
-
-  set user(value: IUser) {
-    if (this._localPassword) {
-      this.currentUser = value;
-      this._localPassword = undefined;
-    } else {
-      this._localPassword = undefined;
-      this.currentUser = value;
-      this.userHasChanged = true;
-      this.updateChangeEvent();
-    }
-  }
-*/
-  /*
-  private deepCopy<T>(source: T): T {
-    return Array.isArray(source)
-      ? source.map((item) => this.deepCopy(item))
-      : source instanceof Date
-      ? new Date(source.getTime())
-      : source && typeof source === "object"
-      ? Object.getOwnPropertyNames(source).reduce((o, prop) => {
-          Object.defineProperty(
-            o,
-            prop,
-            Object.getOwnPropertyDescriptor(source, prop)
-          );
-          o[prop] = this.deepCopy(source[prop]);
-          return o;
-        }, Object.create(Object.getPrototypeOf(source)))
-      : (source as T);
-  }
-  */
   updateUserValid(valid: boolean) {
     this.changeEvent.userValid = valid;
     this.userChange.next(this.changeEvent);
     // console.log("Valid changed: ", this.currentUser , ', ', valid);
   }
-
-  /* Ignore for now
-
-  cancel() {
-    this.currentUser = this.userService.getUserById(this.currentUser?.id);
-    if (this.currentUser) {
-      this.reloadRoles(this.currentUser);
-    }
-    this.userHasChanged = false;
-    this.changeEvent.userValid = true;
-    this.changeEvent.wrChanged = false;
-    this.changeEvent.canceled = true;
-    this.changeEvent.saved = false;
-    this.changeEvent.rolesChanged = false;
-    this.userChange.next(this.changeEvent);
-  }
-
-  save(): void {
-    this.changeEvent.canceled = false;
-    this.changeEvent.saved = true;
-    if (this.currentUser.id) {
-      if (this.userHasChanged && this.changeEvent.userValid) {
-        this._localPassword = this.currentUser.password;
-        this.authService.updateUser(this.currentUser).subscribe((user) => {
-          this.currentUser = user;
-          this.userHasChanged = false;
-          this.userChange.next(this.changeEvent);
-        });
-      }
-      if (this.changeEvent.rolesChanged) {
-        this.userService
-          .updateRoles(
-            this.currentUser,
-            this.authService.currentVerein,
-            this.assignedRoles
-          )
-          .subscribe((user) => {
-            this.currentUser = user;
-            this.reloadRoles(this.currentUser);
-          });
-        this.changeEvent.rolesChanged = false;
-      }
-      this.checkWrChanged();
-    } else {
-      this._localPassword = this.currentUser.password;
-      this.authService.createUser(this.currentUser).subscribe((user) => {
-        this.currentUser = user;
-        if (this.changeEvent.rolesChanged) {
-          this.userService
-            .updateRoles(
-              this.currentUser,
-              this.authService.currentVerein,
-              this.assignedRoles
-            )
-            .subscribe((user) => {
-              this.currentUser = user;
-              this.reloadRoles(this.currentUser);
-            });
-          this.changeEvent.rolesChanged = false;
-        }
-        this.checkWrChanged();
-        this.userHasChanged = false;
-        this.userChange.next(this.changeEvent);
-      });
-      this.userChange.next(this.changeEvent);
-    }
-  }
-  */
 
   checkWrChanged(): void {
     if (this.changeEvent.wrChanged) {
@@ -332,7 +228,12 @@ export class UserFormComponent implements OnInit {
           .subscribe((value) => {
             // created returns no Object just URL this._wertungsrichter = value;
             this.changeEvent.wrChanged = false;
-            //this.userChange.next(this.changeEvent);
+            if (
+              this._wertungsrichter.id === "" ||
+              value?.brevet !== this._wertungsrichter.brevet
+            ) {
+              this._wertungsrichter = value;
+            }
           });
       } else {
         this.userService
@@ -340,7 +241,6 @@ export class UserFormComponent implements OnInit {
           .subscribe((value) => {
             this._wertungsrichter = this.getEmptyWertungsrichter();
             this.changeEvent.wrChanged = false;
-            //this.userChange.next(this.changeEvent);
           });
       }
     }

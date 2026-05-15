@@ -68,7 +68,7 @@ public class AnlassSummaryService {
 		int gemeldeteBr2 = 0;
 		boolean br1Ok = false;
 		boolean br2Ok = false;
-		if (oalResultDto.isStartet()) {
+		if (oalResultDto.startet()) {
 			List<TeilnehmerAnlassLink> links = anlassSrv.getTeilnahmen(anlass, organisation, false);
 
 			startBr1 = (int) links.stream()
@@ -102,7 +102,7 @@ public class AnlassSummaryService {
 			br2Ok = Math.ceil(startBr2 / (float) ATHLETES_PER_WR) <= gemeldeteBr2;
 		}
 		return AnlassSummaryDTO.builder().anlassId(anlass.getId()).organisationsId(organisation.getId())
-				.startet(oalResultDto.isStartet()).verlaengerungsDate(oalResultDto.getVerlaengerungsDate())
+				.startet(oalResultDto.startet()).verlaengerungsDate(oalResultDto.verlaengerungsDate())
 				.startendeBr1(startBr1).startendeK1(startK1).startendeK2(startK2).startendeK3(startK3)
 				.startendeK4(startK4).startendeK5(startK5).startendeK5A(startK5A).startendeK5B(startK5B)
 				.startendeK6(startK6).startendeK7(startK7).startendeKD(startKD).startendeKH(startKH)

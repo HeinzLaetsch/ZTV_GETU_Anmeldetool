@@ -29,7 +29,7 @@ public class TeilnehmerAnlassLink extends Base {
 	@Enumerated(EnumType.STRING)
 	private MeldeStatusEnum meldeStatus;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "TEILNEHMER_ID", nullable = false, insertable = true, updatable = true)
 	@ToString.Exclude
 	private Teilnehmer teilnehmer;

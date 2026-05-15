@@ -45,7 +45,7 @@ export class CachingAnlassService {
   constructor(
     private authService: AuthService,
     private anlassService: AnlassService,
-    private vereinService: CachingVereinService
+    private vereinService: CachingVereinService,
   ) {
     this.anlaesseLoaded = new BehaviorSubject<boolean>(undefined);
     this.teilnahmenLoaded = new BehaviorSubject<boolean>(false);
@@ -67,50 +67,50 @@ export class CachingAnlassService {
   getVerfuegbareWertungsrichter(
     anlass: IAnlass,
     verein: IVerein,
-    brevet: number
+    brevet: number,
   ): Observable<IUser[]> {
     return this.anlassService.getVerfuegbareWertungsrichter(
       anlass,
       verein,
-      brevet
+      brevet,
     );
   }
   getEingeteilteWertungsrichter(
     anlass: IAnlass,
     verein: IVerein,
-    brevet: number
+    brevet: number,
   ): Observable<IPersonAnlassLink[]> {
     return this.anlassService.getEingeteilteWertungsrichter(
       anlass,
       verein,
-      brevet
+      brevet,
     );
   }
 
   getWrEinsatz(
     anlass: IAnlass,
     verein: IVerein,
-    user: IUser
+    user: IUser,
   ): Observable<IPersonAnlassLink> {
     return this.anlassService.getWrEinsatz(anlass, verein, user);
   }
   updateWrEinsatz(
     verein: IVerein,
     anlassLink: IPersonAnlassLink,
-    einsatz: IWertungsrichterEinsatz
+    einsatz: IWertungsrichterEinsatz,
   ): Observable<IWertungsrichterEinsatz> {
     return this.anlassService.updateWrEinsatz(verein, anlassLink, einsatz);
   }
   addWertungsrichterToAnlass(
     anlass: IAnlass,
     verein: IVerein,
-    user: IUser
+    user: IUser,
   ): Observable<IPersonAnlassLink> {
     return this.anlassService.addWertungsrichterToAnlass(anlass, verein, user);
   }
   updateAnlassLink(
     pal: IPersonAnlassLink,
-    verein: IVerein
+    verein: IVerein,
   ): Observable<IPersonAnlassLink> {
     return this.anlassService.updateAnlassLink(pal, verein);
   }
@@ -118,12 +118,12 @@ export class CachingAnlassService {
   deleteWertungsrichterFromAnlass(
     anlass: IAnlass,
     verein: IVerein,
-    user: IUser
+    user: IUser,
   ): Observable<IPersonAnlassLink> {
     return this.anlassService.deleteWertungsrichterFromAnlass(
       anlass,
       verein,
-      user
+      user,
     );
   }
   updateAnlass(anlass: IAnlass): Observable<IAnlass> {
@@ -132,14 +132,14 @@ export class CachingAnlassService {
 
   getVereinStart(
     anlass: IAnlass,
-    verein: IVerein
+    verein: IVerein,
   ): Observable<IOrganisationAnlassLink> {
     return this.anlassService.getVereinStart(anlass, verein);
   }
 
   getTeilnahmenForKategorie(
     anlass: IAnlass,
-    katgorie: KategorieEnum
+    katgorie: KategorieEnum,
   ): IAnlassLink[] {
     const teilnahmen = this.getTeilnehmerForAnlass(anlass);
     const filteredLinks = teilnahmen.filter((link) => {
@@ -153,23 +153,23 @@ export class CachingAnlassService {
   }
 
   getTeilnehmerForAnlassCsv(anlass: IAnlass): void {
-    this.anlassService.getTeilnehmerForAnlassCsv(anlass);
+    this.anlassService.getTeilnehmerForAnlassCsv(anlass, false);
   }
 
   importTeilnehmerForAnlassCsv(
     anlass: IAnlass,
-    formData: FormData
+    formData: FormData,
   ): Observable<any> {
     return this.anlassService.importTeilnehmerForAnlassCsv(anlass, formData);
   }
 
   importContestTeilnehmerForAnlassCsv(
     anlass: IAnlass,
-    formData: FormData
+    formData: FormData,
   ): Observable<any> {
     return this.anlassService.importContestTeilnehmerForAnlassCsv(
       anlass,
-      formData
+      formData,
     );
   }
 
@@ -191,7 +191,7 @@ export class CachingAnlassService {
     abteilung: AbteilungEnum,
     anlage: AnlageEnum,
     geraet: GeraeteEnum,
-    search: string
+    search: string,
   ): Observable<ITeilnahmeStatistic> {
     return this.anlassService.getTeilnahmeStatistic(
       anlass,
@@ -199,7 +199,7 @@ export class CachingAnlassService {
       abteilung,
       anlage,
       geraet,
-      search
+      search,
     );
   }
   getByStartgeraet(
@@ -208,7 +208,7 @@ export class CachingAnlassService {
     abteilung: AbteilungEnum,
     anlage: AnlageEnum,
     geraet: GeraeteEnum,
-    search: string
+    search: string,
   ): Observable<ITeilnehmerStart[]> {
     return this.anlassService.getByStartgeraet(
       anlass,
@@ -216,15 +216,16 @@ export class CachingAnlassService {
       abteilung,
       anlage,
       geraet,
-      search
+      search,
     );
   }
   updateStartgeraet(
     anlass: IAnlass,
-    teilnehmerStart: ITeilnehmerStart
+    teilnehmerStart: ITeilnehmerStart,
   ): Observable<boolean> {
     return this.anlassService.updateTeilnehmerStart(anlass, teilnehmerStart);
   }
+
   getTeilnehmerForAnlass(anlass: IAnlass): IAnlassLink[] {
     if (this.teilnamen && this.teilnamen[anlass.id]?.anlassLinks) {
       return this.teilnamen[anlass.id].anlassLinks.filter((anlassLink) => {
@@ -241,7 +242,7 @@ export class CachingAnlassService {
         return this.compare(
           kategories.indexOf(a.kategorie),
           kategories.indexOf(b.kategorie),
-          true
+          true,
         );
       });
     }
@@ -270,7 +271,7 @@ export class CachingAnlassService {
   }
 
   updateVereinsStart(
-    orgAnlassLink: IOrganisationAnlassLink
+    orgAnlassLink: IOrganisationAnlassLink,
   ): Observable<IOrganisationAnlassLink> {
     return this.anlassService.updateVereinsStart(orgAnlassLink);
   }
@@ -284,7 +285,7 @@ export class CachingAnlassService {
         // this.anlaesse = anlaesse;
         this.anlaesse = anlaesse.map((anlass) => {
           anlass.organisator = this.vereinService.getVereinById(
-            anlass.organisatorId
+            anlass.organisatorId,
           )?.name;
           return anlass;
         });
@@ -354,7 +355,8 @@ export class CachingAnlassService {
     if (this.loaded) {
       return this.anlaesse.find(
         (anlass) =>
-          anlass.anlassBezeichnung === anlassBezeichnung && anlass.tiTu === titu
+          anlass.anlassBezeichnung === anlassBezeichnung &&
+          anlass.tiTu === titu,
       );
     }
     return undefined;
@@ -376,7 +378,7 @@ export class CachingAnlassService {
   }
   neuAnmeldungErlaubtKategorie(
     anlass: IAnlass,
-    kategorie: KategorieEnum
+    kategorie: KategorieEnum,
   ): boolean {
     const anlassLinks: IAnlassLinks = this.teilnamen[anlass.id];
     const anzahlUmmeldungen = anlassLinks.anlassLinks.filter((link) => {
@@ -394,7 +396,7 @@ export class CachingAnlassService {
   loadTeilnahmen(
     anlass: IAnlass,
     verein: IVerein,
-    isLast: boolean
+    isLast: boolean,
   ): Observable<boolean> {
     this.anlassService
       .getTeilnehmer(anlass, verein)
@@ -461,17 +463,17 @@ export class CachingAnlassService {
   } */
   getVereinAnmeldeKontrollePdf(
     anlass: IAnlass,
-    verein: IVerein
+    verein: IVerein,
   ): Observable<string> {
     return this.anlassService.getVereinAnmeldeKontrollePdf(anlass, verein);
   }
   getVereinWertungsrichterKontrollePdf(
     anlass: IAnlass,
-    verein: IVerein
+    verein: IVerein,
   ): Observable<string> {
     return this.anlassService.getVereinWertungsrichterKontrollePdf(
       anlass,
-      verein
+      verein,
     );
   }
 }

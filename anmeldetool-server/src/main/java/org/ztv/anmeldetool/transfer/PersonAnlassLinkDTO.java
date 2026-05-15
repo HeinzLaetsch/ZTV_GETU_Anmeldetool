@@ -6,20 +6,7 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Value;
 
-@Value
+//@Value
 // @AllArgsConstructor
-@Builder
-public class PersonAnlassLinkDTO {
-
-	UUID anlassId;
-
-	UUID personId;
-
-	UUID organisationId;
-
-	boolean dirty;
-
-	private String kommentar;
-
-	private List<WertungsrichterEinsatzDTO> einsaetze;
-}
+//@Builder
+public record PersonAnlassLinkDTO(UUID anlassId, UUID personId, UUID organisationId, boolean dirty, String kommentar, List<WertungsrichterEinsatzDTO> einsaetze) {}

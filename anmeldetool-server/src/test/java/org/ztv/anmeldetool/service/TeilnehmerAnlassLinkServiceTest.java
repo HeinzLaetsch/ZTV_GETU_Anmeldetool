@@ -426,7 +426,7 @@ class TeilnehmerAnlassLinkServiceTest {
           .verein("V").tiTu(TiTuEnum.Ti).abteilung(null).anlage(null).startgeraet(null)
           .kategorie(null).meldeStatus(MeldeStatusEnum.ABGEMELDET).build();
 
-      service.updateAnlassTeilnahme(dto);
+      service.updateAnlassTeilnahme(dto.getId(), dto);
       // after processing, tal should be marked deleted and inactive
       verify(teilnehmerAnlassLinkRepository).save(tal);
       assertTrue(tal.isDeleted());
@@ -438,7 +438,7 @@ class TeilnehmerAnlassLinkServiceTest {
       UUID id = UUID.randomUUID();
       when(teilnehmerAnlassLinkRepository.findById(id)).thenReturn(Optional.empty());
       TeilnehmerStartDTO dto = TeilnehmerStartDTO.builder().id(id).build();
-      assertThrows(ServiceException.class, () -> service.updateAnlassTeilnahme(dto));
+      assertThrows(ServiceException.class, () -> service.updateAnlassTeilnahme(dto.getId(), dto));
     }
   }
 

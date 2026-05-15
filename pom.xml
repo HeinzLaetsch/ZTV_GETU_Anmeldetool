@@ -3,17 +3,22 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.ztv.anmeldetool</groupId>
 	<artifactId>anmeldetool-parent</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.6</version>
+		<version>3.5.9</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
 	<properties>
 		<java.version>21</java.version>
+		<!--
+			Keep Lombok compatible with newer JDKs used by developers/CI.
+			(Older Lombok versions can fail with: TypeTag :: UNKNOWN)
+		-->
+		<lombok.version>1.18.38</lombok.version>
 	</properties>
 	<scm>
 		<developerConnection>

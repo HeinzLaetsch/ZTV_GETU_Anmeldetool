@@ -4,12 +4,12 @@ import { userFeature } from "./user.reducer";
 import * as fromUser from "./user.reducer";
 
 export const selectUserState = createFeatureSelector<UserState>(
-  userFeature.name
+  userFeature.name,
 );
 
 export const selectAllUser = createSelector(
   selectUserState,
-  fromUser.selectAll
+  fromUser.selectAll,
 );
 export const selectAktiveUser = () =>
   createSelector(selectAllUser, (user) => user.filter((user) => user.aktiv));
@@ -24,15 +24,26 @@ export const selectUserById = (id: string) =>
 
 export const selectUserByBenutzername = (name: string) =>
   createSelector(selectAllUser, (user) =>
-    user.filter((user) => user.benutzername === name)
+    user.filter((user) => user.benutzername === name),
   );
 
 export const selectUserByName = (name: string) =>
   createSelector(selectAllUser, (user) =>
-    user.filter((user) => user.name === name)
+    user.filter((user) => user.name === name),
   );
 
-export const selectUser = () =>
+export const selectAktivUser = () =>
   createSelector(selectAllUser, (user) => {
     return user;
+  });
+
+export const selectUser = (aktiv: boolean) =>
+  createSelector(selectAllUser, (user) => {
+    return user.filter((user) => {
+      if (user.pal === undefined) {
+        return true;
+      } else {
+        return false;
+      }
+    });
   });

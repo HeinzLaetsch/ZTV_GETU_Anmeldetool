@@ -25,6 +25,7 @@ public class TeilnehmerStartDTO implements Comparable<TeilnehmerStartDTO> {
 	private AnlageEnum anlage;
 	private GeraetEnum startgeraet;
 	private MeldeStatusEnum meldeStatus;
+	private boolean laufliste;
 
 	@Override
 	public int compareTo(TeilnehmerStartDTO arg0) {

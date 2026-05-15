@@ -8,7 +8,7 @@ import { AnlassActions } from "./anlass.actions";
 export class AnlassEffects {
   constructor(
     private actions$: Actions,
-    private anlassService: AnlassService
+    private anlassService: AnlassService,
   ) {}
 
   loadAnlaesse$ = createEffect(() => {
@@ -21,9 +21,9 @@ export class AnlassEffects {
           ]),
           catchError((error) => {
             return of(AnlassActions.loadAllAnlaesseError({ error: error }));
-          })
+          }),
         );
-      })
+      }),
     );
   });
 }

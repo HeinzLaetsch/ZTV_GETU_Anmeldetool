@@ -1,10 +1,5 @@
 package org.ztv.anmeldetool.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +16,7 @@ import org.ztv.anmeldetool.models.Laufliste;
 import org.ztv.anmeldetool.models.LauflistenContainer;
 import org.ztv.anmeldetool.models.MeldeStatusEnum;
 import org.ztv.anmeldetool.models.Notenblatt;
+import org.ztv.anmeldetool.models.Teilnehmer;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.repositories.EinzelnotenRepository;
@@ -30,6 +26,15 @@ import org.ztv.anmeldetool.repositories.NotenblaetterRepository;
 import org.ztv.anmeldetool.transfer.LauflisteDTO;
 import org.ztv.anmeldetool.transfer.LauflistenEintragDTO;
 import org.ztv.anmeldetool.transfer.LauflistenStatusDTO;
+import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
+import org.ztv.anmeldetool.util.TeilnehmerAnlassLinkMapper;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service("lauflistenService")
 @Slf4j
@@ -47,6 +52,8 @@ public class LauflistenService {
   private final TeilnehmerAnlassLinkService talService;
 
   private final AnlassService anlassService;
+
+  public final TeilnehmerAnlassLinkMapper teilnehmerAnlassLinkMapper;
 
   public Optional<Laufliste> findLauflisteById(UUID id) {
     return this.lauflistenRepo.findById(id);
@@ -155,7 +162,7 @@ public class LauflistenService {
     return notenblatt;
   }
 
- @Transactional
+  @Transactional
   public Laufliste saveLaufliste(Laufliste laufliste) {
     return lauflistenRepo.save(laufliste);
   }
@@ -196,9 +203,9 @@ public class LauflistenService {
     return lauflistenStatusDto;
   }
 
-  public List<LauflistenContainer> findLauflistenForAnlassAndKategorie(UUID anlassId,
+  public List<LauflistenContainer> findLauflistenContainerForAnlassAndKategorie(UUID anlassId,
       KategorieEnum kategorie,
-      AbteilungEnum abteilung, AnlageEnum anlage) {
+      AbteilungEnum abteilung, AnlageEnum anlage, GeraetEnum startGeraet) {
     Anlass anlass = anlassService.findById(anlassId);
     List<LauflistenContainer> existierende = lauflistenContainerRepo
         .findByAnlassAndKategorieOrderByStartgeraetAsc(anlass, kategorie);
@@ -214,7 +221,10 @@ public class LauflistenService {
             || container.getTeilnehmerAnlassLinks().getFirst().getAbteilung().equals(abteilung)) {
           if (anlage.equals(AnlageEnum.UNDEFINED)
               || container.getTeilnehmerAnlassLinks().getFirst().getAnlage().equals(anlage)) {
-            return true;
+            if (startGeraet.equals(GeraetEnum.UNDEFINED)
+                || container.getTeilnehmerAnlassLinks().getFirst().getStartgeraet().equals(startGeraet)) {
+              return true;
+            }
           }
         }
       }
@@ -227,10 +237,11 @@ public class LauflistenService {
       KategorieEnum kategorie,
       AbteilungEnum abteilung, AnlageEnum anlage, boolean tiOnly) throws ServiceException {
     Anlass anlass = anlassService.findById(anlassId);
-    List<LauflistenContainer> existierende = findLauflistenForAnlassAndKategorie(anlassId,
+    List<LauflistenContainer> existierende = findLauflistenContainerForAnlassAndKategorie(anlassId,
         kategorie,
         abteilung,
-        anlage);
+        anlage,
+        GeraetEnum.UNDEFINED);
     if (!existierende.isEmpty()) {
       throw new ServiceException(LauflistenService.class,
           "Es existieren schon Lauflisten für Anlass {} und Kategorie {}".formatted(
@@ -266,21 +277,23 @@ public class LauflistenService {
     }
   }
 
-  public List<LauflistenContainer> getLauflistenForAnlassAndKategorie(UUID anlassId,
+  //TODO wieso diese 2
+  public List<LauflistenContainer> getLauflistenContainerForAnlassAndKategorie(UUID anlassId,
       KategorieEnum kategorie,
-      AbteilungEnum abteilung, AnlageEnum anlage) {
-    return findLauflistenForAnlassAndKategorie(anlassId, kategorie,
+      AbteilungEnum abteilung, AnlageEnum anlage, GeraetEnum startGeraete) {
+    return findLauflistenContainerForAnlassAndKategorie(anlassId, kategorie,
         abteilung,
-        anlage);
+        anlage, startGeraete);
   }
 
-  public int deleteLauflistenForAnlassAndKategorie(UUID anlassId, KategorieEnum kategorie,
+  public int deleteLauflistenContainerForAnlassAndKategorie(UUID anlassId, KategorieEnum kategorie,
       AbteilungEnum abteilung,
       AnlageEnum anlage) throws ServiceException {
-    List<LauflistenContainer> existierende = findLauflistenForAnlassAndKategorie(anlassId,
+    List<LauflistenContainer> existierende = findLauflistenContainerForAnlassAndKategorie(anlassId,
         kategorie,
         abteilung,
-        anlage);
+        anlage,
+        GeraetEnum.UNDEFINED);
     List<Notenblatt> notenblaetter = new ArrayList<Notenblatt>();
     existierende.forEach(container -> {
       container.getTeilnehmerAnlassLinks().forEach(tal -> {
@@ -321,6 +334,15 @@ public class LauflistenService {
     return lauflistenOpt.orElseThrow(() -> new NotFoundException(Laufliste.class, search));
   }
 
+  public void updateEinzelnoten(Laufliste laufliste) {
+    laufliste.getEinzelnoten().forEach(einzelnote -> {
+      Einzelnote managed = this.einzelnotenRepo.findById(einzelnote.getId()).get();
+      managed.setStartOrder(einzelnote.getStartOrder());
+      einzelnotenRepo.save(managed);
+      lauflistenRepo.save(laufliste);
+    });
+  }
+
   public AnlassLauflisten generateLauflistenPdfForAnlassAndKategorie(UUID anlassId,
       KategorieEnum kategorie, AbteilungEnum abteilung, AnlageEnum anlage,
       Optional<Boolean> optOnlyTi)
@@ -341,13 +363,58 @@ public class LauflistenService {
     return anlassLauflisten;
   }
 
+  public LauflistenContainer addTeilnehmerToLauflistenContainer(UUID anlassId, KategorieEnum kategorie,
+      AbteilungEnum abteilung, AnlageEnum anlage, GeraetEnum startGeraet, UUID teilnehmerId) {
+    List<LauflistenContainer> containers= getLauflistenForFilter(anlassId, kategorie, abteilung, anlage, startGeraet);
+    if (Optional.ofNullable(containers).isPresent() && containers.size() == 1) {
+      TeilnehmerAnlassLink tal = talService
+          .findTeilnehmerAnlassLinkById(teilnehmerId)
+          .orElseThrow(() -> new NotFoundException(TeilnehmerAnlassLink.class, teilnehmerId.toString()));
+      LauflistenContainer lc = containers.getFirst();
+      lc.getTeilnehmerAnlassLinks().add(tal);
+
+      tal = createNotenblatt(tal);
+
+      List<Laufliste> lauflisten = lc.getGeraeteLauflisten();
+      var notenblatt =tal.getNotenblatt();
+      lauflisten.forEach(laufliste -> {
+        Einzelnote einzelnote = notenblatt.getEinzelnoteForGeraet(laufliste.getGeraet());
+        einzelnote.setStartOrder(lc.getTeilnehmerAnlassLinks().size() + 1);
+        einzelnote.setLaufliste(laufliste);
+      });
+      tal.setLauflistenContainer(lc);
+      this.talService.save(tal);
+      this.lauflistenContainerRepo.save(lc);
+      return lc;
+    } else {
+      throw new NotFoundException(LauflistenContainer.class,
+          String.format("LauflistenContainer not found for Anlass {}, Kategorie {}, Abteilung {}, Anlage {}, StartGeraet {}",
+          anlassId, kategorie, abteilung, anlage, startGeraet));
+    }
+  }
+
+  public List<LauflistenContainer> getLauflistenForFilter(UUID anlassId, KategorieEnum kategorie,
+      AbteilungEnum abteilung, AnlageEnum anlage, GeraetEnum startGeraet) {
+    List<LauflistenContainer> lauflistenContainers;
+    if (startGeraet== null) {
+      lauflistenContainers = getLauflistenContainerForAnlassAndKategorie(
+          anlassId, kategorie,
+          abteilung, anlage, GeraetEnum.UNDEFINED);
+    } else {
+      lauflistenContainers = getLauflistenContainerForAnlassAndKategorie(
+          anlassId, kategorie,
+          abteilung, anlage, startGeraet);
+    }
+    return lauflistenContainers;
+  }
+
+
+  //TODO Use Mapper
   public List<LauflisteDTO> getLauflistenDtosForFilter(UUID anlassId, KategorieEnum kategorie,
       AbteilungEnum abteilung, AnlageEnum anlage) {
-    List<LauflistenContainer> listen = getLauflistenForAnlassAndKategorie(
-        anlassId, kategorie,
-        abteilung, anlage);
+    List<LauflistenContainer> lauflistenContainers = getLauflistenForFilter(anlassId, kategorie,abteilung , anlage, GeraetEnum.UNDEFINED);
     List<Laufliste> alle = new ArrayList<>();
-    for (LauflistenContainer container : listen) {
+    for (LauflistenContainer container : lauflistenContainers) {
       alle.addAll(container.getGeraeteLauflisten());
     }
 
@@ -356,7 +423,7 @@ public class LauflistenService {
             .anlage(anlage)
             .geraet(laufliste.getGeraet()).id(laufliste.getId()).erfasst(laufliste.isErfasst())
             .checked(laufliste.isChecked()).abloesung(laufliste.getAbloesung()).build())
-        .collect(Collectors.toList());
+        .toList();
   }
 
   private void persistLauflisten(AnlassLauflisten anlassLaufListen) {

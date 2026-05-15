@@ -51,11 +51,11 @@ export class EventStartListComponent
     private anlassService: AnlassService,
     //private anlassService: CachingAnlassService,
     // private teilnehmerService: CachingTeilnehmerService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {
     super();
     this.store.dispatch(
-      TeilnahmenActions.loadAllTeilnahmenInvoked({ payload: moment().year() })
+      TeilnahmenActions.loadAllTeilnahmenInvoked({ payload: moment().year() }),
     );
   }
 
@@ -67,7 +67,7 @@ export class EventStartListComponent
       this.anlass$.subscribe((data) => {
         this.anlass = data;
         this.loadAnlassRelated(anlassId);
-      })
+      }),
     );
 
     // Eventuell eine Ebene höher
@@ -83,13 +83,13 @@ export class EventStartListComponent
       });
     */
     this.teilnahmen$ = this.store.pipe(
-      select(selectTeilnahmenByAnlassId(anlassId))
+      select(selectTeilnahmenByAnlassId(anlassId)),
     );
 
     this.registerSubscription(
       this.teilnahmen$.subscribe((data) => {
         this.alleTeilnahmen = data;
-      })
+      }),
     );
 
     /*
@@ -114,7 +114,7 @@ export class EventStartListComponent
         .pipe(select(selectAnlassSummaryByAnlassId(anlassId)))
         .subscribe((data) => {
           this.anlassSummary = data;
-        })
+        }),
       /*
       this.anlassService
         .getAnlassOrganisationSummary(
@@ -168,25 +168,38 @@ export class EventStartListComponent
   }
 
   private sortBy(a: ITeilnahmen, b: ITeilnahmen): number {
+    if (
+      a.talDTOList[0] == null ||
+      a.talDTOList[0].abteilung == null ||
+      a.talDTOList[0].anlage == null ||
+      a.talDTOList[0].startgeraet == null ||
+      b.talDTOList[0] == null ||
+      b.talDTOList[0].abteilung == null ||
+      b.talDTOList[0].anlage == null ||
+      b.talDTOList[0].startgeraet == null
+    ) {
+      return 0;
+    }
+
     const tituComparison = a.teilnehmer.tiTu.localeCompare(b.teilnehmer.tiTu);
     if (tituComparison !== 0) {
       return tituComparison;
     }
     if (a.talDTOList[0].abteilung && b.talDTOList[0].abteilung) {
       const abtComparison = a.talDTOList[0].abteilung.localeCompare(
-        b.talDTOList[0].abteilung
+        b.talDTOList[0].abteilung,
       );
       if (abtComparison !== 0) {
         return abtComparison;
       }
       const anlComparison = a.talDTOList[0].anlage.localeCompare(
-        b.talDTOList[0].anlage
+        b.talDTOList[0].anlage,
       );
       if (anlComparison !== 0) {
         return anlComparison;
       }
       const startComparison = a.talDTOList[0].startgeraet.localeCompare(
-        b.talDTOList[0].startgeraet
+        b.talDTOList[0].startgeraet,
       );
       if (startComparison !== 0) {
         return startComparison;
@@ -199,6 +212,7 @@ export class EventStartListComponent
     //console.log("getK1 ", this.alleTeilnahmen);
     return this.alleTeilnahmen
       ?.filter((teilnahme) => {
+        console.log("filter: ", teilnahme.talDTOList[0].kategorie);
         return teilnahme.talDTOList[0].kategorie == KategorieEnum.K1;
       })
       .sort((a, b) => this.sortBy(a, b));

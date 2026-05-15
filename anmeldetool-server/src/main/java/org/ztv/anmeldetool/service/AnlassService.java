@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.ztv.anmeldetool.exception.NotFoundException;
@@ -93,6 +94,15 @@ public class AnlassService extends AbstractBaseService<Anlass> {
     }
   }
 
+  @Transactional(readOnly = true)
+  public Optional<Anlass> findPreviousAnlass(Anlass anlass, KategorieEnum kategorie) {
+
+   return getAnlaesse(false).stream()
+       .filter(a -> a.getStartDate().isBefore(anlass.getStartDate())
+           && a.getTiefsteKategorie().ordinal() <= kategorie.ordinal()
+           && a.getHoechsteKategorie().ordinal() >= kategorie.ordinal())
+       .min((a1, a2) -> a2.getStartDate().compareTo(a1.getStartDate()));
+  }
   @Transactional()
   public AnlassDTO updateAnlass(AnlassDTO anlass) {
     return anlassMapper.toDto(this.anlassRepo.save(anlassMapper.toEntity(anlass)));

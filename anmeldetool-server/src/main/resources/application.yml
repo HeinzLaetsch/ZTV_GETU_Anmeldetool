@@ -5,9 +5,8 @@ spring:
   profiles.active: "prod"
   flyway:
     locations: ["classpath:/db/migration"]
-    clean-on-validation-error: true
-    username: postgres
-    password: getu@ztv
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
 
   jpa:
      database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -15,26 +14,26 @@ spring:
      properties.hibernate.jdbc.time_zone: "GMT+1"
               
   datasource:
-    url: jdbc:postgresql://db:5432/getuwettkaempfe
-    username: postgres
-    password: getu@ztv
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
   jackson:
      deserialization.adjust-dates-to-context-time-zone: true
      time-zone: "Europe/Zurich"   
      # time-zone: "UTC"
   mail:
-     enabled: "true"
-     host: "smtp.office365.com"
-     # host: "mail.gmx.net"
-     port: 587
+     enabled: ${MAIL_ENABLED}
+     username:  ${MAIL_USER}
+     password: ${MAIL_PASSWORD}
+
+     host: ${MAIL_HOST}
+     port: ${MAIL_PORT}
      templates.path: "mail-templates"
-     username: "getu-wettkaempfe@ztv.ch"
-     password: "secret"
      properties.mail.smtp:
           auth: "true"
           starttls.enable: "true"
-     simulate:  "false"
-     simulateemail: "heinz.laetsch@gmx.ch"
+     simulate:  ${SIMULATE_ENABLED}
+     simulateemail: ${SIMULATE_EMAIL}
      
   thymeleaf.prefix: "classpath:/mail-templates/"
   application.name: ztv-anmeldetool

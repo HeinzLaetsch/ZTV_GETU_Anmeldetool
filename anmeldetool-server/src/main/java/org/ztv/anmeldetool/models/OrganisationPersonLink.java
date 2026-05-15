@@ -3,6 +3,7 @@ package org.ztv.anmeldetool.models;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -20,7 +21,7 @@ import lombok.ToString;
 @Table(name = "organisation_person_link")
 @Getter
 @Setter
-@AllArgsConstructor
+// @AllArgsConstructor
 public class OrganisationPersonLink extends Base {
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -34,14 +35,15 @@ public class OrganisationPersonLink extends Base {
 	private Person person;
 
 	// Rolle über Enum
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "link")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "link", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	@ToString.Exclude
 	private Set<RollenLink> rollenLink;
 
-  @Builder
+  // @Builder
 	public OrganisationPersonLink() {
 		this.rollenLink = new HashSet<>();
 	}
+	@Builder
   public OrganisationPersonLink(Organisation organisation, Person person) {
     this.organisation = organisation;
     this.person = person;

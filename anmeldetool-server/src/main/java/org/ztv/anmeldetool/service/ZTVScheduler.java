@@ -47,9 +47,9 @@ public class ZTVScheduler {
 
   @Value("${spring.mail.simulate}")
   private boolean simulate;
-  @Value("${spring.mail.username}")
+  @Value("${spring.mail.username:''}")
   private String sender;
-  @Value("${spring.mail.templates.path}")
+  @Value("${spring.mail.templates.path:''}")
   private String mailTemplatesPath;
   @Value("${scheduler.reminder.daysbefore}")
   private int reminderDaysBefore;

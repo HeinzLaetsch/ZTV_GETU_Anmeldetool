@@ -116,7 +116,7 @@ export class IAnlass {
 
   // Cross Kategorie Aenderungen nicht mehr erlaubt
   set crossKategorieAenderungenGeschlossen(
-    crossKategorieAenderungenGeschlossen: Date
+    crossKategorieAenderungenGeschlossen: Date,
   ) {
     this.crossKategorieAenderungenGeschlossen_ =
       crossKategorieAenderungenGeschlossen;
@@ -129,7 +129,7 @@ export class IAnlass {
 
   // Aenderungen innerhalb Kategorie nicht mehr erlaubt.
   set aenderungenInKategorieGeschlossen(
-    aenderungenInKategorieGeschlossen: Date
+    aenderungenInKategorieGeschlossen: Date,
   ) {
     this.aenderungenInKategorieGeschlossen_ = aenderungenInKategorieGeschlossen;
     this.updateAnzeigeStatus();
@@ -212,19 +212,19 @@ export class IAnlass {
 
   getKategorienRaw(): KategorieEnum[] {
     const k5Index = Object.keys(KategorieEnum).findIndex(
-      (key) => key === KategorieEnum.K5
+      (key) => key === KategorieEnum.K5,
     );
     const start = Object.keys(KategorieEnum).findIndex(
-      (key) => key === this.tiefsteKategorie
+      (key) => key === this.tiefsteKategorie,
     );
     let end = Object.keys(KategorieEnum).findIndex(
-      (key) => key === this.hoechsteKategorie
+      (key) => key === this.hoechsteKategorie,
     );
     // Keine Teilnahme
     let filtered = Object.values(KategorieEnum).slice(0, 1);
     if (end > k5Index) {
       filtered = filtered.concat(
-        Object.values(KategorieEnum).slice(start, k5Index)
+        Object.values(KategorieEnum).slice(start, k5Index),
       );
       if (this.tuAnlass || this.alleAnlass) {
         filtered.push(KategorieEnum.K5);
@@ -241,7 +241,7 @@ export class IAnlass {
       filtered.push(KategorieEnum.K7);
     } else {
       filtered = filtered.concat(
-        Object.values(KategorieEnum).slice(start, end + 1)
+        Object.values(KategorieEnum).slice(start, end + 1),
       );
     }
     return filtered;
@@ -249,7 +249,7 @@ export class IAnlass {
 
   public updateAnzeigeStatus(): void {
     if (this.anmeldungBeginn) {
-      const asMoment = moment(this.anmeldungBeginn);
+      const asMoment = moment(this.anmeldungBeginn).startOf("day");
       asMoment.add(1, "days");
       if (asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN);
@@ -259,10 +259,9 @@ export class IAnlass {
     } else {
       this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN);
     }
-    this.erfassenVerlaengert_;
     this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED);
     if (this.erfassenGeschlossen) {
-      const asMoment = moment(this.erfassenGeschlossen);
+      const asMoment = moment(this.erfassenGeschlossen).startOf("day");
       asMoment.add(1, "days");
       if (asMoment.isBefore()) {
         if (this.erfassenVerlaengert) {
@@ -282,20 +281,24 @@ export class IAnlass {
     }
 
     if (this.crossKategorieAenderungenGeschlossen) {
-      const asMoment = moment(this.crossKategorieAenderungenGeschlossen);
+      const asMoment = moment(
+        this.crossKategorieAenderungenGeschlossen,
+      ).startOf("day");
       asMoment.add(1, "days");
       if (asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.CROSS_KATEGORIE_CLOSED);
       } else {
         this.anzeigeStatus.resetStatus(
-          AnzeigeStatusEnum.CROSS_KATEGORIE_CLOSED
+          AnzeigeStatusEnum.CROSS_KATEGORIE_CLOSED,
         );
       }
     } else {
       this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.CROSS_KATEGORIE_CLOSED);
     }
     if (this.aenderungenInKategorieGeschlossen) {
-      const asMoment = moment(this.aenderungenInKategorieGeschlossen);
+      const asMoment = moment(this.aenderungenInKategorieGeschlossen).startOf(
+        "day",
+      );
       asMoment.add(1, "days");
       if (asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.IN_KATEGORIE_CLOSED);
@@ -307,13 +310,13 @@ export class IAnlass {
     }
 
     if (this.aenderungenNichtMehrErlaubt) {
-      const asMoment = moment(this.aenderungenNichtMehrErlaubt);
+      const asMoment = moment(this.aenderungenNichtMehrErlaubt).startOf("day");
       asMoment.add(1, "days");
       if (asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED);
       } else {
         this.anzeigeStatus.resetStatus(
-          AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED
+          AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED,
         );
       }
     } else {
@@ -321,7 +324,7 @@ export class IAnlass {
     }
 
     if (this.endDatum) {
-      const asMoment = moment(this.endDatum);
+      const asMoment = moment(this.endDatum).startOf("day");
       asMoment.add(1, "days");
       if (asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.CLOSED);
@@ -339,7 +342,7 @@ export class IAnlass {
     }
 
     if (this.erfassenVerlaengert) {
-      const asMoment = moment(this.erfassenVerlaengert);
+      const asMoment = moment(this.erfassenVerlaengert).startOf("day");
       asMoment.add(1, "days");
       if (!asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.VERLAENGERT);

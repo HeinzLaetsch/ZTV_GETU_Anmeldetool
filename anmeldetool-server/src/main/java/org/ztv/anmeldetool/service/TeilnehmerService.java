@@ -118,21 +118,26 @@ public class TeilnehmerService {
 
   // Kein Softdelete !
   @Transactional
-  public ResponseEntity<UUID> delete(UUID orgId, UUID teilnehmerId) {
+  public UUID delete(UUID orgId, UUID teilnehmerId) {
     Organisation organisation = organisationSrv.findById(orgId);
     if (organisation == null) {
-      return ResponseEntity.notFound().build();
+      throw new NotFoundException(Organisation.class, orgId);
+      //return ResponseEntity.notFound().build();
     }
     Optional<Teilnehmer> teilnehmerOptional = teilnehmerRepository.findById(teilnehmerId);
     if (teilnehmerOptional.isEmpty()) {
-      return ResponseEntity.notFound().build();
+      throw new NotFoundException(Teilnehmer.class, teilnehmerId);
+      // return ResponseEntity.notFound().build();
     }
     Teilnehmer teilnehmer = teilnehmerOptional.get();
-    List<TeilnehmerAnlassLink> links = this.teilnehmerAnlassLinkRepository.findByTeilnehmer(
-        teilnehmer);
-    this.teilnehmerAnlassLinkRepository.deleteAll(links);
+    //List<TeilnehmerAnlassLink> links = this.teilnehmerAnlassLinkRepository.findByTeilnehmer(
+    //    teilnehmer);
+    // this.log.info("Deleting Links for Teilnehmer with ID: {}", teilnehmerId);
+    //this.teilnehmerAnlassLinkRepository.deleteAll(links);
+
+    this.log.info("Deleting Teilnehmer with ID: {}", teilnehmerId);
     teilnehmerRepository.delete(teilnehmer);
-    return ResponseEntity.ok(teilnehmerId);
+    return teilnehmerId;
   }
 
   public TeilnehmerDTO update(UUID orgId, TeilnehmerDTO teilnehmerDTO) throws NotFoundException {

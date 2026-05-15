@@ -8,14 +8,12 @@ export const teilnahmenFeature = createFeature({
     initialState,
     on(TeilnahmenActions.loadAllTeilnahmenSuccess, (state, action) => {
       const teilnahmen = action.payload;
-      // teilnahmenAdapter.addMany(teilnahmen, state);
       return teilnahmenAdapter.setAll(teilnahmen, state);
     }),
     on(TeilnahmenActions.updateTeilnahmenSuccess, (state, action) => {
       const teilnahme = action.payload;
       console.log("Store updated : true");
       return teilnahmenAdapter.updateOne(teilnahme, state);
-      // return teilnahmenAdapter.setAll(teilnahmen, state);
     }),
     on(TeilnahmenActions.addTeilnehmerSuccess, (state, action) => {
       const teilnehmer = action.payload;
@@ -28,6 +26,7 @@ export const teilnahmenFeature = createFeature({
     }),
     on(TeilnahmenActions.deleteTeilnehmerSuccess, (state, action) => {
       const teilnehmerId = action.payload;
+      console.log("Store updated : deletion of teilnehmer " + teilnehmerId);
       const newState = teilnahmenAdapter.removeOne(teilnehmerId, state);
       return newState;
     })

@@ -1,3 +1,5 @@
+import { IOrganisationAnlassLink } from "./IOrganisationAnlassLink";
+import { IOrganisationPersonLink } from "./IOrganisationPersonLink";
 import { IPersonAnlassLink } from "./IPersonAnlassLink";
 import { IRolle } from "./IRolle";
 import { IWertungsrichter } from "./IWertungsrichter";
@@ -12,8 +14,10 @@ export interface IUser {
   handy: string;
   aktiv: boolean;
   dirty?: boolean;
+  userAlreadyExists?: boolean;
   password?: string;
   rollen?: IRolle[];
   wr?: IWertungsrichter;
   pal?: IPersonAnlassLink;
+  organisationenLinks?: IOrganisationPersonLink[];
 }

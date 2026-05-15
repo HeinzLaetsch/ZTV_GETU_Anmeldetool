@@ -1,41 +1,33 @@
 server:
-  port: 8080
+  port: ${BACKEND_PORT}
   servlet:
     context-path: /
 spring:
   flyway:
     locations: ["classpath:/db/migration"]
-    clean-on-validation-error: false
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
   jpa:
      database-platform: org.hibernate.dialect.PostgreSQLDialect
-     show-sql: "false"
+     show-sql: "true"
      properties:
         hibernate:
            jdbc:
               # time_zone: "Europe/Zurich"
               time_zone: "GMT+1"
-              
-     
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
   jackson:
      deserialization:
         adjust-dates-to-context-time-zone: true
      # time-zone: "Europe/Zurich"
      time-zone: "UTC"
   mail:
-     enabled: "false"
-     username:  ${MAIL_USER}
-     password: ${MAIL_PASSWORD}
-     templates:
-        path: "mail-templates"
-     simulate:  "true"
-     simulateemail: "heinz.laetsch@gmx.ch"
-     
+    enabled: ${MAIL_ENABLED}
+    username:  ${MAIL_USER}
+    password: ${MAIL_PASSWORD}
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    simulate:  ${SIMULATE_ENABLED}
+    simulateemail: ${SIMULATE_EMAIL}
+
+
 # this info may be accessed via actuator
 info:
   app:
@@ -58,7 +50,7 @@ scheduler:
       cron: "20 * * * * *"
       daysbefore: 3
    closed:
-      cron: "0/10 1 * * 12 *"
+      cron: "20 * * * * *"
       daysafter: 1
    mutationen:
       cron: "0/10 1 * * 12 *"

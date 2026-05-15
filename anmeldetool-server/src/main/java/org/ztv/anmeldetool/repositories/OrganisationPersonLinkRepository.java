@@ -13,4 +13,6 @@ import org.ztv.anmeldetool.models.Person;
 public interface OrganisationPersonLinkRepository extends JpaRepository<OrganisationPersonLink, UUID> {
 
 	Optional<OrganisationPersonLink> findByOrganisationAndPerson(Organisation org, Person person);
+
+	Optional<OrganisationPersonLink> findByOrganisation(Organisation org);
 }

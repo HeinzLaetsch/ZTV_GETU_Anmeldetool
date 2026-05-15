@@ -53,13 +53,13 @@ export class AnlassService extends ServiceHelper {
       }),
       catchError((err, caught) => {
         return this.handleError("getAnlaesse", err, caught);
-      })
+      }),
     );
   }
 
   getAnlassOrganisationSummary(
     anlass: IAnlass,
-    verein: IVerein
+    verein: IVerein,
   ): Observable<IAnlassSummary> {
     const combinedUrl =
       this.url +
@@ -76,12 +76,12 @@ export class AnlassService extends ServiceHelper {
     return this.http.get<IAnlassSummary>(combinedUrl).pipe(
       catchError((err, caught) => {
         return this.handleError("getAnlassOrganisationSummary", err, caught);
-      })
+      }),
     );
   }
 
   getAnlassOrganisationSummaries(
-    verein: IVerein
+    verein: IVerein,
   ): Observable<IAnlassSummary[]> {
     const combinedUrl =
       this.url + "/organisationen" + "/" + verein?.id + "/summaries";
@@ -91,14 +91,14 @@ export class AnlassService extends ServiceHelper {
     return this.http.get<IAnlassSummary[]>(combinedUrl).pipe(
       catchError((err, caught) => {
         return this.handleError("getAnlassOrganisationSummaries", err, caught);
-      })
+      }),
     );
   }
 
   getVerfuegbareWertungsrichter(
     anlass: IAnlass,
     verein: IVerein,
-    brevet: number
+    brevet: number,
   ): Observable<IUser[]> {
     const combinedUrl =
       this.url +
@@ -121,14 +121,14 @@ export class AnlassService extends ServiceHelper {
     return this.http.get<IUser[]>(combinedUrl).pipe(
       catchError((err, caught) => {
         return this.handleError("getVerfuegbareWertungsrichter", err, caught);
-      })
+      }),
     );
   }
 
   getEingeteilteWertungsrichter(
     anlass: IAnlass,
     verein: IVerein,
-    brevet: number
+    brevet: number,
   ): Observable<IPersonAnlassLink[]> {
     const combinedUrl =
       this.url +
@@ -151,14 +151,14 @@ export class AnlassService extends ServiceHelper {
     return this.http.get<IPersonAnlassLink[]>(combinedUrl).pipe(
       catchError((err, caught) => {
         return this.handleError("getEingeteilteWertungsrichter", err, caught);
-      })
+      }),
     );
   }
 
   getWrEinsatz(
     anlass: IAnlass,
     verein: IVerein,
-    wertungsrichter: IUser
+    wertungsrichter: IUser,
   ): Observable<IPersonAnlassLink> {
     const combinedUrl =
       this.url +
@@ -181,14 +181,14 @@ export class AnlassService extends ServiceHelper {
     return this.http.get<IPersonAnlassLink>(combinedUrl).pipe(
       catchError((err, caught) => {
         return this.handleError("getWrEinsatz", err, caught);
-      })
+      }),
     );
   }
 
   updateWrEinsatz(
     verein: IVerein,
     anlassLink: IPersonAnlassLink,
-    einsatz: IWertungsrichterEinsatz
+    einsatz: IWertungsrichterEinsatz,
   ): Observable<IWertungsrichterEinsatz> {
     const combinedUrl =
       this.url +
@@ -208,14 +208,14 @@ export class AnlassService extends ServiceHelper {
     return this.http.post<IWertungsrichterEinsatz>(combinedUrl, einsatz).pipe(
       catchError((err, caught) => {
         return this.handleError("updateWrEinsatz", err, caught);
-      })
+      }),
     );
   }
 
   addWertungsrichterToAnlass(
     anlass: IAnlass,
     verein: IVerein,
-    user: IUser
+    user: IUser,
   ): Observable<IPersonAnlassLink> {
     const combinedUrl =
       this.url +
@@ -236,13 +236,13 @@ export class AnlassService extends ServiceHelper {
     return this.http.post<IPersonAnlassLink>(combinedUrl, {}).pipe(
       catchError((err, caught) => {
         return this.handleError("addWertungsrichterToAnlass", err, caught);
-      })
+      }),
     );
   }
 
   updateAnlassLink(
     pal: IPersonAnlassLink,
-    verein: IVerein
+    verein: IVerein,
   ): Observable<IPersonAnlassLink> {
     const combinedUrl =
       this.url +
@@ -259,14 +259,14 @@ export class AnlassService extends ServiceHelper {
     return this.http.post<IPersonAnlassLink>(combinedUrl, pal).pipe(
       catchError((err, caught) => {
         return this.handleError("updateAnlassLink", err, caught);
-      })
+      }),
     );
   }
 
   deleteWertungsrichterFromAnlass(
     anlass: IAnlass,
     verein: IVerein,
-    user: IUser
+    user: IUser,
   ): Observable<IPersonAnlassLink> {
     const combinedUrl =
       this.url +
@@ -287,13 +287,13 @@ export class AnlassService extends ServiceHelper {
     return this.http.delete<IPersonAnlassLink>(combinedUrl).pipe(
       catchError((err, caught) => {
         return this.handleError("deleteWertungsrichterFromAnlass", err, caught);
-      })
+      }),
     );
   }
 
   getVereinStart(
     anlass: IAnlass,
-    verein: IVerein
+    verein: IVerein,
   ): Observable<IOrganisationAnlassLink> {
     const empty = {
       anlassId: anlass?.id,
@@ -309,7 +309,7 @@ export class AnlassService extends ServiceHelper {
     return this.http.get<IOrganisationAnlassLink>(combinedUrl).pipe(
       catchError((err, caught) => {
         return this.handleError("getVereinStart", err, caught, empty);
-      })
+      }),
     );
   }
 
@@ -319,12 +319,12 @@ export class AnlassService extends ServiceHelper {
     return this.http.get<IVerein[]>(combinedUrl).pipe(
       catchError((err, caught) => {
         return this.handleError("getVereinsStarts", err, caught);
-      })
+      }),
     );
   }
 
   updateVereinsStart(
-    orgAnlassLink: IOrganisationAnlassLink
+    orgAnlassLink: IOrganisationAnlassLink,
   ): Observable<IOrganisationAnlassLink> {
     const combinedUrl =
       this.url +
@@ -338,14 +338,14 @@ export class AnlassService extends ServiceHelper {
       "updateVereinsStart called: ",
       combinedUrl,
       ", Body: ",
-      orgAnlassLink
+      orgAnlassLink,
     );
     return this.http
       .patch<IOrganisationAnlassLink>(combinedUrl, orgAnlassLink)
       .pipe(
         catchError((err, caught) => {
           return this.handleError("updateVereinsStart", err, caught);
-        })
+        }),
       );
   }
 
@@ -354,7 +354,7 @@ export class AnlassService extends ServiceHelper {
     return this.http.put<IAnlass>(combinedUrl, anlass).pipe(
       catchError((err, caught) => {
         return this.handleError("updateAnlass", err, caught);
-      })
+      }),
     );
   }
 
@@ -362,7 +362,7 @@ export class AnlassService extends ServiceHelper {
   //saveTeilnahme(verein: IVerein, anlassLink: IAnlassLink): Observable<boolean> {
   saveTeilnahme(
     verein: IVerein,
-    teilnahmen: ITeilnahmen
+    teilnahmen: ITeilnahmen,
   ): Observable<ITeilnahmen> {
     console.log("Service save Teilnahme: ", teilnahmen);
 
@@ -380,7 +380,7 @@ export class AnlassService extends ServiceHelper {
     return this.http.put<ITeilnahmen>(combinedUrl, teilnahmen).pipe(
       catchError((err, caught) => {
         return this.handleError("saveTeilnahme", err, caught);
-      })
+      }),
     );
   }
 
@@ -399,7 +399,7 @@ export class AnlassService extends ServiceHelper {
     return this.http.get<IAnlassLink[]>(combinedUrl).pipe(
       catchError((err, caught) => {
         return this.handleError("getTeilnehmer", err, caught);
-      })
+      }),
     );
   }
 
@@ -418,32 +418,33 @@ export class AnlassService extends ServiceHelper {
     return this.http.get<ITeilnahmen[]>(combinedUrl).pipe(
       catchError((err, caught) => {
         return this.handleError("getTeilnahmen", err, caught);
-      })
+      }),
     );
   }
 
   getOrganisationTeilnahmenStatistik(
     verein: IVerein,
-    jahr: number
+    jahr: number,
   ): Observable<IOrganisationTeilnahmenStatistik[]> {
     const combinedUrl =
       this.url2 + "/" + jahr + "/" + "organisationen" + "/" + verein.id;
     return this.http.get<IOrganisationTeilnahmenStatistik[]>(combinedUrl).pipe(
       catchError((err, caught) => {
         return this.handleError("getStarts", err, caught);
-      })
+      }),
     );
   }
 
   updateTeilnehmerStart(
     anlass: IAnlass,
-    teilnehmerStart: ITeilnehmerStart
+    teilnehmerStart: ITeilnehmerStart,
   ): Observable<boolean> {
-    let combinedUrl = this.url + "/" + anlass.id + "/teilnehmer/";
+    let combinedUrl =
+      this.url + "/" + anlass.id + "/teilnehmer/" + teilnehmerStart.id;
     return this.http.put<boolean>(combinedUrl, teilnehmerStart).pipe(
       catchError((err, caught) => {
         return this.handleError("updateTeilnehmerStart", err, caught);
-      })
+      }),
     );
   }
 
@@ -453,7 +454,7 @@ export class AnlassService extends ServiceHelper {
     abteilung: AbteilungEnum,
     anlage: AnlageEnum,
     geraet: GeraeteEnum,
-    search: string
+    search: string,
   ): Observable<ITeilnehmerStart[]> {
     let combinedUrl =
       this.url +
@@ -474,7 +475,7 @@ export class AnlassService extends ServiceHelper {
     return this.http.get<ITeilnehmerStart[]>(combinedUrl).pipe(
       catchError((err, caught) => {
         return this.handleError("getByStartgeraet", err, caught);
-      })
+      }),
     );
   }
 
@@ -484,7 +485,7 @@ export class AnlassService extends ServiceHelper {
     abteilung: AbteilungEnum,
     anlage: AnlageEnum,
     geraet: GeraeteEnum,
-    search: string
+    search: string,
   ): Observable<ITeilnahmeStatistic> {
     let combinedUrl = this.url + "/" + anlass.id + "/teilnehmer/statistic";
     if (kategorie) {
@@ -506,20 +507,23 @@ export class AnlassService extends ServiceHelper {
     return this.http.get<ITeilnahmeStatistic>(combinedUrl).pipe(
       catchError((err, caught) => {
         return this.handleError("getTeilnahmeStatistic", err, caught);
-      })
+      }),
     );
   }
 
-  // /anlaesse/{anlassId}/organisationen/{orgId}/teilnehmer/
-  getTeilnehmerForAnlassCsv(anlass: IAnlass): void {
-    const combinedUrl = this.url + "/" + anlass.id + "/teilnehmer/";
+  // /anlaesse/{anlassId}/teilnehmer/
+  getTeilnehmerForAnlassCsv(anlass: IAnlass, rotate: boolean): void {
+    let combinedUrl = this.url + "/" + anlass.id + "/teilnehmer/";
+    if (rotate) {
+      combinedUrl = combinedUrl + "?rotate=true";
+    }
     // console.log("getTeilnehmer called: ", combinedUrl);
     this.http
       .get(combinedUrl, { observe: "response", responseType: "text" })
       .pipe(
         catchError((err, caught) => {
           return this.handleError("getTeilnehmerForAnlassCsv", err, caught);
-        })
+        }),
       )
       .subscribe((result: HttpResponse<string>) => {
         const header = result.headers.get("Content-Disposition");
@@ -527,7 +531,7 @@ export class AnlassService extends ServiceHelper {
         this.saveAsFile(
           result.body,
           parts[1].replace("%", ""),
-          "text/csv; charset=UTF-8"
+          "text/csv; charset=UTF-8",
         );
       });
   }
@@ -540,7 +544,7 @@ export class AnlassService extends ServiceHelper {
       .pipe(
         catchError((err, caught) => {
           return this.handleError("getMutationenForAnlassCsv", err, caught);
-        })
+        }),
       )
       .subscribe((result: HttpResponse<string>) => {
         const header = result.headers.get("Content-Disposition");
@@ -548,7 +552,7 @@ export class AnlassService extends ServiceHelper {
         this.saveAsFile(
           result.body,
           parts[1].replace("%", ""),
-          "text/csv; charset=UTF-8"
+          "text/csv; charset=UTF-8",
         );
       });
   }
@@ -561,7 +565,7 @@ export class AnlassService extends ServiceHelper {
       .pipe(
         catchError((err, caught) => {
           return this.handleError("getBenutzerForAnlassCsv", err, caught);
-        })
+        }),
       )
       .subscribe((result: HttpResponse<string>) => {
         const header = result.headers.get("Content-Disposition");
@@ -569,7 +573,7 @@ export class AnlassService extends ServiceHelper {
         this.saveAsFile(
           result.body,
           parts[1].replace("%", ""),
-          "text/csv; charset=UTF-8"
+          "text/csv; charset=UTF-8",
         );
       });
   }
@@ -584,9 +588,9 @@ export class AnlassService extends ServiceHelper {
           return this.handleError(
             "getWertungsrichterForAnlassCsv",
             err,
-            caught
+            caught,
           );
-        })
+        }),
       )
       .subscribe((result: HttpResponse<string>) => {
         const header = result.headers.get("Content-Disposition");
@@ -594,14 +598,14 @@ export class AnlassService extends ServiceHelper {
         this.saveAsFile(
           result.body,
           parts[1].replace("%", ""),
-          "text/csv; charset=UTF-8"
+          "text/csv; charset=UTF-8",
         );
       });
   }
 
   public importTeilnehmerForAnlassCsv(
     anlass: IAnlass,
-    formData: FormData
+    formData: FormData,
   ): Observable<any> {
     const combinedUrl = this.url + "/" + anlass.id + "/teilnehmer/";
     return this.http.post<any>(combinedUrl, formData);
@@ -609,7 +613,7 @@ export class AnlassService extends ServiceHelper {
 
   public importContestTeilnehmerForAnlassCsv(
     anlass: IAnlass,
-    formData: FormData
+    formData: FormData,
   ): Observable<any> {
     const combinedUrl = this.url + "/" + anlass.id + "/teilnehmer/contest";
     console.log("importContestTeilnehmerForAnlassCsv called: ", combinedUrl);
@@ -623,7 +627,7 @@ export class AnlassService extends ServiceHelper {
       .pipe(
         catchError((err, caught) => {
           return this.handleError("getAnmeldeKontrolleCsv", err, caught);
-        })
+        }),
       )
       .subscribe((result: HttpResponse<string>) => {
         const header = result.headers.get("Content-Disposition");
@@ -631,14 +635,14 @@ export class AnlassService extends ServiceHelper {
         this.saveAsFile(
           result.body,
           parts[1].replace("%", ""),
-          "text/csv; charset=UTF-8"
+          "text/csv; charset=UTF-8",
         );
       });
   }
 
   getVereinAnmeldeKontrollePdf(
     anlass: IAnlass,
-    verein: IVerein
+    verein: IVerein,
   ): Observable<string> {
     const statusResponse = new Subject<string>();
 
@@ -663,7 +667,7 @@ export class AnlassService extends ServiceHelper {
       .pipe(
         catchError((err, caught) => {
           return this.handleError("getVereinAnmeldeKontrollePdf", err, caught);
-        })
+        }),
       )
       .subscribe((result: HttpResponse<string>) => {
         const header = result.headers.get("Content-Disposition");
@@ -676,7 +680,7 @@ export class AnlassService extends ServiceHelper {
 
   getVereinWertungsrichterKontrollePdf(
     anlass: IAnlass,
-    verein: IVerein
+    verein: IVerein,
   ): Observable<string> {
     const statusResponse = new Subject<string>();
 
@@ -703,9 +707,9 @@ export class AnlassService extends ServiceHelper {
           return this.handleError(
             "getVereinWertungsrichterKontrollePdf",
             err,
-            caught
+            caught,
           );
-        })
+        }),
       )
       .subscribe((result: HttpResponse<Blob>) => {
         const header = result.headers.get("Content-Disposition");

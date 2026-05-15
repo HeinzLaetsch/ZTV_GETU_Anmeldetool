@@ -1,12 +1,9 @@
 package org.ztv.anmeldetool.service;
 
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.ztv.anmeldetool.exception.NotFoundException;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.Person;
@@ -19,6 +16,9 @@ import org.ztv.anmeldetool.transfer.PersonAnlassLinkCsvDTO;
 import org.ztv.anmeldetool.transfer.PersonAnlassLinkDTO;
 import org.ztv.anmeldetool.util.PersonAnlassLinkExportImportMapper;
 import org.ztv.anmeldetool.util.PersonAnlassLinkMapper;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service("personAnlassLinkService")
 @Slf4j
@@ -34,6 +34,7 @@ public class PersonAnlassLinkService {
   public PersonAnlassLinkDTO getPersonAnlassLinkDTO(Person person, Organisation organisation, Anlass anlass) {
     return personAnlassLinkMapper.toDto(getPersonAnlassLink(person, organisation, anlass));
   }
+
   @Transactional(readOnly = true)
   public PersonAnlassLink getPersonAnlassLink(Person person, Organisation organisation, Anlass anlass) {
     List<PersonAnlassLink> pals = personAnlassLinkRepository
@@ -56,16 +57,19 @@ public class PersonAnlassLinkService {
         .toList();
   }
 
-
-
   @Transactional(readOnly = true)
   public List<PersonAnlassLink> getEingeteilteWertungsrichter(Anlass anlass,
       Organisation organisation,
       WertungsrichterBrevetEnum brevet) {
     List<PersonAnlassLink> pals = personAnlassLinkRepository.findByAnlassAndOrganisation(anlass,
         organisation);
-    return pals.stream().filter(pal ->
-        pal.getPerson().getWertungsrichter().getBrevet().equals(brevet)
+    return pals.stream().filter(pal -> {
+          if (pal.getPerson().getWertungsrichter() == null) {
+            return false;
+          } else {
+            return pal.getPerson().getWertungsrichter().getBrevet().equals(brevet);
+          }
+        }
     ).toList();
   }
 
@@ -111,16 +115,17 @@ public class PersonAnlassLinkService {
     PersonAnlassLinkDTO palDTO = null;
     PersonAnlassLink pal = getPersonAnlassLink(person, organisation, anlass);
     if (pal != null) {
-      pal.setKommentar(personAnlassLinkDto.getKommentar());
+      pal.setKommentar(personAnlassLinkDto.kommentar());
       pal = personAnlassLinkRepository.save(pal);
     } else {
-      pal = createEingeteilteWertungsrichter(anlass, organisation, person, personAnlassLinkDto.getKommentar());
+      pal = createEingeteilteWertungsrichter(anlass, organisation, person, personAnlassLinkDto.kommentar());
     }
     palDTO = this.personAnlassLinkMapper.toDto(pal);
     return palDTO;
   }
+
   @Transactional
-  public PersonAnlassLink createEingeteilteWertungsrichter( Anlass anlass, Organisation organisation, Person person, String kommentar) {
+  public PersonAnlassLink createEingeteilteWertungsrichter(Anlass anlass, Organisation organisation, Person person, String kommentar) {
     PersonAnlassLink pal = new PersonAnlassLink();
     pal.setAktiv(true);
     pal.setAnlass(anlass);

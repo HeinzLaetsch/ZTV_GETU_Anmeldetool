@@ -70,6 +70,7 @@
                     [wertungsrichterUser]="wr"
                     [anlass]="anlass"
                     [useBrevet2]="false"
+                    [changeAllowed]="changeAllowed"
                   ></app-wertungsrichter-chip>
                 </div>
               </div>
@@ -91,6 +92,7 @@
                     [wertungsrichterUser]="wr"
                     [anlass]="anlass"
                     [useBrevet2]="useBrevet2"
+                    [changeAllowed]="changeAllowed"
                     (wertungsrichterUserChange)="
                       wertungsrichterUserChange($event)
                     "
@@ -151,6 +153,7 @@
                     [isAllWertungsrichterList]="true"
                     [wertungsrichterUser]="wr"
                     [anlass]="anlass"
+                    [changeAllowed]="changeAllowed"
                   >
                   </app-wertungsrichter-chip>
                 </div>
@@ -172,6 +175,7 @@
                     [isAllWertungsrichterList]="false"
                     [wertungsrichterUser]="wr"
                     [anlass]="anlass"
+                    [changeAllowed]="changeAllowed"
                     (wertungsrichterUserChange)="
                       wertungsrichterUserChange($event)
                     "

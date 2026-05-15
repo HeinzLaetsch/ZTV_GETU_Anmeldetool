@@ -25,23 +25,23 @@ export class UserService extends ServiceHelper {
     return this.http.get<IUser[]>(this.url).pipe(
       catchError((err, caught) => {
         return this.handleError("getUser", err, caught);
-      })
+      }),
     );
   }
   getUserByBenutzername(benutzername: string): Observable<IUser> {
     // console.log("getUser called");
     return this.http
-      .get<IUser>(this.url + "/benutzernamen/" + benutzername)
+      .get<IUser>(this.url + "/benutzernamen/" + encodeURIComponent(benutzername))
       .pipe(
         catchError((err, caught) => {
           return this.handleError("getUserByBenutzername", err, caught);
-        })
+        }),
       );
   }
   updateRoles(
     user: IUser,
     verein: IVerein,
-    roles: IRolle[]
+    roles: IRolle[],
   ): Observable<IUser> {
     const url =
       this.url +
@@ -53,10 +53,10 @@ export class UserService extends ServiceHelper {
       verein.id +
       "/rollen";
     // console.log("updateRoles called: ", url, " , data: ", roles);
-    return this.http.patch<IUser>(url, roles).pipe(
+    return this.http.put<IUser>(url, roles).pipe(
       catchError((err, caught) => {
         return this.handleError("updateRoles", err, caught);
-      })
+      }),
     );
   }
 
@@ -66,23 +66,23 @@ export class UserService extends ServiceHelper {
       .pipe(
         catchError((err, caught) => {
           return this.handleError("getWertungsrichter", err, caught);
-        })
+        }),
       );
   }
 
   updateWertungsrichter(
     id: string,
-    wertungsrichter: IWertungsrichter
+    wertungsrichter: IWertungsrichter,
   ): Observable<any> {
     return this.http
       .put<IWertungsrichter>(
         this.url + "/" + id + "/wertungsrichter",
-        wertungsrichter
+        wertungsrichter,
       )
       .pipe(
         catchError((err, caught) => {
           return this.handleError("updateWertungsrichter", err, caught);
-        })
+        }),
       );
   }
 
@@ -94,9 +94,9 @@ export class UserService extends ServiceHelper {
           return this.handleError(
             "deleteWertungsrichterForUserId",
             err,
-            caught
+            caught,
           );
-        })
+        }),
       );
   }
 }

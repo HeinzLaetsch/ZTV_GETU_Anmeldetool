@@ -1,7 +1,6 @@
 spring:
   flyway:
     locations: ["classpath:/db/migration"]
-    clean-on-validation-error: true
     username: postgres
     password: adrian2000
   jpa:

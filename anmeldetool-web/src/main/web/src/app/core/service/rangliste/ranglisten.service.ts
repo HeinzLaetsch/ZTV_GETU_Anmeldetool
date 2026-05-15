@@ -14,6 +14,8 @@ import { ILauflistenStatus } from "../../model/ILauflistenStatus";
 import { IRanglistenConfiguration } from "../../model/IRanglistenConfiguration";
 import { IRanglistenEntry } from "../../model/IRanglistenEntry";
 import { KategorieEnum } from "../../model/KategorieEnum";
+import { ITeilnehmerStart } from "../../model/ITeilnehmerStart";
+import { GeraeteEnum } from "../../model/GeraeteEnum";
 
 @Injectable({
   providedIn: "root",
@@ -27,7 +29,7 @@ export class RanglistenService {
   getRanglisteConfiguration(
     anlass: IAnlass,
     tiTu: string,
-    kategorie: KategorieEnum
+    kategorie: KategorieEnum,
   ): Observable<IRanglistenConfiguration> {
     const combinedUrl =
       this.url +
@@ -47,7 +49,7 @@ export class RanglistenService {
   getRanglistenState(
     anlass: IAnlass,
     tiTu: string,
-    kategorie: KategorieEnum
+    kategorie: KategorieEnum,
   ): Observable<ILauflistenStatus> {
     const combinedUrl =
       this.url +
@@ -69,7 +71,7 @@ export class RanglistenService {
     anlass: IAnlass,
     tiTu: string,
     kategorie: KategorieEnum,
-    maxAuszeichnungen: number
+    maxAuszeichnungen: number,
   ): Observable<IRanglistenEntry[]> {
     const combinedUrl =
       this.url +
@@ -92,7 +94,7 @@ export class RanglistenService {
   getTeamwertung(
     anlass: IAnlass,
     tiTu: string,
-    kategorie: KategorieEnum
+    kategorie: KategorieEnum,
   ): Observable<string> {
     const statusResponse = new Subject<string>();
 
@@ -118,8 +120,8 @@ export class RanglistenService {
       })
       .pipe(
         catchError(
-          this.handleError<any>("getRanglistePdfperVerein", statusResponse)
-        )
+          this.handleError<any>("getRanglistePdfperVerein", statusResponse),
+        ),
       )
       .subscribe((result: HttpResponse<string>) => {
         const header = result.headers.get("Content-Disposition");
@@ -133,7 +135,7 @@ export class RanglistenService {
   getRanglistePerVerein(
     anlass: IAnlass,
     tiTu: string,
-    kategorie: KategorieEnum
+    kategorie: KategorieEnum,
   ): Observable<IRanglistenEntry> {
     const combinedUrl =
       this.url +
@@ -155,7 +157,7 @@ export class RanglistenService {
   getRanglistePdfPerVerein(
     anlass: IAnlass,
     tiTu: string,
-    kategorie: KategorieEnum
+    kategorie: KategorieEnum,
   ): Observable<string> {
     const statusResponse = new Subject<string>();
 
@@ -181,8 +183,8 @@ export class RanglistenService {
       })
       .pipe(
         catchError(
-          this.handleError<any>("getRanglistePdfperVerein", statusResponse)
-        )
+          this.handleError<any>("getRanglistePdfperVerein", statusResponse),
+        ),
       )
       .subscribe((result: HttpResponse<string>) => {
         const header = result.headers.get("Content-Disposition");
@@ -197,7 +199,7 @@ export class RanglistenService {
     anlass: IAnlass,
     tiTu: string,
     kategorie: KategorieEnum,
-    maxAuszeichnungen: number
+    maxAuszeichnungen: number,
   ): Observable<string> {
     const statusResponse = new Subject<string>();
 
@@ -224,7 +226,7 @@ export class RanglistenService {
         headers,
       })
       .pipe(
-        catchError(this.handleError<any>("getRanglistePdf", statusResponse))
+        catchError(this.handleError<any>("getRanglistePdf", statusResponse)),
       )
       .subscribe((result: HttpResponse<string>) => {
         const header = result.headers.get("Content-Disposition");
@@ -239,7 +241,7 @@ export class RanglistenService {
     anlass: IAnlass,
     tiTu: string,
     kategorie: KategorieEnum,
-    maxAuszeichnungen: number
+    maxAuszeichnungen: number,
   ): Observable<string> {
     const statusResponse = new Subject<string>();
 
@@ -266,7 +268,7 @@ export class RanglistenService {
         headers,
       })
       .pipe(
-        catchError(this.handleError<any>("getRanglisteCSV", statusResponse))
+        catchError(this.handleError<any>("getRanglisteCSV", statusResponse)),
       )
       .subscribe((result: HttpResponse<string>) => {
         const header = result.headers.get("Content-Disposition");
@@ -282,7 +284,7 @@ export class RanglistenService {
     kategorie: KategorieEnum,
     abteilung: AbteilungEnum,
     anlage: AnlageEnum,
-    onlyTi: boolean
+    onlyTi: boolean,
   ): Observable<string> {
     const statusResponse = new Subject<string>();
 
@@ -310,7 +312,7 @@ export class RanglistenService {
         headers,
       })
       .pipe(
-        catchError(this.handleError<any>("getLauflistenPdf", statusResponse))
+        catchError(this.handleError<any>("getLauflistenPdf", statusResponse)),
       )
       .subscribe((result: HttpResponse<string>) => {
         const header = result.headers.get("Content-Disposition");
@@ -325,7 +327,7 @@ export class RanglistenService {
     anlass: IAnlass,
     kategorie: KategorieEnum,
     abteilung: AbteilungEnum,
-    anlage: AnlageEnum
+    anlage: AnlageEnum,
   ): Observable<ILaufliste[]> {
     const combinedUrl =
       this.url +
@@ -346,7 +348,7 @@ export class RanglistenService {
       catchError((error) => {
         this.handleError<ILaufliste[]>("getLauflisten");
         return of(undefined);
-      })
+      }),
     );
   }
 
@@ -358,7 +360,7 @@ export class RanglistenService {
 
   getAbteilungenForAnlass(
     anlass: IAnlass,
-    kategorie: KategorieEnum
+    kategorie: KategorieEnum,
   ): Observable<AbteilungEnum[]> {
     const combinedUrl =
       this.url + "/" + anlass?.id + "/" + "lauflisten" + "/" + kategorie;
@@ -366,14 +368,14 @@ export class RanglistenService {
       catchError((error) => {
         this.handleError<AbteilungEnum[]>("getAbteilungenForAnlass");
         return of(undefined);
-      })
+      }),
     );
   }
 
   getAnlagenForAnlass(
     anlass: IAnlass,
     kategorie: KategorieEnum,
-    abteilung: AbteilungEnum
+    abteilung: AbteilungEnum,
   ): Observable<AnlageEnum[]> {
     const combinedUrl =
       this.url +
@@ -389,7 +391,7 @@ export class RanglistenService {
       catchError((error) => {
         this.handleError<AnlageEnum[]>("getAnlagenForAnlass");
         return of(undefined);
-      })
+      }),
     );
   }
 
@@ -397,7 +399,7 @@ export class RanglistenService {
     anlass: IAnlass,
     kategorie: KategorieEnum,
     abteilung: AbteilungEnum,
-    anlage: AnlageEnum
+    anlage: AnlageEnum,
   ): Observable<string> {
     const combinedUrl =
       this.url +
@@ -419,13 +421,13 @@ export class RanglistenService {
       catchError((error) => {
         this.handleError<boolean>("deleteLauflistenForAnlassAndKategorie");
         return of("failed");
-      })
+      }),
     );
   }
 
   searchLauflisteByKey(
     anlass: IAnlass,
-    search: string
+    search: string,
   ): Observable<ILaufliste> {
     const combinedUrl =
       this.url + "/" + anlass?.id + "/" + "lauflisten?search=" + search;
@@ -433,12 +435,12 @@ export class RanglistenService {
       catchError((error) => {
         this.handleError<ILaufliste>("searchLauflisteByKey");
         return of(undefined);
-      })
+      }),
     );
   }
   updateLauflistenEintrag(
     anlass: IAnlass,
-    eintrag: ILauflistenEintrag
+    eintrag: ILauflistenEintrag,
   ): Observable<ILauflistenEintrag> {
     const combinedUrl =
       this.url +
@@ -453,13 +455,13 @@ export class RanglistenService {
       catchError((error) => {
         this.handleError<ILauflistenEintrag>("updateLauflistenEintrag");
         return of(undefined);
-      })
+      }),
     );
   }
 
   updateLaufliste(
     anlass: IAnlass,
-    laufliste: ILaufliste
+    laufliste: ILaufliste,
   ): Observable<ILaufliste> {
     const combinedUrl =
       this.url + "/" + anlass?.id + "/" + "lauflisten/" + laufliste.id;
@@ -467,14 +469,14 @@ export class RanglistenService {
       catchError((error) => {
         this.handleError<ILaufliste>("updateLaufliste");
         return of(undefined);
-      })
+      }),
     );
   }
 
   public deleteNotenblatt(
     anlass: IAnlass,
     eintrag: ILauflistenEintrag,
-    grund: string
+    grund: string,
   ): Observable<boolean> {
     const combinedUrl =
       this.url +
@@ -491,13 +493,45 @@ export class RanglistenService {
       catchError((error) => {
         this.handleError<boolean>("deleteNotenblatt");
         return of(false);
-      })
+      }),
     );
   }
+
+  // /{anlassId}/teilnehmer/{kategorie}/{abteilung}/{anlage}/{geraet}"
+  addToStartgeraet(
+    anlass: IAnlass,
+    teilnehmerStart: ITeilnehmerStart,
+  ): Observable<boolean> {
+    const combinedUrl =
+      this.url +
+      "/" +
+      anlass?.id +
+      "/" +
+      "teilnehmer" +
+      "/" +
+      teilnehmerStart.kategorie +
+      "/" +
+      teilnehmerStart.abteilung +
+      "/" +
+      teilnehmerStart.anlage +
+      "/" +
+      teilnehmerStart.startgeraet +
+      "/" +
+      teilnehmerStart.id;
+    console.log("addToStartgeraet called: ", combinedUrl);
+
+    return this.http.put<boolean>(combinedUrl, teilnehmerStart).pipe(
+      catchError((error) => {
+        this.handleError<boolean>("addToStartgeraet");
+        return of(false);
+      }),
+    );
+  }
+
   private handleError<T>(
     operation = "operation",
     statusResponse?: Subject<string>,
-    result?: T
+    result?: T,
   ) {
     return (error: any): Observable<T> => {
       console.error(error);

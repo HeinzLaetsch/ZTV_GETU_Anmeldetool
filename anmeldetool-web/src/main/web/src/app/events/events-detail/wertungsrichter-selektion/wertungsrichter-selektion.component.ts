@@ -40,6 +40,9 @@ export class WertungsrichterSelektionComponent
   @Input()
   anlass: IAnlass;
 
+  @Input()
+  changeAllowed: boolean;
+
   // @Input()
   anlassSummary: IAnlassSummary;
   anlassSummary$: Observable<IAnlassSummary>; // TODO REDUX
@@ -65,7 +68,7 @@ export class WertungsrichterSelektionComponent
   constructor(
     public authService: AuthService,
     private anlassService: AnlassService,
-    private wertungsrichterService: WertungsrichterService
+    private wertungsrichterService: WertungsrichterService,
   ) {
     super();
   }
@@ -73,13 +76,13 @@ export class WertungsrichterSelektionComponent
     /* TODO REDUX */
     this.anlassSummary$ = this.anlassService.getAnlassOrganisationSummary(
       this.anlass,
-      this.authService.currentVerein
+      this.authService.currentVerein,
     );
     this.registerSubscription(
       this.anlassSummary$.subscribe((result) => {
         this.anlassSummary = result;
         this.wrInit();
-      })
+      }),
     );
     /* TODO REDUX */
   }
@@ -100,9 +103,9 @@ export class WertungsrichterSelektionComponent
       .subscribe((assignedWrs) => {
         // this.assignedWr1s = assignedWrs;
         this.assignedWr1s = this.assignedWr1s.concat(assignedWrs);
-        // console.log("has assigned Wrs 1 : ", assignedWrs);
+        console.log("has assigned Wrs 1 : ", assignedWrs);
         this.updateStatus();
-        this.availableWertungsrichter1 = this.getAvailableWertungsrichter1();
+        // this.availableWertungsrichter1 = this.getAvailableWertungsrichter1();
       });
     this.wertungsrichterService
       .getEingeteilteWertungsrichter(this.anlass, 2)
@@ -114,7 +117,7 @@ export class WertungsrichterSelektionComponent
           this.assignedWr1s = this.assignedWr1s.concat(assignedWrs);
           this.useBrevet2 = true;
         }
-        this.availableWertungsrichter2 = this.getAvailableWertungsrichter2();
+        // this.availableWertungsrichter2 = this.getAvailableWertungsrichter2();
       });
     // ist asynchron
     this.getVerfuegbareWertungsrichter(this.wr1s, 1);
@@ -160,27 +163,27 @@ export class WertungsrichterSelektionComponent
   getStatusBr1(): WertungsrichterStatusEnum {
     this.statusBr1 = this.wertungsrichterService.getStatusWertungsrichterBr(
       this.assignedWr1s,
-      this.wertungsrichterPflichtBrevet1
+      this.wertungsrichterPflichtBrevet1,
     );
     return this.statusBr1;
   }
   getStatusBr2(): WertungsrichterStatusEnum {
     this.statusBr2 = this.wertungsrichterService.getStatusWertungsrichterBr(
       this.assignedWr2s,
-      this.wertungsrichterPflichtBrevet2
+      this.wertungsrichterPflichtBrevet2,
     );
     return this.statusBr2;
   }
 
   getWertungsrichterPflichtBrevet1(): number {
     return this.wertungsrichterService.getWertungsrichterPflichtBrevet1(
-      this.anlassSummary
+      this.anlassSummary,
     );
   }
 
   getWertungsrichterPflichtBrevet2(): number {
     return this.wertungsrichterService.getWertungsrichterPflichtBrevet2(
-      this.anlassSummary
+      this.anlassSummary,
     );
   }
 
@@ -202,7 +205,7 @@ export class WertungsrichterSelektionComponent
       moveItemInArray(
         event.container.data,
         event.previousIndex,
-        event.currentIndex
+        event.currentIndex,
       );
       return;
     } else {
@@ -211,7 +214,7 @@ export class WertungsrichterSelektionComponent
         event.previousContainer.data,
         event.container.data,
         event.previousIndex,
-        event.currentIndex
+        event.currentIndex,
       );
       //console.log("Data: ", event.container.data[0]);
     }
@@ -220,14 +223,14 @@ export class WertungsrichterSelektionComponent
         .addWertungsrichterToAnlass(
           this.anlass,
           this.authService.currentVerein,
-          event.container.data[event.currentIndex] as unknown as IUser
+          event.container.data[event.currentIndex] as unknown as IUser,
         )
         .subscribe((result) => {
           this.statusBr1 = this.getStatusBr1();
           this.statusBr2 = this.getStatusBr2();
 
           this.loadWrLink(
-            event.container.data[event.currentIndex] as unknown as IUser
+            event.container.data[event.currentIndex] as unknown as IUser,
           );
         });
     } else {
@@ -235,7 +238,7 @@ export class WertungsrichterSelektionComponent
         .deleteWertungsrichterFromAnlass(
           this.anlass,
           this.authService.currentVerein,
-          event.container.data[event.currentIndex] as unknown as IUser
+          event.container.data[event.currentIndex] as unknown as IUser,
         )
         .subscribe((result) => {
           this.statusBr1 = this.getStatusBr1();
@@ -250,7 +253,7 @@ export class WertungsrichterSelektionComponent
       .getVerfuegbareWertungsrichter(
         this.anlass,
         this.authService.currentVerein,
-        brevet
+        brevet,
       )
       .subscribe((allUser) => {
         if (allUser) {
@@ -266,13 +269,15 @@ export class WertungsrichterSelektionComponent
           });
         }
       });
+    this.availableWertungsrichter1 = this.getAvailableWertungsrichter1();
+    this.availableWertungsrichter2 = this.getAvailableWertungsrichter2();
   }
   loadWrLink(wertungsrichterUser: IUser): void {
     this.anlassService
       .getWrEinsatz(
         this.anlass,
         this.authService.currentVerein,
-        wertungsrichterUser
+        wertungsrichterUser,
       )
       .subscribe((pal) => {
         wertungsrichterUser.pal = pal;

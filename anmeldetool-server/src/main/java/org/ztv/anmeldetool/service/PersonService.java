@@ -1,19 +1,13 @@
 package org.ztv.anmeldetool.service;
 
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.ztv.anmeldetool.exception.ConflictException;
 import org.ztv.anmeldetool.exception.NotFoundException;
 import org.ztv.anmeldetool.models.Organisation;
-import org.ztv.anmeldetool.exception.ConflictException;
 import org.ztv.anmeldetool.models.OrganisationPersonLink;
 import org.ztv.anmeldetool.models.Person;
 import org.ztv.anmeldetool.models.Rolle;
@@ -24,11 +18,15 @@ import org.ztv.anmeldetool.repositories.PersonenRepository;
 import org.ztv.anmeldetool.repositories.RollenLinkRepository;
 import org.ztv.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.transfer.RolleDTO;
-import org.ztv.anmeldetool.util.PersonHelper;
 import org.ztv.anmeldetool.util.PersonMapper;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service("personService")
 @Slf4j
@@ -50,24 +48,29 @@ public class PersonService {
    * @param orgId The UUID of the organisation.
    * @return A collection of PersonDTOs.
    */
-  public List<PersonDTO> findPersonsByOrganisationDTO(UUID orgId) {
-    return personMapper.toDtoList(findPersonsByOrganisation(orgId));
+  public List<PersonDTO> findPersonsDtoByOrganisationId(UUID orgId) {
+    Organisation organisation = organisationSrv.findById(orgId);
+    List<PersonDTO> persons = personMapper.toDtoList(findPersonsByOrganisation(organisation), orgId);
+    return persons;
   }
 
-  public List<Person> findPersonsByOrganisation(UUID orgId) {
-    return persRepo.findByOrganisationId(orgId);
+  public List<Person> findPersonsByOrganisation(Organisation organisation) {
+    List<Person>  persons = persRepo.findByOrganisation(organisation);
+    return persons;
   }
 
   public Person findPersonById(UUID id) {
-    return persRepo.findById(id).orElseThrow(() -> new NotFoundException(Organisation.class, id.toString()));
+    Person person = persRepo.findById(id).orElseThrow(() -> new NotFoundException(Person.class, id.toString()));
+    return person;
   }
 
   public Person findPersonByBenutzername(String username) {
-    return persRepo.findByBenutzernameIgnoreCase(username).orElseThrow(() -> new NotFoundException(Organisation.class, username));
+    return persRepo.findByBenutzernameIgnoreCase(username).orElseThrow(() -> new NotFoundException(Person.class, username));
   }
 
   public PersonDTO findPersonDtoByBenutzername(String username) {
-    return personMapper.toDto(this.findPersonByBenutzername(username));
+    // No active organisation is known here -> return DTO without organisation-scoped roles
+    return personMapper.toDto(this.findPersonByBenutzername(username), null);
   }
 
   @Transactional
@@ -84,48 +87,67 @@ public class PersonService {
 
     Person person = persRepo.findById(personId)
         .orElseThrow(() -> new NotFoundException(Person.class, personId));
-
+    var links = person.getOrganisationenLinks();
+    //TODO check if Benutzername is changed and unique Use same code as in create
+    person.setOrganisationenLinks(null);
     personMapper.updateEntityFromDto(personDTO, person);
-    boolean encodePassword = personDTO.getPassword() != null && !personDTO.getPassword().isEmpty();
-    if (encodePassword) {
-      person.setPassword(personDTO.getPassword());
-    }
+
+    person.setOrganisationenLinks(links);
+
+    boolean encodePassword = handlePassword(personDTO, person);
 
     Person updatedPerson = savePerson(person, encodePassword);
-    return PersonHelper.createPersonDTO(updatedPerson, organisation);
+    return personMapper.toDto(updatedPerson, organisationsId);
+  }
+
+  private boolean handlePassword(PersonDTO personDTO, Person person) {
+    boolean encodePassword = personDTO.password() != null && !personDTO.password().isEmpty();
+    if (encodePassword) {
+      person.setPassword(personDTO.password());
+    }
+    return encodePassword;
   }
 
   @Transactional
   public Person create(Person person, OrganisationPersonLink orgPersLink) {
+    // rollenLinkRep.saveAll(orgPersLink.getRollenLink());
+    person.getOrganisationenLinks().add(orgPersLink);
     Person savedPerson = savePerson(person, true);
-    rollenLinkRep.saveAll(orgPersLink.getRollenLink());
-    savedPerson.getOrganisationenLinks().add(orgPersLink);
     return savedPerson;
   }
 
   @Transactional
   public PersonDTO create(PersonDTO personDTO, UUID organisationId) {
-    if (findPersonByBenutzername(personDTO.getBenutzername()) != null) {
-      String message = "User with username '%s' already exists.".formatted(personDTO.getBenutzername());
-      log.warn(message);
-      throw new ConflictException(message);
+    try {
+      if (findPersonByBenutzername(personDTO.benutzername()) != null) {
+        String message = "User with username '%s' already exists.".formatted(personDTO.benutzername());
+        log.info(message);
+        throw new ConflictException(message);
+      }
+    } catch (NotFoundException e) {
+      // User does not exist, proceed with creation
     }
 
+    log.info("Creating user {}", personDTO.benutzername());
+
     UUID orgId = Optional.ofNullable(organisationId).or(() ->
-        Optional.ofNullable(personDTO.getOrganisationids()).stream().flatMap(Collection::stream).findFirst()
+        Optional.ofNullable(personDTO.organisationids()).stream().flatMap(Collection::stream).findFirst()
     ).orElseThrow(() -> new NotFoundException(Organisation.class,
         organisationId != null ? organisationId : ""));
 
+    log.info("Lookup Organisation with ID {}", orgId);
     Organisation organisation = organisationSrv.findById(orgId);
 
     Person person = personMapper.toEntity(personDTO);
 
+    handlePassword(personDTO, person);
+
     OrganisationPersonLink orgPersLink = createOrgPersonLinks(person, organisation);
-    populateLinkRollen(orgPersLink, personDTO.getRollen());
+    populateLinkRollen(orgPersLink, personDTO.rollen());
 
     person = create(person, orgPersLink);
 
-    return PersonHelper.createPersonDTO(person, organisation);
+    return personMapper.toDto(person, orgId);
   }
 
   private void populateLinkRollen(OrganisationPersonLink orgPersLink, Set<RolleDTO> rollenDTO) {
@@ -149,7 +171,8 @@ public class PersonService {
     orgPersLink.setDeleted(false);
     orgPersLink.setOrganisation(organisation);
     orgPersLink.setPerson(person);
-    return orgPersLinkRep.save(orgPersLink);
+    //return orgPersLinkRep.save(orgPersLink);
+    return orgPersLink;
   }
 
   @Transactional
@@ -171,7 +194,7 @@ public class PersonService {
 
     // Roles to delete
     List<RollenLink> toDelete = existingRollenLinks.stream()
-        .filter(rl -> !newRolleIds.contains(rl.getId().toString()))
+        .filter(rl -> !newRolleIds.contains(rl.getRolle().getId().toString()))
         .collect(Collectors.toList());
 
     rollenLinkRep.deleteAll(toDelete);
@@ -180,7 +203,7 @@ public class PersonService {
     // Roles to add or update
     rollenDTOs.forEach(rolleDTO -> {
       Optional<RollenLink> existingLinkOpt = existingRollenLinks.stream()
-          .filter(rl -> rl.getId().toString().equals(rolleDTO.getId()))
+          .filter(rl -> rl.getRolle().getId().toString().equals(rolleDTO.getId()))
           .findFirst();
 
       if (existingLinkOpt.isPresent()) { // Update existing role link
@@ -204,7 +227,7 @@ public class PersonService {
     });
 
     Person updatedPerson = savePerson(person, false);
-    return PersonHelper.createPersonDTO(updatedPerson, organisation);
+    return personMapper.toDto(updatedPerson, organisationId);
   }
 
   public String getEncodedPassword(String password) {

@@ -69,10 +69,10 @@ public List<OrganisationDTO> getVereinsStartsDTOs(Anlass anlass) {
   public OrganisationAnlassLinkDTO updateTeilnehmendeVereine(Anlass anlass, Organisation organisation, OrganisationAnlassLinkDTO oal) {
     Optional<OrganisationAnlassLink> teilnahme = orgAnlassRepo.findByOrganisationAndAnlass(organisation, anlass);
     OrganisationAnlassLink organisationAnlassLink = teilnahme.orElseGet(OrganisationAnlassLink::new);
-    organisationAnlassLink.setAktiv(oal.isStartet());
+    organisationAnlassLink.setAktiv(oal.startet());
     organisationAnlassLink.setAnlass(anlass);
     organisationAnlassLink.setOrganisation(organisation);
-    organisationAnlassLink.setVerlaengerungsDate(oal.getVerlaengerungsDate());
+    organisationAnlassLink.setVerlaengerungsDate(oal.verlaengerungsDate());
 
     organisationAnlassLink = orgAnlassRepo.save(organisationAnlassLink);
 

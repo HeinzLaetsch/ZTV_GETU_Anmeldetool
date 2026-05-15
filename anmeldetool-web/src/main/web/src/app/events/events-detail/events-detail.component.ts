@@ -4,6 +4,7 @@ import { Update } from "@ngrx/entity";
 import { select, Store } from "@ngrx/store";
 import * as moment from "moment";
 import { Observable } from "rxjs";
+import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IAnlassLink } from "src/app/core/model/IAnlassLink";
 import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
@@ -52,7 +53,7 @@ export class EventsDetailComponent
     public authService: AuthService,
     private store: Store<AppState>,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
   ) {
     super();
     // TODO REDUX store.dispatch(AnlassSummaryActions.loadAllAnlasssummaryInvoked());
@@ -63,19 +64,19 @@ export class EventsDetailComponent
 
     this.anlass$ = this.store.pipe(select(selectAnlassById(anlassId)));
     this.anlassSummary$ = this.store.pipe(
-      select(selectAnlassSummaryByAnlassId(anlassId))
+      select(selectAnlassSummaryByAnlassId(anlassId)),
     );
 
     this.registerSubscription(
       this.anlass$.subscribe((anlass) => {
         this.anlass = anlass;
-      })
+      }),
     );
     this.registerSubscription(
       this.anlassSummary$.subscribe((anlassSummary) => {
         this.anlassSummary = anlassSummary;
         // this.vereinStartet = this.anlassSummary.startet;
-      })
+      }),
     );
 
     /* TODO REDUX
@@ -89,6 +90,18 @@ export class EventsDetailComponent
     );
 */
     // wrInit();
+  }
+  isChangeAllowed(): boolean {
+    if (
+      !this.anlass?.anzeigeStatus.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)
+    ) {
+      if (
+        !this.anlass?.anzeigeStatus.hasStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED)
+      ) {
+        return true;
+      }
+    }
+    return false;
   }
 
   handleClickMe(event: PointerEvent) {
@@ -108,7 +121,7 @@ export class EventsDetailComponent
     this.store.dispatch(
       AnlassSummariesActions.updateAnlasssummaryInvoked({
         payload: anlassSummaryUpdate,
-      })
+      }),
     );
     // this.vereinStartet = start;
     /*
@@ -141,7 +154,7 @@ export class EventsDetailComponent
     this.store.dispatch(
       AnlassSummariesActions.updateAnlasssummaryInvoked({
         payload: anlassSummaryUpdate,
-      })
+      }),
     );
     /*
     let oalUpdate: Update<IOrganisationAnlassLink> = {

@@ -15,6 +15,7 @@ import org.ztv.anmeldetool.models.AbteilungEnum;
 import org.ztv.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.AnlassLauflisten;
+import org.ztv.anmeldetool.models.GeraetEnum;
 import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.LauflistenContainer;
 import org.ztv.anmeldetool.repositories.AnlassRepository;
@@ -34,15 +35,15 @@ public class LauflistenServiceTests {
 	// @Transactional
 	public void testDeleteAllLauflistenForAnlassAndKategorie() throws Exception {
 		Iterable<Anlass> iterable = anlassRepo.findAll();
-		int anzahl = lauflistenService.deleteLauflistenForAnlassAndKategorie(iterable.iterator().next().getId(),
+		int anzahl = lauflistenService.deleteLauflistenContainerForAnlassAndKategorie(iterable.iterator().next().getId(),
 				KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1);
 	}
 
 	@Test
 	public void testFindLauflistenForAnlassAndKategorie() throws Exception {
 		Iterable<Anlass> iterable = anlassRepo.findAll();
-		List<LauflistenContainer> allContainer = lauflistenService.findLauflistenForAnlassAndKategorie(
-				iterable.iterator().next().getId(), KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1);
+		List<LauflistenContainer> allContainer = lauflistenService.findLauflistenContainerForAnlassAndKategorie(
+				iterable.iterator().next().getId(), KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1, GeraetEnum.BARREN);
 		assertThat(allContainer.size()).isGreaterThan(0);
 	}
 
@@ -51,7 +52,7 @@ public class LauflistenServiceTests {
 	public void testDeleteLauflistenForAnlassAndKategorie() throws Exception {
 		testGenerateLauflistenForAnlassAndKategorie();
 		Iterable<Anlass> iterable = anlassRepo.findAll();
-		int anzahl = lauflistenService.deleteLauflistenForAnlassAndKategorie(iterable.iterator().next().getId(),
+		int anzahl = lauflistenService.deleteLauflistenContainerForAnlassAndKategorie(iterable.iterator().next().getId(),
 				KategorieEnum.K1, AbteilungEnum.ABTEILUNG_1, AnlageEnum.ANLAGE_1);
 		assertThat(anzahl).isEqualTo(5);
 	}

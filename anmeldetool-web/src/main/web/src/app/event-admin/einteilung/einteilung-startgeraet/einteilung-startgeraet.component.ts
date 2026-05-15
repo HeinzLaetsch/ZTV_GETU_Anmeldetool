@@ -16,6 +16,7 @@ import { ITeilnehmerStart } from "src/app/core/model/ITeilnehmerStart";
 import { KategorieEnum } from "src/app/core/model/KategorieEnum";
 import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
 import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
+import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.service";
 
 @Component({
   selector: "app-einteilung-startgeraet",
@@ -59,13 +60,17 @@ export class EinteilungStartgeraetComponent implements OnInit {
     "anlage",
     "startgeraet",
     "abmelden",
+    "addToStartgeraet",
   ];
 
   startgeraeteControls_ = new Array<UntypedFormControl>();
   anlageControls_ = new Array<UntypedFormControl>();
   abteilungenControls_ = new Array<UntypedFormControl>();
 
-  constructor(private anlassService: CachingAnlassService) {
+  constructor(
+    private anlassService: CachingAnlassService,
+    private ranglistenService: RanglistenService,
+  ) {
     this.loaded$ = new Subject();
     this.startgeraeteControls_ = new Array();
   }
@@ -75,7 +80,7 @@ export class EinteilungStartgeraetComponent implements OnInit {
     this.refreshEmitter.subscribe((search) => {
       console.log(
         "EinteilungStartgeraetComponent, Refresh Kategorie: ",
-        search
+        search,
       );
       this.search = search;
       this.loadData(search);
@@ -90,7 +95,7 @@ export class EinteilungStartgeraetComponent implements OnInit {
         this.abteilung,
         this.anlage,
         this.startgeraet,
-        search
+        search,
       )
       .subscribe((statistic) => {
         this.teilnahmeStatistic = statistic;
@@ -107,7 +112,7 @@ export class EinteilungStartgeraetComponent implements OnInit {
         this.abteilung,
         this.anlage,
         this.startgeraet,
-        search
+        search,
       )
       .subscribe((startende) => {
         this.startende = startende;
@@ -132,6 +137,10 @@ export class EinteilungStartgeraetComponent implements OnInit {
       });
   }
 
+  public enableAddToStartgeraet(element: ITeilnehmerStart): boolean {
+    return this.teilnahmeStatistic.lauflistenGeneriert && !element.laufliste;
+  }
+
   get startgeraeteControls(): UntypedFormControl[] {
     return this.startgeraeteControls_;
   }
@@ -151,7 +160,7 @@ export class EinteilungStartgeraetComponent implements OnInit {
       case 2:
         console.log(
           " Startgeraet: ",
-          this.startgeraeteControls_[rowIndex].value
+          this.startgeraeteControls_[rowIndex].value,
         );
         this.startende[rowIndex].startgeraet =
           this.startgeraeteControls_[rowIndex].value.toUpperCase();
@@ -212,6 +221,23 @@ export class EinteilungStartgeraetComponent implements OnInit {
     }
     this.anlassService
       .updateStartgeraet(this.anlass, this.startende[rowIndex])
+      .subscribe(() => {});
+  }
+
+  addToStartgeraet(rowIndex: number): void {
+    console.log(
+      "Nachtraeglich zum Startgeraet hinzufügen von ",
+      this.startende[rowIndex].name,
+    );
+    //TODO Check
+    this.startende[rowIndex].meldeStatus =
+      MeldeStatusEnum.ABGEMELDET.toString().toUpperCase();
+    if (!this.anlass.aenderungenNichtMehrErlaubt) {
+      this.startende[rowIndex].meldeStatus =
+        MeldeStatusEnum.ABGEMELDET.toString().toUpperCase();
+    }
+    this.ranglistenService
+      .addToStartgeraet(this.anlass, this.startende[rowIndex])
       .subscribe(() => {});
   }
 }

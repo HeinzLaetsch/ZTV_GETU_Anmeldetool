@@ -16,6 +16,16 @@ import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
+import org.ztv.anmeldetool.models.Anlass;
+import org.ztv.anmeldetool.models.AnlassLauflisten;
+import org.ztv.anmeldetool.models.GeraetEnum;
+import org.ztv.anmeldetool.models.Laufliste;
+import org.ztv.anmeldetool.models.LauflistenContainer;
+import org.ztv.anmeldetool.models.PrintableLaufliste;
+import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
+import org.ztv.anmeldetool.models.TiTuEnum;
+import org.ztv.anmeldetool.service.LauflistenService;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -25,14 +35,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.ztv.anmeldetool.models.Anlass;
-import org.ztv.anmeldetool.models.AnlassLauflisten;
-import org.ztv.anmeldetool.models.GeraetEnum;
-import org.ztv.anmeldetool.models.Laufliste;
-import org.ztv.anmeldetool.models.LauflistenContainer;
-import org.ztv.anmeldetool.models.PrintableLaufliste;
-import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
-import org.ztv.anmeldetool.models.TiTuEnum;
 
 public class LauflistenOutput {
 
@@ -42,7 +44,7 @@ public class LauflistenOutput {
 
   public static void createLaufListe(OutputStream outputStream, Anlass anlass,
       Optional<Boolean> onlyTiOpt,
-      AnlassLauflisten anlassLauflisten) throws IOException {
+      AnlassLauflisten anlassLauflisten, LauflistenService lauflistenService) throws IOException {
 
     PdfDocument pdf = new PdfDocument(new PdfWriter(outputStream));
     Document document = new Document(pdf);
@@ -123,7 +125,7 @@ public class LauflistenOutput {
           AreaBreak aB = new AreaBreak();
           document.add(aB);
         }
-        addLaufliste(document, printable.getLaufliste(), printable.getWechsel());
+        addLaufliste(document, printable.getLaufliste(), printable.getWechsel(), lauflistenService);
         first.set(false);
       } catch (IOException e) {
         e.printStackTrace();
@@ -133,7 +135,7 @@ public class LauflistenOutput {
 
   }
 
-  private static void addLaufliste(Document document, Laufliste laufliste, int currentIndex)
+  private static void addLaufliste(Document document, Laufliste laufliste, int currentIndex, LauflistenService lauflistenService)
       throws IOException {
     PdfFont fontN = PdfFontFactory.createFont(StandardFonts.HELVETICA);
     PdfFont fontB = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
@@ -235,24 +237,23 @@ public class LauflistenOutput {
       index++;
     }
     document.add(table);
+    lauflistenService.updateEinzelnoten(laufliste);
   }
 
   private static void updateStartOrder(TeilnehmerAnlassLink tal, Laufliste laufliste,
       int startOrder) {
-    laufliste.getEinzelnoten().stream().forEach(einzelnote -> {
-      if (tal.getId().equals(einzelnote.getNotenblatt().getTal().getId())) {
-        einzelnote.setStartOrder(startOrder);
-      }
-    });
+    laufliste.getEinzelnoten().stream().filter(einzelnote ->
+        tal.getId().equals(einzelnote.getNotenblatt().getTal().getId())
+    ).findFirst().get().setStartOrder(startOrder);
   }
 
   private static void addContainer(Document document, LauflistenContainer container,
       GeraetEnum geraet,
-      int currentIndex) throws IOException {
+      int currentIndex, LauflistenService lauflistenService) throws IOException {
     Laufliste laufliste = container.getGeraeteLauflisten().stream().filter(liste -> {
       return liste.getGeraet().equals(geraet);
     }).collect(Collectors.toList()).getFirst();
-    addLaufliste(document, laufliste, currentIndex);
+    addLaufliste(document, laufliste, currentIndex, lauflistenService);
   }
 
   private static void addTableHeader(Table table, boolean isSprung) {

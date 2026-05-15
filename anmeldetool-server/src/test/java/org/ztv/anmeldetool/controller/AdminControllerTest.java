@@ -36,7 +36,6 @@ import org.ztv.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerDTO;
 import org.ztv.anmeldetool.transfer.VerbandDTO;
 import org.ztv.anmeldetool.transfer.WertungsrichterDTO;
-import org.ztv.anmeldetool.util.PersonHelper;
 
 @ExtendWith(MockitoExtension.class)
 //@Disabled
@@ -115,12 +114,11 @@ public class AdminControllerTest {
       HttpServletRequest req = mock(HttpServletRequest.class);
       org.ztv.anmeldetool.models.LoginData ld = new org.ztv.anmeldetool.models.LoginData();
       PersonDTO dto = mock(PersonDTO.class);
-      ResponseEntity<PersonDTO> serviceResp = ResponseEntity.ok(dto);
       when(loginSrv.login(any(HttpServletRequest.class), any(LoginData.class))).thenReturn(
-          serviceResp);
+          dto);
 
       ResponseEntity<PersonDTO> resp = controller.login(req, ld);
-      assertSame(serviceResp, resp);
+      assertSame(dto, resp.getBody());
     }
 
     @Test
@@ -218,7 +216,7 @@ public class AdminControllerTest {
       UUID orgId = UUID.randomUUID();
       UUID teilnehmerId = UUID.randomUUID();
       ResponseEntity<UUID> svcResp = ResponseEntity.ok(teilnehmerId);
-      when(teilnehmerSrv.delete(orgId, teilnehmerId)).thenReturn(svcResp);
+      // when(teilnehmerSrv.delete(orgId, teilnehmerId)).thenReturn(svcResp);
       ResponseEntity<?> resp = controller.deleteTeilnehmer(orgId, teilnehmerId);
       assertSame(svcResp, resp);
     }
@@ -278,7 +276,7 @@ public class AdminControllerTest {
       PersonDTO dto = mock(PersonDTO.class);
       UUID personID = UUID.randomUUID();
       UUID organisationsID = UUID.randomUUID();
-      when(dto.getId()).thenReturn(personID);
+      when(dto.id()).thenReturn(personID);
       ResponseEntity<PersonDTO> svcResp = ResponseEntity.ok(mock(PersonDTO.class));
       when(personSrv.create(dto, organisationsID)).thenReturn(svcResp.getBody());
       ResponseEntity<PersonDTO> resp = controller.putUser(organisationsID, null, dto);
@@ -289,7 +287,7 @@ public class AdminControllerTest {
     void patch_updatesWhenIdPresent() {
       PersonDTO dto = mock(PersonDTO.class);
       UUID id = UUID.randomUUID();
-      when(dto.getId()).thenReturn(id);
+      when(dto.id()).thenReturn(id);
       UUID vereinsId = UUID.randomUUID();
       ResponseEntity<PersonDTO> svcResp = ResponseEntity.ok(mock(PersonDTO.class));
       when(personSrv.update(id, dto, vereinsId)).thenReturn(svcResp.getBody());
@@ -300,7 +298,7 @@ public class AdminControllerTest {
     @Test
     void postUser_creates() throws URISyntaxException {
       PersonDTO dto = mock(PersonDTO.class);
-      when(dto.getId()).thenReturn(UUID.randomUUID());
+      when(dto.id()).thenReturn(UUID.randomUUID());
       UUID vereinsId = UUID.randomUUID();
       ResponseEntity<PersonDTO> svcResp = ResponseEntity.ok(mock(PersonDTO.class));
       when(personSrv.create(dto, vereinsId)).thenReturn(svcResp.getBody());
@@ -311,7 +309,7 @@ public class AdminControllerTest {
     @Test
     void postUserWithId_creates() throws URISyntaxException {
       PersonDTO dto = mock(PersonDTO.class);
-      when(dto.getId()).thenReturn(UUID.randomUUID());
+      when(dto.id()).thenReturn(UUID.randomUUID());
       UUID vereinsId = UUID.randomUUID();
       ResponseEntity<PersonDTO> svcResp = ResponseEntity.ok(mock(PersonDTO.class));
       when(personSrv.create(dto, vereinsId)).thenReturn(svcResp.getBody());
@@ -354,13 +352,10 @@ public class AdminControllerTest {
       person.setBenutzername(benutzername);
       when(personSrv.findPersonByBenutzername(benutzername)).thenReturn(person);
       PersonDTO expected = mock(PersonDTO.class);
-      try (MockedStatic<PersonHelper> ms = Mockito.mockStatic(PersonHelper.class)) {
-        ms.when(() -> PersonHelper.createPersonDTO(person, new Organisation()))
-            .thenReturn(expected);
-        ResponseEntity<PersonDTO> resp = controller.getPersonByBenutzername(benutzername);
-        assertEquals(200, resp.getStatusCode().value());
-        assertSame(expected, resp.getBody());
-      }
+      when(personMapper.toDto(person, null)).thenReturn(expected);
+      ResponseEntity<PersonDTO> resp = controller.getPersonByBenutzername(benutzername);
+      assertEquals(200, resp.getStatusCode().value());
+      assertSame(expected, resp.getBody());
     }
 
     @Test

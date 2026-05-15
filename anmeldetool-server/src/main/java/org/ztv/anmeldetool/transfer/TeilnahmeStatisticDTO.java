@@ -16,6 +16,7 @@ public class TeilnahmeStatisticDTO {
 	int ummeldung;
 	int verletzt;
 	int nichtGestartet;
+	boolean lauflistenGeneriert;
 
 	public void incUmmeldung() {
 		this.ummeldung++;
@@ -69,5 +70,9 @@ public class TeilnahmeStatisticDTO {
 		this.neumeldung++;
 		this.totalStartende++;
 		this.total++;
+	}
+
+	public void setLauflistenGeneriert(boolean generiert) {
+		this.lauflistenGeneriert = generiert;
 	}
 }

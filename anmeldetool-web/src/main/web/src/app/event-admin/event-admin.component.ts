@@ -24,7 +24,7 @@ import { AnlassService } from "../core/service/anlass/anlass.service";
   styleUrls: ["./event-admin.component.css"],
 })
 export class EventAdminComponent extends SubscriptionHelper implements OnInit {
-  anlass$: Observable<IAnlass>;
+  anlass$!: Observable<IAnlass>;
   anlass: IAnlass;
 
   private readonly lauflistenPDF$: Subject<void> = new Subject();
@@ -49,6 +49,8 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
 
   loaded$: Subject<boolean>;
 
+  rotieren: boolean;
+
   constructor(
     public dialog: MatDialog,
     private route: ActivatedRoute,
@@ -56,9 +58,10 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
     private store: Store<AppState>,
 
     private anlassService: AnlassService,
-    private ranglistenService: RanglistenService
+    private ranglistenService: RanglistenService,
   ) {
     super();
+    this.rotieren = false;
     this.loaded$ = new Subject();
   }
 
@@ -80,13 +83,13 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
             undefined,
             undefined,
             undefined,
-            undefined
+            undefined,
           )
           .subscribe((statistic) => {
             this.teilnahmeStatistic = statistic;
             this.loaded$.next(true);
           });
-      })
+      }),
     );
   }
 
@@ -103,7 +106,7 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
   }
 
   exportTeilnehmer(): void {
-    this.anlassService.getTeilnehmerForAnlassCsv(this.anlass);
+    this.anlassService.getTeilnehmerForAnlassCsv(this.anlass, this.rotieren);
   }
   importTeilnehmer(): void {
     const dialogRef = this.dialog.open(Upload, {
@@ -114,6 +117,10 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
     const dialogRef = this.dialog.open(ContestUpload, {
       data: this.anlass,
     });
+  }
+
+  teilnehmerRotieren(event: any): void {
+    this.rotieren = event;
   }
 
   exportBenutzer(): void {
@@ -140,7 +147,7 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
       .getAnlagenForAnlass(
         this.anlass,
         this.selectedKategorie,
-        this.selectedAbteilung
+        this.selectedAbteilung,
       )
       .subscribe((result) => {
         this.anlagen = result;
@@ -183,7 +190,7 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
         this.anlass,
         this.selectedKategorie,
         this.selectedAbteilung,
-        this.selectedAnlage
+        this.selectedAnlage,
       )
       .pipe(takeUntil(this.lauflistenPDF$))
       .subscribe((result) => {
@@ -207,7 +214,7 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
         this.selectedKategorie,
         this.selectedAbteilung,
         this.selectedAnlage,
-        this.onlyTi
+        this.onlyTi,
       )
       .pipe(takeUntil(this.lauflistenPDF$))
       .subscribe((result) => {
@@ -227,7 +234,8 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
     this.refreshEmitter.emit(undefined);
   }
 
-  toolSperrenClicked(event: any): void {
+  toolSperrenClicked(checked: boolean): void {
+    this.anlass = { ...this.anlass, toolSperren: checked } as IAnlass;
     this.anlassService
       .updateAnlass(this.anlass)
       .subscribe((anlass) => (this.anlass = anlass));

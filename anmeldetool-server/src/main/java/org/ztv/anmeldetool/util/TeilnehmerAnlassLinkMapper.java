@@ -2,6 +2,7 @@ package org.ztv.anmeldetool.util;
 
 import java.util.UUID;
 
+import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -14,7 +15,9 @@ import org.ztv.anmeldetool.util.idmapper.AnlassFromIdMapper;
 import org.ztv.anmeldetool.util.idmapper.OrganisationFromIdMapper;
 import org.ztv.anmeldetool.util.idmapper.TeilnehmerFromIdMapper;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = { AnlassFromIdMapper.class,
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+		builder = @Builder(disableBuilder = true),
+		uses = { AnlassFromIdMapper.class,
 		OrganisationFromIdMapper.class, TeilnehmerFromIdMapper.class })
 public interface TeilnehmerAnlassLinkMapper {
 	@Mapping(source = "teilnehmer.id", target = "teilnehmerId")

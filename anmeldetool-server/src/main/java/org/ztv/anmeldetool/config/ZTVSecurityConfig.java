@@ -2,6 +2,7 @@ package org.ztv.anmeldetool.config;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
@@ -53,10 +54,14 @@ public class ZTVSecurityConfig {
   @Bean
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-    configuration.setAllowedMethods(Arrays.asList("*"));
-    configuration.setAllowedHeaders(Arrays.asList("*"));
+    configuration.setAllowedOrigins(Arrays.asList("http://www.getu.ztv", "http://localhost:4200"));
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
+    configuration.setAllowedHeaders(List.of("*"));
+    //configuration.setAllowedHeaders(Arrays.asList(
+    //    "Origin", "X-Requested-With", "Content-Type",  "Accept", "Authorization",
+    //   "Access-Control-Allow-Headers", "authtoken"));
     configuration.setAllowCredentials(true);
+    configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Disposition"));
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;

@@ -21,7 +21,8 @@ export const userFeature = createFeature({
     }),
     on(UserActions.loadAllUserSuccess, (state, action) => {
       const user = action.payload;
-      return userAdapter.setAll(user, state);
+      let newUser = addUserAlreadyExistsFlag(user);
+      return userAdapter.setAll(newUser, state);
     }),
     on(UserActions.cancelUser, (state, action) => {
       const user = action.payload;
@@ -39,15 +40,25 @@ export const userFeature = createFeature({
           vorname: action.payload.vorname,
           handy: action.payload.handy,
           email: action.payload.email,
+          userAlreadyExists: true,
         },
       };
       // const user = action.payload;
       const newState = userAdapter.updateOne(user, state);
       return newState;
-    })
+    }),
   ),
 });
 // Spread         ...state,
 
 export const { selectAll, selectEntities, selectIds, selectTotal } =
   userAdapter.getSelectors();
+
+function addUserAlreadyExistsFlag(users: IUser[]): IUser[] {
+  return users.map((user) => {
+    let asUString = JSON.stringify(user);
+    let newUser = JSON.parse(asUString);
+    newUser.userAlreadyExists = true;
+    return newUser;
+  });
+}

@@ -1,15 +1,7 @@
 package org.ztv.anmeldetool.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.ztv.anmeldetool.exception.NotFoundException;
 import org.ztv.anmeldetool.models.AbteilungEnum;
@@ -29,26 +21,34 @@ import org.ztv.anmeldetool.transfer.TeilnahmeStatisticDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkCsvDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerStartDTO;
-
-import lombok.extern.slf4j.Slf4j;
 import org.ztv.anmeldetool.util.TeilnehmerAnlassLinkExportImportMapper;
 import org.ztv.anmeldetool.util.TeilnehmerAnlassLinkMapper;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @Service("teilnehmerAnlassLinkService")
 @Slf4j
 @RequiredArgsConstructor
 public class TeilnehmerAnlassLinkService {
 
-	//public final OrganisationService organisationSrv;
+  //public final OrganisationService organisationSrv;
 
-	public final AnlassService anlassSrv;
+  public final AnlassService anlassSrv;
 
-	//@Autowired
-	//TeilnehmerRepository teilnehmerRepository;
+  //@Autowired
+  //TeilnehmerRepository teilnehmerRepository;
 
-	public final TeilnehmerAnlassLinkRepository teilnehmerAnlassLinkRepository;
+  public final TeilnehmerAnlassLinkRepository teilnehmerAnlassLinkRepository;
 
-	public final OrganisationAnlassLinkRepository organisationAnlassLinkRepository;
+  public final OrganisationAnlassLinkRepository organisationAnlassLinkRepository;
 
   public final OrganisationService organisationSrv;
 
@@ -56,94 +56,90 @@ public class TeilnehmerAnlassLinkService {
 
   public final TeilnehmerAnlassLinkExportImportMapper teilnehmerAnlassLinkMapperExportImport;
 
-  public List<TeilnehmerAnlassLinkCsvDTO> getAllTeilnehmerForAnlassAsCsv(UUID anlassId) {
-    List<TeilnehmerAnlassLink> tals = getAllTeilnehmerForAnlassAndUpdateStartnummern(anlassId);
-    List<TeilnehmerAnlassLinkCsvDTO> talsCsv = tals.stream().map(tal -> {
+  public final TeilnehmerRotationService teilnehmerRotationService;
+
+  public List<TeilnehmerAnlassLinkCsvDTO> getAllTeilnehmerForAnlassAsCsv(UUID anlassId, Optional<Boolean> rotate) {
+    AtomicReference<List<TeilnehmerAnlassLink>> tals = new AtomicReference<>(getAllTeilnehmerForAnlassAndUpdateStartnummern(anlassId));
+    Anlass anlass = anlassSrv.findById(anlassId);
+
+    if (rotate.orElse(Boolean.FALSE)) {
+      tals.set(teilnehmerRotationService.rotateTeilnehmer(anlass, tals.get()));
+    }
+    List<TeilnehmerAnlassLinkCsvDTO> talsCsv = tals.get().stream().map(tal -> {
       return teilnehmerAnlassLinkMapperExportImport.fromEntity(tal);
     }).toList();
     return talsCsv;
   }
 
-  /*
-  public getTeilnahmen() {
-    List<TeilnehmerAnlassLink> links = anlassSrv.getTeilnahmen(anlassId, orgId, false);
-    List<TeilnehmerAnlassLinkDTO> linksDto = links.stream().map(link -> {
-      return teilnehmerAnlassMapper.toDto(link);
-    }).collect(Collectors.toList());
-    if (linksDto.size() == 0) {
-      return getNotFound();
-    }
-    return ResponseEntity.ok(linksDto);
-  } */
- 	public Optional<TeilnehmerAnlassLink> findTeilnehmerAnlassLinkById(UUID id) {
-		return teilnehmerAnlassLinkRepository.findById(id);
-	}
+  public Optional<TeilnehmerAnlassLink> findTeilnehmerAnlassLinkById(UUID id) {
+    return teilnehmerAnlassLinkRepository.findById(id);
+  }
 
-	public Optional<TeilnehmerAnlassLink> findTeilnehmerAnlassLinkByAnlassAndTeilnehmer(Anlass anlass,
-			Teilnehmer teilnehmer) {
-		return teilnehmerAnlassLinkRepository.findByAnlassAndTeilnehmer(anlass, teilnehmer);
-	}
+  public Optional<TeilnehmerAnlassLink> findTeilnehmerAnlassLinkByAnlassAndTeilnehmer(Anlass anlass,
+      Teilnehmer teilnehmer) {
+    return teilnehmerAnlassLinkRepository.findByAnlassAndTeilnehmer(anlass, teilnehmer);
+  }
 
-	public List<TeilnehmerAnlassLink> findTeilnehmerAnlassLinkByTeilnehmer(Teilnehmer teilnehmer) {
-		return teilnehmerAnlassLinkRepository.findByTeilnehmer(teilnehmer);
-	}
+  public List<TeilnehmerAnlassLink> findTeilnehmerAnlassLinkByTeilnehmer(Teilnehmer teilnehmer) {
+    return teilnehmerAnlassLinkRepository.findByTeilnehmer(teilnehmer);
+  }
 
-	public List<TeilnehmerAnlassLink> findAnlassTeilnahmenByKategorie(Anlass anlass, KategorieEnum kategorie)
-			throws ServiceException {
-		// TODO check if Verein startet
-		List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] { MeldeStatusEnum.ABGEMELDET_1,
-				MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.UMMELDUNG });
-		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndAktivAndKategorie(anlass,
-				true, exclusion, kategorie);
-		return teilnahmen;
-	}
+  public List<TeilnehmerAnlassLink> findAnlassTeilnahmenByKategorie(Anlass anlass, KategorieEnum kategorie)
+      throws ServiceException {
+    // TODO check if Verein startet
+    List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] {MeldeStatusEnum.ABGEMELDET_1,
+        MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.UMMELDUNG});
+    List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndAktivAndKategorie(anlass,
+        true, exclusion, kategorie);
+    return teilnahmen;
+  }
 
-	public List<TeilnehmerAnlassLink> findWettkampfTeilnahmenByKategorieAndTiTuOrderByOrganisation(Anlass anlass,
-			KategorieEnum kategorie, TiTuEnum tiTu) throws ServiceException {
-		List<MeldeStatusEnum> exclusion = Arrays
-				.asList(new MeldeStatusEnum[] { MeldeStatusEnum.NICHTGESTARTET, MeldeStatusEnum.ABGEMELDET_1,
-						MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.UMMELDUNG });
-		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository
-				.findByAnlassAndAktivAndKategorieAndTiTuOrderByOrganisation(anlass, true, exclusion, kategorie, tiTu);
-		return teilnahmen;
-	}
+  public List<TeilnehmerAnlassLink> findWettkampfTeilnahmenByKategorieAndTiTuOrderByOrganisation(Anlass anlass,
+      KategorieEnum kategorie, TiTuEnum tiTu) throws ServiceException {
+    List<MeldeStatusEnum> exclusion = Arrays
+        .asList(new MeldeStatusEnum[] {MeldeStatusEnum.NICHTGESTARTET, MeldeStatusEnum.ABGEMELDET_1,
+            MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.UMMELDUNG});
+    List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository
+        .findByAnlassAndAktivAndKategorieAndTiTuOrderByOrganisation(anlass, true, exclusion, kategorie, tiTu);
+    return teilnahmen;
+  }
 
-	public List<TeilnehmerAnlassLink> findWettkampfTeilnahmenByKategorieAndTiTu(Anlass anlass, KategorieEnum kategorie,
-			TiTuEnum tiTu) throws ServiceException {
+  public List<TeilnehmerAnlassLink> findWettkampfTeilnahmenByKategorieAndTiTu(Anlass anlass, KategorieEnum kategorie,
+      TiTuEnum tiTu) throws ServiceException {
 
-		List<MeldeStatusEnum> exclusion = Arrays
-				.asList(new MeldeStatusEnum[] { MeldeStatusEnum.NICHTGESTARTET, MeldeStatusEnum.ABGEMELDET_1,
-						MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.UMMELDUNG });
-		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndKategorieAndTiTu(anlass,
-				exclusion, kategorie, tiTu);
-		return teilnahmen;
-	}
+    List<MeldeStatusEnum> exclusion = Arrays
+        .asList(new MeldeStatusEnum[] {MeldeStatusEnum.NICHTGESTARTET, MeldeStatusEnum.ABGEMELDET_1,
+            MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.UMMELDUNG});
+    List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndKategorieAndTiTu(anlass,
+        exclusion, kategorie, tiTu);
+    return teilnahmen;
+  }
 
-	public List<AnlageEnum> findAnlagenByKategorieAndAbteilung(UUID anlassId, KategorieEnum kategorie,
-			AbteilungEnum abteilung) {
+  public List<AnlageEnum> findAnlagenByKategorieAndAbteilung(UUID anlassId, KategorieEnum kategorie,
+      AbteilungEnum abteilung) {
 
-		List<AnlageEnum> anlagen = teilnehmerAnlassLinkRepository
-				.findDistinctAnlagenByAnlassAndKategorieAndAbteilung(anlassId, true, kategorie, abteilung);
-		return anlagen;
-	}
+    List<AnlageEnum> anlagen = teilnehmerAnlassLinkRepository
+        .findDistinctAnlagenByAnlassAndKategorieAndAbteilung(anlassId, true, kategorie, abteilung);
+    return anlagen;
+  }
 
   public List<AbteilungEnum> findAbteilungenByKategorie(UUID anlassId, KategorieEnum kategorie) {
     Anlass anlass = this.anlassSrv.findById(anlassId);
     return findAbteilungenByKategorie(anlass, kategorie);
   }
 
-	public List<AbteilungEnum> findAbteilungenByKategorie(Anlass anlass, KategorieEnum kategorie) {
+  public List<AbteilungEnum> findAbteilungenByKategorie(Anlass anlass, KategorieEnum kategorie) {
 
-		UUID anlass_id = anlass.getId();
-		List<AbteilungEnum> abteilungen = teilnehmerAnlassLinkRepository
-				.findDistinctAbteilungenByAnlassAndKategorie(anlass_id, true, kategorie);
-		return abteilungen;
-	}
+    UUID anlass_id = anlass.getId();
+    List<AbteilungEnum> abteilungen = teilnehmerAnlassLinkRepository
+        .findDistinctAbteilungenByAnlassAndKategorie(anlass_id, true, kategorie);
+    return abteilungen;
+  }
 
-	public TeilnehmerAnlassLink save(TeilnehmerAnlassLink tal) {
-		TeilnehmerAnlassLink saved = this.teilnehmerAnlassLinkRepository.saveAndFlush(tal);
-		return saved;
-	}
+  public TeilnehmerAnlassLink save(TeilnehmerAnlassLink tal) {
+    TeilnehmerAnlassLink saved = this.teilnehmerAnlassLinkRepository.saveAndFlush(tal);
+    return saved;
+  }
 
   public List<TeilnehmerAnlassLinkDTO> getTeilnahmenDTOByAnlassOrg(UUID anlassId, UUID orgId, boolean exclude) {
     Anlass anlass = anlassSrv.findById(anlassId);
@@ -151,8 +147,8 @@ public class TeilnehmerAnlassLinkService {
     List<TeilnehmerAnlassLink> teilnahmen;
     if (exclude) {
       List<MeldeStatusEnum> exclusion = Arrays
-          .asList(new MeldeStatusEnum[] { MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.ABGEMELDET_1,
-              MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.UMMELDUNG });
+          .asList(new MeldeStatusEnum[] {MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.ABGEMELDET_1,
+              MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.UMMELDUNG});
       teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndOrganisationExclude(anlass, organisation,
           exclusion);
     } else {
@@ -169,230 +165,262 @@ public class TeilnehmerAnlassLinkService {
     }).toList();
 
     /**
-    if (teilnahmen.size() > 0) {
-      log.debug("Teilnehmer {}", teilnahmen.getFirst().getKategorie());
-      try {
-        log.debug("Teilnehmer {}", teilnahmen.getFirst().getTeilnehmer().getName());
-      } catch (Exception ex) {
-        log.warn("Kein Teilnehmer message: {} ", ex.getMessage());
-      }
-      log.debug("Teilnehmer {}", teilnahmen.getFirst().getOrganisation().getName());
-    }
+     if (teilnahmen.size() > 0) {
+     log.debug("Teilnehmer {}", teilnahmen.getFirst().getKategorie());
+     try {
+     log.debug("Teilnehmer {}", teilnahmen.getFirst().getTeilnehmer().getName());
+     } catch (Exception ex) {
+     log.warn("Kein Teilnehmer message: {} ", ex.getMessage());
+     }
+     log.debug("Teilnehmer {}", teilnahmen.getFirst().getOrganisation().getName());
+     }
      **/
     return teilnahmen.stream().map(teilnehmerAnlassLinkMapper::toDto).toList();
   }
 
-	public List<TeilnehmerAnlassLink> findAnlassTeilnahmen(UUID anlassId) {
-		List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] { MeldeStatusEnum.ABGEMELDET_1,
-				MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.UMMELDUNG });
+  public List<TeilnehmerAnlassLink> findAnlassTeilnahmen(UUID anlassId) {
+    List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] {MeldeStatusEnum.ABGEMELDET_1,
+        MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.UMMELDUNG});
 
-		return findAnlassTeilnahmen(anlassId, exclusion, true);
-	}
+    return findAnlassTeilnahmen(anlassId, exclusion, true);
+  }
 
-	public List<TeilnehmerAnlassLink> findAnlassTeilnahmen(UUID anlassId, List<MeldeStatusEnum> exclusion,
-			boolean linkStatus) {
-		Anlass anlass = anlassSrv.findById(anlassId);
-		if (anlass == null) {
-			throw new NotFoundException(this.getClass(), anlassId);
-		}
+  public List<TeilnehmerAnlassLink> findAnlassTeilnahmen(UUID anlassId, List<MeldeStatusEnum> exclusion,
+      boolean linkStatus) {
+    Anlass anlass = anlassSrv.findById(anlassId);
+    if (anlass == null) {
+      throw new NotFoundException(this.getClass(), anlassId);
+    }
 
-		List<OrganisationAnlassLink> orgLinks = organisationAnlassLinkRepository.findByAnlassAndAktiv(anlass, true);
-		List<Organisation> orgs = orgLinks.stream().map(oal -> {
-			return oal.getOrganisation();
-		}).collect(Collectors.toList());
-		List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndAktiv(anlass, linkStatus,
-				exclusion, orgs);
-		return teilnahmen;
-	}
+    List<OrganisationAnlassLink> orgLinks = organisationAnlassLinkRepository.findByAnlassAndAktiv(anlass, true);
+    List<Organisation> orgs = orgLinks.stream().map(oal -> {
+      return oal.getOrganisation();
+    }).collect(Collectors.toList());
+    List<TeilnehmerAnlassLink> teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndAktiv(anlass, linkStatus,
+        exclusion, orgs);
+    return teilnahmen;
+  }
 
-	public int findMaxStartNummer() {
-		Optional<TeilnehmerAnlassLink> max = teilnehmerAnlassLinkRepository
-				.findTopByStartnummerNotNullOrderByStartnummerDesc();
-		int maxStartnummer = 1;
-		if (max.isPresent() && max.get().getStartnummer() != null) {
-			maxStartnummer = max.get().getStartnummer() + 1;
-		}
-		return maxStartnummer;
-	}
+  public int findMaxStartNummer() {
+    Optional<TeilnehmerAnlassLink> max = teilnehmerAnlassLinkRepository
+        .findTopByStartnummerNotNullOrderByStartnummerDesc();
+    int maxStartnummer = 1;
+    if (max.isPresent() && max.get().getStartnummer() != null) {
+      maxStartnummer = max.get().getStartnummer() + 1;
+    }
+    return maxStartnummer;
+  }
 
-	private List<TeilnehmerAnlassLink> updateStartNummern(List<TeilnehmerAnlassLink> tals) {
+  private List<TeilnehmerAnlassLink> updateStartNummern(List<TeilnehmerAnlassLink> tals) {
 
-		AtomicInteger maxStartnummerAtomic = new AtomicInteger(findMaxStartNummer());
-		List<TeilnehmerAnlassLink> mustUpdateTal = tals.stream().filter(tal -> {
-			if (tal.getStartnummer() == null) {
-				tal.setStartnummer(maxStartnummerAtomic.getAndIncrement());
-				return true;
-			}
-			return false;
-		}).collect(Collectors.toList());
+    AtomicInteger maxStartnummerAtomic = new AtomicInteger(findMaxStartNummer());
+    List<TeilnehmerAnlassLink> mustUpdateTal = tals.stream().filter(tal -> {
+      if (tal.getStartnummer() == null) {
+        tal.setStartnummer(maxStartnummerAtomic.getAndIncrement());
+        return true;
+      }
+      return false;
+    }).collect(Collectors.toList());
 
-		teilnehmerAnlassLinkRepository.saveAll(mustUpdateTal);
-		return tals;
-	}
+    teilnehmerAnlassLinkRepository.saveAll(mustUpdateTal);
+    return tals;
+  }
 
-	private List<TeilnehmerAnlassLink> getTeilnehmerAnlassLinks(UUID anlassId, KategorieEnum kategorie,
-			AbteilungEnum abteilung, AnlageEnum anlage, GeraetEnum geraet) {
+  private List<TeilnehmerAnlassLink> getTeilnehmerAnlassLinks(UUID anlassId, KategorieEnum kategorie,
+      AbteilungEnum abteilung, AnlageEnum anlage, GeraetEnum geraet) {
 
-		Anlass anlass = anlassSrv.findById(anlassId);
+    Anlass anlass = anlassSrv.findById(anlassId);
 
-		if (anlass == null) {
-			throw new NotFoundException(this.getClass(),
-					"Could not find Anlass with id: %s".formatted(anlassId.toString()));
-		}
-		List<TeilnehmerAnlassLink> tals = null;
-		// TODO check wieso !
-		if (AbteilungEnum.UNDEFINED.equals(abteilung)) {
-			tals = this.teilnehmerAnlassLinkRepository.findByAnlass(anlass, kategorie, null, null, null);
-			tals = tals.stream().filter(tal -> {
-				return tal.getAbteilung() == null;
-			}).collect(Collectors.toList());
-		} else {
-			tals = this.teilnehmerAnlassLinkRepository.findByAnlass(anlass, kategorie, abteilung, anlage, geraet);
-		}
-		return tals;
-	}
+    if (anlass == null) {
+      throw new NotFoundException(this.getClass(),
+          "Could not find Anlass with id: %s".formatted(anlassId.toString()));
+    }
+    List<TeilnehmerAnlassLink> tals = null;
+    // TODO check wieso !
+    if (AbteilungEnum.UNDEFINED.equals(abteilung)) {
+      tals = this.teilnehmerAnlassLinkRepository.findByAnlass(anlass, kategorie, null, null, null);
+      tals = tals.stream().filter(tal -> {
+        return tal.getAbteilung() == null;
+      }).collect(Collectors.toList());
+    } else {
+      tals = this.teilnehmerAnlassLinkRepository.findByAnlass(anlass, kategorie, abteilung, anlage, geraet);
+    }
+    return tals;
+  }
 
-	public List<TeilnehmerStartDTO> getTeilnehmerForStartgeraet(UUID anlassId, KategorieEnum kategorie,
-			AbteilungEnum abteilung, AnlageEnum anlage, GeraetEnum geraet, Optional<String> search) {
-		List<TeilnehmerAnlassLink> tals = getTeilnehmerAnlassLinks(anlassId, kategorie, abteilung, anlage, geraet);
+  private List<TeilnehmerAnlassLink> filterTeilnehmer(List<TeilnehmerAnlassLink> tals, Optional<String> search) {
+    if (search.isPresent()) {
+      String[] searchTerms = search.get().toLowerCase().split("\\s+");
+      tals = tals.stream()
+          .filter(tal -> matchesAllTerms(tal, searchTerms))
+          .toList();
+    }
+    return tals;
+  }
 
-		tals = tals.stream().filter(tal -> {
-			return tal.getMeldeStatus() == null || MeldeStatusEnum.STARTET.equals(tal.getMeldeStatus())
-					|| MeldeStatusEnum.NEUMELDUNG.equals(tal.getMeldeStatus());
-		}).collect(Collectors.toList());
+  private String safe(String value) {
+    return value == null ? "" : value.toLowerCase();
+  }
 
-		if (search.isPresent()) {
-			tals = tals.stream().filter(tal -> {
-				return tal.getTeilnehmer().getName().toLowerCase().contains(search.get().toLowerCase())
-						|| tal.getTeilnehmer().getVorname().toLowerCase().contains(search.get().toLowerCase());
-			}).collect(Collectors.toList());
-		}
-		List<TeilnehmerStartDTO> tss = tals.stream().map(tal -> {
-			return TeilnehmerStartDTO.builder().id(tal.getId()).name(tal.getTeilnehmer().getName())
-					.vorname(tal.getTeilnehmer().getVorname()).verein(tal.getOrganisation().getName())
-					.tiTu(tal.getTeilnehmer().getTiTu()).kategorie(tal.getKategorie()).abteilung(tal.getAbteilung())
-					.anlage(tal.getAnlage()).startgeraet(tal.getStartgeraet()).meldeStatus(tal.getMeldeStatus())
-					.build();
-		}).collect(Collectors.toList());
-		Collections.sort(tss);
-		return tss;
-	}
+  private boolean matchesAllTerms(TeilnehmerAnlassLink tal, String[] searchTerms) {
+    String name = safe(tal.getTeilnehmer().getName());
+    String vorname = safe(tal.getTeilnehmer().getVorname());
+    String orgName = safe(tal.getTeilnehmer().getOrganisation().getName());
 
-	// TODO Adjust to new Data
-	public TeilnahmeStatisticDTO getStatisticForAnlass(UUID anlassId, KategorieEnum kategorie, AbteilungEnum abteilung,
-			AnlageEnum anlage, GeraetEnum geraet, Optional<String> search) {
-		TeilnahmeStatisticDTO teilnahmeStatstic = new TeilnahmeStatisticDTO();
-		List<TeilnehmerAnlassLink> tals = getTeilnehmerAnlassLinks(anlassId, kategorie, abteilung, anlage, geraet);
-		if (search.isPresent()) {
-			tals = tals.stream().filter(tal -> {
-				return tal.getTeilnehmer().getName().toLowerCase().contains(search.get().toLowerCase())
-						|| tal.getTeilnehmer().getVorname().toLowerCase().contains(search.get().toLowerCase());
-			}).collect(Collectors.toList());
-		}
+    return Arrays.stream(searchTerms)
+        .allMatch(term ->
+            name.contains(term)
+            || vorname.contains(term)
+            || orgName.contains(term)
+        );
+  }
 
-		for (TeilnehmerAnlassLink tal : tals) {
-			if (tal.getMeldeStatus() == null) {
-				teilnahmeStatstic.incStartet();
-			} else {
-				switch (tal.getMeldeStatus()) {
-				case STARTET:
-					teilnahmeStatstic.incStartet();
-					break;
-				case NEUMELDUNG:
-					teilnahmeStatstic.incNeumeldung();
-					break;
-				case ABGEMELDET_1:
-					teilnahmeStatstic.incAbgemeldet_1();
-					break;
-				case ABGEMELDET_2:
-					teilnahmeStatstic.incAbgemeldet_2();
-					break;
-				case ABGEMELDET_3:
-					teilnahmeStatstic.incAbgemeldet_3();
-					break;
-				case ABGEMELDET_4:
-					teilnahmeStatstic.incAbgemeldet_4();
-					break;
-				case UMMELDUNG:
-					teilnahmeStatstic.incUmmeldung();
-					break;
-				case VERLETZT:
-					teilnahmeStatstic.incVerletzt();
-					break;
-				case NICHTGESTARTET:
-					teilnahmeStatstic.incNichtGestartet();
-					break;
-				default:
-					teilnahmeStatstic.incStartet();
-				}
-			}
-		}
-		return teilnahmeStatstic;
-	}
+  public List<TeilnehmerStartDTO> getTeilnehmerForStartgeraet(UUID anlassId, KategorieEnum kategorie,
+      AbteilungEnum abteilung, AnlageEnum anlage, GeraetEnum geraet, Optional<String> search) {
+    List<TeilnehmerAnlassLink> tals = getTeilnehmerAnlassLinks(anlassId, kategorie, abteilung, anlage, geraet);
+
+    tals = tals.stream().filter(tal -> {
+      return tal.getMeldeStatus() == null || MeldeStatusEnum.STARTET.equals(tal.getMeldeStatus())
+          || MeldeStatusEnum.NEUMELDUNG.equals(tal.getMeldeStatus());
+    }).collect(Collectors.toList());
+
+    tals = filterTeilnehmer(tals, search);
+
+
+    List<TeilnehmerStartDTO> tss = tals.stream().map(tal -> {
+      if (tal.getTeilnehmer().getName().equals("Meier") && tal.getTeilnehmer().getVorname().equals("Pascale")) {
+        log.info("Debug Teilnehmer: {}, {}, {}, {}, {}, {}, {}, {}, {}, {}", tal.getId(), tal.getTeilnehmer().getName(),
+            tal.getTeilnehmer().getVorname(), tal.getOrganisation().getName(), tal.getTeilnehmer().getTiTu(),
+            tal.getKategorie(), tal.getAbteilung(), tal.getAnlage(), tal.getStartgeraet(), tal.getMeldeStatus());
+      }
+
+        return TeilnehmerStartDTO.builder().id(tal.getId()).name(tal.getTeilnehmer().getName())
+          .vorname(tal.getTeilnehmer().getVorname()).verein(tal.getOrganisation().getName())
+          .tiTu(tal.getTeilnehmer().getTiTu()).kategorie(tal.getKategorie()).abteilung(tal.getAbteilung())
+          .anlage(tal.getAnlage()).startgeraet(tal.getStartgeraet()).meldeStatus(tal.getMeldeStatus())
+          .laufliste(tal.getLauflistenContainer()!=null)
+          .build();
+    }).collect(Collectors.toList());
+    Collections.sort(tss);
+    return tss;
+  }
+
+  // TODO Adjust to new Data
+  public TeilnahmeStatisticDTO getStatisticForAnlass(UUID anlassId, KategorieEnum kategorie, AbteilungEnum abteilung,
+      AnlageEnum anlage, GeraetEnum geraet, Optional<String> search) {
+    TeilnahmeStatisticDTO teilnahmeStatstic = new TeilnahmeStatisticDTO();
+    List<TeilnehmerAnlassLink> tals = getTeilnehmerAnlassLinks(anlassId, kategorie, abteilung, anlage, geraet);
+
+    tals = filterTeilnehmer(tals, search);
+
+    boolean lauflistenGeneriert = false;
+    for (TeilnehmerAnlassLink tal : tals) {
+      lauflistenGeneriert = lauflistenGeneriert || tal.getLauflistenContainer() != null;
+      if (tal.getMeldeStatus() == null) {
+        teilnahmeStatstic.incStartet();
+      } else {
+        switch (tal.getMeldeStatus()) {
+          case STARTET:
+            teilnahmeStatstic.incStartet();
+            break;
+          case NEUMELDUNG:
+            teilnahmeStatstic.incNeumeldung();
+            break;
+          case ABGEMELDET_1:
+            teilnahmeStatstic.incAbgemeldet_1();
+            break;
+          case ABGEMELDET_2:
+            teilnahmeStatstic.incAbgemeldet_2();
+            break;
+          case ABGEMELDET_3:
+            teilnahmeStatstic.incAbgemeldet_3();
+            break;
+          case ABGEMELDET_4:
+            teilnahmeStatstic.incAbgemeldet_4();
+            break;
+          case UMMELDUNG:
+            teilnahmeStatstic.incUmmeldung();
+            break;
+          case VERLETZT:
+            teilnahmeStatstic.incVerletzt();
+            break;
+          case NICHTGESTARTET:
+            teilnahmeStatstic.incNichtGestartet();
+            break;
+          default:
+            teilnahmeStatstic.incStartet();
+        }
+      }
+    }
+    teilnahmeStatstic.setLauflistenGeneriert(lauflistenGeneriert);
+    return teilnahmeStatstic;
+  }
 
   public List<TeilnehmerAnlassLinkCsvDTO> getMutationenDTOForAnlass(UUID anlassId) {
     List<TeilnehmerAnlassLink> tals = getMutationenForAnlass(anlassId);
     return tals.stream().map(teilnehmerAnlassLinkMapperExportImport::fromEntity).toList();
   }
-	public List<TeilnehmerAnlassLink> getMutationenForAnlass(UUID anlassId) {
-		// MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG
-		List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] { MeldeStatusEnum.STARTET });
 
-		List<TeilnehmerAnlassLink> tals = findAnlassTeilnahmen(anlassId, exclusion, true);
-		tals = tals.stream().filter(tal -> tal.getMeldeStatus() != null).toList();
-		return tals;
-	}
+  public List<TeilnehmerAnlassLink> getMutationenForAnlass(UUID anlassId) {
+    // MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.UMMELDUNG
+    List<MeldeStatusEnum> exclusion = Arrays.asList(new MeldeStatusEnum[] {MeldeStatusEnum.STARTET});
 
-	public List<TeilnehmerAnlassLink> getAllTeilnehmerForAnlassAndUpdateStartnummern(UUID anlassId) {
-		List<TeilnehmerAnlassLink> tals = findAnlassTeilnahmen(anlassId);
-		tals = updateStartNummern(tals);
-		return tals;
-	}
+    List<TeilnehmerAnlassLink> tals = findAnlassTeilnahmen(anlassId, exclusion, true);
+    tals = tals.stream().filter(tal -> tal.getMeldeStatus() != null).toList();
+    return tals;
+  }
 
-	public int updateAnlassTeilnahmen(UUID anlassId, List<TeilnehmerAnlassLinkCsvDTO> talsDto) {
-		List<TeilnehmerAnlassLink> tals = findAnlassTeilnahmen(anlassId);
-		List<TeilnehmerAnlassLink> toUpdate = new ArrayList<TeilnehmerAnlassLink>();
-		int counter = 0;
-		for (TeilnehmerAnlassLinkCsvDTO talDto : talsDto) {
-			for (TeilnehmerAnlassLink tal : tals) {
-				if (tal.getStartnummer() != null && (tal.getStartnummer().compareTo(talDto.getStartnummer()) == 0)
-						&& talDto.getTeilnehmerId().equals(tal.getTeilnehmer().getId())) {
-					tal.setAbteilung(talDto.getAbteilung());
-					tal.setAnlage(talDto.getAnlage());
-					tal.setStartgeraet(talDto.getStartgeraet());
-					toUpdate.add(tal);
-					counter++;
-					break;
-				}
-			}
-		}
+  public List<TeilnehmerAnlassLink> getAllTeilnehmerForAnlassAndUpdateStartnummern(UUID anlassId) {
+    List<TeilnehmerAnlassLink> tals = findAnlassTeilnahmen(anlassId);
+    tals = updateStartNummern(tals);
+    return tals;
+  }
 
-		toUpdate = teilnehmerAnlassLinkRepository.saveAll(toUpdate);
-		if (toUpdate == null || toUpdate.size() != counter) {
-			throw new NotFoundException(this.getClass(), anlassId);
-		}
-		return counter;
-	}
+  public int updateAnlassTeilnahmen(UUID anlassId, List<TeilnehmerAnlassLinkCsvDTO> talsDto) {
+    List<TeilnehmerAnlassLink> tals = findAnlassTeilnahmen(anlassId);
+    List<TeilnehmerAnlassLink> toUpdate = new ArrayList<TeilnehmerAnlassLink>();
+    int counter = 0;
+    for (TeilnehmerAnlassLinkCsvDTO talDto : talsDto) {
+      for (TeilnehmerAnlassLink tal : tals) {
+        if (tal.getStartnummer() != null && (tal.getStartnummer().compareTo(talDto.getStartnummer()) == 0)
+            && talDto.getTeilnehmerId().equals(tal.getTeilnehmer().getId())) {
+          tal.setAbteilung(talDto.getAbteilung());
+          tal.setAnlage(talDto.getAnlage());
+          tal.setStartgeraet(talDto.getStartgeraet());
+          toUpdate.add(tal);
+          counter++;
+          break;
+        }
+      }
+    }
 
-	public void updateAnlassTeilnahme(TeilnehmerStartDTO tsDTO) {
-		Optional<TeilnehmerAnlassLink> optTal = teilnehmerAnlassLinkRepository.findById(tsDTO.getId());
-		if (optTal.isEmpty()) {
-			throw new NotFoundException(this.getClass(), tsDTO.getId());
-		}
-		TeilnehmerAnlassLink tal = optTal.get();
-		tal.setAbteilung(tsDTO.getAbteilung());
-		tal.setAnlage(tsDTO.getAnlage());
-		tal.setStartgeraet(tsDTO.getStartgeraet());
-		tal.setMeldeStatus(tsDTO.getMeldeStatus());
-		if (MeldeStatusEnum.ABGEMELDET.equals(tal.getMeldeStatus())) {
-			tal.setMeldeStatus(MeldeStatusEnum.ABGEMELDET_3);
-		}
-		if (MeldeStatusEnum.ABGEMELDET_3.equals(tal.getMeldeStatus())) {
-			tal.setDeleted(true);
-			tal.setAktiv(false);
-		}
-		teilnehmerAnlassLinkRepository.save(tal);
-	}
+    toUpdate = teilnehmerAnlassLinkRepository.saveAll(toUpdate);
+    if (toUpdate == null || toUpdate.size() != counter) {
+      throw new NotFoundException(this.getClass(), anlassId);
+    }
+    return counter;
+  }
+
+  public void updateAnlassTeilnahme(UUID teilnehmerid, TeilnehmerStartDTO tsDTO) {
+    Optional<TeilnehmerAnlassLink> optTal = teilnehmerAnlassLinkRepository.findById(teilnehmerid);
+    if (optTal.isEmpty()) {
+      throw new NotFoundException(this.getClass(), teilnehmerid);
+    }
+    TeilnehmerAnlassLink tal = optTal.get();
+    tal.setAbteilung(tsDTO.getAbteilung());
+    tal.setAnlage(tsDTO.getAnlage());
+    tal.setStartgeraet(tsDTO.getStartgeraet());
+    tal.setMeldeStatus(tsDTO.getMeldeStatus());
+    if (MeldeStatusEnum.ABGEMELDET.equals(tal.getMeldeStatus())) {
+      tal.setMeldeStatus(MeldeStatusEnum.ABGEMELDET_3);
+    }
+    if (MeldeStatusEnum.ABGEMELDET_3.equals(tal.getMeldeStatus())) {
+      tal.setDeleted(true);
+      tal.setAktiv(false);
+    }
+    teilnehmerAnlassLinkRepository.save(tal);
+  }
+
   public TeilnehmerAnlassLinkDTO markAsDeleted(UUID id, String grund) {
     Optional<TeilnehmerAnlassLink> talOpt = findTeilnehmerAnlassLinkById(id);
     if (talOpt.isEmpty()) {

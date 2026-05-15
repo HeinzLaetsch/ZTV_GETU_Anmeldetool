@@ -10,4 +10,5 @@ export interface ITeilnahmeStatistic {
   ummeldung: number;
   verletzt: number;
   nichtGestartet: number;
+  lauflistenGeneriert: boolean;
 }

@@ -27,7 +27,7 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private vereinService: CachingVereinService,
-    private userService: CachingUserService
+    private userService: CachingUserService,
   ) {
     // console.info("Service created");
     this.token = "undefined";
@@ -69,7 +69,7 @@ export class AuthService {
         this.vereinService
           .reset()
           .subscribe((result) =>
-            console.log("Vereins Cache reloaded: ", result)
+            console.log("Vereins Cache reloaded: ", result),
           );
         this.createUser(user).subscribe(
           (user) => {
@@ -78,13 +78,13 @@ export class AuthService {
           (error) => {
             console.error("Error", error);
             emitter.error("Fehler beim Erstellen des Benutzers");
-          }
+          },
         );
       },
       (error) => {
         console.error("Error", error);
         emitter.error("Fehler beim Erstellen des Vereins");
-      }
+      },
     );
     return emitter.asObservable();
   }
@@ -107,25 +107,27 @@ export class AuthService {
           console.error(error);
           emitter.error("Fehler beim erstellen des Users: " + error.error);
         }
-      }
+      },
     );
     return emitter.asObservable();
   }
 
   updateUser(user: IUser): Observable<IUser> {
     const emitter: EventEmitter<IUser> = new EventEmitter();
-    this.http.patch<IUser>(this.userUrl, user).subscribe((user) => {
-      // this.currentUser = user;
-      // console.log("User: ", user);
-      emitter.emit(user);
-    });
+    this.http
+      .put<IUser>(this.userUrl + "/" + user.id, user)
+      .subscribe((user) => {
+        // this.currentUser = user;
+        // console.log("User: ", user);
+        emitter.emit(user);
+      });
     return emitter.asObservable();
   }
 
   login(
     verein: IVerein,
     userName: string,
-    password: string
+    password: string,
   ): Observable<IUser> {
     const loginData: ILoginData = {
       organisationId: verein.id,
@@ -149,7 +151,7 @@ export class AuthService {
       },
       () => {
         console.log("Completed: ");
-      }
+      },
     );
     return emitter.asObservable();
     //  .pipe(catchError(this.handleError<IUser>()));
@@ -168,7 +170,7 @@ export class AuthService {
 
   hasRole(roleName: string): boolean {
     const rollen = this.currentUser?.rollen?.filter(
-      (role) => role.name === roleName.toUpperCase()
+      (role) => role.name === roleName.toUpperCase(),
     );
     // console.log('Rollen: ' , rollen, ' , Name: ', roleName);
     if (rollen && rollen.length > 0) {

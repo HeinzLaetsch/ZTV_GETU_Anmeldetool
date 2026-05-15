@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>org.ztv.anmeldetool</groupId>
 		<artifactId>anmeldetool-parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.4-SNAPSHOT</version>
 	</parent>
 	<properties>
 		<npm-build>run build</npm-build>

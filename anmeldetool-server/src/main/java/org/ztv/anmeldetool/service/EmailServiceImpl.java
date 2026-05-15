@@ -23,16 +23,16 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
-	@Value("${spring.mail.enabled}")
+	@Value("${spring.mail.enabled:false}")
 	private boolean enableEmail;
 
-	@Value("${spring.mail.username}")
+	@Value("${spring.mail.username:''}")
 	private String sender;
 
-	@Value("${spring.mail.simulateemail}")
+	@Value("${spring.mail.simulateemail}:''")
 	private String simulateEmail;
 
-	@Value("${spring.mail.simulate}")
+	@Value("${spring.mail.simulate:false}")
 	private boolean simulate;
 
 	private final JavaMailSender emailSender;

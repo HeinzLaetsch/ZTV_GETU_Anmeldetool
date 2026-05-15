@@ -7,6 +7,7 @@ import {
   Output,
   SimpleChanges,
 } from "@angular/core";
+import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import { IUser } from "src/app/core/model/IUser";
 import { IWertungsrichter } from "src/app/core/model/IWertungsrichter";
@@ -34,6 +35,9 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
   anlass: IAnlass;
   @Input()
   useBrevet2: boolean;
+  @Input()
+  changeAllowed: boolean;
+
   @Output()
   wertungsrichterUserChange = new EventEmitter<IUser>();
 
@@ -42,7 +46,7 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
   constructor(
     private authservice: AuthService,
     private userService: CachingUserService,
-    private anlassService: CachingAnlassService
+    private anlassService: CachingAnlassService,
   ) {}
   ngOnChanges(changes: SimpleChanges): void {
     if (
@@ -62,7 +66,6 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
         }
       });
   }
-
   wrEinsatzChange(wrEinsatz: IWertungsrichterEinsatz) {
     this.wertungsrichterUserChange.emit(this.wertungsrichterUser);
   }
@@ -73,7 +76,7 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
     this.anlassService
       .updateAnlassLink(
         this.wertungsrichterUser.pal,
-        this.authservice.currentVerein
+        this.authservice.currentVerein,
       )
       .subscribe((pal) => {
         console.log("Pal saved: ", pal.kommentar);
@@ -95,7 +98,7 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
     const einsatz = this.wertungsrichterUser?.pal?.einsaetze?.filter(
       (einsatz) => {
         return einsatz.wertungsrichterSlotId === slot.id;
-      }
+      },
     )?.[0];
     return einsatz;
   }

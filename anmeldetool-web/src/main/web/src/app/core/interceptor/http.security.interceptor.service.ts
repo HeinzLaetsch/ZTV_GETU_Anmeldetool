@@ -12,11 +12,14 @@ import { tap } from "rxjs/operators";
 import { AuthService } from "../service/auth/auth.service";
 @Injectable()
 export class HttpSecurityInterceptorService implements HttpInterceptor {
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+  ) {}
 
   intercept(
     req: HttpRequest<any>,
-    next: HttpHandler
+    next: HttpHandler,
   ): Observable<HttpEvent<any>> {
     /*
     console.log(
@@ -50,14 +53,14 @@ export class HttpSecurityInterceptorService implements HttpInterceptor {
         },
         (err: any) => {
           if (err instanceof HttpErrorResponse) {
-            if (err.status !== 401) {
+            if (err.status !== 401 && err.status !== 403) {
               return;
             }
             this.authService.currentUser = undefined;
             this.router.navigate(["/"]);
           }
-        }
-      )
+        },
+      ),
     );
     /*
     .pipe(

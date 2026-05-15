@@ -7,9 +7,9 @@
       <div class="col-sm-1">
         <h1>{{ anlass.tiTu }}</h1>
       </div>
-      <div class="col-sm-4">
+      <div class="col-sm-4" *ngIf="administrator">
         <mat-checkbox
-          [(ngModel)]="anlass.toolSperren"
+          [ngModel]="anlass.toolSperren"
           (ngModelChange)="toolSperrenClicked($event)"
           >Tool sperren
         </mat-checkbox>
@@ -17,7 +17,7 @@
     </div>
   </div>
   <mat-tab-group *ngIf="administrator || sekretariat" mat-align-tabs="start">
-    <mat-tab label="Exports/Imports">
+    <mat-tab label="Exports/Imports" *ngIf="administrator">
       <div class="container-lg">
         <div class="row" *ngIf="loaded$ | async as obs; else loading">
           <div class="col-1">Total Startende</div>
@@ -66,6 +66,13 @@
             >
               Exportieren
             </button>
+            <div>
+              <mat-checkbox
+                [(ngModel)]="rotieren"
+                (ngModelChange)="teilnehmerRotieren($event)"
+                >Teilnehmer rotieren
+              </mat-checkbox>
+            </div>
           </div>
           <div class="col-sm-2">
             <button

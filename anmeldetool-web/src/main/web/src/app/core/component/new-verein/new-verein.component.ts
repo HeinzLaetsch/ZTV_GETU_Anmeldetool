@@ -15,6 +15,7 @@ import { VereinService } from "src/app/core/service/verein/verein.service";
 import { IVerein } from "src/app/verein/verein";
 import { IRolle } from "../../model/IRolle";
 import { IUser } from "../../model/IUser";
+import { UserService } from "../../service/user/user.service";
 
 @Component({
   selector: "app-new-verein",
@@ -69,9 +70,8 @@ export class NewVereinComponent implements OnInit {
     private authService: AuthService,
     private vereinService: VereinService,
     private verbandService: VerbandService,
-    private userService: CachingUserService,
-    private teilnehmerService: CachingTeilnehmerService,
-    private router: Router
+    private userService: UserService,
+    private router: Router,
   ) {
     this.form = this.formBuilder.group({
       vereinsNameControl: [this.vereinsName, Validators.required],
@@ -144,7 +144,7 @@ export class NewVereinComponent implements OnInit {
                 (user) => {
                   console.log(
                     "Neuer Verein inklusive User kreiert ",
-                    user.benutzername
+                    user.benutzername,
                   );
                   // Immer erster !!
                   this.verein.id = user.organisationids[0];
@@ -153,15 +153,17 @@ export class NewVereinComponent implements OnInit {
                     .login(
                       this.verein,
                       user.benutzername,
-                      this._verantwortlicher.password
+                      this._verantwortlicher.password,
                     )
                     .subscribe({
                       next(data) {
                         self.router.navigate(["anlass"]);
 
+                        /* ToDo check if preload is realy neccessary
                         self.userService.reset().subscribe((result) => {
                           // console.log("Login UserService loaded");
                         });
+                        */
                         // TODO check if preload is realy neccessary
                         /*
                         self.teilnehmerService
@@ -181,13 +183,13 @@ export class NewVereinComponent implements OnInit {
                 (error) => {
                   this.error = true;
                   this.errorMessage = error;
-                }
+                },
               );
           }
         },
         (error) => {
           console.error("Error", error);
-        }
+        },
       );
 
     console.log("Save");

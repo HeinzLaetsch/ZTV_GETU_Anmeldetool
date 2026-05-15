@@ -10,7 +10,7 @@ export class UserEffects {
   constructor(
     private actions$: Actions,
     private userService: UserService,
-    private authService: AuthService
+    private authService: AuthService,
   ) {}
 
   loadUser$ = createEffect(() => {
@@ -23,26 +23,40 @@ export class UserEffects {
           ]),
           catchError((error) => {
             return of(UserActions.loadAllUserError({ error: error }));
-          })
+          }),
         );
-      })
+      }),
     );
   });
   saveUser$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(UserActions.saveUserInvoked),
       mergeMap((action) => {
-        return this.authService.createUser(action.payload).pipe(
-          switchMap((user) => [
-            UserActions.saveUserSuccess({
-              payload: user,
+        if (action.payload.userAlreadyExists) {
+          return this.authService.updateUser(action.payload).pipe(
+            switchMap((user) => [
+              UserActions.saveUserSuccess({
+                payload: user,
+              }),
+            ]),
+            catchError((error) => {
+              return of(UserActions.saveUserError({ error: error }));
             }),
-          ]),
-          catchError((error) => {
-            return of(UserActions.saveUserError({ error: error }));
-          })
-        );
-      })
+          );
+        } else {
+          return this.authService.createUser(action.payload).pipe(
+            switchMap((user) => [
+              UserActions.saveUserSuccess({
+                payload: user,
+              }),
+            ]),
+            catchError((error) => {
+              return of(UserActions.saveUserError({ error: error }));
+            }),
+          );
+        }
+      }),
     );
   });
 }
+

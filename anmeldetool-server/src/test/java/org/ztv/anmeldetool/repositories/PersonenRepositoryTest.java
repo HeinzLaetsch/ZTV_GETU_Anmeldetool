@@ -157,7 +157,7 @@ class PersonenRepositoryTest extends AbstractRepositoryTest {
     link3 = organisationPersonLinkRepository.save(link3);
 
     // 3. Execute the repository method
-    List<Person> personsInOrg1 = personRepository.findByOrganisationId(org1.getId());
+    List<Person> personsInOrg1 = personRepository.findByOrganisation(org1);
 
     // 4. Assert the results
     assertThat(personsInOrg1).hasSize(2);
@@ -171,7 +171,7 @@ class PersonenRepositoryTest extends AbstractRepositoryTest {
     Organisation org = buildDefaultOrganisation("Test Organisation", VerbandEnum.GLZ);
     organisationsRepository.save(org);
 
-    List<Person> persons = personRepository.findByOrganisationId(org.getId());
+    List<Person> persons = personRepository.findByOrganisation(org);
 
     assertThat(persons).isEmpty();
   }

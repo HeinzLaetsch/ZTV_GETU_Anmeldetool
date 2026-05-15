@@ -37,21 +37,10 @@ export class WertungsrichterFormComponent implements OnInit, OnChanges {
 
   userValid: boolean;
 
-  /*
-  <<<<<< <HEAD
-  */
   brevetControl = new UntypedFormControl("", Validators.required);
   letzterFkControl = new UntypedFormControl("");
   gueltigControl = new UntypedFormControl("");
   bestaetigtControl = new UntypedFormControl("");
-  /*
-  =======
-  brevetControl = new FormControl(undefined, Validators.required);
-  letzterFkControl = new FormControl(undefined);
-  gueltigControl = new FormControl(undefined);
-  bestaetigtControl = new FormControl(undefined);
->>>>>>> main
-*/
   form: UntypedFormGroup = new UntypedFormGroup({
     brevetControl: this.brevetControl,
     letzterFkControl: this.letzterFkControl,

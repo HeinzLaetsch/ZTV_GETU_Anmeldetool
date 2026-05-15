@@ -6,16 +6,7 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Value;
 
-@Value
-@Builder
-public class OrganisationAnlassLinkDTO {
-
-	UUID anlassId;
-
-	UUID organisationsId;
-
-	boolean startet;
-
-	private LocalDateTime verlaengerungsDate;
-
+//@Value
+//@Builder
+public record OrganisationAnlassLinkDTO(UUID anlassId, UUID organisationsId, boolean startet, LocalDateTime verlaengerungsDate) {
 }

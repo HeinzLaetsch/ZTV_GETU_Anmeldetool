@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.ztv.anmeldetool.exception.NotFoundException;
 import org.ztv.anmeldetool.models.Person;
 import org.ztv.anmeldetool.models.PersonAnlassLink;
 import org.ztv.anmeldetool.models.Wertungsrichter;
@@ -57,7 +58,8 @@ public class WertungsrichterService extends AbstractBaseService<Wertungsrichter>
           return already;
         }
     ).toList();
-    return personMapper.toDtoList(verfuegbare);
+    // No active organisation known in this context -> return DTOs without organisation-scoped roles
+    return personMapper.toDtoList(verfuegbare, null);
   }
 
 
@@ -82,8 +84,16 @@ public class WertungsrichterService extends AbstractBaseService<Wertungsrichter>
   public WertungsrichterDTO update(UUID personId, WertungsrichterDTO wertungsrichterDto) {
     Wertungsrichter wertungsrichter = wrMapper.WertungsrichterDTOToWertungsrichter(
         wertungsrichterDto);
-    if (wertungsrichterDto.getId() != null) {
-      wertungsrichter.setId(wertungsrichterDto.getId());
+    wertungsrichter.setId(wertungsrichterDto.getId());
+    if (wertungsrichter.getId() != null) {
+      Wertungsrichter existing = findById(wertungsrichter.getId());
+      existing.setBrevet(wertungsrichter.getBrevet());
+      existing.setGueltig(wertungsrichter.isGueltig());
+      existing.setLetzterFk(wertungsrichter.getLetzterFk());
+      existing.setAktiv(wertungsrichter.isAktiv());
+      wertungsrichter = existing;
+    } else {
+      wertungsrichter.setId(UUID.randomUUID());
     }
     wertungsrichter = wertungsrichterRepo.save(wertungsrichter);
 
@@ -106,11 +116,10 @@ public class WertungsrichterService extends AbstractBaseService<Wertungsrichter>
     wertungsrichterRepo.delete(wrOpt.get());
   }
 
-  //TODO proper exception
   @Override
   public Wertungsrichter findById(UUID id) {
     return wertungsrichterRepo.findById(id)
         .orElseThrow(
-            () -> new RuntimeException("Wertungsrichter mit ID " + id + " nicht gefunden."));
+            () -> new NotFoundException(Wertungsrichter.class, id));
   }
 }

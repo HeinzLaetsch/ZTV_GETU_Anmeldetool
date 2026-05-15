@@ -11,8 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +30,8 @@ import org.ztv.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.GeraetEnum;
 import org.ztv.anmeldetool.models.KategorieEnum;
+import org.ztv.anmeldetool.models.Laufliste;
+import org.ztv.anmeldetool.models.LauflistenContainer;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.Person;
 import org.ztv.anmeldetool.models.PersonAnlassLink;
@@ -41,6 +45,7 @@ import org.ztv.anmeldetool.output.WertungsrichterOutput;
 import org.ztv.anmeldetool.service.AnlassService;
 import org.ztv.anmeldetool.service.AnlassSummaryService;
 import org.ztv.anmeldetool.service.AnmeldekontrolService;
+import org.ztv.anmeldetool.service.LauflistenService;
 import org.ztv.anmeldetool.service.OrganisationAnlassLinkService;
 import org.ztv.anmeldetool.service.OrganisationService;
 import org.ztv.anmeldetool.service.PersonAnlassLinkService;
@@ -84,9 +89,6 @@ public class AnlassAdminController {
   private final OrganisationAnlassLinkService organisationAnlassLinkSrv;
   private final PersonAnlassLinkService personAnlassLinkSrv;
   private final PersonService personSrv;
-  //private final BenutzerExport benutzerExport;
-  //private final WertungsrichterExport wertungsrichterExport;
-  //private final TeilnehmerExportImport teilnehmerExportImport;
 
   @GetMapping
   public ResponseEntity<List<AnlassDTO>> getAnlaesse(
@@ -175,9 +177,9 @@ public class AnlassAdminController {
     return ResponseEntity.ok(anlassSrv.updateAnlass(anlassDTO));
   }
 
-  @PutMapping("/{anlassId}/teilnehmer")
-  public ResponseEntity<Void> updateAnlassStart(@RequestBody TeilnehmerStartDTO ts) {
-    teilnehmerAnlassLinkSrv.updateAnlassTeilnahme(ts);
+  @PutMapping("/{anlassId}/teilnehmer/{teilnehmerid}")
+  public ResponseEntity<Void> updateAnlassStart(@PathVariable UUID teilnehmerid, @RequestBody TeilnehmerStartDTO ts) {
+    teilnehmerAnlassLinkSrv.updateAnlassTeilnahme(teilnehmerid,ts);
     return ResponseEntity.ok().build();
   }
 
@@ -228,7 +230,6 @@ public class AnlassAdminController {
         kategorie, abteilung, anlage, geraet, search);
     return ResponseEntity.ok(statistic);
   }
-
   @GetMapping("/{anlassId}/teilnehmer/{kategorie}/{abteilung}/{anlage}/{geraet}")
   public ResponseEntity<List<TeilnehmerStartDTO>> getByStartgeraet(@PathVariable UUID anlassId,
       @PathVariable(required = false) KategorieEnum kategorie,
@@ -257,9 +258,13 @@ public class AnlassAdminController {
   }
 
   @GetMapping(value = "/{anlassId}/teilnehmer/", produces = "text/csv;charset=UTF-8")
-  public ResponseEntity<Void> getTeilnehmer(HttpServletResponse response, @PathVariable UUID anlassId) {
+  public ResponseEntity<Void> getTeilnehmer(HttpServletResponse response,
+      @PathVariable UUID anlassId,
+      @RequestParam Optional<Boolean> rotate) {
+//    List<TeilnehmerAnlassLinkCsvDTO> talsCsv = teilnehmerAnlassLinkSrv.getAllTeilnehmerForAnlassAsCsv(
+//        anlassId, rotate, maxAbteilung);
     List<TeilnehmerAnlassLinkCsvDTO> talsCsv = teilnehmerAnlassLinkSrv.getAllTeilnehmerForAnlassAsCsv(
-        anlassId);
+        anlassId, rotate);
     if (talsCsv.isEmpty()) {
       return ResponseEntity.notFound().build();
     }
@@ -371,7 +376,7 @@ public class AnlassAdminController {
     WertungsrichterBrevetEnum brevetEnum = WertungsrichterBrevetEnum.fromInt(brevet);
     Anlass anlass = anlassSrv.findById(anlassId);
     Organisation organisation = organisationSrv.findById(orgId);
-    List<Person> personen = personSrv.findPersonsByOrganisation(organisation.getId());
+    List<Person> personen = personSrv.findPersonsByOrganisation(organisation);
     List<PersonAnlassLink> eingeteilteWrs = personAnlassLinkSrv.getEingeteilteWertungsrichter(
         anlass, organisation,
         brevetEnum);

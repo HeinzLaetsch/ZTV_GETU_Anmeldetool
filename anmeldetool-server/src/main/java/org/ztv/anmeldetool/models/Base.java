@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.domain.Persistable;
 
 @MappedSuperclass
 @SuperBuilder
@@ -21,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @Getter
 @Setter
-public abstract class Base {
+public abstract class Base implements Persistable<UUID> {
 	@Id
 	@Builder.Default
 	private UUID id = UUID.randomUUID();
@@ -48,6 +49,14 @@ public abstract class Base {
 	public Base(Boolean aktiv, Calendar changeDate) {
 		this.aktiv = aktiv;
 		this.changeDate = changeDate;
+	}
+
+	@Override
+	public boolean isNew() {
+		if (id == null) {
+			return true;
+		}
+		return false;
 	}
 
 	@Override
