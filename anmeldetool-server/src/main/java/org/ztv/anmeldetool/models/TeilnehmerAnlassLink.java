@@ -7,6 +7,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -21,6 +23,13 @@ import lombok.ToString;
 @Getter
 @Setter
 @EqualsAndHashCode
+@NamedEntityGraph(
+    name = "TeilnehmerAnlassLink.withTeilnehmer",
+    attributeNodes = {
+				@NamedAttributeNode("teilnehmer"),
+		    @NamedAttributeNode("organisation")
+    }
+)
 public class TeilnehmerAnlassLink extends Base {
 
 	@Enumerated(EnumType.STRING)
@@ -49,7 +58,8 @@ public class TeilnehmerAnlassLink extends Base {
 	@ToString.Exclude
 	private LauflistenContainer lauflistenContainer;
 
-	@OneToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	// Auf Lazy gesetzt, sonst immer mehrere Queries
+	@OneToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	@JoinColumn(name = "notenblatt_id", referencedColumnName = "id", nullable = true, insertable = true, updatable = true)
 	@ToString.Exclude
 	@Getter(value = AccessLevel.NONE)

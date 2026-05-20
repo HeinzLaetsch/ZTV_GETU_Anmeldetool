@@ -3,6 +3,8 @@ package org.ztv.anmeldetool.repositories;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -74,6 +76,20 @@ public interface TeilnehmerAnlassLinkRepository extends JpaRepository<Teilnehmer
 			""")
 	List<TeilnehmerAnlassLink> findByAnlassAndAktiv(Anlass anlass, boolean aktiv, List<MeldeStatusEnum> exclusion,
 			List<Organisation> orgs);
+
+	@Query("""
+			SELECT tal FROM TeilnehmerAnlassLink tal
+			WHERE tal.anlass = :anlass
+			  AND tal.aktiv = true
+			  AND tal.kategorie <> org.ztv.anmeldetool.models.KategorieEnum.KEIN_START
+			  AND (:kategorie IS NULL OR tal.kategorie = :kategorie)
+			  AND (:abteilung IS NULL OR tal.abteilung = :abteilung)
+			  AND (:anlage IS NULL OR tal.anlage = :anlage)
+			  AND (:geraet IS NULL OR tal.startgeraet = :geraet)
+			""")
+	@EntityGraph(value = "TeilnehmerAnlassLink.withTeilnehmer", type = EntityGraph.EntityGraphType.FETCH)
+	List<TeilnehmerAnlassLink> findByAnlassEntityGraph(Anlass anlass, KategorieEnum kategorie, AbteilungEnum abteilung,
+			AnlageEnum anlage, GeraetEnum geraet);
 
 	@Query("""
 			SELECT tal FROM TeilnehmerAnlassLink tal

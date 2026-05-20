@@ -1,5 +1,8 @@
 package org.ztv.anmeldetool.models;
 
+import java.util.Arrays;
+import java.util.List;
+
 public enum MeldeStatusEnum {
 	KEINE_TEILNAHME("Keine Teilnahme"), STARTET("Startet"), STARTET_VERLAENGERT("Startet_Verlaengert"),
 	ABGEMELDET("Abgemeldet"), ABGEMELDET_1("Abgemeldet_1"), ABGEMELDET_2("Abgemeldet_2"), ABGEMELDET_3("Abgemeldet_3"),
@@ -17,7 +20,10 @@ public enum MeldeStatusEnum {
 				|| this.equals(MeldeStatusEnum.ABGEMELDET_2) || this.equals(MeldeStatusEnum.ABGEMELDET_3)
 				|| this.equals(MeldeStatusEnum.VERLETZT) || this.equals(MeldeStatusEnum.NICHTGESTARTET);
 	}
-
+	public static List<MeldeStatusEnum> abgemeldet() {
+		return Arrays.asList(new MeldeStatusEnum[] {MeldeStatusEnum.NICHTGESTARTET, MeldeStatusEnum.ABGEMELDET_1,
+						MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3, MeldeStatusEnum.ABGEMELDET_4, MeldeStatusEnum.UMMELDUNG});
+	}
 	public boolean vorWettkampfAbgemeldet() {
 		return this.equals(MeldeStatusEnum.ABGEMELDET_2);
 	}

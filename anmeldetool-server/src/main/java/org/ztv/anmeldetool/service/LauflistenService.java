@@ -258,6 +258,7 @@ public class LauflistenService {
             && tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET_1
             && tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET_2
             && tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET_3
+            && tal.getMeldeStatus() != MeldeStatusEnum.ABGEMELDET_4
             && tal.getMeldeStatus() != MeldeStatusEnum.UMMELDUNG) {
           tal = this.createNotenblatt(tal);
           TiTuEnum titu = anlass.getTiTu();
