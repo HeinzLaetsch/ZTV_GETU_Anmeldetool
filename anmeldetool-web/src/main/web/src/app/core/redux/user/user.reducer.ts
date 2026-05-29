@@ -1,11 +1,11 @@
-import { createFeature, createReducer, on } from "@ngrx/store";
-import { UserActions } from "./user.actions";
-import { userAdapter, initialState } from "./user.state";
-import { Update } from "@ngrx/entity";
-import { IUser } from "../../model/IUser";
+import { createFeature, createReducer, on } from '@ngrx/store';
+import { UserActions } from './user.actions';
+import { initialState, userAdapter } from './user.state';
+import { Update } from '@ngrx/entity';
+import { IUser } from '../../model/IUser';
 
 export const userFeature = createFeature({
-  name: "user",
+  name: 'user',
   reducer: createReducer(
     initialState,
 
@@ -21,7 +21,7 @@ export const userFeature = createFeature({
     }),
     on(UserActions.loadAllUserSuccess, (state, action) => {
       const user = action.payload;
-      let newUser = addUserAlreadyExistsFlag(user);
+      const newUser = addUserAlreadyExistsFlag(user);
       return userAdapter.setAll(newUser, state);
     }),
     on(UserActions.cancelUser, (state, action) => {
@@ -51,13 +51,12 @@ export const userFeature = createFeature({
 });
 // Spread         ...state,
 
-export const { selectAll, selectEntities, selectIds, selectTotal } =
-  userAdapter.getSelectors();
+export const { selectAll, selectEntities, selectIds, selectTotal } = userAdapter.getSelectors();
 
 function addUserAlreadyExistsFlag(users: IUser[]): IUser[] {
   return users.map((user) => {
-    let asUString = JSON.stringify(user);
-    let newUser = JSON.parse(asUString);
+    const asUString = JSON.stringify(user);
+    const newUser = JSON.parse(asUString);
     newUser.userAlreadyExists = true;
     return newUser;
   });

@@ -5,28 +5,14 @@
     <p>
       <mat-form-field [appearance]="appearance">
         <mat-label>Verein</mat-label>
-        <input
-          matInput
-          type="text"
-          [formControl]="vwVereinControl"
-          [matAutocomplete]="auto"
-        />
-        <mat-autocomplete
-          autoActiveFirstOption
-          #auto="matAutocomplete"
-          [displayWith]="displayFn"
-        >
+        <input matInput type="text" [formControl]="vwVereinControl" [matAutocomplete]="auto" />
+        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFn">
           <mat-option value=""></mat-option>
-          <mat-option
-            *ngFor="let verein of filteredOptions | async"
-            [value]="verein"
-          >
+          <mat-option *ngFor="let verein of filteredOptions | async" [value]="verein">
             {{ verein.name }}
           </mat-option>
         </mat-autocomplete>
-        <mat-error *ngIf="vwUserNameControl.hasError('required')">
-          Pflichtfeld
-        </mat-error>
+        <mat-error *ngIf="vwUserNameControl.hasError('required')"> Pflichtfeld </mat-error>
         <mat-hint>Wähle deinen Verein aus</mat-hint>
       </mat-form-field>
     </p>
@@ -34,14 +20,8 @@
     <p>
       <mat-form-field [appearance]="appearance">
         <mat-label>Benutzername</mat-label>
-        <input
-          matInput
-          placeholder="Benutzername"
-          [formControl]="vwUserNameControl"
-        />
-        <mat-error *ngIf="vwUserNameControl.hasError('required')">
-          Pflichtfeld
-        </mat-error>
+        <input matInput placeholder="Benutzername" [formControl]="vwUserNameControl" />
+        <mat-error *ngIf="vwUserNameControl.hasError('required')"> Pflichtfeld </mat-error>
         <mat-hint>Gib den Benutzernamen(eMail) ein</mat-hint>
       </mat-form-field>
     </p>
@@ -49,15 +29,8 @@
     <p>
       <mat-form-field [appearance]="appearance">
         <mat-label>Passwort</mat-label>
-        <input
-          matInput
-          type="password"
-          placeholder="Passwort"
-          [formControl]="vwPasswordControl"
-        />
-        <mat-error *ngIf="vwPasswordControl.hasError('required')">
-          Pflichtfeld
-        </mat-error>
+        <input matInput type="password" placeholder="Passwort" [formControl]="vwPasswordControl" />
+        <mat-error *ngIf="vwPasswordControl.hasError('required')"> Pflichtfeld </mat-error>
         <mat-hint>Gib das Passwort ein</mat-hint>
       </mat-form-field>
     </p>
@@ -80,9 +53,7 @@
     <!--button mat-button mat-dialog-close>Abbrechen</button-->
   </div>
   <div>
-    <button mat-button (click)="newVereinClicked()">
-      Neues Vereinslogin beantragen
-    </button>
+    <button mat-button (click)="newVereinClicked()">Neues Vereinslogin beantragen</button>
   </div>
   <div>
     <button mat-button [mat-dialog-close]="true" (click)="newAnmelderClicked()">

@@ -1,15 +1,17 @@
-import { OnDestroy, Injectable } from "@angular/core";
-import { Unsubscribable } from "rxjs";
+import { Injectable, type OnDestroy } from "@angular/core";
+import type { Unsubscribable } from "rxjs";
 
 @Injectable()
 export abstract class SubscriptionHelper implements OnDestroy {
-  private subscriptions: Array<Unsubscribable> = [];
+	private subscriptions: Unsubscribable[] = [];
 
-  registerSubscription(subscription: Unsubscribable) {
-    this.subscriptions.push(subscription);
-  }
+	registerSubscription(subscription: Unsubscribable): void {
+		this.subscriptions.push(subscription);
+	}
 
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
-  }
+	ngOnDestroy(): void {
+		this.subscriptions.forEach((subscription) => {
+			subscription.unsubscribe();
+		});
+	}
 }

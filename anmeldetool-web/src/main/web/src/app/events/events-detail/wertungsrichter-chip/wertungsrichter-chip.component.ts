@@ -1,26 +1,17 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-} from "@angular/core";
-import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { IUser } from "src/app/core/model/IUser";
-import { IWertungsrichter } from "src/app/core/model/IWertungsrichter";
-import { IWertungsrichterEinsatz } from "src/app/core/model/IWertungsrichterEinsatz";
-import { IWertungsrichterSlot } from "src/app/core/model/IWertungsrichterSlot";
-import { AuthService } from "src/app/core/service/auth/auth.service";
-import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
-import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
+import { Component, EventEmitter, Input, type OnChanges, type OnInit, Output, type SimpleChanges } from '@angular/core';
+import type { IAnlass } from 'src/app/core/model/IAnlass';
+import type { IUser } from 'src/app/core/model/IUser';
+import type { IWertungsrichter } from 'src/app/core/model/IWertungsrichter';
+import type { IWertungsrichterEinsatz } from 'src/app/core/model/IWertungsrichterEinsatz';
+import type { IWertungsrichterSlot } from 'src/app/core/model/IWertungsrichterSlot';
+import { AuthService } from 'src/app/core/service/auth/auth.service';
+import { CachingAnlassService } from 'src/app/core/service/caching-services/caching.anlass.service';
+import { CachingUserService } from 'src/app/core/service/caching-services/caching.user.service';
 
 @Component({
-  selector: "app-wertungsrichter-chip",
-  templateUrl: "./wertungsrichter-chip.component.html",
-  styleUrls: ["./wertungsrichter-chip.component.css"],
+  selector: 'lxt-wertungsrichter-chip',
+  templateUrl: './wertungsrichter-chip.component.html',
+  styleUrls: ['./wertungsrichter-chip.component.css'],
 })
 export class WertungsrichterChipComponent implements OnInit, OnChanges {
   @Input()
@@ -49,37 +40,29 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
     private anlassService: CachingAnlassService,
   ) {}
   ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes.isAllWertungsrichterList &&
-      !changes.isAllWertungsrichterList.currentValue
-    ) {
+    if (changes.isAllWertungsrichterList && !changes.isAllWertungsrichterList.currentValue) {
       // console.error("Load Einsaetze: ", changes);
     }
   }
 
   ngOnInit(): void {
-    this.userService
-      .getWertungsrichter(this.wertungsrichterUser.id)
-      .subscribe((value) => {
-        if (value) {
-          this.wertungsrichter = value;
-        }
-      });
+    this.userService.getWertungsrichter(this.wertungsrichterUser.id).subscribe((value) => {
+      if (value) {
+        this.wertungsrichter = value;
+      }
+    });
   }
   wrEinsatzChange(wrEinsatz: IWertungsrichterEinsatz) {
     this.wertungsrichterUserChange.emit(this.wertungsrichterUser);
   }
 
   kommentarChange(value): void {
-    console.log("Value changed: ", value);
+    console.log('Value changed: ', value);
     this.wertungsrichterUser.pal.kommentar = value.target.value;
     this.anlassService
-      .updateAnlassLink(
-        this.wertungsrichterUser.pal,
-        this.authservice.currentVerein,
-      )
+      .updateAnlassLink(this.wertungsrichterUser.pal, this.authservice.currentVerein)
       .subscribe((pal) => {
-        console.log("Pal saved: ", pal.kommentar);
+        console.log('Pal saved: ', pal.kommentar);
       });
   }
   getSlotsForBrevet(): IWertungsrichterSlot[] {
@@ -95,11 +78,9 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
 
   getEinsatzForSlot(slot: IWertungsrichterSlot): IWertungsrichterEinsatz {
     // console.log("getEinsatzForSlot: ", slot, this.wertungsrichterUser);
-    const einsatz = this.wertungsrichterUser?.pal?.einsaetze?.filter(
-      (einsatz) => {
-        return einsatz.wertungsrichterSlotId === slot.id;
-      },
-    )?.[0];
+    const einsatz = this.wertungsrichterUser?.pal?.einsaetze?.filter((einsatz) => {
+      return einsatz.wertungsrichterSlotId === slot.id;
+    })?.[0];
     return einsatz;
   }
 

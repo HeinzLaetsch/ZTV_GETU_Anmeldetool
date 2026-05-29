@@ -1,30 +1,29 @@
-import { FocusMonitor } from "@angular/cdk/a11y";
-import { BooleanInput, coerceBooleanProperty } from "@angular/cdk/coercion";
+import { CommonModule } from '@angular/common';
+import { FocusMonitor } from '@angular/cdk/a11y';
+import { type BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
   Component,
   ElementRef,
+  forwardRef,
   Inject,
   Input,
-  OnDestroy,
+  type OnDestroy,
   Optional,
   Self,
   ViewChild,
-} from "@angular/core";
+} from '@angular/core';
 import {
-  AbstractControl,
-  ControlValueAccessor,
-  UntypedFormBuilder,
-  UntypedFormGroup,
+  type AbstractControl,
+  type ControlValueAccessor,
+  FormBuilder,
+  type FormGroup,
   NgControl,
-  ValidationErrors,
+  ReactiveFormsModule,
+  type ValidationErrors,
   Validators,
-} from "@angular/forms";
-import {
-  MatFormField,
-  MatFormFieldControl,
-  MAT_FORM_FIELD,
-} from "@angular/material/form-field";
-import { Subject } from "rxjs";
+} from '@angular/forms';
+import { MAT_FORM_FIELD, type MatFormField, MatFormFieldControl } from '@angular/material/form-field';
+import { Subject } from 'rxjs';
 
 /** @title Form field with custom telephone number input control. */
 
@@ -34,35 +33,36 @@ export class MyTel {
     public part1: string,
     public part2: string,
     public part3: string,
-    public part4: string
+    public part4: string,
   ) {}
 }
 
 /** Custom `MatFormFieldControl` for telephone number input. */
 @Component({
-  selector: "app-phone-input",
-  templateUrl: "phone-input.html",
-  styleUrls: ["phone-input.css"],
-  providers: [{ provide: MatFormFieldControl, useExisting: PhoneInput }],
-  host: {
-    "[class.phone-floating]": "shouldLabelFloat",
-    "[id]": "id",
-  },
+  selector: 'lxt-phone-input',
+  templateUrl: './phone-input.html',
+  styleUrls: ['./phone-input.css'],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  providers: [
+    {
+      provide: MatFormFieldControl,
+      useExisting: forwardRef(() => PhoneInput),
+    },
+  ],
 })
-export class PhoneInput
-  implements ControlValueAccessor, MatFormFieldControl<MyTel>, OnDestroy
-{
+export class PhoneInput implements ControlValueAccessor, MatFormFieldControl<MyTel>, OnDestroy {
   static nextId = 0;
-  @ViewChild("part1") part1Input: HTMLInputElement;
-  @ViewChild("part2") part2Input: HTMLInputElement;
-  @ViewChild("part3") part3Input: HTMLInputElement;
-  @ViewChild("part4") part4Input: HTMLInputElement;
+  @ViewChild('part1') part1Input: HTMLInputElement;
+  @ViewChild('part2') part2Input: HTMLInputElement;
+  @ViewChild('part3') part3Input: HTMLInputElement;
+  @ViewChild('part4') part4Input: HTMLInputElement;
 
-  parts: UntypedFormGroup;
+  parts: FormGroup;
   stateChanges = new Subject<void>();
   focused = false;
   touched = false;
-  controlType = "phone-input";
+  controlType = 'phone-input';
   id = `phone-input-${PhoneInput.nextId++}`;
   onChange = (_: any) => {};
   onTouched = () => {};
@@ -79,7 +79,7 @@ export class PhoneInput
     return this.focused || !this.empty;
   }
 
-  @Input("aria-describedby") userAriaDescribedBy: string;
+  @Input('aria-describedby') userAriaDescribedBy: string;
 
   get placeholder(): string {
     return this._placeholder;
@@ -123,7 +123,7 @@ export class PhoneInput
   }
   @Input()
   set value(tel: MyTel | null) {
-    const { part1, part2, part3, part4 } = tel || new MyTel("", "", "", "");
+    const { part1, part2, part3, part4 } = tel || new MyTel('', '', '', '');
     this.parts.setValue({ part1, part2, part3, part4 });
     this.stateChanges.next();
   }
@@ -135,10 +135,10 @@ export class PhoneInput
     // Shows error only after its touched
     // return this.parts.invalid && this.touched;
     const errors: ValidationErrors = {
-      required: this.parts.hasError("required"),
-      minLength: this.parts.hasError("minLength"),
-      maxLength: this.parts.hasError("maxLength"),
-      pattern: this.parts.hasError("pattern"),
+      required: this.parts.hasError('required'),
+      minLength: this.parts.hasError('minLength'),
+      maxLength: this.parts.hasError('maxLength'),
+      pattern: this.parts.hasError('pattern'),
     };
 
     this.ngControl.control.updateValueAndValidity();
@@ -147,48 +147,32 @@ export class PhoneInput
   }
 
   constructor(
-    formBuilder: UntypedFormBuilder,
+    private _formBuilder: FormBuilder,
     private _focusMonitor: FocusMonitor,
     private _elementRef: ElementRef<HTMLElement>,
-    @Optional() @Inject(MAT_FORM_FIELD) public _formField: MatFormField,
-    @Optional() @Self() public ngControl: NgControl
+    @Optional()
+    @Inject(MAT_FORM_FIELD)
+    public _formField: MatFormField,
+    @Optional()
+    @Self()
+    public ngControl: NgControl,
   ) {
-    this.parts = formBuilder.group({
+    this.parts = this._formBuilder.group({
       part1: [
         null,
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(3),
-          Validators.pattern("[0-9]{3}"),
-        ],
+        [Validators.required, Validators.minLength(3), Validators.maxLength(3), Validators.pattern('[0-9]{3}')],
       ],
       part2: [
         null,
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(3),
-          Validators.pattern("[0-9]{3}"),
-        ],
+        [Validators.required, Validators.minLength(3), Validators.maxLength(3), Validators.pattern('[0-9]{3}')],
       ],
       part3: [
         null,
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(2),
-          Validators.pattern("[0-9]{2}"),
-        ],
+        [Validators.required, Validators.minLength(2), Validators.maxLength(2), Validators.pattern('[0-9]{2}')],
       ],
       part4: [
         null,
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(2),
-          Validators.pattern("[0-9]{2}"),
-        ],
+        [Validators.required, Validators.minLength(2), Validators.maxLength(2), Validators.pattern('[0-9]{2}')],
       ],
     });
 
@@ -210,9 +194,7 @@ export class PhoneInput
   }
 
   onFocusOut(event: FocusEvent) {
-    if (
-      !this._elementRef.nativeElement.contains(event.relatedTarget as Element)
-    ) {
+    if (!this._elementRef.nativeElement.contains(event.relatedTarget as Element)) {
       this.touched = true;
       this.focused = false;
       this.onTouched();
@@ -220,39 +202,34 @@ export class PhoneInput
     }
   }
 
-  autoFocusNext(
-    control: AbstractControl,
-    nextElement?: HTMLInputElement
-  ): void {
+  autoFocusNext(control: AbstractControl, nextElement?: HTMLInputElement): void {
     if (!control.errors && nextElement) {
-      this._focusMonitor.focusVia(nextElement, "program");
+      this._focusMonitor.focusVia(nextElement, 'program');
     }
   }
 
   autoFocusPrev(control: AbstractControl, prevElement: HTMLInputElement): void {
     if (control.value.length < 1) {
-      this._focusMonitor.focusVia(prevElement, "program");
+      this._focusMonitor.focusVia(prevElement, 'program');
     }
   }
 
   setDescribedByIds(ids: string[]) {
-    const controlElement = this._elementRef.nativeElement.querySelector(
-      ".phone-input-container"
-    )!;
-    controlElement.setAttribute("aria-describedby", ids.join(" "));
+    const controlElement = this._elementRef.nativeElement.querySelector('.phone-input-container')!;
+    controlElement.setAttribute('aria-describedby', ids.join(' '));
   }
 
   onContainerClick() {
     if (this.parts.controls.part4.valid) {
-      this._focusMonitor.focusVia(this.part4Input, "program");
+      this._focusMonitor.focusVia(this.part4Input, 'program');
     } else if (this.parts.controls.part3.valid) {
-      this._focusMonitor.focusVia(this.part4Input, "program");
+      this._focusMonitor.focusVia(this.part4Input, 'program');
     } else if (this.parts.controls.part2.valid) {
-      this._focusMonitor.focusVia(this.part3Input, "program");
+      this._focusMonitor.focusVia(this.part3Input, 'program');
     } else if (this.parts.controls.part1.valid) {
-      this._focusMonitor.focusVia(this.part2Input, "program");
+      this._focusMonitor.focusVia(this.part2Input, 'program');
     } else {
-      this._focusMonitor.focusVia(this.part1Input, "program");
+      this._focusMonitor.focusVia(this.part1Input, 'program');
     }
   }
 

@@ -1,4 +1,4 @@
-export interface IWertungsrichterSlot {
+export type IWertungsrichterSlot = {
   id: string;
   reihenfolge: number;
   brevet: number;

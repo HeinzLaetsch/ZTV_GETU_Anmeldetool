@@ -1,4 +1,4 @@
-export interface IOrganisationAnlassLink {
+export type IOrganisationAnlassLink = {
   anlassId: string;
   organisationsId: string;
   startet: boolean;

@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from "@ngrx/store";
-import { IAnlass } from "../../model/IAnlass";
+import type { IAnlass } from "../../model/IAnlass";
 
 /*
 export enum ActionTypes {
@@ -21,10 +21,10 @@ export const loadAllAnlaesseFailed = createAction(
 );
 */
 export const AnlassActions = createActionGroup({
-  source: "Anlass",
-  events: {
-    "Load All Anlaesse INVOKED": emptyProps(),
-    "Load All Anlaesse SUCCESS": props<{ payload: IAnlass[] }>(),
-    "Load All Anlaesse ERROR": props<{ error: string }>(),
-  },
+	source: "Anlass",
+	events: {
+		"Load All Anlaesse invoked": emptyProps(),
+		"Load All Anlaesse success": props<{ payload: IAnlass[] }>(),
+		"Load All Anlaesse error": props<{ error: string }>(),
+	},
 });

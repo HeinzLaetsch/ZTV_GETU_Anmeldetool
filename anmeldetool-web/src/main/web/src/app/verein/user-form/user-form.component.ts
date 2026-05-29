@@ -1,17 +1,23 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { Subscription } from "rxjs";
-import { IRolle } from "src/app/core/model/IRolle";
-import { IUser } from "src/app/core/model/IUser";
-import { IWertungsrichter } from "src/app/core/model/IWertungsrichter";
-import { AuthService } from "src/app/core/service/auth/auth.service";
-import { CachingRoleService } from "src/app/core/service/caching-services/caching.role.service";
-import { CachingUserService } from "src/app/core/service/caching-services/caching.user.service";
-import { IChangeEvent } from "../profile/IChangeEvent";
+import { Component, EventEmitter, Input, type OnInit, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import type { Subscription } from 'rxjs';
+import type { IRolle } from 'src/app/core/model/IRolle';
+import type { IUser } from 'src/app/core/model/IUser';
+import type { IWertungsrichter } from 'src/app/core/model/IWertungsrichter';
+import { AuthService } from 'src/app/core/service/auth/auth.service';
+import { CachingRoleService } from 'src/app/core/service/caching-services/caching.role.service';
+import { CachingUserService } from 'src/app/core/service/caching-services/caching.user.service';
+import { UserComponent } from 'src/app/shared/component/user/user.component';
+import type { IChangeEvent } from '../profile/IChangeEvent';
+import { RoleFormComponent } from '../profile/role-form/role-form.component';
+import { WertungsrichterFormComponent } from '../profile/wertungsrichter-form/wertungsrichter-form.component';
 
 @Component({
-  selector: "app-user-form",
-  templateUrl: "./user-form.component.html",
-  styleUrls: ["./user-form.component.css"],
+  selector: 'lxt-user-form',
+  templateUrl: './user-form.component.html',
+  styleUrls: ['./user-form.component.scss'],
+  standalone: true,
+  imports: [CommonModule, UserComponent, RoleFormComponent, WertungsrichterFormComponent],
 })
 export class UserFormComponent implements OnInit {
   @Input()
@@ -26,13 +32,13 @@ export class UserFormComponent implements OnInit {
   userChange: EventEmitter<IChangeEvent>;
 
   changeEvent: IChangeEvent;
-  appearance = "outline";
+  appearance = 'outline';
 
   _assignedRoles: IRolle[];
 
   _wertungsrichter: IWertungsrichter;
 
-  _localPassword = "";
+  _localPassword = '';
 
   constructor(
     private authService: AuthService,
@@ -55,7 +61,7 @@ export class UserFormComponent implements OnInit {
 
   getEmptyWertungsrichter(): IWertungsrichter {
     return {
-      id: "",
+      id: '',
       brevet: 1,
       gueltig: false,
       letzterFK: new Date(),
@@ -67,16 +73,14 @@ export class UserFormComponent implements OnInit {
     this.changeEvent.tabIndex = this.tabIndex;
     if (this.currentUser.id && this.currentUser.id.length > 0) {
       this.reloadRoles(this.currentUser);
-      this.userService
-        .getWertungsrichter(this.currentUser.id)
-        .subscribe((value) => {
-          if (value) {
-            this._wertungsrichter = value;
-          }
-        });
+      this.userService.getWertungsrichter(this.currentUser.id).subscribe((value) => {
+        if (value) {
+          this._wertungsrichter = value;
+        }
+      });
     } else {
       this.changeEvent.userValid = false;
-      this._assignedRoles = new Array<IRolle>();
+      this._assignedRoles = [] as IRolle[];
     }
   }
 
@@ -84,32 +88,26 @@ export class UserFormComponent implements OnInit {
     if (!this.changeEvent.userValid) {
       return true;
     }
-    if (
-      !this.changeEvent.rolesChanged &&
-      !this.changeEvent.userHasChanged &&
-      !this.changeEvent.wrChanged
-    ) {
+    if (!this.changeEvent.rolesChanged && !this.changeEvent.userHasChanged && !this.changeEvent.wrChanged) {
       return true;
     }
     return false;
   }
   private reloadRoles(user: IUser) {
-    let localSubscription2: Subscription = undefined;
+    let localSubscription2: Subscription;
     if (user && user.id && user.id.length > 0) {
       // console.log("user.id is valid");
-      localSubscription2 = this.roleService
-        .getRolesForUser(user)
-        .subscribe((result) => {
-          this._assignedRoles = result;
-          this.changeEvent.hasWr = this.isWertungsrichter();
-          // console.log("RoleFormComponent:: ngOnInit: ", this._assignedRoles);
-          if (localSubscription2) {
-            localSubscription2.unsubscribe();
-          }
-        });
+      localSubscription2 = this.roleService.getRolesForUser(user).subscribe((result) => {
+        this._assignedRoles = result;
+        this.changeEvent.hasWr = this.isWertungsrichter();
+        // console.log("RoleFormComponent:: ngOnInit: ", this._assignedRoles);
+        if (localSubscription2) {
+          localSubscription2.unsubscribe();
+        }
+      });
     } else {
-      console.log("user.id not valid");
-      this._assignedRoles = new Array<IRolle>();
+      console.log('user.id not valid');
+      this._assignedRoles = [] as IRolle[];
       this.changeEvent.hasWr = false;
     }
   }
@@ -119,17 +117,14 @@ export class UserFormComponent implements OnInit {
   }
 
   isWertungsrichter() {
-    return this.hasRole("WERTUNGSRICHTER");
+    return this.hasRole('WERTUNGSRICHTER');
   }
 
   isOwner() {
     if (this.authService.isAdministrator()) {
       return true;
     }
-    if (
-      this.currentUser.benutzername ===
-      this.authService.currentUser.benutzername
-    ) {
+    if (this.currentUser.benutzername === this.authService.currentUser.benutzername) {
       return true;
     }
     return false;
@@ -137,9 +132,7 @@ export class UserFormComponent implements OnInit {
 
   private hasRole(roleName: string): boolean {
     if (this._assignedRoles) {
-      const rollen = this._assignedRoles.filter(
-        (role) => role.name === roleName,
-      );
+      const rollen = this._assignedRoles.filter((role) => role.name === roleName);
       // console.log('Rollen: ' , rollen, ' , Name: ', roleName);
       if (rollen && rollen.length > 0) {
         return rollen[0].aktiv;
@@ -200,11 +193,7 @@ export class UserFormComponent implements OnInit {
 
   saveRolesChanged() {
     this.userService
-      .updateRoles(
-        this.currentUser,
-        this.authService.currentVerein,
-        this.assignedRoles,
-      )
+      .updateRoles(this.currentUser, this.authService.currentVerein, this.assignedRoles)
       .subscribe((user) => {
         this.currentUser = user;
         this.reloadRoles(this.currentUser);
@@ -223,25 +212,18 @@ export class UserFormComponent implements OnInit {
       if (this.changeEvent.hasWr) {
         const newWR = JSON.parse(JSON.stringify(this._wertungsrichter));
         newWR.personId = this.currentUser.id;
-        this.userService
-          .updateWertungsrichter(this.currentUser.id, newWR)
-          .subscribe((value) => {
-            // created returns no Object just URL this._wertungsrichter = value;
-            this.changeEvent.wrChanged = false;
-            if (
-              this._wertungsrichter.id === "" ||
-              value?.brevet !== this._wertungsrichter.brevet
-            ) {
-              this._wertungsrichter = value;
-            }
-          });
+        this.userService.updateWertungsrichter(this.currentUser.id, newWR).subscribe((value) => {
+          // created returns no Object just URL this._wertungsrichter = value;
+          this.changeEvent.wrChanged = false;
+          if (this._wertungsrichter.id === '' || value?.brevet !== this._wertungsrichter.brevet) {
+            this._wertungsrichter = value;
+          }
+        });
       } else {
-        this.userService
-          .deleteWertungsrichterForUserId(this.currentUser.id)
-          .subscribe((value) => {
-            this._wertungsrichter = this.getEmptyWertungsrichter();
-            this.changeEvent.wrChanged = false;
-          });
+        this.userService.deleteWertungsrichterForUserId(this.currentUser.id).subscribe((value) => {
+          this._wertungsrichter = this.getEmptyWertungsrichter();
+          this.changeEvent.wrChanged = false;
+        });
       }
     }
   }

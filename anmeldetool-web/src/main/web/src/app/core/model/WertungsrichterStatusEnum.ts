@@ -1,5 +1,5 @@
 export enum WertungsrichterStatusEnum {
-  OK = "OK",
-  NOTOK = "unvollständig",
-  KEINEPFLICHT = "Keine WR nötig",
+  OK = 'OK',
+  NOTOK = 'unvollständig',
+  KEINEPFLICHT = 'Keine WR nötig',
 }

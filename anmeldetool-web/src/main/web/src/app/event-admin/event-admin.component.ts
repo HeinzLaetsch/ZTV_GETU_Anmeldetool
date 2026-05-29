@@ -1,36 +1,36 @@
-import { Component, EventEmitter, OnInit } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
-import { ActivatedRoute } from "@angular/router";
-import { Observable, Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
-import { AbteilungEnum } from "src/app/core/model/AbteilungEnum";
-import { AnlageEnum } from "src/app/core/model/AnlageEnum";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { ITeilnahmeStatistic } from "src/app/core/model/ITeilnahmeStatistic";
-import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { AuthService } from "src/app/core/service/auth/auth.service";
-import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.service";
-import { ContestUpload } from "./contest-upload-dialog/contest-upload.component";
-import { Upload } from "./upload-dialog/upload.component";
-import { select, Store } from "@ngrx/store";
-import { AppState } from "../core/redux/core.state";
-import { SubscriptionHelper } from "../utils/subscription-helper";
-import { selectAnlassById } from "../core/redux/anlass";
-import { AnlassService } from "../core/service/anlass/anlass.service";
+import { Component, EventEmitter, type OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
+import { select, Store } from '@ngrx/store';
+import { type Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import type { AbteilungEnum } from 'src/app/core/model/AbteilungEnum';
+import type { AnlageEnum } from 'src/app/core/model/AnlageEnum';
+import type { IAnlass } from 'src/app/core/model/IAnlass';
+import type { ITeilnahmeStatistic } from 'src/app/core/model/ITeilnahmeStatistic';
+import type { KategorieEnum } from 'src/app/core/model/KategorieEnum';
+import { AuthService } from 'src/app/core/service/auth/auth.service';
+import { RanglistenService } from 'src/app/core/service/rangliste/ranglisten.service';
+import { selectAnlassById } from '../core/redux/anlass';
+import type { AppState } from '../core/redux/core.state';
+import { AnlassService } from '../core/service/anlass/anlass.service';
+import { SubscriptionHelper } from '../utils/subscription-helper';
+import { ContestUpload } from './contest-upload-dialog/contest-upload.component';
+import { Upload } from './upload-dialog/upload.component';
 
 @Component({
-  selector: "app-event-admin",
-  templateUrl: "./event-admin.component.html",
-  styleUrls: ["./event-admin.component.css"],
+  selector: 'lxt-event-admin',
+  templateUrl: './event-admin.component.html',
+  styleUrls: ['./event-admin.component.css'],
 })
 export class EventAdminComponent extends SubscriptionHelper implements OnInit {
   anlass$!: Observable<IAnlass>;
   anlass: IAnlass;
 
-  private readonly lauflistenPDF$: Subject<void> = new Subject();
+  private readonly lauflistenPDF$ = new Subject<void>();
 
   message: string;
-  hasError: boolean = false;
+  hasError = false;
   onlyTi = false;
   hideOnlyTi = false;
 
@@ -65,7 +65,7 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
     this.loaded$ = new Subject();
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     const anlassId: string = this.route.snapshot.params.id;
     // console.log("url param: ", anlassId);
     this.anlass$ = this.store.pipe(select(selectAnlassById(anlassId)));
@@ -77,14 +77,7 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
         }
         this.kategorien = this.anlass.getKategorienRaw();
         this.anlassService
-          .getTeilnahmeStatistic(
-            this.anlass,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-          )
+          .getTeilnahmeStatistic(this.anlass, undefined, undefined, undefined, undefined, undefined)
           .subscribe((statistic) => {
             this.teilnahmeStatistic = statistic;
             this.loaded$.next(true);
@@ -119,7 +112,7 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
     });
   }
 
-  teilnehmerRotieren(event: any): void {
+  teilnehmerRotieren(event: boolean): void {
     this.rotieren = event;
   }
 
@@ -136,49 +129,39 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
   }
 
   getAbteilungenForAnlass(): void {
-    this.ranglistenService
-      .getAbteilungenForAnlass(this.anlass, this.selectedKategorie)
-      .subscribe((result) => {
-        this.abteilungen = result;
-      });
+    this.ranglistenService.getAbteilungenForAnlass(this.anlass, this.selectedKategorie).subscribe((result) => {
+      this.abteilungen = result;
+    });
   }
   getAnlagenForAnlass(): void {
     this.ranglistenService
-      .getAnlagenForAnlass(
-        this.anlass,
-        this.selectedKategorie,
-        this.selectedAbteilung,
-      )
+      .getAnlagenForAnlass(this.anlass, this.selectedKategorie, this.selectedAbteilung)
       .subscribe((result) => {
         this.anlagen = result;
       });
   }
 
-  changeKategorie(event: any) {
-    console.log("Event: ", event);
+  changeKategorie(event: KategorieEnum): void {
+    console.log('Event: ', event);
     this.selectedKategorie = event;
     this.selectedAbteilung = undefined;
     this.selectedAnlage = undefined;
     this.getAbteilungenForAnlass();
   }
-  changeAbteilung(event: any) {
-    console.log("Event: ", event);
+  changeAbteilung(event: AbteilungEnum): void {
+    console.log('Event: ', event);
     this.selectedAbteilung = event;
     this.selectedAnlage = undefined;
     this.getAnlagenForAnlass();
   }
-  changeAnlage(event: any) {
-    console.log("Event: ", event);
+  changeAnlage(event: AnlageEnum): void {
+    console.log('Event: ', event);
     this.selectedAnlage = event;
     // this.getAnlagenForAnlass();
   }
 
   get isButtonsDisabled(): boolean {
-    if (
-      this.selectedKategorie &&
-      this.selectedAbteilung &&
-      this.selectedAnlage
-    ) {
+    if (this.selectedKategorie && this.selectedAbteilung && this.selectedAnlage) {
       return false;
     }
     return true;
@@ -194,12 +177,12 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
       )
       .pipe(takeUntil(this.lauflistenPDF$))
       .subscribe((result) => {
-        console.error("result: ", result);
-        if (!result || result === "Success") {
-          this.message = "Löschen erfolgreich durchgeführt";
+        console.error('result: ', result);
+        if (!result || result === 'Success') {
+          this.message = 'Löschen erfolgreich durchgeführt';
           this.hasError = false;
         } else {
-          this.message = "Löschen fehlgeschlagen";
+          this.message = 'Löschen fehlgeschlagen';
           this.hasError = true;
         }
         this.lauflistenPDF$.next();
@@ -209,21 +192,15 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
   lauflistenPDF(): void {
     this.hasError = false;
     this.ranglistenService
-      .getLauflistenPdf(
-        this.anlass,
-        this.selectedKategorie,
-        this.selectedAbteilung,
-        this.selectedAnlage,
-        this.onlyTi,
-      )
+      .getLauflistenPdf(this.anlass, this.selectedKategorie, this.selectedAbteilung, this.selectedAnlage, this.onlyTi)
       .pipe(takeUntil(this.lauflistenPDF$))
       .subscribe((result) => {
-        console.error("result: ", result);
-        if (result === "Success") {
-          this.message = "Listen erfolgreich generiert";
+        console.error('result: ', result);
+        if (result === 'Success') {
+          this.message = 'Listen erfolgreich generiert';
           this.hasError = false;
         } else {
-          this.message = "Listen generieren fehlgeschlagen";
+          this.message = 'Listen generieren fehlgeschlagen';
           this.hasError = true;
         }
         this.lauflistenPDF$.next();
@@ -236,8 +213,6 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
 
   toolSperrenClicked(checked: boolean): void {
     this.anlass = { ...this.anlass, toolSperren: checked } as IAnlass;
-    this.anlassService
-      .updateAnlass(this.anlass)
-      .subscribe((anlass) => (this.anlass = anlass));
+    this.anlassService.updateAnlass(this.anlass).subscribe((anlass) => (this.anlass = anlass));
   }
 }

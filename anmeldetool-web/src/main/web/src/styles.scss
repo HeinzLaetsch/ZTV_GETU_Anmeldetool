@@ -1,5 +1,5 @@
-@import "assets/styles/colors.scss";
-@import "assets/styles/styles.css";
+@use 'assets/styles/colors' as *;
+@use 'assets/styles/styles';
 
 html,
 body {

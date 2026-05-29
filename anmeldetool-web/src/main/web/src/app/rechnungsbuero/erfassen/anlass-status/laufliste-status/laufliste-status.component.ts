@@ -1,14 +1,17 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { AbteilungEnum } from "src/app/core/model/AbteilungEnum";
-import { AnlageEnum } from "src/app/core/model/AnlageEnum";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { ILaufliste } from "src/app/core/model/ILaufliste";
-import { KategorieEnum } from "src/app/core/model/KategorieEnum";
+import { Component, EventEmitter, Input, type OnInit, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import type { AbteilungEnum } from 'src/app/core/model/AbteilungEnum';
+import type { AnlageEnum } from 'src/app/core/model/AnlageEnum';
+import type { IAnlass } from 'src/app/core/model/IAnlass';
+import type { ILaufliste } from 'src/app/core/model/ILaufliste';
+import type { KategorieEnum } from 'src/app/core/model/KategorieEnum';
 
 @Component({
-  selector: "app-laufliste-status",
-  templateUrl: "./laufliste-status.component.html",
-  styleUrls: ["./laufliste-status.component.css"],
+  selector: 'lxt-laufliste-status',
+  templateUrl: './laufliste-status.component.html',
+  styleUrls: ['./laufliste-status.component.css'],
+  standalone: true,
+  imports: [CommonModule],
 })
 export class LauflisteStatusComponent implements OnInit {
   @Input()
@@ -36,20 +39,14 @@ export class LauflisteStatusComponent implements OnInit {
   ngOnInit() {
     this.erfasstChangedEmitter.subscribe((laufliste) => {
       if (laufliste.id === this.laufliste.id) {
-        console.log(
-          "LauflisteStatusComponent : Laufliste changed: ",
-          laufliste
-        );
+        console.log('LauflisteStatusComponent : Laufliste changed: ', laufliste);
         this.laufliste.erfasst = laufliste.erfasst;
         this.lauflisteErfasstEvent.emit(this.laufliste);
       }
     });
     this.checkedChangedEmitter.subscribe((laufliste) => {
       if (laufliste.id === this.laufliste.id) {
-        console.log(
-          "LauflisteStatusComponent : Laufliste changed: ",
-          laufliste
-        );
+        console.log('LauflisteStatusComponent : Laufliste changed: ', laufliste);
         this.laufliste.checked = laufliste.checked;
         this.lauflisteCheckedEvent.emit(this.laufliste);
       }

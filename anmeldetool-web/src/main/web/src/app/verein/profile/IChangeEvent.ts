@@ -1,4 +1,4 @@
-export interface IChangeEvent {
+export type IChangeEvent = {
   tabIndex: number;
   rolesChanged: boolean;
   userHasChanged: boolean;

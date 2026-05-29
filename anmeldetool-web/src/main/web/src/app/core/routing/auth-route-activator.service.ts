@@ -1,12 +1,15 @@
-import { Injectable } from "@angular/core";
-import { ActivatedRouteSnapshot, Router } from "@angular/router";
-import { AuthService } from "../service/auth/auth.service";
+import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, Router } from '@angular/router';
+import { AuthService } from '../service/auth/auth.service';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class AuthRouteActivatorService {
-  constructor(public authService: AuthService, private router: Router) {}
+  constructor(
+    public authService: AuthService,
+    private router: Router,
+  ) {}
 
   canActivate(route: ActivatedRouteSnapshot) {
     if (this.authService.isAdministrator()) {
@@ -22,7 +25,7 @@ export class AuthRouteActivatorService {
     }
     // console.log("canActivate ", isAuthenticated);
     if (!isAuthenticated || !accessAllowed) {
-      this.router.navigate(["/"]);
+      this.router.navigate(['/']);
     }
     return isAuthenticated;
   }

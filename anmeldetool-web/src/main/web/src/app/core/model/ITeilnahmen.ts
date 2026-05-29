@@ -1,7 +1,7 @@
-import { IAnlassLink } from "./IAnlassLink";
-import { ITeilnehmer } from "./ITeilnehmer";
+import { IAnlassLink } from './IAnlassLink';
+import { ITeilnehmer } from './ITeilnehmer';
 
-export interface ITeilnahmen {
+export type ITeilnahmen = {
   jahr: number;
   teilnehmer: ITeilnehmer;
   talDTOList?: IAnlassLink[];

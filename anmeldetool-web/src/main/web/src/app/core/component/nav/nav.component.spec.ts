@@ -1,10 +1,10 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { RouterModule } from "@angular/router";
-import { AppRoutingModule } from "../../../app-routing.module";
-import { MaterialModule } from "../../../shared/material-module";
-import { NavComponent } from "./nav.component";
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterModule } from '@angular/router';
+import { AppRoutingModule } from '../../../app-routing.module';
+import { MaterialModule } from '../../../shared/material-module';
+import { NavComponent } from './nav.component';
 
-describe("NavComponent", () => {
+describe('NavComponent', () => {
   let component: NavComponent;
   let fixture: ComponentFixture<NavComponent>;
 
@@ -19,7 +19,7 @@ describe("NavComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

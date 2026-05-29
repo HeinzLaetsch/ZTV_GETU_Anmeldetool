@@ -1,22 +1,23 @@
-import { IAnlassLinks } from "./IAnlassLinks";
-import { TiTuEnum } from "./TiTuEnum";
+import { IAnlassLinks } from './IAnlassLinks';
+import { KategorieEnum } from './KategorieEnum';
+import { TiTuEnum } from './TiTuEnum';
 
-export interface ITeilnehmer {
+export type ITeilnehmer = {
   id?: string;
   name?: string;
   vorname?: string;
   jahrgang?: number;
   stvNummer?: string;
-  tiTu?: TiTuEnum;
+  tiTu?: keyof typeof TiTuEnum;
   dirty?: boolean;
   teilnahmen?: IAnlassLinks;
   onlyCreated?: boolean;
-  letzteKategorie?: string;
-}
+  letzteKategorie?: keyof typeof KategorieEnum;
+};
 
 export function hashCode(str: string): number {
-  var h: number = 0;
-  for (var i = 0; i < str.length; i++) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) {
     h = 31 * h + str.charCodeAt(i);
   }
   return h;

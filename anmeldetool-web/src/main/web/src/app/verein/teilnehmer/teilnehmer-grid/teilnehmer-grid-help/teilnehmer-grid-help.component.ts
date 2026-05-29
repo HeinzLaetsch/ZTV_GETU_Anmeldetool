@@ -3,18 +3,18 @@ import { MatDialogRef } from "@angular/material/dialog";
 import { MaterialModule } from "src/app/shared/material-module";
 
 @Component({
-  standalone: true,
-  imports: [MaterialModule],
-  selector: "teilnehmer-grid-help",
-  templateUrl: "teilnehmer-grid-help.component.html",
-  styleUrls: ["teilnehmer-grid-help.component.css"],
+	standalone: true,
+	imports: [MaterialModule],
+	selector: "lxt-teilnehmer-grid-help",
+	templateUrl: "teilnehmer-grid-help.component.html",
+	styleUrls: ["teilnehmer-grid-help.component.css"],
 })
 export class TeilnehmerGridHelpComponent {
-  readonly dialogRef = inject(MatDialogRef<TeilnehmerGridHelpComponent>);
+	readonly dialogRef = inject(MatDialogRef<TeilnehmerGridHelpComponent>);
 
-  constructor() {}
+	constructor() {}
 
-  onCloseClick(): void {
-    this.dialogRef.close();
-  }
+	onCloseClick(): void {
+		this.dialogRef.close();
+	}
 }

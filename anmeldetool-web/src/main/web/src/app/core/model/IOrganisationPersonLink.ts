@@ -1,4 +1,4 @@
-export interface IOrganisationPersonLink {
+export type IOrganisationPersonLink = {
   id?: string;
   personId: string;
   organisationsId: string;

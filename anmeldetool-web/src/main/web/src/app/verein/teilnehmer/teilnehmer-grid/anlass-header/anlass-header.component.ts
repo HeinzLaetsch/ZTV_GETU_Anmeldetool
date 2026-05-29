@@ -1,4 +1,4 @@
-import { AgPromise, IHeaderComp, IHeaderParams } from "ag-grid-community";
+import { AgPromise, IHeaderComp, IHeaderParams } from 'ag-grid-community';
 // https://plnkr.co/edit/?open=main.js&preview
 export class AnlassHeaderComponent implements IHeaderComp {
   agParams;
@@ -14,7 +14,7 @@ export class AnlassHeaderComponent implements IHeaderComp {
   onSortChangedListener;
 
   refresh(params: IHeaderParams<any>): boolean {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   getGui(): HTMLElement {
     return this.eGui;
@@ -30,29 +30,17 @@ export class AnlassHeaderComponent implements IHeaderComp {
 
   destroy() {
     if (this.onMenuClickListener) {
-      this.eMenuButton.removeEventListener("click", this.onMenuClickListener);
+      this.eMenuButton.removeEventListener('click', this.onMenuClickListener);
     }
-    this.eSortDownButton.removeEventListener(
-      "click",
-      this.onSortAscRequestedListener
-    );
-    this.eSortUpButton.removeEventListener(
-      "click",
-      this.onSortDescRequestedListener
-    );
-    this.eSortRemoveButton.removeEventListener(
-      "click",
-      this.onRemoveSortListener
-    );
-    this.agParams.column.removeEventListener(
-      "sortChanged",
-      this.onSortChangedListener
-    );
+    this.eSortDownButton.removeEventListener('click', this.onSortAscRequestedListener);
+    this.eSortUpButton.removeEventListener('click', this.onSortDescRequestedListener);
+    this.eSortRemoveButton.removeEventListener('click', this.onRemoveSortListener);
+    this.agParams.column.removeEventListener('sortChanged', this.onSortChangedListener);
   }
 
   init(agParams) {
     this.agParams = agParams;
-    this.eGui = document.createElement("div");
+    this.eGui = document.createElement('div');
     this.eGui.innerHTML = `
             <div class="customHeaderMenuButton">
                 <i class="fa ${this.agParams.menuIcon}"></i>
@@ -70,10 +58,10 @@ export class AnlassHeaderComponent implements IHeaderComp {
             </div>
         `;
 
-    this.eMenuButton = this.eGui.querySelector(".customHeaderMenuButton");
-    this.eSortDownButton = this.eGui.querySelector(".customSortDownLabel");
-    this.eSortUpButton = this.eGui.querySelector(".customSortUpLabel");
-    this.eSortRemoveButton = this.eGui.querySelector(".customSortRemoveLabel");
+    this.eMenuButton = this.eGui.querySelector('.customHeaderMenuButton');
+    this.eSortDownButton = this.eGui.querySelector('.customSortDownLabel');
+    this.eSortUpButton = this.eGui.querySelector('.customSortUpLabel');
+    this.eSortRemoveButton = this.eGui.querySelector('.customSortRemoveLabel');
 
     /*
     if (this.agParams.enableMenu) {

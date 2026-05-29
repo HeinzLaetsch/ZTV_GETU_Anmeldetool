@@ -1,51 +1,42 @@
-import {
-  AfterContentChecked,
-  AfterViewInit,
-  Component,
-  OnInit,
-} from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
-import { IAnlass } from "../../model/IAnlass";
-import { AuthService } from "../../service/auth/auth.service";
-import { CachingAnlassService } from "../../service/caching-services/caching.anlass.service";
-import { CachingVereinService } from "../../service/caching-services/caching.verein.service";
-import { LoginDialogComponent } from "../login/login-dialog.component";
-import { NewAnmelderComponent } from "../new-anmelder/new-anmelder.component";
-import { NewVereinComponent } from "../new-verein/new-verein.component";
-import { AppState } from "../../redux/core.state";
-import { select, Store } from "@ngrx/store";
-import { SubscriptionHelper } from "src/app/utils/subscription-helper";
-import { selectSperrenAnlaesse } from "../../redux/anlass";
+import { type AfterContentChecked, type AfterViewInit, Component, type OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { select, Store } from '@ngrx/store';
+import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
+import type { IAnlass } from '../../model/IAnlass';
+import { selectSperrenAnlaesse } from '../../redux/anlass';
+import type { AppState } from '../../redux/core.state';
+import { AuthService } from '../../service/auth/auth.service';
+import { BusyIndicatorProgressBarComponent } from '../busy-indicator-progress-bar/busy-indicator-progress-bar.component';
+import { LoginDialogComponent } from '../login/login-dialog.component';
+import { NavComponent } from '../nav/nav.component';
+import { NewAnmelderComponent } from '../new-anmelder/new-anmelder.component';
+import { NewVereinComponent } from '../new-verein/new-verein.component';
 
 /** @title Main Component */
 @Component({
-  selector: "app-anmelde-tool",
-  templateUrl: "app.component.html",
-  styleUrls: ["app.component.css"],
+  selector: 'lxt-anmelde-tool',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
+  standalone: true,
+  imports: [BusyIndicatorProgressBarComponent, NavComponent],
 })
-export class AnmeldeToolComponent
-  extends SubscriptionHelper
-  implements OnInit, AfterViewInit, AfterContentChecked
-{
+export class AnmeldeToolComponent extends SubscriptionHelper implements OnInit, AfterViewInit, AfterContentChecked {
   localeTextDE = {
-    contains: "Beinhaltet",
+    contains: 'Beinhaltet',
   };
   private showPage = 0;
   dialogOpen = false;
   appBlocked = false;
-  _authenticated: boolean;
-  anlass: IAnlass;
+  _authenticated = false;
+  anlass: IAnlass | undefined;
 
   fillerNav = Array.from({ length: 10 }, (_, i) => `Nav Item ${i + 1}`);
 
   constructor(
     private authService: AuthService,
-    // public vereinService: CachingVereinService,
-    // private anlassService: CachingAnlassService,
-    // private router: ActivatedRoute,
     private store: Store<AppState>,
 
-    public dialog: MatDialog
+    public dialog: MatDialog,
   ) {
     super();
     this.registerSubscription(
@@ -61,20 +52,16 @@ export class AnmeldeToolComponent
           this.dialogOpen = true;
           this.openLoginDialog();
         }
-      })
+      }),
     );
   }
 
   ngOnInit(): void {}
 
   ngAfterContentChecked(): void {
-    if (
-      !this.appBlocked &&
-      !this.authService.isAuthenticated() &&
-      this._authenticated
-    ) {
+    if (!this.appBlocked && !this.authService.isAuthenticated() && this._authenticated) {
       this._authenticated = false;
-      console.log("AnmeldeToolComponent::ngAfterContentChecked");
+      console.log('AnmeldeToolComponent::ngAfterContentChecked');
       this.openLoginDialog();
     }
   }
@@ -99,20 +86,20 @@ export class AnmeldeToolComponent
       .subscribe((anlass) => (this.anlass = anlass));
   }*/
 
-  openLoginDialog() {
+  openLoginDialog(): void {
     // this.dialogOpen = true;
 
     // console.log("Dialog open");
 
-    let dialogRef = this.dialog.open(LoginDialogComponent, {
-      height: "500px",
-      width: "500px",
+    const dialogRef = this.dialog.open(LoginDialogComponent, {
+      height: '500px',
+      width: '500px',
       disableClose: true,
       autoFocus: true,
     });
     dialogRef.afterClosed().subscribe((result) => {
       // console.log("Dialog Closed", result);
-      if (result === "OK") {
+      if (result === 'OK') {
         this.dialogOpen = false;
         this._authenticated = true;
       }
@@ -124,29 +111,29 @@ export class AnmeldeToolComponent
       }
     });
   }
-  openNewVereinDialog() {
-    let dialogRef1 = this.dialog.open(NewVereinComponent, {
-      height: "900px",
-      width: "500px",
+  openNewVereinDialog(): void {
+    const dialogRef1 = this.dialog.open(NewVereinComponent, {
+      height: '900px',
+      width: '500px',
       disableClose: true,
     });
     dialogRef1.afterClosed().subscribe((result) => {
-      console.log("Dialog 1 Closed", result);
-      if (result !== "OK") {
+      console.log('Dialog 1 Closed', result);
+      if (result !== 'OK') {
         this.openLoginDialog();
       } else {
         this.dialogOpen = false;
       }
     });
   }
-  openNewAnmelderDialog() {
-    let dialogRef2 = this.dialog.open(NewAnmelderComponent, {
-      height: "770px",
-      width: "500px",
+  openNewAnmelderDialog(): void {
+    const dialogRef2 = this.dialog.open(NewAnmelderComponent, {
+      height: '770px',
+      width: '500px',
       disableClose: true,
     });
     dialogRef2.afterClosed().subscribe((result) => {
-      console.log("Dialog 2 Closed", result);
+      console.log('Dialog 2 Closed', result);
       this.openLoginDialog();
     });
   }
@@ -155,12 +142,12 @@ export class AnmeldeToolComponent
     return this.vereinService.isVereineLoaded();
   }*/
 
-  get authenticated() {
+  get authenticated(): boolean {
     // console.log('ngOnInit 2: ');
     return this.authService.isAuthenticated();
   }
   onShowPage(showPage: number): void {
-    console.log("On ShowPage", showPage);
+    console.log('On ShowPage', showPage);
     this.showPage = showPage;
   }
 
@@ -175,9 +162,9 @@ export class AnmeldeToolComponent
   }
   getOverlayContentClass(): string {
     if (this.authenticated) {
-      return "";
+      return '';
     } else {
-      return "overlay-content-login";
+      return 'overlay-content-login';
     }
   }
 }

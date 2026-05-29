@@ -1,17 +1,15 @@
-import { Injectable } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
-import { CanDeactivate } from "@angular/router";
-import { Observable, of, Subject } from "rxjs";
-import { map } from "rxjs/operators";
-import { ProfileComponent } from "../profile.component";
-import { HasChangesComponent } from "./has-changes.component";
+import { Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { CanDeactivate } from '@angular/router';
+import { Observable, of, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { ProfileComponent } from '../profile.component';
+import { HasChangesComponent } from './has-changes.component';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
-export class CanDeactivateProfileGuard
-  implements CanDeactivate<ProfileComponent>
-{
+export class CanDeactivateProfileGuard implements CanDeactivate<ProfileComponent> {
   dialogResult: Subject<string>;
   constructor(public dialog: MatDialog) {
     this.dialogResult = new Subject();
@@ -22,12 +20,12 @@ export class CanDeactivateProfileGuard
       return this.openDialog().pipe(
         map((result) => {
           console.log(result);
-          if (result === "Cancel") {
+          if (result === 'Cancel') {
             return true;
           } else {
             return false;
           }
-        })
+        }),
       );
     }
     return of(true);

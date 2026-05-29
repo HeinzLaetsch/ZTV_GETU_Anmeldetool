@@ -1,7 +1,4 @@
-<div
-  class="container"
-  *ngIf="(anlass$ | async) && (anlassSummary$ | async); else loading"
->
+<div class="container" *ngIf="(anlass$ | async) && (anlassSummary$ | async); else loading">
   <div class="row">
     <div class="col-7">
       <h2>{{ anlass.getCleaned() }}</h2>
@@ -10,17 +7,13 @@
       <h2>{{ anlass.tiTu }}</h2>
     </div>
     <div class="col-sm-2">
-      <div [routerLink]="['anmeldung']" class="well hoverwell button">
-        Anmeldungs Übersicht
-      </div>
+      <div [routerLink]="['anmeldung']" class="well hoverwell button">Anmeldungs Übersicht</div>
     </div>
     <div class="col-sm-2">
-      <div [routerLink]="['startliste']" class="well hoverwell button">
-        Startliste
-      </div>
+      <div [routerLink]="['startliste']" class="well hoverwell button">Startliste</div>
     </div>
   </div>
-  <app-anlass-detail [anlass]="anlass"></app-anlass-detail>
+  <lxt-anlass-detail [anlass]="anlass"></lxt-anlass-detail>
   <!--  neu app-anlass-detail
   <div class="row">
     <div class="col-sm-3">
@@ -52,11 +45,11 @@
   -->
 
   <hr />
-  <app-anlass-statistik
+  <lxt-anlass-statistik
     [anlass]="anlass"
     [anlassSummary]="anlassSummary"
     (startetChanged)="startetChanged($event)"
-  ></app-anlass-statistik>
+  ></lxt-anlass-statistik>
   <!-- neu Anlass Statistik
   <div class="row">
     <div class="col-12" *ngIf="orgAnlassLink">
@@ -176,11 +169,11 @@
   </div>
 -->
 
-  <app-wertungsrichter-selektion
+  <lxt-wertungsrichter-selektion
     *ngIf="anlassSummary.startet"
     [anlass]="anlass"
     [changeAllowed]="isChangeAllowed()"
-  ></app-wertungsrichter-selektion>
+  ></lxt-wertungsrichter-selektion>
 
   <!-- neu Wertungsrichter Selektion
   <div class="row">
@@ -247,13 +240,13 @@
                   cdkDropListOrientation="vertical"
                   (cdkDropListDropped)="drop($event, '1')"
                 >
-                  <app-wertungsrichter-chip
+                  <lxt-wertungsrichter-chip
                     *ngFor="let wr of availableWertungsrichter1"
                     [isAllWertungsrichterList]="true"
                     [wertungsrichterUser]="wr"
                     [anlass]="anlass"
                     [useBrevet2]="false"
-                  ></app-wertungsrichter-chip>
+                  ></lxt-wertungsrichter-chip>
                 </div>
               </div>
               <div class="col">
@@ -268,7 +261,7 @@
                   class="drag-drop-list col"
                   (cdkDropListDropped)="drop($event, '2')"
                 >
-                  <app-wertungsrichter-chip
+                  <lxt-wertungsrichter-chip
                     *ngFor="let wr of assignedWr1s"
                     [isAllWertungsrichterList]="false"
                     [wertungsrichterUser]="wr"
@@ -277,7 +270,7 @@
                     (wertungsrichterUserChange)="
                       wertungsrichterUserChange($event)
                     "
-                  ></app-wertungsrichter-chip>
+                  ></lxt-wertungsrichter-chip>
                 </div>
               </div>
             </div>
@@ -329,13 +322,13 @@
                   isStartedCheckboxDisabled() || !isBrevet2Anlass()
                 "
               >
-                <app-wertungsrichter-chip
+                <lxt-wertungsrichter-chip
                   *ngFor="let wr of availableWertungsrichter2"
                   [isAllWertungsrichterList]="true"
                   [wertungsrichterUser]="wr"
                   [anlass]="anlass"
                 >
-                </app-wertungsrichter-chip>
+                </lxt-wertungsrichter-chip>
               </div>
             </div>
             <div class="col">
@@ -350,7 +343,7 @@
                   isStartedCheckboxDisabled() || !isBrevet2Anlass()
                 "
               >
-                <app-wertungsrichter-chip
+                <lxt-wertungsrichter-chip
                   *ngFor="let wr of assignedWr2s"
                   [isAllWertungsrichterList]="false"
                   [wertungsrichterUser]="wr"
@@ -359,7 +352,7 @@
                     wertungsrichterUserChange($event)
                   "
                 >
-                </app-wertungsrichter-chip>
+                </lxt-wertungsrichter-chip>
               </div>
             </div>
           </div>
@@ -375,12 +368,12 @@
     </div>
   </div>
 -->
-  <app-events-dates
+  <lxt-events-dates
     [anlass]="anlass"
     [anlassSummary]="anlassSummary"
     [viewOnly]="isViewOnly()"
     (verlaengertChanged)="verlaengertChanged($event)"
-  ></app-events-dates>
+  ></lxt-events-dates>
 </div>
 
 <ng-template #loading>

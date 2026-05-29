@@ -20,16 +20,11 @@
         <span *ngIf="anlass.startDatum !== anlass.endDatum">von</span>:
       </div>
       <div class="col-sm-2 text-bold">
-        {{ anlass.startDatum | date : "EEE, d MMMM , y" : "GMT+1" : "DE-CH" }}
+        {{ anlass.startDatum | date: 'EEE, d MMMM , y' : 'GMT+1' : 'DE-CH' }}
       </div>
-      <div class="col-sm-2" *ngIf="anlass.startDatum !== anlass.endDatum">
-        bis:
-      </div>
-      <div
-        class="col-sm text-bold"
-        *ngIf="anlass.startDatum !== anlass.endDatum"
-      >
-        {{ anlass.endDatum | date : "EEE, d MMMM , y" : "GMT+1" : "DE-CH" }}
+      <div class="col-sm-2" *ngIf="anlass.startDatum !== anlass.endDatum">bis:</div>
+      <div class="col-sm text-bold" *ngIf="anlass.startDatum !== anlass.endDatum">
+        {{ anlass.endDatum | date: 'EEE, d MMMM , y' : 'GMT+1' : 'DE-CH' }}
         >
       </div>
     </div>
@@ -174,9 +169,7 @@
       <div class="col-sm-3 total"><h3>Termin Anmeldung und Zahlung:</h3></div>
       <div class="col-sm total">
         <h3>
-          {{
-            anlass.erfassenGeschlossen | date : "d. MMMM y" : "GMT+1" : "DE-CH"
-          }}
+          {{ anlass.erfassenGeschlossen | date: 'd. MMMM y' : 'GMT+1' : 'DE-CH' }}
         </h3>
       </div>
     </div>
@@ -205,12 +198,8 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-7"></div>
-      <div class="col-sm-2 well hoverwell button" (click)="print()">
-        Ausdrucken
-      </div>
-      <div class="col-sm-2 well hoverwell button" (click)="printWRs()">
-        Wertungsrichter Einsätze
-      </div>
+      <div class="col-sm-2 well hoverwell button" (click)="print()">Ausdrucken</div>
+      <div class="col-sm-2 well hoverwell button" (click)="printWRs()">Wertungsrichter Einsätze</div>
     </div>
   </div>
 </div>

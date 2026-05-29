@@ -1,12 +1,9 @@
-import { Component } from "@angular/core";
-import { NgIf } from "@angular/common";
-import { ICellRendererParams } from "ag-grid-community";
-import { ICellRendererAngularComp } from "ag-grid-angular";
-import {
-  KategorieEnum,
-  KategorieEnumFunction,
-} from "src/app/core/model/KategorieEnum";
-import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
+import { Component } from '@angular/core';
+import { NgIf } from '@angular/common';
+import { ICellRendererParams } from 'ag-grid-community';
+import { ICellRendererAngularComp } from 'ag-grid-angular';
+import { KategorieEnum, KategorieEnumFunction } from 'src/app/core/model/KategorieEnum';
+import { MeldeStatusEnum } from 'src/app/core/model/MeldeStatusEnum';
 
 @Component({
   standalone: true,
@@ -18,12 +15,8 @@ import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
       </span>
     </div>
     <div class="teilnahme-status-status">
-      <span *ngIf="showStatus(params.value)"
-        >{{ params.value.meldeStatus }}
-      </span>
-      <span *ngIf="!showStatus(params.value)"
-        >{{ params.value.meldeStatus }}
-      </span>
+      <span *ngIf="showStatus(params.value)">{{ params.value.meldeStatus }} </span>
+      <span *ngIf="!showStatus(params.value)">{{ params.value.meldeStatus }} </span>
     </div>
   </div>`,
   styles: [
@@ -49,7 +42,7 @@ import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
   ],
 })
 export class TeilnahmeStatusRenderer implements ICellRendererAngularComp {
-  public params!: ICellRendererParams;
+  params!: ICellRendererParams;
 
   agInit(params: ICellRendererParams): void {
     this.params = params;
@@ -62,14 +55,8 @@ export class TeilnahmeStatusRenderer implements ICellRendererAngularComp {
 
   showKategorie(value: any) {
     if (value) {
-      let keinStart = KategorieEnum.KEIN_START;
-      if (
-        !KategorieEnumFunction.equals(
-          KategorieEnum.KEIN_START,
-          value.kategorie
-        ) &&
-        keinStart !== value.kategorie
-      ) {
+      const keinStart = KategorieEnum.KEIN_START;
+      if (!KategorieEnumFunction.equals(KategorieEnum.KEIN_START, value.kategorie) && keinStart !== value.kategorie) {
         return true;
       }
     }
@@ -78,14 +65,10 @@ export class TeilnahmeStatusRenderer implements ICellRendererAngularComp {
 
   showStatus(value: any): boolean {
     if (value && value.meldeStatus) {
-      if (
-        value.meldeStatus.toUpperCase() === MeldeStatusEnum.ABGEMELDET
-      ) {
+      if (value.meldeStatus.toUpperCase() === MeldeStatusEnum.ABGEMELDET) {
         return true;
       }
-      if (
-        value.meldeStatus.toUpperCase() === "ABGEMELDET"
-      ) {
+      if (value.meldeStatus.toUpperCase() === 'ABGEMELDET') {
         return true;
       }
     }
@@ -94,9 +77,9 @@ export class TeilnahmeStatusRenderer implements ICellRendererAngularComp {
 
   getClass() {
     if (this.params.column.isCellEditable(this.params.node)) {
-      return "teilnahme-status";
+      return 'teilnahme-status';
     } else {
-      return "teilnahme-status-disabled";
+      return 'teilnahme-status-disabled';
     }
   }
 }

@@ -12,24 +12,19 @@
         <span
           [ngClass]="{
             'h2-green': wertungsrichter.gueltig,
-            'h2-red': !wertungsrichter.gueltig
+            'h2-red': !wertungsrichter.gueltig,
           }"
-          >{{
-            wertungsrichterUser.vorname + " " + wertungsrichterUser.name
-          }}</span
+          >{{ wertungsrichterUser.vorname + ' ' + wertungsrichterUser.name }}</span
         >
       </div>
       <div class="col-2">Brevet {{ wertungsrichter.brevet }}</div>
     </div>
-    <div
-      class="row"
-      *ngIf="!isAllWertungsrichterList && wertungsrichterUser.pal"
-    >
+    <div class="row" *ngIf="!isAllWertungsrichterList && wertungsrichterUser.pal">
       <div class="col">Einsätze</div>
     </div>
     <div class="row" *ngIf="!isAllWertungsrichterList">
       <div class="col doubleRow">
-        <app-wertungsrichter-slot
+        <lxt-wertungsrichter-slot
           *ngFor="let slot of getSlotsForBrevet()"
           [slot]="slot"
           [wrAnlassLink]="wrAnlassLink"
@@ -39,12 +34,8 @@
           (wrEinsatzChange)="wrEinsatzChange($event)"
           [egalIsAktiv]="egalIsAktiv(slot)"
         >
-        </app-wertungsrichter-slot>
-        <mat-form-field
-          *ngIf="wertungsrichterUser.pal"
-          class="full-width"
-          appearance="fill"
-        >
+        </lxt-wertungsrichter-slot>
+        <mat-form-field *ngIf="wertungsrichterUser.pal" class="full-width" appearance="fill">
           <mat-label>Kommentar</mat-label>
           <input
             matInput

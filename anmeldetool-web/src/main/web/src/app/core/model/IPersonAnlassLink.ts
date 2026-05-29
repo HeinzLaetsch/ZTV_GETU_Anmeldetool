@@ -1,6 +1,6 @@
-import { IWertungsrichterEinsatz } from "./IWertungsrichterEinsatz";
+import { IWertungsrichterEinsatz } from './IWertungsrichterEinsatz';
 
-export interface IPersonAnlassLink {
+export type IPersonAnlassLink = {
   id: string;
   anlassId?: string;
   personId?: string;

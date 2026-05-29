@@ -1,41 +1,21 @@
 export enum TiTuEnum {
-  Ti = "Turnerin",
-  Tu = "Turner",
-  Alle = "Gemeinsamer Anlass",
+  Ti = 'Turnerin',
+  Tu = 'Turner',
+  Alle = 'Gemeinsamer Anlass',
 }
 
-export namespace TiTuEnum {
-  export function toString(tiTu: TiTuEnum): string {
-    return TiTuEnum[tiTu];
+export const TiTuValues = Object.values(TiTuEnum);
+
+export const parseTiTuEnum = (value?: string): TiTuEnum | undefined => {
+  if (!value) {
+    return undefined;
   }
 
-  export function values(): any[] {
-    return Object.values(TiTuEnum);
+  if (value in TiTuEnum) {
+    return TiTuEnum[value as keyof typeof TiTuEnum];
   }
 
-  export function keys(): any[] {
-    return Object.keys(TiTuEnum);
-  }
+  return TiTuValues.find((tiTu) => tiTu === value);
+};
 
-  export function parse(tiTu: string): TiTuEnum {
-    return TiTuEnum[tiTu];
-  }
-
-  export function equals(tiTu1: TiTuEnum, tiTu2: TiTuEnum): boolean {
-    let tiTu1String = TiTuEnum[tiTu1];
-    if (tiTu1String === undefined) {
-      tiTu1String = tiTu1;
-    }
-    let tiTu2String = TiTuEnum[tiTu2];
-    if (tiTu2String === undefined) {
-      tiTu2String = tiTu2;
-    }
-    return tiTu1String === tiTu2String;
-  }
-}
-export function getTiTuEnum(value: string): TiTuEnum | undefined {
-  const entry = Object.entries(TiTuEnum).find(([key, val]) => val === value);
-  return entry
-    ? (TiTuEnum[entry[0] as keyof typeof TiTuEnum] as TiTuEnum)
-    : undefined;
-}
+export const isTiTuEnumEqual = (a?: string, b?: string): boolean => parseTiTuEnum(a) === parseTiTuEnum(b);

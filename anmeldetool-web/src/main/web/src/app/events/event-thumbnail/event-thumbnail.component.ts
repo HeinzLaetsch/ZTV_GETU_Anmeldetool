@@ -1,29 +1,22 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { Router } from "@angular/router";
-import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
-import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { IAnlassExtended } from "src/app/core/model/IAnlassExtended";
-import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
-import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
-import { selectAktiveAnlaesse } from "src/app/core/redux/anlass";
-import { AppState } from "src/app/core/redux/core.state";
-import { selectVereinById } from "src/app/core/redux/verein";
-import { AnlassService } from "src/app/core/service/anlass/anlass.service";
-import { AuthService } from "src/app/core/service/auth/auth.service";
-import { SubscriptionHelper } from "src/app/utils/subscription-helper";
-import { IVerein } from "src/app/verein/verein";
+import { Component, EventEmitter, Input, type OnInit, Output } from '@angular/core';
+import { Router } from '@angular/router';
+import { select, Store } from '@ngrx/store';
+import type { AnzeigeStatusEnum } from 'src/app/core/model/AnzeigeStatusEnum';
+import type { IAnlassExtended } from 'src/app/core/model/IAnlassExtended';
+import type { IOrganisationAnlassLink } from 'src/app/core/model/IOrganisationAnlassLink';
+import type { AppState } from 'src/app/core/redux/core.state';
+import { selectVereinById } from 'src/app/core/redux/verein';
+import { AnlassService } from 'src/app/core/service/anlass/anlass.service';
+import { AuthService } from 'src/app/core/service/auth/auth.service';
+import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
+import type { IVerein } from 'src/app/verein/verein';
 
 @Component({
-  selector: "app-event-thumbnail",
-  templateUrl: "./event-thumbnail.component.html",
-  styleUrls: ["./event-thumbnail.component.css"],
+  selector: 'lxt-event-thumbnail',
+  templateUrl: './event-thumbnail.component.html',
+  styleUrls: ['./event-thumbnail.component.css'],
 })
-export class EventThumbnailComponent
-  extends SubscriptionHelper
-  implements OnInit
-{
+export class EventThumbnailComponent extends SubscriptionHelper implements OnInit {
   @Input() anlassExtended: IAnlassExtended;
 
   @Output() anlassClick = new EventEmitter();
@@ -35,32 +28,28 @@ export class EventThumbnailComponent
     private store: Store<AppState>,
     private router: Router,
 
-    private anlassService: AnlassService
+    private anlassService: AnlassService,
   ) {
     super();
   }
 
   ngOnInit() {
     this.registerSubscription(
-      this.store
-        .pipe(
-          select(selectVereinById(this.anlassExtended.anlass.organisatorId))
-        )
-        .subscribe((result) => {
-          this.organisator = result;
-        })
+      this.store.pipe(select(selectVereinById(this.anlassExtended.anlass.organisatorId))).subscribe((result) => {
+        this.organisator = result;
+      }),
     );
   }
 
   isEnabled(): boolean {
-    return this.authService.currentVerein.name != "ZTV";
+    return this.authService.currentVerein.name != 'ZTV';
   }
 
   getClassForAnzeigeStatus(anzeigeStatus: AnzeigeStatusEnum): string {
     if (this.anlassExtended.anlass.anzeigeStatus.hasStatus(anzeigeStatus)) {
-      return "div-red";
+      return 'div-red';
     }
-    return "div-green";
+    return 'div-green';
   }
 
   getStartedClass() {
@@ -72,11 +61,7 @@ export class EventThumbnailComponent
   }
 
   get hasTeilnehmer(): boolean {
-    return (
-      this.anlassExtended.summary.startendeBr1 +
-        this.anlassExtended.summary.startendeBr2 >
-      0
-    );
+    return this.anlassExtended.summary.startendeBr1 + this.anlassExtended.summary.startendeBr2 > 0;
   }
 
   getTeilnehmerClass() {
@@ -96,7 +81,7 @@ export class EventThumbnailComponent
   }
   handleClickMe(event: MouseEvent) {
     // this.anlassClick.emit(this.anlass.anlassBezeichnung);
-    this.router.navigate(["/anlaesse/", this.anlassExtended.anlass?.id]);
+    this.router.navigate(['/anlaesse/', this.anlassExtended.anlass?.id]);
   }
 
   vereinStartedClicked(event: MouseEvent) {
@@ -110,19 +95,15 @@ export class EventThumbnailComponent
     };
     // Sollte ersetzt werden
     this.registerSubscription(
-      this.anlassService
-        .updateVereinsStart(organisationAnlassLink)
-        .subscribe((result) => {
-          console.log("Clicked: ", result);
-        })
+      this.anlassService.updateVereinsStart(organisationAnlassLink).subscribe((result) => {
+        console.log('Clicked: ', result);
+      }),
     );
   }
 
   get isWertungsrichterOk(): boolean {
     if (this.hasTeilnehmer) {
-      return (
-        this.anlassExtended.summary.br1Ok && this.anlassExtended.summary.br2Ok
-      );
+      return this.anlassExtended.summary.br1Ok && this.anlassExtended.summary.br2Ok;
     }
     return true;
   }

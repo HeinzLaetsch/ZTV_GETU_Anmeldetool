@@ -1,0 +1,94 @@
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -moz-transform: translateX(-50%) translateY(-50%);
+  -webkit-transform: translateX(-50%) translateY(-50%);
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -moz-transform: translateX(-50%) translateY(-50%);
+  -webkit-transform: translateX(-50%) translateY(-50%);
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.overlay {
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  z-index: 2;
+  left: 0;
+  top: 0;
+  background-color: rgba(139, 139, 139, 0.5);
+  overflow-x: hidden;
+  transition: 0.5s;
+}
+
+.overlay-content-login {
+  width: 300px;
+  height: 400px;
+  position: fixed;
+  top: 50vh;
+  left: 50vw;
+  margin-top: -200px;
+  margin-left: -150px;
+  background-color: rgba(250, 250, 250);
+  z-index: 1;
+}
+
+.overlay-content-newverein {
+  width: 500px;
+  height: 860px;
+  position: fixed;
+  top: 50vh;
+  left: 50vw;
+  margin-top: -430px;
+  margin-left: -250px;
+  background-color: rgba(50, 250, 250);
+  z-index: 1;
+}
+
+.overlay-content-newanmelder {
+  width: 500px;
+  height: 740px;
+  position: fixed;
+  top: 50vh;
+  left: 50vw;
+  margin-top: -370px;
+  margin-left: -250px;
+  background-color: rgba(250, 50, 250);
+  z-index: 1;
+}
+
+.example-container {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.example-is-mobile {
+  .example-toolbar {
+    position: fixed;
+    z-index: 2;
+  }
+
+  .example-sidenav-container {
+    flex: 1 0 auto;
+  }
+}
+
+.example-sidenav-container {
+  flex: 1;
+}
+
+h1.example-app-name {
+  margin-left: 8px;
+}

@@ -1,19 +1,23 @@
-import { HttpEventType } from "@angular/common/http";
-import { Component, Inject } from "@angular/core";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { Subject, Subscription } from "rxjs";
-import { takeUntil } from "rxjs/operators";
-import { TiTuEnum } from "src/app/core/model/TiTuEnum";
-import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
+import { HttpEventType } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { Component, Inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { Subject, type Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { CachingAnlassService } from 'src/app/core/service/caching-services/caching.anlass.service';
 
 @Component({
-  selector: "app-upload",
-  templateUrl: "./upload.component.html",
-  styleUrls: ["./upload.component.css"],
+  selector: 'lxt-upload',
+  templateUrl: './upload.component.html',
+  styleUrls: ['./upload.component.css'],
+  standalone: true,
+  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
 })
 export class Upload {
   private _destroy$ = new Subject<void>();
-  fileName = "";
+  fileName = '';
   uploading: false;
   type: string;
   upLoadError: string;
@@ -24,7 +28,7 @@ export class Upload {
   constructor(
     private dialogRef: MatDialogRef<Upload>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private anlassService: CachingAnlassService
+    private anlassService: CachingAnlassService,
   ) {}
 
   onFileSelected(event) {
@@ -35,36 +39,33 @@ export class Upload {
 
       const formData = new FormData();
 
-      formData.append("teilnehmer", file);
+      formData.append('teilnehmer', file);
       // const alle = this.anlassService.getAnlaesse(TiTuEnum.Alle);
       this.anlassService
         .importTeilnehmerForAnlassCsv(this.data, formData)
         .pipe(takeUntil(this._destroy$))
         .subscribe(
           (event) => {
-            console.log("Resultat: ", event);
+            console.log('Resultat: ', event);
             if (event?.type === HttpEventType.UploadProgress) {
-              this.uploadProgress = Math.round(
-                100 * (event.loaded / event.total)
-              );
+              this.uploadProgress = Math.round(100 * (event.loaded / event.total));
             } else {
               this.uploading = false;
-              this.type = "success";
+              this.type = 'success';
               this.dialogRef.close();
             }
             // this.updateActiveBkpLoad();
           },
-          // tslint:disable-next-line:no-any
           (error: any) => {
-            console.error("error during file upload: ", error);
+            console.error('error during file upload: ', error);
             this.uploading = false;
             this.upLoadError = error.error;
-            this.type = "error";
-          }
+            this.type = 'error';
+          },
         );
     }
   }
-  public ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this._destroy$.next();
   }
 }

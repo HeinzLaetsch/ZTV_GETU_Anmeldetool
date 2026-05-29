@@ -1,26 +1,13 @@
-import { Injectable } from "@angular/core";
-import { Observable, of } from "rxjs";
+import { Injectable } from '@angular/core';
+import { type Observable, of } from 'rxjs';
 
 @Injectable()
 export abstract class ServiceHelper {
-  handleError(
-    operation = "operation",
-    error: any,
-    result?: any,
-    emptyObject?: any
-  ) {
-    if (error.status === 404) {
-      return of(emptyObject);
+  handleError<T>(operation = 'operation', error: unknown, result?: T | Observable<T>, emptyObject?: T): Observable<T> {
+    if (error instanceof Error && 'status' in error && (error as { status: number }).status === 404) {
+      return of(emptyObject as T);
     }
-    console.error(
-      "Error in: ",
-      operation,
-      ", message: ",
-      error,
-      ", result: ",
-      result
-    );
+    console.error('Error in: ', operation, ', message: ', error, ', result: ', result);
     throw error;
-    //};
   }
 }

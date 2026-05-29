@@ -1,10 +1,10 @@
-import { Injectable } from "@angular/core";
-import { Observable, Subject } from "rxjs";
-import { IVerein } from "src/app/verein/verein";
-import { VereinService } from "../verein/verein.service";
+import { Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { IVerein } from 'src/app/verein/verein';
+import { VereinService } from '../verein/verein.service';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class CachingVereinService {
   private vereineLoaded: Subject<boolean>;
@@ -34,47 +34,47 @@ export class CachingVereinService {
   loadVereine(): Observable<boolean> {
     if (!this._loadRunning && !this.loaded) {
       this._loadRunning = true;
-      console.log("Vereine not Loaded");
+      console.log('Vereine not Loaded');
       try {
         this.vereinService.getVereine().subscribe((vereine) => {
           this.vereine = vereine;
           this.vereine.sort((a, b) => {
             let strippedA = a.name.toUpperCase();
             let strippedB = b.name.toUpperCase();
-            if (strippedA === "ZTV") {
+            if (strippedA === 'ZTV') {
               return 1;
             }
-            if (strippedB === "ZTV") {
+            if (strippedB === 'ZTV') {
               return -1;
             }
-            strippedA = this.strip(strippedA, "GR ");
-            strippedB = this.strip(strippedB, "GR ");
-            strippedA = this.strip(strippedA, "GETU ");
-            strippedB = this.strip(strippedB, "GETU ");
-            strippedA = this.strip(strippedA, "DTV ");
-            strippedB = this.strip(strippedB, "DTV ");
-            strippedA = this.strip(strippedA, "STU ");
-            strippedB = this.strip(strippedB, "STU ");
-            strippedA = this.strip(strippedA, "TG ");
-            strippedB = this.strip(strippedB, "TG ");
-            strippedA = this.strip(strippedA, "TV ");
-            strippedB = this.strip(strippedB, "TV ");
-            strippedA = this.strip(strippedA, "TSV ");
-            strippedB = this.strip(strippedB, "TSV ");
-            strippedA = this.strip(strippedA, "GERÄTERIEGE JUGI ");
-            strippedB = this.strip(strippedB, "GERÄTERIEGE JUGI ");
-            strippedA = this.strip(strippedA, "GERÄTERIEGE ");
-            strippedB = this.strip(strippedB, "GERÄTERIEGE ");
-            strippedA = this.strip(strippedA, "TURNVEREIN ");
-            strippedB = this.strip(strippedB, "TURNVEREIN ");
-            strippedA = this.strip(strippedA, "TURNSPORT ");
-            strippedB = this.strip(strippedB, "TURNSPORT ");
-            strippedA = this.strip(strippedA, "GERÄTETURNEN ");
-            strippedB = this.strip(strippedB, "GERÄTETURNEN ");
-            strippedA = this.strip(strippedA, "SATUS ");
-            strippedB = this.strip(strippedB, "SATUS ");
-            strippedA = this.strip(strippedA, "NEUE SEKTION ");
-            strippedB = this.strip(strippedB, "NEUE SEKTION ");
+            strippedA = this.strip(strippedA, 'GR ');
+            strippedB = this.strip(strippedB, 'GR ');
+            strippedA = this.strip(strippedA, 'GETU ');
+            strippedB = this.strip(strippedB, 'GETU ');
+            strippedA = this.strip(strippedA, 'DTV ');
+            strippedB = this.strip(strippedB, 'DTV ');
+            strippedA = this.strip(strippedA, 'STU ');
+            strippedB = this.strip(strippedB, 'STU ');
+            strippedA = this.strip(strippedA, 'TG ');
+            strippedB = this.strip(strippedB, 'TG ');
+            strippedA = this.strip(strippedA, 'TV ');
+            strippedB = this.strip(strippedB, 'TV ');
+            strippedA = this.strip(strippedA, 'TSV ');
+            strippedB = this.strip(strippedB, 'TSV ');
+            strippedA = this.strip(strippedA, 'GERÄTERIEGE JUGI ');
+            strippedB = this.strip(strippedB, 'GERÄTERIEGE JUGI ');
+            strippedA = this.strip(strippedA, 'GERÄTERIEGE ');
+            strippedB = this.strip(strippedB, 'GERÄTERIEGE ');
+            strippedA = this.strip(strippedA, 'TURNVEREIN ');
+            strippedB = this.strip(strippedB, 'TURNVEREIN ');
+            strippedA = this.strip(strippedA, 'TURNSPORT ');
+            strippedB = this.strip(strippedB, 'TURNSPORT ');
+            strippedA = this.strip(strippedA, 'GERÄTETURNEN ');
+            strippedB = this.strip(strippedB, 'GERÄTETURNEN ');
+            strippedA = this.strip(strippedA, 'SATUS ');
+            strippedB = this.strip(strippedB, 'SATUS ');
+            strippedA = this.strip(strippedA, 'NEUE SEKTION ');
+            strippedB = this.strip(strippedB, 'NEUE SEKTION ');
 
             if (strippedA < strippedB) {
               return -1;
@@ -89,10 +89,10 @@ export class CachingVereinService {
           // this.vereineLoaded.next(true);
           // console.log("Vereine Loaded 2");
           this.vereineLoaded.complete();
-          console.log("Vereine Loaded");
+          console.log('Vereine Loaded');
         });
       } catch (error) {
-        console.log("Vereine Load error ", error);
+        console.log('Vereine Load error ', error);
       }
     } else {
       if (this.loaded) {

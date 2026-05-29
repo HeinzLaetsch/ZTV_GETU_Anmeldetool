@@ -1,16 +1,16 @@
-import { Injectable } from "@angular/core";
-import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { catchError, map, mergeMap, of, switchMap } from "rxjs";
-import { OalActions } from "./oal.actions";
-import { VereinService } from "../../service/verein/verein.service";
-import { AnlassService } from "../../service/anlass/anlass.service";
+import { Injectable } from '@angular/core';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { catchError, map, mergeMap, of, switchMap } from 'rxjs';
+import { OalActions } from './oal.actions';
+import { VereinService } from '../../service/verein/verein.service';
+import { AnlassService } from '../../service/anlass/anlass.service';
 
 @Injectable()
 export class OalEffects {
   constructor(
     private actions$: Actions,
     private vereinService: VereinService,
-    private anlassService: AnlassService
+    private anlassService: AnlassService,
   ) {}
 
   loadOal$ = createEffect(() => {
@@ -18,14 +18,12 @@ export class OalEffects {
       ofType(OalActions.loadAllOalInvoked),
       mergeMap((action) => {
         return this.vereinService.getStarts().pipe(
-          switchMap((oals) => [
-            OalActions.loadAllOalSuccess({ payload: oals }),
-          ]),
+          switchMap((oals) => [OalActions.loadAllOalSuccess({ payload: oals })]),
           catchError((error) => {
             return of(OalActions.loadAllOalError({ error: error }));
-          })
+          }),
         );
-      })
+      }),
     );
   });
 
@@ -41,9 +39,9 @@ export class OalEffects {
           }),
           catchError((error) => {
             return of(OalActions.updateVereinsStartError({ error: error }));
-          })
+          }),
         );
-      })
+      }),
     );
   });
 }

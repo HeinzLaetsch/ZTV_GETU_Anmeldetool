@@ -1,6 +1,6 @@
-import { Params } from "@angular/router";
+import { Params } from '@angular/router';
 
-export interface RouterStateUrl {
+export type RouterStateUrl = {
   url: string;
   params: Params;
   queryParams: Params;

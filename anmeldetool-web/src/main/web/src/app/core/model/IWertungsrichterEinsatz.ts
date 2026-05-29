@@ -1,4 +1,4 @@
-export interface IWertungsrichterEinsatz {
+export type IWertungsrichterEinsatz = {
   id: string;
   wertungsrichterSlotId: string;
   personAnlassLinkId: string;

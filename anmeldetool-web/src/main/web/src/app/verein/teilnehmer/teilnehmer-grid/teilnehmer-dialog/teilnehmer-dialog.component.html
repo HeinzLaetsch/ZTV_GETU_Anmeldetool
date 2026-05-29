@@ -9,41 +9,25 @@
   <div>
     <mat-form-field>
       <mat-label>Name</mat-label>
-      <input
-        matInput
-        [(ngModel)]="data.teilnehmer.name"
-        disabled="{{ data.disabled }}"
-      />
+      <input matInput [(ngModel)]="data.teilnehmer.name" disabled="{{ data.disabled }}" />
     </mat-form-field>
   </div>
   <div>
     <mat-form-field>
       <mat-label>Vorname</mat-label>
-      <input
-        matInput
-        [(ngModel)]="data.teilnehmer.vorname"
-        disabled="{{ data.disabled }}"
-      />
+      <input matInput [(ngModel)]="data.teilnehmer.vorname" disabled="{{ data.disabled }}" />
     </mat-form-field>
   </div>
   <div>
     <mat-form-field>
       <mat-label>Jahrgang</mat-label>
-      <input
-        matInput
-        [(ngModel)]="data.teilnehmer.jahrgang"
-        disabled="{{ data.disabled }}"
-      />
+      <input matInput [(ngModel)]="data.teilnehmer.jahrgang" disabled="{{ data.disabled }}" />
     </mat-form-field>
   </div>
   <div>
     <mat-form-field>
       <mat-label>Turnerin/Turner {{ data.teilnehmer.tiTu }}</mat-label>
-      <select
-        matNativeControl
-        [(ngModel)]="data.teilnehmer.tiTu"
-        disabled="{{ data.disabled }}"
-      >
+      <select matNativeControl [(ngModel)]="data.teilnehmer.tiTu" disabled="{{ data.disabled }}">
         <option value="Ti">Turnerin</option>
         <option value="Tu">Turner</option>
       </select>
@@ -52,11 +36,7 @@
   <div>
     <mat-form-field>
       <mat-label>STV Nummer</mat-label>
-      <input
-        matInput
-        [(ngModel)]="data.teilnehmer.stvNummer"
-        disabled="{{ data.disabled }}"
-      />
+      <input matInput [(ngModel)]="data.teilnehmer.stvNummer" disabled="{{ data.disabled }}" />
     </mat-form-field>
   </div>
 </div>

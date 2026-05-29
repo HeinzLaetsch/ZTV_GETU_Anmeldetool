@@ -1,7 +1,7 @@
-import { KategorieEnum } from "./KategorieEnum";
-import { TiTuEnum } from "./TiTuEnum";
+import { KategorieEnum } from './KategorieEnum';
+import { TiTuEnum } from './TiTuEnum';
 
-export interface IRanglistenConfiguration {
+export type IRanglistenConfiguration = {
   id: string;
   anlassId: string;
   kategorie: KategorieEnum;

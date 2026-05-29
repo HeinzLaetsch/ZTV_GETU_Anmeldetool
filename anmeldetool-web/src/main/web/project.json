@@ -1,14 +1,14 @@
 {
-  "$schema": "node_modules/nx/schemas/project-schema.json",
   "name": "at-app",
+  "$schema": "node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
+  "sourceRoot": "src",
+  "prefix": "app",
   "generators": {
     "@schematics/angular:component": {
       "style": "scss"
     }
   },
-  "sourceRoot": "src",
-  "prefix": "app",
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
@@ -27,7 +27,6 @@
         "styles": [
           "src/custom-theme.scss",
           "node_modules/bootstrap/dist/css/bootstrap.min.css",
-          "node_modules/ngx-toastr/toastr.css",
           "src/styles.scss"
         ],
         "scripts": [
@@ -124,19 +123,21 @@
     "serve": {
       "executor": "@angular-devkit/build-angular:dev-server",
       "options": {
-        "browserTarget": "at-app:build"
+        "buildTarget": "at-app:build:development"
       },
       "configurations": {
         "development": {
-          "browserTarget": "at-app:build:development"
+          "buildTarget": "at-app:build:development"
         },
         "production": {
-          "browserTarget": "at-app:build:production"
+          "buildTarget": "at-app:build:production"
         },
-          "halle": {
-          "browserTarget": "at-app:build:halle"
+        "halle": {
+          "buildTarget": "at-app:build:halle"
         }
-      }
+      },
+      "continuous": true,
+      "cache": false
     },
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",

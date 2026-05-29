@@ -1,5 +1,5 @@
-describe("Anmeldetool Login Page", () => {
-  it("loads Login Page", () => {
-    cy.visit("/");
+describe('Anmeldetool Login Page', () => {
+  it('loads Login Page', () => {
+    cy.visit('/');
   });
 });

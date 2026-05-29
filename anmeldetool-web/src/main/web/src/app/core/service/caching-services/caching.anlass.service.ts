@@ -1,32 +1,32 @@
-import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
-import { IVerein } from "src/app/verein/verein";
-import { AbteilungEnum } from "../../model/AbteilungEnum";
-import { AnlageEnum } from "../../model/AnlageEnum";
-import { GeraeteEnum } from "../../model/GeraeteEnum";
-import { IAnlass } from "../../model/IAnlass";
-import { IAnlassLink } from "../../model/IAnlassLink";
-import { IAnlassLinks } from "../../model/IAnlassLinks";
-import { IOrganisationAnlassLink } from "../../model/IOrganisationAnlassLink";
-import { IPersonAnlassLink } from "../../model/IPersonAnlassLink";
-import { ITeilnahmeStatistic } from "../../model/ITeilnahmeStatistic";
-import { ITeilnehmer } from "../../model/ITeilnehmer";
-import { ITeilnehmerStart } from "../../model/ITeilnehmerStart";
-import { IUser } from "../../model/IUser";
-import { IWertungsrichterEinsatz } from "../../model/IWertungsrichterEinsatz";
-import { KategorieEnum } from "../../model/KategorieEnum";
-import { MeldeStatusEnum } from "../../model/MeldeStatusEnum";
-import { TiTuEnum } from "../../model/TiTuEnum";
-import { AnlassService } from "../anlass/anlass.service";
-import { CachingVereinService } from "./caching.verein.service";
-import { AuthService } from "../auth/auth.service";
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { IVerein } from 'src/app/verein/verein';
+import { AbteilungEnum } from '../../model/AbteilungEnum';
+import { AnlageEnum } from '../../model/AnlageEnum';
+import { GeraeteEnum } from '../../model/GeraeteEnum';
+import { IAnlass } from '../../model/IAnlass';
+import { IAnlassLink } from '../../model/IAnlassLink';
+import { IAnlassLinks } from '../../model/IAnlassLinks';
+import { IOrganisationAnlassLink } from '../../model/IOrganisationAnlassLink';
+import { IPersonAnlassLink } from '../../model/IPersonAnlassLink';
+import { ITeilnahmeStatistic } from '../../model/ITeilnahmeStatistic';
+import { ITeilnehmer } from '../../model/ITeilnehmer';
+import { ITeilnehmerStart } from '../../model/ITeilnehmerStart';
+import { IUser } from '../../model/IUser';
+import { IWertungsrichterEinsatz } from '../../model/IWertungsrichterEinsatz';
+import { KategorieEnum } from '../../model/KategorieEnum';
+import { MeldeStatusEnum } from '../../model/MeldeStatusEnum';
+import { TiTuEnum } from '../../model/TiTuEnum';
+import { AnlassService } from '../anlass/anlass.service';
+import { CachingVereinService } from './caching.verein.service';
+import { AuthService } from '../auth/auth.service';
 
-export interface IHash {
+export type IHash = {
   [anlassId: string]: IAnlassLinks;
 }
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class CachingAnlassService {
   // private teilnahmenLoaded: BehaviorSubject<boolean>;
@@ -64,34 +64,14 @@ export class CachingAnlassService {
     return this.loadAnlaesse();
   }
 
-  getVerfuegbareWertungsrichter(
-    anlass: IAnlass,
-    verein: IVerein,
-    brevet: number,
-  ): Observable<IUser[]> {
-    return this.anlassService.getVerfuegbareWertungsrichter(
-      anlass,
-      verein,
-      brevet,
-    );
+  getVerfuegbareWertungsrichter(anlass: IAnlass, verein: IVerein, brevet: number): Observable<IUser[]> {
+    return this.anlassService.getVerfuegbareWertungsrichter(anlass, verein, brevet);
   }
-  getEingeteilteWertungsrichter(
-    anlass: IAnlass,
-    verein: IVerein,
-    brevet: number,
-  ): Observable<IPersonAnlassLink[]> {
-    return this.anlassService.getEingeteilteWertungsrichter(
-      anlass,
-      verein,
-      brevet,
-    );
+  getEingeteilteWertungsrichter(anlass: IAnlass, verein: IVerein, brevet: number): Observable<IPersonAnlassLink[]> {
+    return this.anlassService.getEingeteilteWertungsrichter(anlass, verein, brevet);
   }
 
-  getWrEinsatz(
-    anlass: IAnlass,
-    verein: IVerein,
-    user: IUser,
-  ): Observable<IPersonAnlassLink> {
+  getWrEinsatz(anlass: IAnlass, verein: IVerein, user: IUser): Observable<IPersonAnlassLink> {
     return this.anlassService.getWrEinsatz(anlass, verein, user);
   }
   updateWrEinsatz(
@@ -101,46 +81,25 @@ export class CachingAnlassService {
   ): Observable<IWertungsrichterEinsatz> {
     return this.anlassService.updateWrEinsatz(verein, anlassLink, einsatz);
   }
-  addWertungsrichterToAnlass(
-    anlass: IAnlass,
-    verein: IVerein,
-    user: IUser,
-  ): Observable<IPersonAnlassLink> {
+  addWertungsrichterToAnlass(anlass: IAnlass, verein: IVerein, user: IUser): Observable<IPersonAnlassLink> {
     return this.anlassService.addWertungsrichterToAnlass(anlass, verein, user);
   }
-  updateAnlassLink(
-    pal: IPersonAnlassLink,
-    verein: IVerein,
-  ): Observable<IPersonAnlassLink> {
+  updateAnlassLink(pal: IPersonAnlassLink, verein: IVerein): Observable<IPersonAnlassLink> {
     return this.anlassService.updateAnlassLink(pal, verein);
   }
 
-  deleteWertungsrichterFromAnlass(
-    anlass: IAnlass,
-    verein: IVerein,
-    user: IUser,
-  ): Observable<IPersonAnlassLink> {
-    return this.anlassService.deleteWertungsrichterFromAnlass(
-      anlass,
-      verein,
-      user,
-    );
+  deleteWertungsrichterFromAnlass(anlass: IAnlass, verein: IVerein, user: IUser): Observable<IPersonAnlassLink> {
+    return this.anlassService.deleteWertungsrichterFromAnlass(anlass, verein, user);
   }
   updateAnlass(anlass: IAnlass): Observable<IAnlass> {
     return this.anlassService.updateAnlass(anlass);
   }
 
-  getVereinStart(
-    anlass: IAnlass,
-    verein: IVerein,
-  ): Observable<IOrganisationAnlassLink> {
+  getVereinStart(anlass: IAnlass, verein: IVerein): Observable<IOrganisationAnlassLink> {
     return this.anlassService.getVereinStart(anlass, verein);
   }
 
-  getTeilnahmenForKategorie(
-    anlass: IAnlass,
-    katgorie: KategorieEnum,
-  ): IAnlassLink[] {
+  getTeilnahmenForKategorie(anlass: IAnlass, katgorie: KategorieEnum): IAnlassLink[] {
     const teilnahmen = this.getTeilnehmerForAnlass(anlass);
     const filteredLinks = teilnahmen.filter((link) => {
       return link.kategorie === katgorie;
@@ -156,21 +115,12 @@ export class CachingAnlassService {
     this.anlassService.getTeilnehmerForAnlassCsv(anlass, false);
   }
 
-  importTeilnehmerForAnlassCsv(
-    anlass: IAnlass,
-    formData: FormData,
-  ): Observable<any> {
+  importTeilnehmerForAnlassCsv(anlass: IAnlass, formData: FormData): Observable<any> {
     return this.anlassService.importTeilnehmerForAnlassCsv(anlass, formData);
   }
 
-  importContestTeilnehmerForAnlassCsv(
-    anlass: IAnlass,
-    formData: FormData,
-  ): Observable<any> {
-    return this.anlassService.importContestTeilnehmerForAnlassCsv(
-      anlass,
-      formData,
-    );
+  importContestTeilnehmerForAnlassCsv(anlass: IAnlass, formData: FormData): Observable<any> {
+    return this.anlassService.importContestTeilnehmerForAnlassCsv(anlass, formData);
   }
 
   getBenutzerForAnlassCsv(anlass: IAnlass): void {
@@ -193,14 +143,7 @@ export class CachingAnlassService {
     geraet: GeraeteEnum,
     search: string,
   ): Observable<ITeilnahmeStatistic> {
-    return this.anlassService.getTeilnahmeStatistic(
-      anlass,
-      kategorie,
-      abteilung,
-      anlage,
-      geraet,
-      search,
-    );
+    return this.anlassService.getTeilnahmeStatistic(anlass, kategorie, abteilung, anlage, geraet, search);
   }
   getByStartgeraet(
     anlass: IAnlass,
@@ -210,26 +153,16 @@ export class CachingAnlassService {
     geraet: GeraeteEnum,
     search: string,
   ): Observable<ITeilnehmerStart[]> {
-    return this.anlassService.getByStartgeraet(
-      anlass,
-      kategorie,
-      abteilung,
-      anlage,
-      geraet,
-      search,
-    );
+    return this.anlassService.getByStartgeraet(anlass, kategorie, abteilung, anlage, geraet, search);
   }
-  updateStartgeraet(
-    anlass: IAnlass,
-    teilnehmerStart: ITeilnehmerStart,
-  ): Observable<boolean> {
+  updateStartgeraet(anlass: IAnlass, teilnehmerStart: ITeilnehmerStart): Observable<boolean> {
     return this.anlassService.updateTeilnehmerStart(anlass, teilnehmerStart);
   }
 
   getTeilnehmerForAnlass(anlass: IAnlass): IAnlassLink[] {
     if (this.teilnamen && this.teilnamen[anlass.id]?.anlassLinks) {
       return this.teilnamen[anlass.id].anlassLinks.filter((anlassLink) => {
-        return anlassLink.kategorie !== "keine Teilnahme";
+        return anlassLink.kategorie !== 'keine Teilnahme';
       });
     }
     return undefined;
@@ -239,11 +172,7 @@ export class CachingAnlassService {
     if (this.teilnamen) {
       const kategories = Object.keys(KategorieEnum);
       return this.teilnamen[anlass.id].anlassLinks.sort((a, b) => {
-        return this.compare(
-          kategories.indexOf(a.kategorie),
-          kategories.indexOf(b.kategorie),
-          true,
-        );
+        return this.compare(kategories.indexOf(a.kategorie), kategories.indexOf(b.kategorie), true);
       });
     }
     return undefined;
@@ -270,9 +199,7 @@ export class CachingAnlassService {
     return undefined;
   }
 
-  updateVereinsStart(
-    orgAnlassLink: IOrganisationAnlassLink,
-  ): Observable<IOrganisationAnlassLink> {
+  updateVereinsStart(orgAnlassLink: IOrganisationAnlassLink): Observable<IOrganisationAnlassLink> {
     return this.anlassService.updateVereinsStart(orgAnlassLink);
   }
   isAnlaesseLoaded(): Observable<boolean> {
@@ -284,16 +211,14 @@ export class CachingAnlassService {
       this.anlassService.getAnlaesse(true).subscribe((anlaesse) => {
         // this.anlaesse = anlaesse;
         this.anlaesse = anlaesse.map((anlass) => {
-          anlass.organisator = this.vereinService.getVereinById(
-            anlass.organisatorId,
-          )?.name;
+          anlass.organisator = this.vereinService.getVereinById(anlass.organisatorId)?.name;
           return anlass;
         });
         this._loadRunning = false;
         this.loaded = true;
         // this.anlaesseLoaded.next(true);
         this.anlaesseLoaded.complete();
-        console.log("Anlaesse Loaded");
+        console.log('Anlaesse Loaded');
       });
     } else {
       if (this.loaded) {
@@ -314,8 +239,8 @@ export class CachingAnlassService {
         if (sm) {
           return this.anlaesse.filter((anlass) => {
             if (sm && anlass.smQuali && anlass.ausserkantonal) {
-              if (admin) return true;
-              else return false;
+              if (admin) {return true;}
+              else {return false;}
             }
             return true;
           });
@@ -324,8 +249,8 @@ export class CachingAnlassService {
       }
       return this.anlaesse.filter((anlass) => {
         if (sm && anlass.smQuali && anlass.ausserkantonal) {
-          if (admin) return true;
-          else return false;
+          if (admin) {return true;}
+          else {return false;}
         }
         const key = TiTuEnum[anlass.tiTu];
         if (key === titu) {
@@ -353,11 +278,7 @@ export class CachingAnlassService {
   }
   getAnlassByAnlassBezeichnung(anlassBezeichnung: string, titu: string) {
     if (this.loaded) {
-      return this.anlaesse.find(
-        (anlass) =>
-          anlass.anlassBezeichnung === anlassBezeichnung &&
-          anlass.tiTu === titu,
-      );
+      return this.anlaesse.find((anlass) => anlass.anlassBezeichnung === anlassBezeichnung && anlass.tiTu === titu);
     }
     return undefined;
   }
@@ -376,10 +297,7 @@ export class CachingAnlassService {
     }
     return false;
   }
-  neuAnmeldungErlaubtKategorie(
-    anlass: IAnlass,
-    kategorie: KategorieEnum,
-  ): boolean {
+  neuAnmeldungErlaubtKategorie(anlass: IAnlass, kategorie: KategorieEnum): boolean {
     const anlassLinks: IAnlassLinks = this.teilnamen[anlass.id];
     const anzahlUmmeldungen = anlassLinks.anlassLinks.filter((link) => {
       const sameKat = link.kategorie === kategorie;
@@ -393,44 +311,34 @@ export class CachingAnlassService {
     }).length;
     return anzahlUmmeldungen > neuMeldungen;
   }
-  loadTeilnahmen(
-    anlass: IAnlass,
-    verein: IVerein,
-    isLast: boolean,
-  ): Observable<boolean> {
-    this.anlassService
-      .getTeilnehmer(anlass, verein)
-      .subscribe((anlassLinkArray) => {
-        const anlassLinks: IAnlassLinks = {
-          dirty: false,
-          anlass: anlass,
-          anlassLinks: anlassLinkArray,
-        };
-        if (anlassLinks) {
-          anlassLinks.anlassLinks.forEach((al) => {
-            if (
-              al.kategorie === "KEIN_START" ||
-              al.kategorie === undefined ||
-              al.kategorie === null
-            ) {
-              al.kategorie = KategorieEnum.KEINE_TEILNAHME;
-            }
-          });
-        }
-        this.teilnamen[anlass.id] = anlassLinks;
-        // Fuer jeden Anlass ein Observable
-        // console.log("Teilnahme loaded: ", anlass.anlassBezeichnung, ' Verein: ', verein.name, ' isLast: ', isLast);
-        if (isLast) {
-          this.teilnahmenLoaded.next(true);
-        }
-      });
+  loadTeilnahmen(anlass: IAnlass, verein: IVerein, isLast: boolean): Observable<boolean> {
+    this.anlassService.getTeilnehmer(anlass, verein).subscribe((anlassLinkArray) => {
+      const anlassLinks: IAnlassLinks = {
+        dirty: false,
+        anlass: anlass,
+        anlassLinks: anlassLinkArray,
+      };
+      if (anlassLinks) {
+        anlassLinks.anlassLinks.forEach((al) => {
+          if (al.kategorie === 'KEIN_START' || al.kategorie === undefined || al.kategorie === null) {
+            al.kategorie = KategorieEnum.KEINE_TEILNAHME;
+          }
+        });
+      }
+      this.teilnamen[anlass.id] = anlassLinks;
+      // Fuer jeden Anlass ein Observable
+      // console.log("Teilnahme loaded: ", anlass.anlassBezeichnung, ' Verein: ', verein.name, ' isLast: ', isLast);
+      if (isLast) {
+        this.teilnahmenLoaded.next(true);
+      }
+    });
     return this.teilnahmenLoaded.asObservable();
   }
   isTeilnahmenLoaded(): Observable<boolean> {
     return this.teilnahmenLoaded.asObservable();
   }
 
-  public getTeilnahmen(anlass: IAnlass, brevet: number) {
+  getTeilnahmen(anlass: IAnlass, brevet: number) {
     const teilnahmen = this.getTeilnehmerForAnlass(anlass);
     if (teilnahmen) {
       if (brevet === 1) {
@@ -454,26 +362,17 @@ export class CachingAnlassService {
         });
       }
     } else {
-      return new Array();
+      return [];
     }
   }
   /*
   saveTeilnahme(verein: IVerein, anlassLink: IAnlassLink): Observable<boolean> {
     return this.anlassService.saveTeilnahme(verein, anlassLink);
   } */
-  getVereinAnmeldeKontrollePdf(
-    anlass: IAnlass,
-    verein: IVerein,
-  ): Observable<string> {
+  getVereinAnmeldeKontrollePdf(anlass: IAnlass, verein: IVerein): Observable<string> {
     return this.anlassService.getVereinAnmeldeKontrollePdf(anlass, verein);
   }
-  getVereinWertungsrichterKontrollePdf(
-    anlass: IAnlass,
-    verein: IVerein,
-  ): Observable<string> {
-    return this.anlassService.getVereinWertungsrichterKontrollePdf(
-      anlass,
-      verein,
-    );
+  getVereinWertungsrichterKontrollePdf(anlass: IAnlass, verein: IVerein): Observable<string> {
+    return this.anlassService.getVereinWertungsrichterKontrollePdf(anlass, verein);
   }
 }

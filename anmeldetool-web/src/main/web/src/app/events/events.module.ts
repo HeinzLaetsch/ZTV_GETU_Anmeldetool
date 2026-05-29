@@ -1,18 +1,19 @@
-import { CommonModule } from "@angular/common";
-import { NgModule } from "@angular/core";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { HoverOverDirective } from "../core/directive/hover.directive";
-import { MaterialModule } from "../shared/material-module";
-import { CreateEventComponent } from "./create-event";
-import { EventsDatesComponent } from "./dates/events-dates.component";
-import { EventListComponent } from "./event-list";
-import { EventRegisterSummaryComponent } from "./event-register-summary";
-import {
-  EventStartListComponent,
-  EventStartListHeaderComponent,
-  EventStartListRowComponent,
-} from "./event-start-list";
-import { EventThumbnailComponent } from "./event-thumbnail";
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
+import { HoverOverDirective } from '../core/directive/hover.directive';
+import { AnlassSummaryEffects } from '../core/redux/anlass-summary';
+import { anlassSummariesFeature } from '../core/redux/anlass-summary/anlass-summary.reducer';
+import { TeilnahmenEffects } from '../core/redux/teilnahmen';
+import { teilnahmenFeature } from '../core/redux/teilnahmen/teilnahmen.reducer';
+import { MaterialModule } from '../shared/material-module';
+import { CreateEventComponent } from './create-event';
+import { EventsDatesComponent } from './dates/events-dates.component';
+import { EventListComponent } from './event-list';
+import { EventRegisterSummaryComponent } from './event-register-summary';
+import { EventStartListComponent, EventStartListHeaderComponent, EventStartListRowComponent } from './event-start-list';
+import { EventThumbnailComponent } from './event-thumbnail';
 import {
   AnlassDetailComponent,
   AnlassStatistikComponent,
@@ -20,28 +21,20 @@ import {
   WertungsrichterChipComponent,
   WertungsrichterSelektionComponent,
   WertungsrichterSlotComponent,
-} from "./events-detail";
-import { EventsRoutingModule } from "./events-routing.module";
-import { StoreModule } from "@ngrx/store";
-import { anlassSummariesFeature } from "../core/redux/anlass-summary/anlass-summary.reducer";
-import { EffectsModule } from "@ngrx/effects";
-import { AnlassSummaryEffects } from "../core/redux/anlass-summary";
-import { teilnahmenFeature } from "../core/redux/teilnahmen/teilnahmen.reducer";
-import { TeilnahmenEffects } from "../core/redux/teilnahmen";
-import { teilnehmerFeature } from "../core/redux/teilnehmer/teilnehmer.reducer";
-import { TeilnehmerEffects } from "../core/redux/teilnehmer";
+} from './events-detail';
+import { EventsRoutingModule } from './events-routing.module';
 
-export function checkDirtyState(component: CreateEventComponent) {
+export function checkDirtyState(component: CreateEventComponent): boolean {
   if (component.isDirty) {
-    return window.confirm(
-      "Anlass nicht gespeichert, wollen Sie wirklich abbrechen"
-    );
+    return window.confirm('Anlass nicht gespeichert, wollen Sie wirklich abbrechen');
   }
   return true;
 }
 
 @NgModule({
-  declarations: [
+  imports: [
+    CommonModule,
+    EventsRoutingModule,
     EventListComponent,
     WertungsrichterChipComponent,
     WertungsrichterSlotComponent,
@@ -57,13 +50,6 @@ export function checkDirtyState(component: CreateEventComponent) {
     HoverOverDirective,
     AnlassDetailComponent,
     AnlassStatistikComponent,
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    EventsRoutingModule,
     StoreModule.forFeature(anlassSummariesFeature),
     StoreModule.forFeature(teilnahmenFeature),
     // StoreModule.forFeature(otsFeature),

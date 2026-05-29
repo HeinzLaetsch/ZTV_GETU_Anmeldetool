@@ -1,1 +1,1 @@
-export * from "./wertungsrichter-slot.component";
+export * from './wertungsrichter-slot.component';

@@ -1,7 +1,7 @@
-export * from "./ots.state";
+export * from './ots.state';
 
-export * from "./ots.actions";
+export * from './ots.actions';
 
-export * from "./ots.selectors";
+export * from './ots.selectors';
 
-export * from "./ots.effects";
+export * from './ots.effects';

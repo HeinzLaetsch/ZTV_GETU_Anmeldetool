@@ -1,5 +1,5 @@
-import { EntityAdapter, EntityState, createEntityAdapter } from "@ngrx/entity";
-import { IOrganisationTeilnahmenStatistik } from "../../model/IOrganisationTeilnahmenStatistik";
+import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
+import { IOrganisationTeilnahmenStatistik } from '../../model/IOrganisationTeilnahmenStatistik';
 
 export const otsAdapter: EntityAdapter<IOrganisationTeilnahmenStatistik> =
   createEntityAdapter<IOrganisationTeilnahmenStatistik>({
@@ -10,14 +10,10 @@ export function selectAnlassId(ots: IOrganisationTeilnahmenStatistik) {
   return ots.anlassId;
 }
 
-export function sortByAnlassId(
-  a: IOrganisationTeilnahmenStatistik,
-  b: IOrganisationTeilnahmenStatistik
-): any {
+export function sortByAnlassId(a: IOrganisationTeilnahmenStatistik, b: IOrganisationTeilnahmenStatistik): any {
   return a.anlassId.localeCompare(b.anlassId);
 }
 
-export interface OtsState
-  extends EntityState<IOrganisationTeilnahmenStatistik> {}
+export type OtsState = {} & EntityState<IOrganisationTeilnahmenStatistik>
 
 export const initialState: OtsState = otsAdapter.getInitialState();

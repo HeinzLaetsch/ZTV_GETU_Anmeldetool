@@ -1,4 +1,4 @@
-export interface ILauflistenEintrag {
+export type ILauflistenEintrag = {
   id: string;
   laufliste_id: string;
   startnummer: number;

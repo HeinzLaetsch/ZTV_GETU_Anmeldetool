@@ -1,20 +1,20 @@
-import { Injectable } from "@angular/core";
-import { MatPaginator } from "@angular/material/paginator";
-import { Sort } from "@angular/material/sort";
-import { BehaviorSubject, forkJoin, Observable, of } from "rxjs";
-import { tap } from "rxjs/operators";
-import { IVerein } from "src/app/verein/verein";
-import { IAnlass } from "../../model/IAnlass";
-import { ITeilnehmer } from "../../model/ITeilnehmer";
-import { KategorieEnum } from "../../model/KategorieEnum";
-import { TiTuEnum } from "../../model/TiTuEnum";
-import { TeilnehmerService } from "../teilnehmer/teilnehmer.service";
-import { CachingAnlassService } from "./caching.anlass.service";
+import { Injectable } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
+import { Sort } from '@angular/material/sort';
+import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { IVerein } from 'src/app/verein/verein';
+import { IAnlass } from '../../model/IAnlass';
+import { ITeilnehmer } from '../../model/ITeilnehmer';
+import { KategorieEnum } from '../../model/KategorieEnum';
+import { TiTuEnum } from '../../model/TiTuEnum';
+import { TeilnehmerService } from '../teilnehmer/teilnehmer.service';
+import { CachingAnlassService } from './caching.anlass.service';
 
-import { Platform } from "@angular/cdk/platform";
+import { Platform } from '@angular/cdk/platform';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class CachingTeilnehmerService {
   private teilnehmerLoaded: BehaviorSubject<number>;
@@ -24,25 +24,25 @@ export class CachingTeilnehmerService {
 
   private loaded = false;
 
-  public dirty = false;
+  dirty = false;
 
-  public valid = true;
+  valid = true;
 
-  private teilnehmer: ITeilnehmer[];
+  private teilnehmer: ITeilnehmer[] = [];
   // private orgUsers: IUser[];
 
-  private oldSort: Sort;
-  private sortedTeilnehmer: ITeilnehmer[];
+  private oldSort: Sort | undefined;
+  private sortedTeilnehmer: ITeilnehmer[] = [];
 
-  private oldFilter: string;
-  private filteredTeilnehmer: ITeilnehmer[];
+  private oldFilter = '';
+  private filteredTeilnehmer: ITeilnehmer[] = [];
 
   constructor(
     private teilnehmerService: TeilnehmerService,
     private anlassService: CachingAnlassService,
-    private platform: Platform
+    private platform: Platform,
   ) {
-    this.teilnehmerLoaded = new BehaviorSubject<number>(undefined);
+    this.teilnehmerLoaded = new BehaviorSubject<number>(0);
     // this.teilnehmerLoaded = new Subject<number>();
   }
   reset(verein: IVerein, loaded: boolean): Observable<string[]> {
@@ -56,7 +56,7 @@ export class CachingTeilnehmerService {
       }
     });
     if (observables.length === 0) {
-      return of(["true"]);
+      return of(['true']);
     } else {
       this.teilnehmer = this.teilnehmer.filter((teilnehmer) => {
         return !teilnehmer.onlyCreated;
@@ -71,23 +71,21 @@ export class CachingTeilnehmerService {
   }
 
   loadTeilnehmer(verein: IVerein): Observable<number> {
-    console.log("Teilnehmer Caching loadTeilnehmer: ", verein.name);
+    console.log('Teilnehmer Caching loadTeilnehmer: ', verein.name);
     if (!this._loadRunning && !this.loaded) {
       this._loadRunning = true;
       // verein: IVerein, filter = '',  sortDirection = 'asc', pageIndex = 0, pageSize = 3
-      this.teilnehmerService
-        .getTeilnehmer(verein, 0, 150)
-        .subscribe((teilnehmer) => {
-          this.teilnehmer = teilnehmer;
-          // this.orgUsers = users;
-          // this.users = this.deepCopy(users);
-          this._loadRunning = false;
-          this.loaded = true;
-          this.dirty = false;
-          this.valid = true;
-          this.teilnehmerLoaded.next(teilnehmer.length);
-          console.log("Teilnehmer Loaded: ", teilnehmer.length);
-        });
+      this.teilnehmerService.getTeilnehmer(verein, 0, 150).subscribe((teilnehmer) => {
+        this.teilnehmer = teilnehmer;
+        // this.orgUsers = users;
+        // this.users = this.deepCopy(users);
+        this._loadRunning = false;
+        this.loaded = true;
+        this.dirty = false;
+        this.valid = true;
+        this.teilnehmerLoaded.next(teilnehmer.length);
+        console.log('Teilnehmer Loaded: ', teilnehmer.length);
+      });
     } else {
       if (this.loaded) {
         this.teilnehmerLoaded.next(this.teilnehmer.length);
@@ -96,34 +94,48 @@ export class CachingTeilnehmerService {
     return this.teilnehmerLoaded.asObservable();
   }
   private deepCopy<T>(source: T): T {
-    return Array.isArray(source)
-      ? source.map((item) => this.deepCopy(item))
-      : source instanceof Date
-      ? new Date(source.getTime())
-      : source && typeof source === "object"
-      ? Object.getOwnPropertyNames(source).reduce((o, prop) => {
-          Object.defineProperty(
-            o,
-            prop,
-            Object.getOwnPropertyDescriptor(source, prop)
-          );
-          o[prop] = this.deepCopy(source[prop]);
-          return o;
-        }, Object.create(Object.getPrototypeOf(source)))
-      : (source as T);
+    if (source === null || source === undefined) {
+      return source;
+    }
+
+    if (Array.isArray(source)) {
+      return source.map((item) => this.deepCopy(item)) as unknown as T;
+    }
+
+    if (source instanceof Date) {
+      return new Date(source.getTime()) as unknown as T;
+    }
+
+    if (typeof source === 'object') {
+      const sourceObject = source as Record<string, unknown>;
+      const target = Object.create(Object.getPrototypeOf(sourceObject)) as Record<string, unknown>;
+
+      Object.getOwnPropertyNames(sourceObject).forEach((prop) => {
+        const descriptor = Object.getOwnPropertyDescriptor(sourceObject, prop);
+        if (descriptor) {
+          Object.defineProperty(target, prop, descriptor);
+        }
+        target[prop] = this.deepCopy(sourceObject[prop]);
+      });
+
+      return target as T;
+    }
+
+    return source;
   }
   getTiTuTeilnehmer(tiTu: TiTuEnum): ITeilnehmer[] {
     const tituFiltered = this.teilnehmer.filter((teilnehmer) => {
-      const key = TiTuEnum[teilnehmer.tiTu];
+      const tiTuKey = teilnehmer.tiTu;
+      if (!tiTuKey) {
+        return false;
+      }
+      const key = TiTuEnum[tiTuKey];
       return key === tiTu;
     });
     return tituFiltered;
   }
 
-  deleteTeilnehmer(
-    verein: IVerein,
-    teilnehmer: ITeilnehmer
-  ): Observable<string> {
+  deleteTeilnehmer(verein: IVerein, teilnehmer: ITeilnehmer): Observable<string> {
     this.removeTeilnehmer(teilnehmer);
     return this.teilnehmerService.delete(verein, teilnehmer);
   }
@@ -133,15 +145,9 @@ export class CachingTeilnehmerService {
     sort: Sort,
     tiTu: TiTuEnum,
     paginator: MatPaginator,
-    row: number
+    row: number,
   ): Observable<string> {
-    const teilnehmer = this.getTeilnehmer(
-      filter,
-      sort,
-      tiTu,
-      paginator,
-      undefined
-    )[row];
+    const teilnehmer = this.getTeilnehmer(filter, sort, tiTu, paginator)[row];
     this.removeTeilnehmer(teilnehmer);
     return this.teilnehmerService.delete(verein, teilnehmer);
   }
@@ -153,10 +159,10 @@ export class CachingTeilnehmerService {
   }
   getTeilnehmer(
     filter: string,
-    sort: Sort,
+    sort: Sort | undefined,
     tiTu: TiTuEnum,
     paginator: MatPaginator,
-    previousIndex: number
+    previousIndex?: number,
   ): ITeilnehmer[] {
     if (this.loaded) {
       // console.log('Vereins User: ' , this.users);
@@ -175,10 +181,10 @@ export class CachingTeilnehmerService {
       const paged = tituFiltered.slice(start, end);
       return paged;
     }
-    return undefined;
+    return [];
   }
 
-  private sortBySort(tituFiltered: ITeilnehmer[], sort: Sort): ITeilnehmer[] {
+  private sortBySort(tituFiltered: ITeilnehmer[], sort: Sort | undefined): ITeilnehmer[] {
     const kategories = Object.keys(KategorieEnum);
     if (!sort) {
       this.oldSort = sort;
@@ -191,12 +197,12 @@ export class CachingTeilnehmerService {
           }
         }
         const isEqual = this.compare(
-          kategories.indexOf(a.letzteKategorie),
-          kategories.indexOf(b.letzteKategorie),
-          true
+          kategories.indexOf(a.letzteKategorie ?? ''),
+          kategories.indexOf(b.letzteKategorie ?? ''),
+          true,
         );
         if (isEqual === 0) {
-          return this.compare(a.name, b.name, true);
+          return this.compare(a.name ?? '', b.name ?? '', true);
         }
         return isEqual;
       });
@@ -206,20 +212,23 @@ export class CachingTeilnehmerService {
       return this.sortedTeilnehmer;
     }
     this.oldSort = sort;
-    console.log("Sort: ", sort.active);
-    const isAsc = sort.direction === "asc";
+    console.log('Sort: ', sort.active);
+    const isAsc = sort.direction === 'asc';
     const anlass = this.anlassService.getAnlassById(sort.active);
     this.sortedTeilnehmer = tituFiltered.sort((a, b) => {
       switch (sort.active) {
-        case "name":
-          return this.compare(a.name, b.name, isAsc);
-        case "vorname":
-          return this.compare(a.vorname, b.vorname, isAsc);
-        case "jahrgang":
-          return this.compare(a.jahrgang, b.jahrgang, isAsc);
-        case "stvnummer":
-          return this.compare(a.stvNummer, b.stvNummer, isAsc);
+        case 'name':
+          return this.compare(a.name ?? '', b.name ?? '', isAsc);
+        case 'vorname':
+          return this.compare(a.vorname ?? '', b.vorname ?? '', isAsc);
+        case 'jahrgang':
+          return this.compare(a.jahrgang ?? 0, b.jahrgang ?? 0, isAsc);
+        case 'stvnummer':
+          return this.compare(a.stvNummer ?? '', b.stvNummer ?? '', isAsc);
         default:
+          if (!anlass) {
+            return 0;
+          }
           const aLink = this.anlassService.getTeilnahme(anlass, a);
           const bLink = this.anlassService.getTeilnahme(anlass, b);
           if (!aLink) {
@@ -234,11 +243,7 @@ export class CachingTeilnehmerService {
             }
             return 0;
           }
-          return this.compare(
-            kategories.indexOf(aLink.kategorie),
-            kategories.indexOf(bLink.kategorie),
-            isAsc
-          );
+          return this.compare(kategories.indexOf(aLink.kategorie), kategories.indexOf(bLink.kategorie), isAsc);
       }
     });
     return this.sortedTeilnehmer;
@@ -250,7 +255,7 @@ export class CachingTeilnehmerService {
     }
     return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
   }
-  public getTeilnehmerForAnlass(anlass: IAnlass) {
+  getTeilnehmerForAnlass(anlass: IAnlass) {
     // console.log("getTeilnehmerForAnlass: " + anlass.anlassBezeichnung);
     const aLinks = this.anlassService.getTeilnahmenForAnlassSorted(anlass);
     // console.log("aLinks: " + aLinks.length);
@@ -259,12 +264,16 @@ export class CachingTeilnehmerService {
       if (alink.kategorie != KategorieEnum.KEINE_TEILNAHME) {
         // console.log("create copy: " + alink.teilnehmerId);
         const teilnehmer = this.getTeilnehmerById(alink.teilnehmerId);
-        // teilnehmer ist schon copy
-        // console.log("teilnehmer: " + teilnehmer);
-        const copy = Object.assign(teilnehmer);
-        // console.log("copy: " + copy);
-        copy.teilnahmen = {
-          anlassLinks: [alink],
+        if (!teilnehmer) {
+          return undefined;
+        }
+        const copy: ITeilnehmer = {
+          ...teilnehmer,
+          teilnahmen: {
+            dirty: false,
+            anlass,
+            anlassLinks: [alink],
+          },
         };
         // console.log("copy.anlasslinks: " + copy.anlassLinks);
         return copy;
@@ -272,14 +281,9 @@ export class CachingTeilnehmerService {
       return undefined;
     });
     // console.log("teilnehmer: " + teilnehmer);
-    return teilnehmer.filter((teilnehmer) => {
-      return !!teilnehmer?.teilnahmen;
-    });
+    return teilnehmer.filter((item): item is ITeilnehmer => !!item?.teilnahmen);
   }
-  private filterByName(
-    filter: string,
-    teilnehmer: ITeilnehmer[]
-  ): ITeilnehmer[] {
+  private filterByName(filter: string, teilnehmer: ITeilnehmer[]): ITeilnehmer[] {
     if (!filter || filter.length === 0) {
       this.oldFilter = filter;
       return teilnehmer;
@@ -289,10 +293,10 @@ export class CachingTeilnehmerService {
     }
     this.oldFilter = filter;
     this.filteredTeilnehmer = teilnehmer.filter((teilnehmer) => {
-      if (teilnehmer.name.toLowerCase().indexOf(filter) > -1) {
+      if ((teilnehmer.name ?? '').toLowerCase().indexOf(filter) > -1) {
         return true;
       }
-      if (teilnehmer.vorname.toLowerCase().indexOf(filter) > -1) {
+      if ((teilnehmer.vorname ?? '').toLowerCase().indexOf(filter) > -1) {
         return true;
       }
       return false;
@@ -300,12 +304,10 @@ export class CachingTeilnehmerService {
     return this.filteredTeilnehmer;
   }
 
-  getTeilnehmerById(id: string) {
+  getTeilnehmerById(id: string): ITeilnehmer | undefined {
     // console.log("getTeilnehmerById id: " + id + ", loaded:" + this.loaded);
     if (this.loaded) {
-      const newTeilnehmer = this.teilnehmer.find(
-        (newTeilnehmer) => newTeilnehmer.id === id
-      );
+      const newTeilnehmer = this.teilnehmer.find((newTeilnehmer) => newTeilnehmer.id === id);
       // console.log("Org: ", newTeilnehmer);
       const copy = this.deepCopy(newTeilnehmer);
       // console.log("Copy: ", copy);
@@ -320,8 +322,8 @@ export class CachingTeilnehmerService {
         teilnehmer.onlyCreated = true;
         this.teilnehmer.push(teilnehmer);
         this.dirty = true;
-        console.log("From Tap:", teilnehmer);
-      })
+        console.log('From Tap:', teilnehmer);
+      }),
     );
   }
 
@@ -334,11 +336,7 @@ export class CachingTeilnehmerService {
         this.dirty = false;
         observables.push(this.teilnehmerService.patch(verein, teilnehmer));
       }
-      if (
-        teilnehmer.teilnahmen &&
-        teilnehmer.teilnahmen.anlassLinks &&
-        teilnehmer.teilnahmen.dirty
-      ) {
+      if (teilnehmer.teilnahmen && teilnehmer.teilnahmen.anlassLinks && teilnehmer.teilnahmen.dirty) {
         teilnehmer.teilnahmen.anlassLinks.forEach((value) => {
           if (value.dirty) {
             // observables.push(this.anlassService.saveTeilnahme(verein, value));

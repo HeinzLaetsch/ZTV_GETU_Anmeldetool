@@ -1,20 +1,24 @@
-import { Component, OnInit } from "@angular/core";
-import { MatSelectChange } from "@angular/material/select";
-import { ISmQuali } from "src/app/core/model/ISmQuali";
-import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { getTiTuEnum, TiTuEnum } from "src/app/core/model/TiTuEnum";
-import { SmQualiService } from "src/app/core/service/smquali/smquali.service";
+import { Component, type OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import type { MatSelectChange } from '@angular/material/select';
+import type { ISmQuali } from 'src/app/core/model/ISmQuali';
+import { KategorieEnum } from 'src/app/core/model/KategorieEnum';
+import { parseTiTuEnum, TiTuEnum } from 'src/app/core/model/TiTuEnum';
+import { SmQualiService } from 'src/app/core/service/smquali/smquali.service';
+import { MaterialModule } from 'src/app/shared/material-module';
 
 @Component({
-  selector: "app-smquali-viewer",
-  templateUrl: "./smquali-viewer.component.html",
-  styleUrls: ["./smquali-viewer.component.css"],
+  selector: 'lxt-smquali-viewer',
+  templateUrl: './smquali-viewer.component.html',
+  styleUrls: ['./smquali-viewer.component.css'],
+  standalone: true,
+  imports: [CommonModule, MaterialModule],
 })
 export class SmQualiViewerComponent implements OnInit {
-  jahr: number = 2023;
+  jahr = 2023;
   tiTu: TiTuEnum = TiTuEnum.Ti;
   kategorie: KategorieEnum = KategorieEnum.K7;
-  nurQuali: boolean = true;
+  nurQuali = true;
 
   smQualiList: ISmQuali[];
   constructor(private smQualiService: SmQualiService) {}
@@ -25,29 +29,19 @@ export class SmQualiViewerComponent implements OnInit {
 
   private loadAuswertung() {
     this.smQualiService
-      .getSmAuswertungJson(
-        this.jahr,
-        this.getFilter(this.tiTu),
-        this.kategorie,
-        this.nurQuali
-      )
+      .getSmAuswertungJson(this.jahr, this.getFilter(this.tiTu), this.kategorie, this.nurQuali)
       .subscribe((result) => (this.smQualiList = result));
   }
   downloadAuswertungCSV() {
-    this.smQualiService.getSmAuswertungCsv(
-      this.jahr,
-      this.getFilter(this.tiTu),
-      this.kategorie,
-      this.nurQuali
-    );
+    this.smQualiService.getSmAuswertungCsv(this.jahr, this.getFilter(this.tiTu), this.kategorie, this.nurQuali);
   }
 
   private getFilter(titu: TiTuEnum): string {
-    let filter = "Tu";
+    let filter = 'Tu';
     if (TiTuEnum.Tu === titu) {
-      filter = "Tu";
+      filter = 'Tu';
     } else {
-      filter = "Ti";
+      filter = 'Ti';
     }
     return filter;
   }
@@ -60,19 +54,9 @@ export class SmQualiViewerComponent implements OnInit {
   }
   getKategorien() {
     if (this.tiTu === TiTuEnum.Ti) {
-      return [
-        KategorieEnum.K5A,
-        KategorieEnum.K6,
-        KategorieEnum.KD,
-        KategorieEnum.K7,
-      ];
+      return [KategorieEnum.K5A, KategorieEnum.K6, KategorieEnum.KD, KategorieEnum.K7];
     } else {
-      return [
-        KategorieEnum.K5,
-        KategorieEnum.K6,
-        KategorieEnum.KH,
-        KategorieEnum.K7,
-      ];
+      return [KategorieEnum.K5, KategorieEnum.K6, KategorieEnum.KH, KategorieEnum.K7];
     }
   }
   getTiTu() {
@@ -84,8 +68,7 @@ export class SmQualiViewerComponent implements OnInit {
   }
 
   tiTuSelected(tiTu: MatSelectChange): void {
-    const aNY = getTiTuEnum(tiTu.value);
-    this.tiTu = getTiTuEnum(tiTu.value);
+    this.tiTu = parseTiTuEnum(tiTu.value) || TiTuEnum.Tu;
     // this.tiTu = TiTuEnum[tiTu.value];
     this.loadAuswertung();
   }

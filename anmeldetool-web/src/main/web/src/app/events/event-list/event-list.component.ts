@@ -1,22 +1,19 @@
-import { Component, OnInit } from "@angular/core";
-import { select, Store } from "@ngrx/store";
-import { combineLatest, forkJoin, Observable, Subscription } from "rxjs";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { IAnlassExtended } from "src/app/core/model/IAnlassExtended";
-import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
-import { selectAnlaesseSortedNew } from "src/app/core/redux/anlass";
-import {
-  AnlassSummariesActions,
-  selectAnlassSummaries,
-} from "src/app/core/redux/anlass-summary";
-import { AppState } from "src/app/core/redux/core.state";
-import { AuthService } from "src/app/core/service/auth/auth.service";
-import { SubscriptionHelper } from "src/app/utils/subscription-helper";
+import { Component, type OnInit } from '@angular/core';
+import { select, Store } from '@ngrx/store';
+import { combineLatest, forkJoin, type Observable, Subscription } from 'rxjs';
+import type { IAnlass } from 'src/app/core/model/IAnlass';
+import type { IAnlassExtended } from 'src/app/core/model/IAnlassExtended';
+import type { IAnlassSummary } from 'src/app/core/model/IAnlassSummary';
+import { selectAnlaesseSortedNew } from 'src/app/core/redux/anlass';
+import { AnlassSummariesActions, selectAnlassSummaries } from 'src/app/core/redux/anlass-summary';
+import type { AppState } from 'src/app/core/redux/core.state';
+import { AuthService } from 'src/app/core/service/auth/auth.service';
+import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
 
 @Component({
-  selector: "app-event-list",
-  templateUrl: "./event-list.component.html",
-  styleUrls: ["./event-list.component.css"],
+  selector: 'lxt-event-list',
+  templateUrl: './event-list.component.html',
+  styleUrls: ['./event-list.component.css'],
 })
 export class EventListComponent extends SubscriptionHelper implements OnInit {
   // anlaesse: IAnlass[];
@@ -32,13 +29,11 @@ export class EventListComponent extends SubscriptionHelper implements OnInit {
 
   constructor(
     public authService: AuthService,
-    private store: Store<AppState> // private anlassService: CachingAnlassService
+    private store: Store<AppState>, // private anlassService: CachingAnlassService
   ) {
     super();
     this.store.dispatch(AnlassSummariesActions.loadAllAnlasssummariesInvoked());
-    this.anlaesse$ = this.store.pipe(
-      select(selectAnlaesseSortedNew(this.authService.isAdministrator()))
-    );
+    this.anlaesse$ = this.store.pipe(select(selectAnlaesseSortedNew(this.authService.isAdministrator())));
     this.anlassSummaries$ = this.store.pipe(select(selectAnlassSummaries()));
   }
 
@@ -58,15 +53,14 @@ export class EventListComponent extends SubscriptionHelper implements OnInit {
           };
           return anlaesseExtended;
         });
-        console.log("AnlaesseExtended: ", this.anlaesseExtended);
-      })
+        console.log('AnlaesseExtended: ', this.anlaesseExtended);
+      }),
     );
   }
 
   get showEvents(): boolean {
     return (
-      (this.authService.isAuthenticated() &&
-        this.authService.isVereinsAnmmelder()) ||
+      (this.authService.isAuthenticated() && this.authService.isVereinsAnmmelder()) ||
       this.authService.isAdministrator()
     );
     /*
@@ -80,7 +74,7 @@ export class EventListComponent extends SubscriptionHelper implements OnInit {
     */
   }
   handleEventClicked(data) {
-    console.log("received :", data);
+    console.log('received :', data);
   }
 
   /*

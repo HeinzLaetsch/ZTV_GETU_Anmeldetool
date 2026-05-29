@@ -1,4 +1,4 @@
-export interface IWertungsrichter {
+export type IWertungsrichter = {
   id: string;
   personId?: string;
   brevet: number;

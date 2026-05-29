@@ -1,7 +1,7 @@
-import { KategorieEnum } from "./KategorieEnum";
-import { TiTuEnum } from "./TiTuEnum";
+import { KategorieEnum } from './KategorieEnum';
+import { TiTuEnum } from './TiTuEnum';
 
-export interface ILauflistenStatus {
+export type ILauflistenStatus = {
   allErfasst: boolean;
   allChecked: boolean;
 }

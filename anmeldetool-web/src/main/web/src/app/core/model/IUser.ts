@@ -1,10 +1,10 @@
-import { IOrganisationAnlassLink } from "./IOrganisationAnlassLink";
-import { IOrganisationPersonLink } from "./IOrganisationPersonLink";
-import { IPersonAnlassLink } from "./IPersonAnlassLink";
-import { IRolle } from "./IRolle";
-import { IWertungsrichter } from "./IWertungsrichter";
+import { IOrganisationAnlassLink } from './IOrganisationAnlassLink';
+import { IOrganisationPersonLink } from './IOrganisationPersonLink';
+import { IPersonAnlassLink } from './IPersonAnlassLink';
+import { IRolle } from './IRolle';
+import { IWertungsrichter } from './IWertungsrichter';
 
-export interface IUser {
+export type IUser = {
   id?: string;
   organisationids: string[];
   benutzername: string;

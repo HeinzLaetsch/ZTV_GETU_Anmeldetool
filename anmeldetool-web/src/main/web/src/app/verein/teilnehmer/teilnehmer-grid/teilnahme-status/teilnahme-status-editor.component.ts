@@ -1,16 +1,11 @@
-import {
-  AfterViewInit,
-  Component,
-  ViewChild,
-  ViewContainerRef,
-} from "@angular/core";
-import { NgFor } from "@angular/common";
-import { NgIf } from "@angular/common";
-import { ICellEditorAngularComp } from "ag-grid-angular";
-import { FormsModule } from "@angular/forms";
-import { MaterialModule } from "src/app/shared/material-module";
-import { IAnlassLink } from "src/app/core/model/IAnlassLink";
-import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
+import { AfterViewInit, Component, ViewChild, ViewContainerRef } from '@angular/core';
+import { NgFor } from '@angular/common';
+import { NgIf } from '@angular/common';
+import { ICellEditorAngularComp } from 'ag-grid-angular';
+import { FormsModule } from '@angular/forms';
+import { MaterialModule } from 'src/app/shared/material-module';
+import { IAnlassLink } from 'src/app/core/model/IAnlassLink';
+import { MeldeStatusEnum } from 'src/app/core/model/MeldeStatusEnum';
 
 @Component({
   standalone: true,
@@ -19,28 +14,16 @@ import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
     <div #container class="teilnahme-status">
       <!-- Kategorie -->
       <div
-        *ngIf="
-          params.mode === 0 ||
-          params.mode === 3 ||
-          (params.mode === 2 && params.kats.length === 0)
-        "
+        *ngIf="params.mode === 0 || params.mode === 3 || (params.mode === 2 && params.kats.length === 0)"
         class="teilnahme-status-kategorie"
       >
         {{ tal.kategorie }}
       </div>
       <div
-        *ngIf="
-          params.mode === 1 ||
-          params.mode === 4 ||
-          (params.mode === 2 && params.kats.length > 0)
-        "
+        *ngIf="params.mode === 1 || params.mode === 4 || (params.mode === 2 && params.kats.length > 0)"
         class="teilnahme-status-kategorie"
       >
-        <mat-select
-          [(ngModel)]="tal.kategorie"
-          (selectionChange)="onChanged()"
-          (click)="selected()"
-        >
+        <mat-select [(ngModel)]="tal.kategorie" (selectionChange)="onChanged()" (click)="selected()">
           <mat-option *ngFor="let kat of params.kats" [value]="kat">
             {{ kat }}
           </mat-option>
@@ -48,10 +31,7 @@ import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
       </div>
 
       <!-- MeldeStatus -->
-      <div
-        *ngIf="params.mode === 0 || params.mode === 3"
-        class="teilnahme-status-status"
-      >
+      <div *ngIf="params.mode === 0 || params.mode === 3" class="teilnahme-status-status">
         {{ tal.meldeStatus }}
       </div>
       <div
@@ -84,14 +64,12 @@ import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
     `,
   ],
 })
-export class TeilnahmeStatusEditor
-  implements ICellEditorAngularComp, AfterViewInit
-{
-  public params: any;
-  public tal: IAnlassLink;
+export class TeilnahmeStatusEditor implements ICellEditorAngularComp, AfterViewInit {
+  params: any;
+  tal: IAnlassLink;
 
-  @ViewChild("container", { read: ViewContainerRef })
-  public container!: ViewContainerRef;
+  @ViewChild('container', { read: ViewContainerRef })
+  container!: ViewContainerRef;
 
   // dont use afterGuiAttached for post gui events - hook into ngAfterViewInit instead for this
   ngAfterViewInit() {
@@ -102,7 +80,7 @@ export class TeilnahmeStatusEditor
 
   agInit(params: any): void {
     this.params = params;
-    console.log("Mode: ", params?.mode);
+    console.log('Mode: ', params?.mode);
     this.tal = {
       anlassId: this.params.value.anlassId,
       teilnehmerId: this.params.value.teilnehmerId,
@@ -112,11 +90,8 @@ export class TeilnahmeStatusEditor
     };
   }
   selected() {
-    if (
-      this.params.kats.length > 0 &&
-      this.params.value.meldeStatus?.toUpperCase() == "ABGEMELDET"
-    ) {
-      console.log("Selected");
+    if (this.params.kats.length > 0 && this.params.value.meldeStatus?.toUpperCase() == 'ABGEMELDET') {
+      console.log('Selected');
       this.tal.meldeStatus = MeldeStatusEnum.STARTET;
       this.params.stopEditing();
     }
@@ -124,7 +99,7 @@ export class TeilnahmeStatusEditor
 
   resetKategorie() {
     // this.tal.kategorie = "KEIN_START";
-    if (this.tal.meldeStatus?.toUpperCase() === "ABGEMELDET") {
+    if (this.tal.meldeStatus?.toUpperCase() === 'ABGEMELDET') {
       this.tal.meldeStatus = MeldeStatusEnum.STARTET;
     } else {
       this.tal.meldeStatus = MeldeStatusEnum.ABGEMELDET;
@@ -141,7 +116,7 @@ export class TeilnahmeStatusEditor
   }
 
   onChanged() {
-    if (this.tal.kategorie === "KEIN_START") {
+    if (this.tal.kategorie === 'KEIN_START') {
       this.tal.meldeStatus = MeldeStatusEnum.ABGEMELDET;
     } else {
       this.tal.meldeStatus = MeldeStatusEnum.STARTET;
@@ -152,8 +127,8 @@ export class TeilnahmeStatusEditor
   onKeyDown(event: any): void {
     const key = event.key;
     if (
-      key == "ArrowLeft" || // left
-      key == "ArrowRight"
+      key == 'ArrowLeft' || // left
+      key == 'ArrowRight'
     ) {
       event.stopPropagation();
     }

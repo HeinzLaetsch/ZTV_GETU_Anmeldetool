@@ -16,23 +16,12 @@
         *ngIf="authService.isAdministrator() || authService.isSekretariat()"
         data-cy="admin-funcs-nav-btn"
       >
-        <button
-          mat-button
-          class="mainNav"
-          disableRipple
-          [matMenuTriggerFor]="menu"
-        >
+        <button mat-button class="mainNav" disableRipple [matMenuTriggerFor]="menu">
           Anlässe Verwalten
-          <mat-icon class="material-icons-outlined arrow-icon">
-            arrow_drop_down
-          </mat-icon>
+          <mat-icon class="material-icons-outlined arrow-icon"> arrow_drop_down </mat-icon>
         </button>
         <mat-menu #menu="matMenu">
-          <div
-            *ngFor="let anlass of eigeneAnlaesse"
-            class="dropdown-item"
-            data-cy="data-import-nav-btn"
-          >
+          <div *ngFor="let anlass of eigeneAnlaesse" class="dropdown-item" data-cy="data-import-nav-btn">
             <button
               mat-button
               class="mainNav small-text"
@@ -41,9 +30,7 @@
               [routerLinkActiveOptions]="{ exact: true }"
               disableRipple
             >
-              <div *ngIf="getOrganisator(anlass) | async; let org">
-                {{ anlass.getCleaned() }} - {{ org.name }}
-              </div>
+              <div *ngIf="getOrganisator(anlass) | async; let org">{{ anlass.getCleaned() }} - {{ org.name }}</div>
             </button>
           </div>
         </mat-menu>
@@ -55,29 +42,15 @@
       <!-- routerLink="/rechnungsbuero" routerLinkActive="active" -->
       <mat-list-item
         class="task-add-btn"
-        *ngIf="
-          (authService.isAdministrator() || authService.isRechnungsbuero()) &&
-          authService.currentVerein
-        "
+        *ngIf="(authService.isAdministrator() || authService.isRechnungsbuero()) && authService.currentVerein"
         data-cy="admin-funcs-nav-btn"
       >
-        <button
-          mat-button
-          class="mainNav"
-          disableRipple
-          [matMenuTriggerFor]="RBmenu"
-        >
+        <button mat-button class="mainNav" disableRipple [matMenuTriggerFor]="RBmenu">
           Rechnungsbüro
-          <mat-icon class="material-icons-outlined arrow-icon">
-            arrow_drop_down
-          </mat-icon>
+          <mat-icon class="material-icons-outlined arrow-icon"> arrow_drop_down </mat-icon>
         </button>
         <mat-menu #RBmenu="matMenu">
-          <div
-            *ngFor="let anlass of eigeneAnlaesse"
-            class="dropdown-item"
-            data-cy="data-import-nav-btn"
-          >
+          <div *ngFor="let anlass of eigeneAnlaesse" class="dropdown-item" data-cy="data-import-nav-btn">
             <button
               mat-button
               class="mainNav small-text"
@@ -91,21 +64,10 @@
           </div>
         </mat-menu>
       </mat-list-item>
-      <mat-list-item
-        class="task-add-btn"
-        *ngIf="authService.isAdministrator()"
-        data-cy="admin-funcs-nav-btn"
-      >
-        <button
-          mat-button
-          class="mainNav"
-          disableRipple
-          [matMenuTriggerFor]="menu"
-        >
+      <mat-list-item class="task-add-btn" *ngIf="authService.isAdministrator()" data-cy="admin-funcs-nav-btn">
+        <button mat-button class="mainNav" disableRipple [matMenuTriggerFor]="menu">
           Verein auswählen ({{ authService.currentVerein.name }})
-          <mat-icon class="material-icons-outlined arrow-icon">
-            arrow_drop_down
-          </mat-icon>
+          <mat-icon class="material-icons-outlined arrow-icon"> arrow_drop_down </mat-icon>
         </button>
         <mat-menu #menu="matMenu">
           <div

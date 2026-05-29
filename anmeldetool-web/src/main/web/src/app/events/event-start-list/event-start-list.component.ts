@@ -1,40 +1,27 @@
-import { Component, OnInit } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
-import { select, Store } from "@ngrx/store";
-import * as moment from "moment";
-import { Observable } from "rxjs";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
-import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
-import { ITeilnahmen } from "src/app/core/model/ITeilnahmen";
-import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
-import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { MeldeStatusEnum } from "src/app/core/model/MeldeStatusEnum";
-import { selectAnlassById } from "src/app/core/redux/anlass";
-import {
-  AnlassSummariesActions,
-  selectAnlassSummaryByAnlassId,
-} from "src/app/core/redux/anlass-summary";
-import { AppState } from "src/app/core/redux/core.state";
-import {
-  selectTeilnahmen,
-  selectTeilnahmenByAnlassId,
-  TeilnahmenActions,
-} from "src/app/core/redux/teilnahmen";
-import { AnlassService } from "src/app/core/service/anlass/anlass.service";
-import { AuthService } from "src/app/core/service/auth/auth.service";
-//import { CachingTeilnehmerService } from "src/app/core/service/caching-services/caching.teilnehmer.service";
-import { SubscriptionHelper } from "src/app/utils/subscription-helper";
+import { Component, type OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { select, Store } from '@ngrx/store';
+import moment from 'moment';
+import type { Observable } from 'rxjs';
+import type { IAnlass } from 'src/app/core/model/IAnlass';
+import type { IAnlassSummary } from 'src/app/core/model/IAnlassSummary';
+import type { IOrganisationAnlassLink } from 'src/app/core/model/IOrganisationAnlassLink';
+import type { ITeilnahmen } from 'src/app/core/model/ITeilnahmen';
+import { KategorieEnum } from 'src/app/core/model/KategorieEnum';
+import { selectAnlassById } from 'src/app/core/redux/anlass';
+import { selectAnlassSummaryByAnlassId } from 'src/app/core/redux/anlass-summary';
+import type { AppState } from 'src/app/core/redux/core.state';
+import { selectTeilnahmenByAnlassId, TeilnahmenActions } from 'src/app/core/redux/teilnahmen';
+import { AnlassService } from 'src/app/core/service/anlass/anlass.service';
+import { AuthService } from 'src/app/core/service/auth/auth.service';
+import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
 
 @Component({
-  selector: "app-event-start-list",
-  templateUrl: "./event-start-list.component.html",
-  styleUrls: ["./event-start-list.component.css"],
+  selector: 'lxt-event-start-list',
+  templateUrl: './event-start-list.component.html',
+  styleUrls: ['./event-start-list.component.css'],
 })
-export class EventStartListComponent
-  extends SubscriptionHelper
-  implements OnInit
-{
+export class EventStartListComponent extends SubscriptionHelper implements OnInit {
   anlass: IAnlass;
   anlass$: Observable<IAnlass>;
   teilnahmen$: Observable<ITeilnahmen[]>;
@@ -54,9 +41,7 @@ export class EventStartListComponent
     private route: ActivatedRoute,
   ) {
     super();
-    this.store.dispatch(
-      TeilnahmenActions.loadAllTeilnahmenInvoked({ payload: moment().year() }),
-    );
+    this.store.dispatch(TeilnahmenActions.loadAllTeilnahmenInvoked({ payload: moment().year() }));
   }
 
   ngOnInit() {
@@ -82,9 +67,7 @@ export class EventStartListComponent
         this.anlass.erfassenVerlaengert = result.verlaengerungsDate;
       });
     */
-    this.teilnahmen$ = this.store.pipe(
-      select(selectTeilnahmenByAnlassId(anlassId)),
-    );
+    this.teilnahmen$ = this.store.pipe(select(selectTeilnahmenByAnlassId(anlassId)));
 
     this.registerSubscription(
       this.teilnahmen$.subscribe((data) => {
@@ -110,11 +93,9 @@ export class EventStartListComponent
 
   private loadAnlassRelated(anlassId: string) {
     this.registerSubscription(
-      this.store
-        .pipe(select(selectAnlassSummaryByAnlassId(anlassId)))
-        .subscribe((data) => {
-          this.anlassSummary = data;
-        }),
+      this.store.pipe(select(selectAnlassSummaryByAnlassId(anlassId))).subscribe((data) => {
+        this.anlassSummary = data;
+      }),
       /*
       this.anlassService
         .getAnlassOrganisationSummary(
@@ -137,9 +118,7 @@ export class EventStartListComponent
   }
 
   get titel(): string {
-    return (
-      this.anlass.getCleaned() + " - " + this.authService.currentVerein.name
-    );
+    return this.anlass.getCleaned() + ' - ' + this.authService.currentVerein.name;
   }
   get vereinStarted(): boolean {
     // return this.organisationAnlassLink?.startet;
@@ -186,21 +165,15 @@ export class EventStartListComponent
       return tituComparison;
     }
     if (a.talDTOList[0].abteilung && b.talDTOList[0].abteilung) {
-      const abtComparison = a.talDTOList[0].abteilung.localeCompare(
-        b.talDTOList[0].abteilung,
-      );
+      const abtComparison = a.talDTOList[0].abteilung.localeCompare(b.talDTOList[0].abteilung);
       if (abtComparison !== 0) {
         return abtComparison;
       }
-      const anlComparison = a.talDTOList[0].anlage.localeCompare(
-        b.talDTOList[0].anlage,
-      );
+      const anlComparison = a.talDTOList[0].anlage.localeCompare(b.talDTOList[0].anlage);
       if (anlComparison !== 0) {
         return anlComparison;
       }
-      const startComparison = a.talDTOList[0].startgeraet.localeCompare(
-        b.talDTOList[0].startgeraet,
-      );
+      const startComparison = a.talDTOList[0].startgeraet.localeCompare(b.talDTOList[0].startgeraet);
       if (startComparison !== 0) {
         return startComparison;
       }
@@ -212,7 +185,7 @@ export class EventStartListComponent
     //console.log("getK1 ", this.alleTeilnahmen);
     return this.alleTeilnahmen
       ?.filter((teilnahme) => {
-        console.log("filter: ", teilnahme.talDTOList[0].kategorie);
+        console.log('filter: ', teilnahme.talDTOList[0].kategorie);
         return teilnahme.talDTOList[0].kategorie == KategorieEnum.K1;
       })
       .sort((a, b) => this.sortBy(a, b));

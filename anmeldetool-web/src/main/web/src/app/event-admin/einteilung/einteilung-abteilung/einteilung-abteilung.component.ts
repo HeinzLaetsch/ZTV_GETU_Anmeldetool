@@ -1,27 +1,17 @@
-import {
-  Component,
-  Input,
-  OnInit,
-  Output,
-  ViewEncapsulation,
-  EventEmitter,
-} from "@angular/core";
-import { Subject } from "rxjs";
-import { AbteilungEnum } from "src/app/core/model/AbteilungEnum";
-import { AnlageEnum } from "src/app/core/model/AnlageEnum";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { ILaufliste } from "src/app/core/model/ILaufliste";
-import { ITeilnahmeStatistic } from "src/app/core/model/ITeilnahmeStatistic";
-import { IUser } from "src/app/core/model/IUser";
-import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
-import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.service";
-import { ChangeEvent } from "src/app/rechnungsbuero/model/change-event";
+import { Component, type EventEmitter, Input, type OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Subject } from 'rxjs';
+import type { AbteilungEnum } from 'src/app/core/model/AbteilungEnum';
+import { AnlageEnum } from 'src/app/core/model/AnlageEnum';
+import type { IAnlass } from 'src/app/core/model/IAnlass';
+import type { ITeilnahmeStatistic } from 'src/app/core/model/ITeilnahmeStatistic';
+import type { KategorieEnum } from 'src/app/core/model/KategorieEnum';
+import { CachingAnlassService } from 'src/app/core/service/caching-services/caching.anlass.service';
+import { RanglistenService } from 'src/app/core/service/rangliste/ranglisten.service';
 
 @Component({
-  selector: "app-einteilung-abteilung",
-  templateUrl: "./einteilung-abteilung.component.html",
-  styleUrls: ["./einteilung-abteilung.component.css"],
+  selector: 'lxt-einteilung-abteilung',
+  templateUrl: './einteilung-abteilung.component.html',
+  styleUrls: ['./einteilung-abteilung.component.css'],
   encapsulation: ViewEncapsulation.None,
 })
 export class EinteilungAbteilungComponent implements OnInit {
@@ -49,30 +39,21 @@ export class EinteilungAbteilungComponent implements OnInit {
 
   constructor(
     private anlassService: CachingAnlassService,
-    private ranglistenService: RanglistenService
+    private ranglistenService: RanglistenService,
   ) {
     this.loaded$ = new Subject();
   }
 
   ngOnInit() {
-    this.ranglistenService
-      .getAnlagenForAnlass(this.anlass, this.kategorie, this.abteilung)
-      .subscribe((anlagen) => {
-        this.anlagen = anlagen;
-        if (this.statisticLoaded) {
-          this.loaded$.next(true);
-        }
-        this.otherLoaded = true;
-      });
+    this.ranglistenService.getAnlagenForAnlass(this.anlass, this.kategorie, this.abteilung).subscribe((anlagen) => {
+      this.anlagen = anlagen;
+      if (this.statisticLoaded) {
+        this.loaded$.next(true);
+      }
+      this.otherLoaded = true;
+    });
     this.anlassService
-      .getTeilnahmeStatistic(
-        this.anlass,
-        this.kategorie,
-        this.abteilung,
-        undefined,
-        undefined,
-        this.search
-      )
+      .getTeilnahmeStatistic(this.anlass, this.kategorie, this.abteilung, undefined, undefined, this.search)
       .subscribe((statistic) => {
         this.teilnahmeStatistic = statistic;
         if (this.otherLoaded) {
@@ -81,17 +62,10 @@ export class EinteilungAbteilungComponent implements OnInit {
         this.statisticLoaded = true;
       });
     this.refreshEmitter.subscribe((search) => {
-      console.log("EinteilungAbteilungComponent, Refresh Kategorie: ", search);
+      console.log('EinteilungAbteilungComponent, Refresh Kategorie: ', search);
       this.search = search;
       this.anlassService
-        .getTeilnahmeStatistic(
-          this.anlass,
-          this.kategorie,
-          this.abteilung,
-          undefined,
-          undefined,
-          search
-        )
+        .getTeilnahmeStatistic(this.anlass, this.kategorie, this.abteilung, undefined, undefined, search)
         .subscribe((statistic) => {
           this.teilnahmeStatistic = statistic;
         });

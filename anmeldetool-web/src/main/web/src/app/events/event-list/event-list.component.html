@@ -3,10 +3,7 @@
 <div class="row" *ngIf="anlaesse$ | async; else loading">
   <div *ngIf="showEvents" class="row">
     <div *ngFor="let anlass of anlaesseExtended" class="col-md-auto">
-      <app-event-thumbnail
-        #thumbnail
-        [anlassExtended]="anlass"
-      ></app-event-thumbnail>
+      <lxt-event-thumbnail #thumbnail [anlassExtended]="anlass"></lxt-event-thumbnail>
     </div>
   </div>
 </div>

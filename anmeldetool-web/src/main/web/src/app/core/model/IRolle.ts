@@ -1,4 +1,4 @@
-export interface IRolle {
+export type IRolle = {
   id: string;
   name: string;
   aktiv: boolean;

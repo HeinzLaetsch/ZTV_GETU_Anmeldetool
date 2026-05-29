@@ -1,6 +1,30 @@
-import {enableProdMode} from '@angular/core';
-import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
+import { APP_INITIALIZER } from '@angular/core';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { provideEffects } from '@ngrx/effects';
+import { Store } from '@ngrx/store';
+import { provideStore } from '@ngrx/store';
+import { routingProviders } from './app/app.routing';
+import { AnmeldeToolComponent } from './app/core/component/app/app.component';
+import { AnlassActions } from './app/core/redux/anlass';
+import { AnlassEffects } from './app/core/redux/anlass/anlass.effects';
+import { VereinActions } from './app/core/redux/verein';
+import { appEffects } from './app/redux/app.effects';
+import { appReducers } from './app/redux/app.reducer';
 
-import {AppModule} from './app/app.module';
-
-platformBrowserDynamic().bootstrapModule(AppModule);
+bootstrapApplication(AnmeldeToolComponent, {
+  providers: [
+    routingProviders,
+    provideStore(appReducers),
+    //provideEffects(...appEffects),
+    provideEffects([AnlassEffects]),
+    {
+      provide: APP_INITIALIZER,
+      multi: true,
+      deps: [Store],
+      useFactory: (store: Store) => () => {
+        store.dispatch(AnlassActions.loadAllAnlaesseInvoked());
+        store.dispatch(VereinActions.loadAllVereineInvoked());
+      },
+    },
+  ],
+}).catch((e) => console.error(e));

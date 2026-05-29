@@ -1,18 +1,18 @@
-import { HttpClient, HttpHeaders, HttpResponse } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { Observable, Subject, of } from "rxjs";
-import { catchError } from "rxjs/operators";
-import { environment } from "src/environments/environment";
-import { ISmQuali } from "../../model/ISmQuali";
-import { KategorieEnum } from "../../model/KategorieEnum";
-import * as FileSaver from "file-saver";
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable, of, Subject } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
+import { ISmQuali } from '../../model/ISmQuali';
+import { KategorieEnum } from '../../model/KategorieEnum';
+import * as FileSaver from 'file-saver';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class SmQualiService {
   apiHost = `${environment.apiHost}`;
-  private url: string = this.apiHost + "/smquali";
+  private url: string = this.apiHost + '/smquali';
 
   vereine = {};
 
@@ -22,52 +22,47 @@ export class SmQualiService {
     jahr: number,
     titu: string,
     kategorie: KategorieEnum,
-    onlyQuali: boolean
+    onlyQuali: boolean,
   ): Observable<ISmQuali[]> {
-    let combinedUrl = this.url + "/" + jahr + "/" + titu + "/" + kategorie;
+    let combinedUrl = this.url + '/' + jahr + '/' + titu + '/' + kategorie;
     if (!onlyQuali) {
-      combinedUrl += "?onlyQuali=" + onlyQuali;
+      combinedUrl += '?onlyQuali=' + onlyQuali;
     }
     let headers: HttpHeaders = new HttpHeaders();
-    headers = headers.append("Accept", "application/json");
+    headers = headers.append('Accept', 'application/json');
 
     return this.http
       .get<ISmQuali[]>(combinedUrl, {
         headers,
       })
-      .pipe(catchError(this.handleError<ISmQuali[]>("getSmAuswertung", [])));
+      .pipe(catchError(this.handleError<ISmQuali[]>('getSmAuswertung', [])));
   }
 
-  getSmAuswertungCsv(
-    jahr: number,
-    titu: string,
-    kategorie: KategorieEnum,
-    onlyQuali: boolean
-  ): Observable<string> {
+  getSmAuswertungCsv(jahr: number, titu: string, kategorie: KategorieEnum, onlyQuali: boolean): Observable<string> {
     const statusResponse = new Subject<string>();
-    let combinedUrl = this.url + "/" + jahr + "/" + titu + "/" + kategorie;
+    let combinedUrl = this.url + '/' + jahr + '/' + titu + '/' + kategorie;
     if (!onlyQuali) {
-      combinedUrl += "?onlyQuali=" + onlyQuali;
+      combinedUrl += '?onlyQuali=' + onlyQuali;
     }
     let headers: HttpHeaders = new HttpHeaders();
-    headers = headers.append("Accept", "text/csv;charset=UTF-8");
+    headers = headers.append('Accept', 'text/csv;charset=UTF-8');
 
     this.http
       .get(combinedUrl, {
-        observe: "response",
-        responseType: "blob",
+        observe: 'response',
+        responseType: 'blob',
         headers,
       })
-      .pipe(catchError(this.handleError<any>("getSmAuswertungCsv", [])))
+      .pipe(catchError(this.handleError<any>('getSmAuswertungCsv', [])))
       .subscribe((result: HttpResponse<string>) => {
-        const header = result.headers.get("Content-Disposition");
-        const parts = header.split("filename=");
-        this.saveAsFile(result.body, parts[1], "text/csv");
-        statusResponse.next("Success");
+        const header = result.headers.get('Content-Disposition');
+        const parts = header.split('filename=');
+        this.saveAsFile(result.body, parts[1], 'text/csv');
+        statusResponse.next('Success');
       });
     return statusResponse.asObservable();
   }
-  private handleError<T>(operation = "operation", result?: T) {
+  private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
       console.error(error);
       return of(result as T);

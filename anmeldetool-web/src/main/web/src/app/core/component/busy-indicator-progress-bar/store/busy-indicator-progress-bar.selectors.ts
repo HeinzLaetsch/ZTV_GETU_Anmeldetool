@@ -1,16 +1,11 @@
-import { createFeatureSelector, createSelector } from "@ngrx/store";
-import { loadingFeature } from "./busy-indicator-progress-bar.reducers";
-import { LoadingState } from "./busy-indicator-progress-bar.state";
-import * as fromLoading from "./busy-indicator-progress-bar.reducers";
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { loadingFeature } from './busy-indicator-progress-bar.reducers';
+import { LoadingState } from './busy-indicator-progress-bar.state';
+import * as fromLoading from './busy-indicator-progress-bar.reducers';
 
-export const selectLoadingState = createFeatureSelector<LoadingState>(
-  loadingFeature.name
-);
+export const selectLoadingState = createFeatureSelector<LoadingState>(loadingFeature.name);
 
-export const selectAllLoading = createSelector(
-  selectLoadingState,
-  fromLoading.selectAll
-);
+export const selectAllLoading = createSelector(selectLoadingState, fromLoading.selectAll);
 export const selectAllLoadings = () =>
   createSelector(selectAllLoading, (loadingState) => {
     return loadingState;

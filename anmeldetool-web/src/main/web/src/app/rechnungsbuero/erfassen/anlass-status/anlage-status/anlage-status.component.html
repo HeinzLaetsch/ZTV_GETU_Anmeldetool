@@ -3,30 +3,14 @@
     <mat-panel-title> {{ anlage }} </mat-panel-title>
     <mat-panel-description>
       Erfasst
-      <img
-        *ngIf="!erfasst"
-        class="smallIcon"
-        src="assets/images/skype/white-question-mark.png"
-      />
-      <img
-        *ngIf="erfasst"
-        class="smallIcon"
-        src="assets/images/skype/check-mark.png"
-      />
+      <img *ngIf="!erfasst" class="smallIcon" src="assets/images/skype/white-question-mark.png" />
+      <img *ngIf="erfasst" class="smallIcon" src="assets/images/skype/check-mark.png" />
       checked
-      <img
-        *ngIf="!checked"
-        class="smallIcon"
-        src="assets/images/skype/white-question-mark.png"
-      />
-      <img
-        *ngIf="checked"
-        class="smallIcon"
-        src="assets/images/skype/check-mark.png"
-      />
+      <img *ngIf="!checked" class="smallIcon" src="assets/images/skype/white-question-mark.png" />
+      <img *ngIf="checked" class="smallIcon" src="assets/images/skype/check-mark.png" />
     </mat-panel-description>
   </mat-expansion-panel-header>
-  <app-laufliste-status
+  <lxt-laufliste-status
     *ngFor="let laufliste of lauflisten"
     [anlass]="anlass"
     [kategorie]="kategorie"
@@ -38,5 +22,5 @@
     (lauflisteErfasstEvent)="lauflisteErfasstChanged($event)"
     (lauflisteCheckedEvent)="lauflisteCheckedChanged($event)"
     (lauflisteSelectedEvent)="lauflisteSelected($event)"
-  ></app-laufliste-status>
+  ></lxt-laufliste-status>
 </mat-expansion-panel>

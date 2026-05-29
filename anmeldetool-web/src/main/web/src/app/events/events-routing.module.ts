@@ -1,33 +1,33 @@
-import { NgModule } from "@angular/core";
-import { RouterModule, Routes } from "@angular/router";
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
 import {
   EventListComponent,
   EventRegisterSummaryComponent,
   EventRouteActivatorService,
   EventsDetailComponent,
   EventStartListComponent,
-} from "./index";
+} from './index';
 
 export const routes: Routes = [
   {
-    path: "",
+    path: '',
     component: EventListComponent,
     // canActivate: [EventRouteActivatorService],
   },
   {
-    path: ":id",
+    path: ':id',
     component: EventsDetailComponent,
     canActivate: [EventRouteActivatorService],
     data: { roles: [] },
   },
   {
-    path: ":id/anmeldung",
+    path: ':id/anmeldung',
     component: EventRegisterSummaryComponent,
     canActivate: [EventRouteActivatorService],
     data: { roles: [] },
   },
   {
-    path: ":id/startliste",
+    path: ':id/startliste',
     component: EventStartListComponent,
     canActivate: [EventRouteActivatorService],
     data: { roles: [] },

@@ -1,28 +1,28 @@
-import { NgModule } from "@angular/core";
-import { RouterModule, Routes } from "@angular/router";
-import { EventRouteActivatorService } from "../events";
-import { EventAdminComponent } from "./index";
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { EventRouteActivatorService } from '../events';
+import { EventAdminComponent } from './index';
 
 export const EventAdminRoutes: Routes = [
   {
-    path: "",
+    path: '',
     component: EventAdminComponent,
   },
   {
-    path: ":id",
+    path: ':id',
     component: EventAdminComponent,
   },
   {
-    path: "admin",
+    path: 'admin',
     component: EventAdminComponent,
     canActivate: [EventRouteActivatorService],
-    data: { roles: ["SEKRETARIAT"] },
+    data: { roles: ['SEKRETARIAT'] },
   },
   {
-    path: ":id/admin",
+    path: ':id/admin',
     component: EventAdminComponent,
     canActivate: [EventRouteActivatorService],
-    data: { roles: ["SEKRETARIAT"] },
+    data: { roles: ['SEKRETARIAT'] },
   },
 ];
 

@@ -1,16 +1,17 @@
-import { Injectable } from "@angular/core";
-import { Resolve } from "@angular/router";
-import { Observable, of } from "rxjs";
+import { Injectable } from '@angular/core';
+import { Resolve } from '@angular/router';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class TeilnehmerResolverService implements Resolve<number> {
-  constructor() // private teilnehmerService: CachingTeilnehmerService // private authService: AuthService,
-  {}
+  constructor() {
+    // private teilnehmerService: CachingTeilnehmerService // private authService: AuthService,
+  }
 
   resolve(): Observable<number> {
-    console.log("resolve Teilnehmer");
+    console.log('resolve Teilnehmer');
     return of(0);
     /*
     return this.teilnehmerService

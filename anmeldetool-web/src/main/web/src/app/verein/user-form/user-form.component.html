@@ -1,34 +1,32 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-6">
-      <app-user
+      <lxt-user
         [modify]="true"
-        [readOnly]="
-          !(isOwner() || isVereinsAnmelder || isVereinsVerantwortlicher)
-        "
+        [readOnly]="!(isOwner() || isVereinsAnmelder || isVereinsVerantwortlicher)"
         [(user)]="currentUser"
         [showPassword]="isOwner()"
         [showBenutzername]="true"
         [mustShowPassword]="false"
         (valid)="updateUserValid($event)"
-      ></app-user>
+      ></lxt-user>
     </div>
     <div class="col-6" [hidden]="isUserDirty()">
-      <app-role
+      <lxt-role
         [currentUser]="currentUser"
         [isVereinsAnmelder]="isVereinsAnmelder"
         [isVereinsVerantwortlicher]="isVereinsVerantwortlicher"
         [(assignedRoles)]="assignedRoles"
       >
-      </app-role>
-      <app-wertungsrichter
+      </lxt-role>
+      <lxt-wertungsrichter
         *ngIf="isWertungsrichter()"
         [currentUser]="currentUser"
         [(wertungsrichter)]="wertungsrichter"
         [isVereinsAnmelder]="isVereinsAnmelder"
         [isVereinsVerantwortlicher]="isVereinsVerantwortlicher"
       >
-      </app-wertungsrichter>
+      </lxt-wertungsrichter>
     </div>
   </div>
 </div>

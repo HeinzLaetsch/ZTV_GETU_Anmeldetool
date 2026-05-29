@@ -1,33 +1,36 @@
-import { Component } from "@angular/core";
-import { ProgressBarMode } from "@angular/material/progress-bar";
-import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
-import { AppState } from "../../redux/core.state";
-import {
-  selectErrors,
-  selectLoading,
-  selectTransactions,
-} from "./store/busy-indicator-progress-bar.selectors";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { SnackBarComponent } from "./snack-bar/snack-bar.component";
-import { ILoading } from "./store/busy-indicator-progress-bar.state";
-import { LoadingActions } from "./store/busy-indicator-progress-bar.actions";
-import { SubscriptionHelper } from "src/app/utils/subscription-helper";
+import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
+import type { ProgressBarMode } from '@angular/material/progress-bar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { select, Store } from '@ngrx/store';
+import type { Observable } from 'rxjs';
+import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
+import type { AppState } from '../../redux/core.state';
+import { SnackBarComponent } from './snack-bar/snack-bar.component';
+import { LoadingActions } from './store/busy-indicator-progress-bar.actions';
+import { selectErrors, selectLoading, selectTransactions } from './store/busy-indicator-progress-bar.selectors';
+import type { ILoading } from './store/busy-indicator-progress-bar.state';
 
 @Component({
-  selector: "app-busy-indicator-progress-bar",
-  templateUrl: "./busy-indicator-progress-bar.component.html",
-  styleUrls: ["./busy-indicator-progress-bar.component.scss"],
+  selector: 'lxt-busy-indicator-progress-bar',
+  templateUrl: './busy-indicator-progress-bar.component.html',
+  styleUrls: ['./busy-indicator-progress-bar.component.scss'],
+  standalone: true,
+  imports: [CommonModule, MatProgressBarModule, MatSnackBarModule],
 })
 export class BusyIndicatorProgressBarComponent extends SubscriptionHelper {
-  public mode: ProgressBarMode = "determinate";
+  mode: ProgressBarMode = 'determinate';
   durationInSeconds = 5;
 
-  isLoading$: Observable<any>;
-  isTransactions$: Observable<any>;
-  isError$: Observable<any>;
+  isLoading$: Observable<ILoading[]>;
+  isTransactions$: Observable<ILoading[]>;
+  isError$: Observable<ILoading[]>;
 
-  constructor(private store: Store<AppState>, private _snackBar: MatSnackBar) {
+  private readonly store = inject(Store<AppState>);
+  private readonly _snackBar = inject(MatSnackBar);
+
+  constructor() {
     super();
     this.isLoading$ = this.store.pipe(select(selectLoading()));
     this.isTransactions$ = this.store.pipe(select(selectTransactions()));
@@ -35,10 +38,10 @@ export class BusyIndicatorProgressBarComponent extends SubscriptionHelper {
     this.registerSubscription(
       this.isLoading$.subscribe((data) => {
         if (data && data.length > 0) {
-          console.log("ProgressBarMode: buffer 1");
-          this.mode = "buffer";
+          console.log('ProgressBarMode: buffer 1');
+          this.mode = 'buffer';
         }
-      })
+      }),
     );
     this.registerSubscription(
       this.isTransactions$.subscribe((data) => {
@@ -50,41 +53,23 @@ export class BusyIndicatorProgressBarComponent extends SubscriptionHelper {
                 this.store.dispatch(
                   LoadingActions.loadingEventProcessed({
                     payload: item.id,
-                  })
+                  }),
                 );
               } else {
                 isAllFinished = false;
               }
             });
-            if (isAllFinished) {
-              console.log("ProgressBarMode: determinate 2");
-              this.mode = "determinate";
-            }
           }
         }
-      })
-    );
-    this.registerSubscription(
-      this.isError$.subscribe((data) => {
-        if (data && data.length > 0) {
-          console.log("ProgressBarMode: determinate 3");
-          this.mode = "determinate";
-          const error = data.find((x) => x.hasError);
-          this.openSnackBar(error);
-          this.store.dispatch(
-            LoadingActions.loadingEventProcessed({
-              payload: error.id,
-            })
-          );
-        }
-      })
+      }),
     );
   }
-  openSnackBar(data: ILoading) {
+
+  openSnackBar(data: ILoading): void {
     this._snackBar.openFromComponent(SnackBarComponent, {
       duration: this.durationInSeconds * 1000,
-      verticalPosition: "top",
-      data: data.id + " / " + data.message,
+      verticalPosition: 'top',
+      data: data.id + ' / ' + data.message,
     });
   }
 }

@@ -316,8 +316,7 @@ const AG_GRID_LOCALE_DE = {
   ariaValuesDropZonePanelLabel: 'Values',
   ariaPivotDropZonePanelLabel: 'Column Labels',
   ariaDropZoneColumnComponentDescription: 'Press DELETE to remove',
-  ariaDropZoneColumnValueItemDescription:
-    'Press ENTER to change the aggregation type',
+  ariaDropZoneColumnValueItemDescription: 'Press ENTER to change the aggregation type',
   ariaDropZoneColumnGroupItemDescription: 'Press ENTER to sort',
   // used for aggregate drop zone, format: {aggregation}{ariaDropZoneColumnComponentAggFuncSeparator}{column name}
   ariaDropZoneColumnComponentAggFuncSeparator: ' of ',

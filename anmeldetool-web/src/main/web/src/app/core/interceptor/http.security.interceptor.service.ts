@@ -1,15 +1,9 @@
-import {
-  HttpErrorResponse,
-  HttpEvent,
-  HttpHandler,
-  HttpInterceptor,
-  HttpRequest,
-} from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { Router } from "@angular/router";
-import { Observable } from "rxjs";
-import { tap } from "rxjs/operators";
-import { AuthService } from "../service/auth/auth.service";
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { AuthService } from '../service/auth/auth.service';
 @Injectable()
 export class HttpSecurityInterceptorService implements HttpInterceptor {
   constructor(
@@ -17,10 +11,7 @@ export class HttpSecurityInterceptorService implements HttpInterceptor {
     private authService: AuthService,
   ) {}
 
-  intercept(
-    req: HttpRequest<any>,
-    next: HttpHandler,
-  ): Observable<HttpEvent<any>> {
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     /*
     console.log(
       "Interceptor called: ",
@@ -37,10 +28,10 @@ export class HttpSecurityInterceptorService implements HttpInterceptor {
       if (this.authService.currentUser !== null) {
         // console.log("Current User: ", this.authService.);
         newHeaders = newHeaders
-          .append("authtoken", this.authService.getToken())
-          .append("userid", this.authService.currentUser.id)
-          .append("vereinsid", this.authService.currentVerein?.id)
-          .append("X-Requested-With", "XMLHttpRequest");
+          .append('authtoken', this.authService.getToken())
+          .append('userid', this.authService.currentUser.id)
+          .append('vereinsid', this.authService.currentVerein?.id)
+          .append('X-Requested-With', 'XMLHttpRequest');
       }
     } else {
       // console.log("Dont do anything");
@@ -57,7 +48,7 @@ export class HttpSecurityInterceptorService implements HttpInterceptor {
               return;
             }
             this.authService.currentUser = undefined;
-            this.router.navigate(["/"]);
+            this.router.navigate(['/']);
           }
         },
       ),

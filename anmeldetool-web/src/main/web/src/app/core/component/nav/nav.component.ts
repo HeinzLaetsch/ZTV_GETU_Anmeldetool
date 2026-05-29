@@ -1,30 +1,31 @@
-import { Component, OnInit } from "@angular/core";
-import { AuthService } from "../../service/auth/auth.service";
-import { AppState } from "../../redux/core.state";
-import { Store, select } from "@ngrx/store";
-import { SubscriptionHelper } from "src/app/utils/subscription-helper";
-import { IAnlass } from "../../model/IAnlass";
-import { Observable } from "rxjs";
-import { selectAnlaesseSortedNew } from "../../redux/anlass";
-import {
-  selectAlleVereine,
-  selectVereinById,
-  selectVereineSorted,
-} from "../../redux/verein";
-import { IVerein } from "src/app/verein/verein";
-import { Router } from "@angular/router";
+import { Component, type OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
+import { select, Store } from '@ngrx/store';
+import type { Observable } from 'rxjs';
+import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
+import type { IVerein } from 'src/app/verein/verein';
+import type { IAnlass } from '../../model/IAnlass';
+import { selectAnlaesseSortedNew } from '../../redux/anlass';
+import type { AppState } from '../../redux/core.state';
+import { selectVereinById, selectVereineSorted } from '../../redux/verein';
+import { AuthService } from '../../service/auth/auth.service';
+import { MaterialModule } from 'src/app/shared/material-module';
 
 @Component({
-  selector: "app-nav",
-  templateUrl: "./nav.component.html",
-  styleUrls: ["./nav.component.scss"],
+  selector: 'lxt-nav',
+  templateUrl: './nav.component.html',
+  styleUrls: ['./nav.component.scss'],
+  standalone: true,
+  imports: [CommonModule, RouterModule, MaterialModule],
 })
 export class NavComponent extends SubscriptionHelper implements OnInit {
   anlaesse: IAnlass[];
-  public anlaesse$!: Observable<IAnlass[]>;
+  anlaesse$!: Observable<IAnlass[]>;
 
   vereine: IVerein[];
-  public vereine$!: Observable<IVerein[]>;
+  vereine$!: Observable<IVerein[]>;
 
   organisator: IVerein;
 
@@ -36,9 +37,7 @@ export class NavComponent extends SubscriptionHelper implements OnInit {
     super();
     this.anlaesse$ = this.store.pipe(select(selectAnlaesseSortedNew(true)));
     this.vereine$ = this.store.pipe(select(selectVereineSorted()));
-    this.router.routeReuseStrategy.shouldReuseRoute = function () {
-      return false;
-    };
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
   }
 
   ngOnInit() {
@@ -81,6 +80,6 @@ export class NavComponent extends SubscriptionHelper implements OnInit {
     // this.anlassService.reset();
     // this.teilnehmerService.reset(oldSelectedVerein, false);
     // this.teilnehmerService.loadTeilnehmer(verein);
-    this.router.navigate(["/"]);
+    this.router.navigate(['/']);
   }
 }

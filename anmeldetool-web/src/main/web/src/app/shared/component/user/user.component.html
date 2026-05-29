@@ -2,15 +2,8 @@
   <p *ngIf="showBenutzername">
     <mat-form-field [appearance]="appearance">
       <mat-label>Benutzername</mat-label>
-      <input
-        matInput
-        placeholder="Benutzername"
-        formControlName="benutzernameControl"
-        required
-      />
-      <mat-error *ngIf="form.controls.benutzernameControl.hasError('required')">
-        Pflichtfeld
-      </mat-error>
+      <input matInput placeholder="Benutzername" formControlName="benutzernameControl" required />
+      <mat-error *ngIf="form.controls.benutzernameControl.hasError('required')"> Pflichtfeld </mat-error>
       <mat-error *ngIf="form.controls.benutzernameControl.invalid">
         ungültiger Benutzername Beispiel: hans.muster&#64;turnverein.ch
       </mat-error>
@@ -21,82 +14,47 @@
   <p>
     <mat-form-field [appearance]="appearance">
       <mat-label>Nachname</mat-label>
-      <input
-        matInput
-        placeholder="Nachname"
-        formControlName="nachnameControl"
-        required
-      />
-      <mat-error *ngIf="form.controls.nachnameControl.hasError('required')">
-        Pflichtfeld
-      </mat-error>
+      <input matInput placeholder="Nachname" formControlName="nachnameControl" required />
+      <mat-error *ngIf="form.controls.nachnameControl.hasError('required')"> Pflichtfeld </mat-error>
       <mat-hint>Gib den Nachnamen ein</mat-hint>
     </mat-form-field>
   </p>
   <p>
     <mat-form-field [appearance]="appearance">
       <mat-label>Vorname</mat-label>
-      <input
-        matInput
-        placeholder="Vorname"
-        formControlName="vornameControl"
-        required
-      />
-      <mat-error *ngIf="form.controls.vornameControl.hasError('required')">
-        Pflichtfeld
-      </mat-error>
+      <input matInput placeholder="Vorname" formControlName="vornameControl" required />
+      <mat-error *ngIf="form.controls.vornameControl.hasError('required')"> Pflichtfeld </mat-error>
       <mat-hint>Gib den Vornamen ein</mat-hint>
     </mat-form-field>
   </p>
   <p *ngIf="showPassword && !mustShowPassword">
-    <mat-checkbox
-      formControlName="passwortAendernControl"
-      [(ngModel)]="showPasswordAendern"
+    <mat-checkbox formControlName="passwortAendernControl" [(ngModel)]="showPasswordAendern"
       >Passwort ändern
     </mat-checkbox>
   </p>
   <p *ngIf="showPasswordAendern || mustShowPassword">
     <mat-form-field [appearance]="appearance">
       <mat-label>Passwort</mat-label>
-      <input
-        type="password"
-        matInput
-        placeholder="Passwort"
-        formControlName="passwortControl"
-      />
-      <mat-error *ngIf="form.controls.passwortControl.hasError('required')">
-        Pflichtfeld
-      </mat-error>
+      <input type="password" matInput placeholder="Passwort" formControlName="passwortControl" />
+      <mat-error *ngIf="form.controls.passwortControl.hasError('required')"> Pflichtfeld </mat-error>
       <mat-hint>Gib das gleiche Passwort nochmals ein</mat-hint>
     </mat-form-field>
   </p>
   <p *ngIf="showPasswordAendern || mustShowPassword">
     <mat-form-field [appearance]="appearance">
       <mat-label>Passwort bestätigen</mat-label>
-      <input
-        type="password"
-        matInput
-        placeholder="Passwort"
-        formControlName="passwort2Control"
-      />
-      <mat-error *ngIf="form.controls.passwort2Control.hasError('required')">
-        Pflichtfeld
-      </mat-error>
+      <input type="password" matInput placeholder="Passwort" formControlName="passwort2Control" />
+      <mat-error *ngIf="form.controls.passwort2Control.hasError('required')"> Pflichtfeld </mat-error>
       <mat-hint>Gib das Passwort nochmals ein</mat-hint>
     </mat-form-field>
   </p>
   <p>
     <mat-form-field appearance="fill">
       <mat-label>Mobiltelefon</mat-label>
-      <app-phone-input
-        formControlName="mobilNummerControl"
-        required
-      ></app-phone-input>
+      <lxt-phone-input formControlName="mobilNummerControl" required></lxt-phone-input>
       <mat-icon matSuffix>phone</mat-icon>
       <mat-hint>Gib die Mobilnummer ein Beispiel: 076 111 11 11</mat-hint>
-      <mat-error *ngIf="form.controls.mobilNummerControl.hasError('required')">
-        Pflichtfeld
-      </mat-error>
+      <mat-error *ngIf="form.controls.mobilNummerControl.hasError('required')"> Pflichtfeld </mat-error>
       <mat-error *ngIf="form.controls.mobilNummerControl.invalid">
         ungültige Mobile Nummer Beispiel: 076 111 11 11
       </mat-error>
@@ -105,17 +63,9 @@
   <p>
     <mat-form-field [appearance]="appearance">
       <mat-label>Kontakt eMail Adresse</mat-label>
-      <input
-        matInput
-        placeholder="eMail Adresse"
-        formControlName="eMailAdresseControl"
-      />
-      <mat-error *ngIf="form.controls.eMailAdresseControl.hasError('required')">
-        Pflichtfeld
-      </mat-error>
-      <mat-error *ngIf="form.controls.eMailAdresseControl.hasError('valid')">
-        ungültige eMail Adresse
-      </mat-error>
+      <input matInput placeholder="eMail Adresse" formControlName="eMailAdresseControl" />
+      <mat-error *ngIf="form.controls.eMailAdresseControl.hasError('required')"> Pflichtfeld </mat-error>
+      <mat-error *ngIf="form.controls.eMailAdresseControl.hasError('valid')"> ungültige eMail Adresse </mat-error>
       <mat-hint>Gib die eMail Adresse ein</mat-hint>
     </mat-form-field>
   </p>

@@ -1,7 +1,7 @@
-import { IMeldeStatusStati } from "./IMeldeStatusStati";
-import { KategorieEnum } from "./KategorieEnum";
+import { IMeldeStatusStati } from './IMeldeStatusStati';
+import { KategorieEnum } from './KategorieEnum';
 
-export interface IKategorieStati {
+export type IKategorieStati = {
   kategorie: KategorieEnum;
   meldeStati: IMeldeStatusStati[];
 }

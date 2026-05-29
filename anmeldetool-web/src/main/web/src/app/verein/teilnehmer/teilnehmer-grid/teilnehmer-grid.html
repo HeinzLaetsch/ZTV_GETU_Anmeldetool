@@ -28,10 +28,7 @@
     </mat-form-field>
   </span-->
   <span class="abstand">
-    <mat-checkbox
-      class="checkbox"
-      [(ngModel)]="showOldAnlaesse"
-      (change)="showOldChanged($event.checked)"
+    <mat-checkbox class="checkbox" [(ngModel)]="showOldAnlaesse" (change)="showOldChanged($event.checked)"
       >vergangene Wettkämpfe anzeigen</mat-checkbox
     >
   </span>
@@ -48,7 +45,7 @@
     matTooltip="Neue TurnerIn anlegen"
     matTooltipPosition="below"
     matTooltipHideDelay="500"
-    (click)="addRow($event)"
+    (click)="addRow()"
   >
     Neu
   </button>

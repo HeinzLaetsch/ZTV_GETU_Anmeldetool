@@ -6,10 +6,7 @@
       </div>
     </div>
     <div class="row red">
-      <h2>
-        die Anlage und das Startgerät können bis ca. 15 Minuten vor dem
-        Wettkampfstart noch ändern
-      </h2>
+      <h2>die Anlage und das Startgerät können bis ca. 15 Minuten vor dem Wettkampfstart noch ändern</h2>
     </div>
     <div class="row">
       <div class="col-sm-10">
@@ -26,16 +23,11 @@
         <span *ngIf="anlass.startDatum !== anlass.endDatum">von</span>:
       </div>
       <div class="col-sm-2 text-bold">
-        {{ anlass.startDatum | date : "EEE, d MMMM , y" : "GMT+1" : "DE-CH" }}
+        {{ anlass.startDatum | date: 'EEE, d MMMM , y' : 'GMT+1' : 'DE-CH' }}
       </div>
-      <div class="col-sm-2" *ngIf="anlass.startDatum !== anlass.endDatum">
-        bis:
-      </div>
-      <div
-        class="col-sm text-bold"
-        *ngIf="anlass.startDatum !== anlass.endDatum"
-      >
-        {{ anlass.endDatum | date : "EEE, d MMMM , y" : "GMT+1" : "DE-CH" }}
+      <div class="col-sm-2" *ngIf="anlass.startDatum !== anlass.endDatum">bis:</div>
+      <div class="col-sm text-bold" *ngIf="anlass.startDatum !== anlass.endDatum">
+        {{ anlass.endDatum | date: 'EEE, d MMMM , y' : 'GMT+1' : 'DE-CH' }}
         >
       </div>
     </div>
@@ -74,168 +66,112 @@
         {{ anzahlTeilnehmer }}
       </div>
     </div>
-    <ng-container
-      *ngIf="brevet1Anlass && getTeilnahmenForKategorieK1().length > 0"
-    >
-      <app-event-start-list-header
-        [titel]="'Kategorie 1'"
-      ></app-event-start-list-header>
-      <app-event-start-list-row
+    <ng-container *ngIf="brevet1Anlass && getTeilnahmenForKategorieK1().length > 0">
+      <lxt-event-start-list-header [titel]="'Kategorie 1'"></lxt-event-start-list-header>
+      <lxt-event-start-list-row
         *ngFor="let teilnahme of getTeilnahmenForKategorieK1()"
         [anlass]="anlass"
         [teilnahme]="teilnahme"
-      ></app-event-start-list-row>
+      ></lxt-event-start-list-row>
     </ng-container>
 
-    <ng-container
-      *ngIf="brevet1Anlass && getTeilnahmenForKategorieK2().length > 0"
-    >
-      <app-event-start-list-header
-        [titel]="'Kategorie 2'"
-      ></app-event-start-list-header>
-      <app-event-start-list-row
+    <ng-container *ngIf="brevet1Anlass && getTeilnahmenForKategorieK2().length > 0">
+      <lxt-event-start-list-header [titel]="'Kategorie 2'"></lxt-event-start-list-header>
+      <lxt-event-start-list-row
         *ngFor="let teilnahme of getTeilnahmenForKategorieK2()"
         [anlass]="anlass"
         [teilnahme]="teilnahme"
-      ></app-event-start-list-row>
+      ></lxt-event-start-list-row>
     </ng-container>
 
-    <ng-container
-      *ngIf="brevet1Anlass && getTeilnahmenForKategorieK3().length > 0"
-    >
-      <app-event-start-list-header
-        [titel]="'Kategorie 3'"
-      ></app-event-start-list-header>
-      <app-event-start-list-row
+    <ng-container *ngIf="brevet1Anlass && getTeilnahmenForKategorieK3().length > 0">
+      <lxt-event-start-list-header [titel]="'Kategorie 3'"></lxt-event-start-list-header>
+      <lxt-event-start-list-row
         *ngFor="let teilnahme of getTeilnahmenForKategorieK3()"
         [anlass]="anlass"
         [teilnahme]="teilnahme"
-      ></app-event-start-list-row>
+      ></lxt-event-start-list-row>
     </ng-container>
 
-    <ng-container
-      *ngIf="brevet1Anlass && getTeilnahmenForKategorieK4().length > 0"
-    >
-      <app-event-start-list-header
-        [titel]="'Kategorie 4'"
-      ></app-event-start-list-header>
-      <app-event-start-list-row
+    <ng-container *ngIf="brevet1Anlass && getTeilnahmenForKategorieK4().length > 0">
+      <lxt-event-start-list-header [titel]="'Kategorie 4'"></lxt-event-start-list-header>
+      <lxt-event-start-list-row
         *ngFor="let teilnahme of getTeilnahmenForKategorieK4()"
         [anlass]="anlass"
         [teilnahme]="teilnahme"
-      ></app-event-start-list-row>
+      ></lxt-event-start-list-row>
     </ng-container>
 
-    <ng-container
-      *ngIf="
-        tuAnlass && brevet2Anlass && getTeilnahmenForKategorieK5().length > 0
-      "
-    >
-      <app-event-start-list-header
-        [titel]="'Kategorie 5'"
-      ></app-event-start-list-header>
-      <app-event-start-list-row
+    <ng-container *ngIf="tuAnlass && brevet2Anlass && getTeilnahmenForKategorieK5().length > 0">
+      <lxt-event-start-list-header [titel]="'Kategorie 5'"></lxt-event-start-list-header>
+      <lxt-event-start-list-row
         *ngFor="let teilnahme of getTeilnahmenForKategorieK5()"
         [anlass]="anlass"
         [teilnahme]="teilnahme"
-      ></app-event-start-list-row>
+      ></lxt-event-start-list-row>
     </ng-container>
 
-    <ng-container
-      *ngIf="
-        tiAnlass && brevet2Anlass && getTeilnahmenForKategorieK5A().length > 0
-      "
-    >
-      <app-event-start-list-header
-        [titel]="'Kategorie 5A'"
-      ></app-event-start-list-header>
-      <app-event-start-list-row
+    <ng-container *ngIf="tiAnlass && brevet2Anlass && getTeilnahmenForKategorieK5A().length > 0">
+      <lxt-event-start-list-header [titel]="'Kategorie 5A'"></lxt-event-start-list-header>
+      <lxt-event-start-list-row
         *ngFor="let teilnahme of getTeilnahmenForKategorieK5A()"
         [anlass]="anlass"
         [teilnahme]="teilnahme"
-      ></app-event-start-list-row>
+      ></lxt-event-start-list-row>
     </ng-container>
 
-    <ng-container
-      *ngIf="
-        tiAnlass && brevet2Anlass && getTeilnahmenForKategorieK5B().length > 0
-      "
-    >
-      <app-event-start-list-header
-        [titel]="'Kategorie 5B'"
-      ></app-event-start-list-header>
-      <app-event-start-list-row
+    <ng-container *ngIf="tiAnlass && brevet2Anlass && getTeilnahmenForKategorieK5B().length > 0">
+      <lxt-event-start-list-header [titel]="'Kategorie 5B'"></lxt-event-start-list-header>
+      <lxt-event-start-list-row
         *ngFor="let teilnahme of getTeilnahmenForKategorieK5B()"
         [anlass]="anlass"
         [teilnahme]="teilnahme"
-      ></app-event-start-list-row>
+      ></lxt-event-start-list-row>
     </ng-container>
 
-    <ng-container
-      *ngIf="brevet2Anlass && getTeilnahmenForKategorieK6().length > 0"
-    >
-      <app-event-start-list-header
-        [titel]="'Kategorie 6'"
-      ></app-event-start-list-header>
+    <ng-container *ngIf="brevet2Anlass && getTeilnahmenForKategorieK6().length > 0">
+      <lxt-event-start-list-header [titel]="'Kategorie 6'"></lxt-event-start-list-header>
 
-      <app-event-start-list-row
+      <lxt-event-start-list-row
         *ngFor="let teilnahme of getTeilnahmenForKategorieK6()"
         [anlass]="anlass"
         [teilnahme]="teilnahme"
-      ></app-event-start-list-row>
+      ></lxt-event-start-list-row>
     </ng-container>
 
-    <ng-container
-      *ngIf="
-        tiAnlass && brevet2Anlass && getTeilnahmenForKategorieKD().length > 0
-      "
-    >
-      <app-event-start-list-header
-        [titel]="'Kategorie Damen'"
-      ></app-event-start-list-header>
-      <app-event-start-list-row
+    <ng-container *ngIf="tiAnlass && brevet2Anlass && getTeilnahmenForKategorieKD().length > 0">
+      <lxt-event-start-list-header [titel]="'Kategorie Damen'"></lxt-event-start-list-header>
+      <lxt-event-start-list-row
         *ngFor="let teilnahme of getTeilnahmenForKategorieKD()"
         [anlass]="anlass"
         [teilnahme]="teilnahme"
-      ></app-event-start-list-row>
+      ></lxt-event-start-list-row>
     </ng-container>
 
-    <ng-container
-      *ngIf="
-        tuAnlass && brevet2Anlass && getTeilnahmenForKategorieKH().length > 0
-      "
-    >
-      <app-event-start-list-header
-        [titel]="'Kategorie Herren'"
-      ></app-event-start-list-header>
-      <app-event-start-list-row
+    <ng-container *ngIf="tuAnlass && brevet2Anlass && getTeilnahmenForKategorieKH().length > 0">
+      <lxt-event-start-list-header [titel]="'Kategorie Herren'"></lxt-event-start-list-header>
+      <lxt-event-start-list-row
         *ngFor="let teilnahme of getTeilnahmenForKategorieKH()"
         [anlass]="anlass"
         [teilnahme]="teilnahme"
-      ></app-event-start-list-row>
+      ></lxt-event-start-list-row>
     </ng-container>
 
-    <ng-container
-      *ngIf="brevet2Anlass && getTeilnahmenForKategorieK7().length > 0"
-    >
-      <app-event-start-list-header
-        [titel]="'Kategorie 7'"
-      ></app-event-start-list-header>
+    <ng-container *ngIf="brevet2Anlass && getTeilnahmenForKategorieK7().length > 0">
+      <lxt-event-start-list-header [titel]="'Kategorie 7'"></lxt-event-start-list-header>
 
-      <app-event-start-list-row
+      <lxt-event-start-list-row
         *ngFor="let teilnahme of getTeilnahmenForKategorieK7()"
         [anlass]="anlass"
         [teilnahme]="teilnahme"
-      ></app-event-start-list-row>
+      ></lxt-event-start-list-row>
     </ng-container>
 
     <div class="row"></div>
     <div class="container">
       <div class="row">
         <div class="col-sm-9"></div>
-        <div class="col-sm-2 well hoverwell button" (click)="print()">
-          Ausdrucken
-        </div>
+        <div class="col-sm-2 well hoverwell button" (click)="print()">Ausdrucken</div>
       </div>
     </div>
   </div>

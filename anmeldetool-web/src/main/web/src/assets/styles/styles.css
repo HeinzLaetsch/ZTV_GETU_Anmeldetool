@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
-@import "ag-grid-community/styles/ag-grid.css";
-@import "ag-grid-community/styles/ag-theme-alpine.css";
+@import 'ag-grid-community/styles/ag-grid.css';
+@import 'ag-grid-community/styles/ag-theme-alpine.css';
 
 .ag-theme-alpine .ag-header-cell {
   padding: 5px;
@@ -12,7 +12,8 @@
   font-family: 'Material Icons';
   font-style: normal;
   font-weight: 400;
-  src: local('Material Icons'),
+  src:
+    local('Material Icons'),
     local('MaterialIcons-Regular'),
     url(../material/font/MaterialIcons-Regular.ttf) format('truetype');
 }
@@ -42,7 +43,7 @@
 
 :root {
   --ztv-blue: #488dd6;
-  --ztv-light-blue: rgba(72,141,214, 0.5);
+  --ztv-light-blue: rgba(72, 141, 214, 0.5);
   --ztv-lighter-blue: rgba(72, 141, 214, 0.25);
   --ztv-white: #ffff;
   --ztv-black: rgba(0, 0, 0, 0.78);
@@ -172,7 +173,7 @@ body {
 body,
 .mat-body {
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
   font-size: 0.8rem !important;
   font-weight: 300 !important;
 }

@@ -1,4 +1,4 @@
-export interface ITeilnahmeStatistic {
+export type ITeilnahmeStatistic = {
   total: number;
   totalStartende: number;
   totalZurueckgezogen: number;

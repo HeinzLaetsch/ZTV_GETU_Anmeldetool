@@ -1,4 +1,4 @@
-export interface IRanglistenEntry {
+export type IRanglistenEntry = {
   gesamtPunktzahl: number;
   noteReck: number;
   noteBoden: number;

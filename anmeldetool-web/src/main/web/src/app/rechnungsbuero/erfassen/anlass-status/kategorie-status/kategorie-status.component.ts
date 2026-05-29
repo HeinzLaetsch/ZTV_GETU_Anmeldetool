@@ -1,23 +1,21 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewEncapsulation,
-} from "@angular/core";
-import { AbteilungEnum } from "src/app/core/model/AbteilungEnum";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { ILaufliste } from "src/app/core/model/ILaufliste";
-import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.service";
-import { ChangeEvent } from "src/app/rechnungsbuero/model/change-event";
+import { Component, EventEmitter, Input, type OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AbteilungEnum } from 'src/app/core/model/AbteilungEnum';
+import type { IAnlass } from 'src/app/core/model/IAnlass';
+import type { ILaufliste } from 'src/app/core/model/ILaufliste';
+import type { KategorieEnum } from 'src/app/core/model/KategorieEnum';
+import { RanglistenService } from 'src/app/core/service/rangliste/ranglisten.service';
+import type { ChangeEvent } from 'src/app/rechnungsbuero/model/change-event';
+import { MaterialModule } from 'src/app/shared/material-module';
+import { AbteilungStatusComponent } from '../abteilung-status/abteilung-status.component';
 
 @Component({
-  selector: "app-kategorie-status",
-  templateUrl: "./kategorie-status.component.html",
-  styleUrls: ["./kategorie-status.component.css"],
+  selector: 'lxt-kategorie-status',
+  templateUrl: './kategorie-status.component.html',
+  styleUrls: ['./kategorie-status.component.css'],
   encapsulation: ViewEncapsulation.None,
+  standalone: true,
+  imports: [CommonModule, MaterialModule, AbteilungStatusComponent],
 })
 export class KategorieStatusComponent implements OnInit {
   @Input()
@@ -44,19 +42,16 @@ export class KategorieStatusComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.ranglistenService
-      .getAbteilungenForAnlass(this.anlass, this.kategorie)
-      .subscribe((abteilungen) => {
-        this.abteilungen = abteilungen;
-      });
+    this.ranglistenService.getAbteilungenForAnlass(this.anlass, this.kategorie).subscribe((abteilungen) => {
+      this.abteilungen = abteilungen;
+    });
     this.erfasstChangedEmitter.subscribe((laufliste) => {
       // console.log("KategorieStatusComponent: Laufliste changed: ", laufliste);
     });
   }
 
   erfasstChanged(changeEvent: ChangeEvent) {
-    this.erfasstAbteilungen[this.getIndex(changeEvent.topic)] =
-      changeEvent.status;
+    this.erfasstAbteilungen[this.getIndex(changeEvent.topic)] = changeEvent.status;
     const nichtAlle = this.erfasstAbteilungen.filter((erfasst) => {
       if (erfasst === false) {
         return true;
@@ -66,8 +61,7 @@ export class KategorieStatusComponent implements OnInit {
     this.erfasst = nichtAlle.length === 0;
   }
   checkedChanged(changeEvent: ChangeEvent) {
-    this.checkedAbteilungen[this.getIndex(changeEvent.topic)] =
-      changeEvent.status;
+    this.checkedAbteilungen[this.getIndex(changeEvent.topic)] = changeEvent.status;
     const nichtAlle = this.checkedAbteilungen.filter((checked) => {
       if (checked === false) {
         return true;

@@ -1,25 +1,18 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-} from "@angular/core";
-import {
-  UntypedFormControl,
-  UntypedFormGroup,
-  Validators,
-} from "@angular/forms";
-import { IRolle } from "src/app/core/model/IRolle";
-import { IUser } from "src/app/core/model/IUser";
-import { IWertungsrichter } from "src/app/core/model/IWertungsrichter";
+import { Component, EventEmitter, Input, type OnChanges, type OnInit, Output, type SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import type { IRolle } from 'src/app/core/model/IRolle';
+import type { IUser } from 'src/app/core/model/IUser';
+import type { IWertungsrichter } from 'src/app/core/model/IWertungsrichter';
+import { MaterialModule } from 'src/app/shared/material-module';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
-  selector: "app-wertungsrichter",
-  templateUrl: "./wertungsrichter-form.component.html",
-  styleUrls: ["./wertungsrichter-form.component.css"],
+  selector: 'lxt-wertungsrichter',
+  templateUrl: './wertungsrichter-form.component.html',
+  styleUrls: ['./wertungsrichter-form.component.scss'],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, MaterialModule],
 })
 export class WertungsrichterFormComponent implements OnInit, OnChanges {
   @Input()
@@ -33,14 +26,14 @@ export class WertungsrichterFormComponent implements OnInit, OnChanges {
   @Output()
   wertungsrichterChange = new EventEmitter<IWertungsrichter>();
 
-  appearance = "outline";
+  appearance = 'outline';
 
   userValid: boolean;
 
-  brevetControl = new UntypedFormControl("", Validators.required);
-  letzterFkControl = new UntypedFormControl("");
-  gueltigControl = new UntypedFormControl("");
-  bestaetigtControl = new UntypedFormControl("");
+  brevetControl = new UntypedFormControl('', Validators.required);
+  letzterFkControl = new UntypedFormControl('');
+  gueltigControl = new UntypedFormControl('');
+  bestaetigtControl = new UntypedFormControl('');
   form: UntypedFormGroup = new UntypedFormGroup({
     brevetControl: this.brevetControl,
     letzterFkControl: this.letzterFkControl,
@@ -55,8 +48,7 @@ export class WertungsrichterFormComponent implements OnInit, OnChanges {
 
     this.form.valueChanges.subscribe((value: any) => {
       if (this.form.dirty && this.brevetControl.dirty) {
-        this.wertungsrichter.brevet = this.brevetControl
-          .value as unknown as number;
+        this.wertungsrichter.brevet = this.brevetControl.value as unknown as number;
         this.wertungsrichterChange.emit(this.wertungsrichter);
       }
     });
@@ -81,10 +73,7 @@ export class WertungsrichterFormComponent implements OnInit, OnChanges {
   }
 
   disableRole(role: IRolle) {
-    if (
-      role.name === "VEREINSVERANTWORTLICHER" &&
-      !this.isVereinsVerantwortlicher
-    ) {
+    if (role.name === 'VEREINSVERANTWORTLICHER' && !this.isVereinsVerantwortlicher) {
       return true;
     }
     return false;

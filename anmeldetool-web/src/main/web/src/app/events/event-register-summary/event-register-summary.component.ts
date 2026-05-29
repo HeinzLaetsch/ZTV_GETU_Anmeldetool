@@ -1,34 +1,29 @@
-import { Component, OnInit } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
-import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
-import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
-import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
-import { IUser } from "src/app/core/model/IUser";
-import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { TiTuEnum } from "src/app/core/model/TiTuEnum";
-import { WertungsrichterStatusEnum } from "src/app/core/model/WertungsrichterStatusEnum";
-import { selectAnlassById } from "src/app/core/redux/anlass";
-import { AppState } from "src/app/core/redux/core.state";
-import { selectVereinById } from "src/app/core/redux/verein";
-import { AnlassService } from "src/app/core/service/anlass/anlass.service";
-import { AuthService } from "src/app/core/service/auth/auth.service";
-import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
-import { WertungsrichterService } from "src/app/core/service/wertungsrichter.service";
-import { SubscriptionHelper } from "src/app/utils/subscription-helper";
-import { IVerein } from "src/app/verein/verein";
+import { Component, type OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { select, Store } from '@ngrx/store';
+import type { Observable } from 'rxjs';
+import type { AnzeigeStatusEnum } from 'src/app/core/model/AnzeigeStatusEnum';
+import type { IAnlass } from 'src/app/core/model/IAnlass';
+import type { IAnlassSummary } from 'src/app/core/model/IAnlassSummary';
+import type { IUser } from 'src/app/core/model/IUser';
+import { KategorieEnum } from 'src/app/core/model/KategorieEnum';
+import { TiTuEnum } from 'src/app/core/model/TiTuEnum';
+import { WertungsrichterStatusEnum } from 'src/app/core/model/WertungsrichterStatusEnum';
+import { selectAnlassById } from 'src/app/core/redux/anlass';
+import type { AppState } from 'src/app/core/redux/core.state';
+import { selectVereinById } from 'src/app/core/redux/verein';
+import { AnlassService } from 'src/app/core/service/anlass/anlass.service';
+import { AuthService } from 'src/app/core/service/auth/auth.service';
+import { WertungsrichterService } from 'src/app/core/service/wertungsrichter.service';
+import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
+import type { IVerein } from 'src/app/verein/verein';
 
 @Component({
-  selector: "app-event-register-summary",
-  templateUrl: "./event-register-summary.component.html",
-  styleUrls: ["./event-register-summary.component.css"],
+  selector: 'lxt-event-register-summary',
+  templateUrl: './event-register-summary.component.html',
+  styleUrls: ['./event-register-summary.component.css'],
 })
-export class EventRegisterSummaryComponent
-  extends SubscriptionHelper
-  implements OnInit
-{
+export class EventRegisterSummaryComponent extends SubscriptionHelper implements OnInit {
   anlass: IAnlass;
   anlass$: Observable<IAnlass>;
   // organisationAnlassLink: IOrganisationAnlassLink;
@@ -36,8 +31,8 @@ export class EventRegisterSummaryComponent
   anlassSummary: IAnlassSummary;
   organisator: IVerein;
 
-  assignedWr1s = new Array<IUser>();
-  assignedWr2s = new Array<IUser>();
+  assignedWr1s = [] as IUser[];
+  assignedWr2s = [] as IUser[];
 
   //anzahlTeilnehmer;
 
@@ -45,11 +40,10 @@ export class EventRegisterSummaryComponent
     public authService: AuthService,
     private store: Store<AppState>,
     private anlassService: AnlassService,
-    // private anlassService: CachingAnlassService,
     private wertungsrichterService: WertungsrichterService,
     private route: ActivatedRoute,
     private router: Router,
-    private angWindow: Window
+    private angWindow: Window,
   ) {
     super();
   }
@@ -61,7 +55,7 @@ export class EventRegisterSummaryComponent
       this.anlass$.subscribe((data) => {
         this.anlass = data;
         this.loadAnlassRelated();
-      })
+      }),
     );
     // console.log("url param: ", anlassId);
     // this.anlass = this.anlassService.getAnlassById(anlassId);
@@ -70,20 +64,15 @@ export class EventRegisterSummaryComponent
   private loadAnlassRelated() {
     this.registerSubscription(
       this.anlassService
-        .getAnlassOrganisationSummary(
-          this.anlass,
-          this.authService.currentVerein
-        )
+        .getAnlassOrganisationSummary(this.anlass, this.authService.currentVerein)
         .subscribe((result) => {
           this.anlassSummary = result;
-        })
+        }),
     );
     this.registerSubscription(
-      this.store
-        .pipe(select(selectVereinById(this.anlass.organisatorId)))
-        .subscribe((result) => {
-          this.organisator = result;
-        })
+      this.store.pipe(select(selectVereinById(this.anlass.organisatorId))).subscribe((result) => {
+        this.organisator = result;
+      }),
     );
 
     /*
@@ -125,18 +114,13 @@ export class EventRegisterSummaryComponent
   printWRs() {
     this.registerSubscription(
       this.anlassService
-        .getVereinWertungsrichterKontrollePdf(
-          this.anlass,
-          this.authService.currentVerein
-        )
-        .subscribe((result) => {})
+        .getVereinWertungsrichterKontrollePdf(this.anlass, this.authService.currentVerein)
+        .subscribe((result) => {}),
     );
   }
 
   get titel(): string {
-    return (
-      this.anlass.getCleaned() + " - " + this.authService.currentVerein.name
-    );
+    return this.anlass.getCleaned() + ' - ' + this.authService.currentVerein.name;
   }
   get vereinStarted(): boolean {
     // return this.organisationAnlassLink?.startet;
@@ -254,17 +238,13 @@ export class EventRegisterSummaryComponent
 
   get tuAnlass(): boolean {
     const tiTus = Object.keys(TiTuEnum);
-    const tuAnlass =
-      tiTus.indexOf(this.anlass.tiTu) === 1 ||
-      tiTus.indexOf(this.anlass.tiTu) === 2;
+    const tuAnlass = tiTus.indexOf(this.anlass.tiTu) === 1 || tiTus.indexOf(this.anlass.tiTu) === 2;
     return tuAnlass;
   }
 
   get tiAnlass(): boolean {
     const tiTus = Object.keys(TiTuEnum);
-    const tiuAnlass =
-      tiTus.indexOf(this.anlass.tiTu) === 0 ||
-      tiTus.indexOf(this.anlass.tiTu) === 2;
+    const tiuAnlass = tiTus.indexOf(this.anlass.tiTu) === 0 || tiTus.indexOf(this.anlass.tiTu) === 2;
     return tiuAnlass;
   }
 
@@ -274,9 +254,9 @@ export class EventRegisterSummaryComponent
 
   getClassForAnzeigeStatus(anzeigeStatus: AnzeigeStatusEnum): string {
     if (this.anlass.anzeigeStatus.hasStatus(anzeigeStatus)) {
-      return "div-red";
+      return 'div-red';
     }
-    return "div-green";
+    return 'div-green';
   }
 
   getStartedClass() {
@@ -312,7 +292,7 @@ export class EventRegisterSummaryComponent
   }
   handleClickMe(event: PointerEvent) {
     // this.anlassClick.emit(this.anlass.anlassBezeichnung);
-    this.router.navigate(["/anlass/", this.anlass?.id]);
+    this.router.navigate(['/anlass/', this.anlass?.id]);
   }
 
   vereinStartedClicked(event: PointerEvent) {
@@ -343,19 +323,19 @@ export class EventRegisterSummaryComponent
     return this.wertungsrichterService.getStatusWertungsrichter(
       this.anlassSummary,
       this.assignedWr1s,
-      this.assignedWr2s
+      this.assignedWr2s,
     );
   }
   fillassignedWrs() {
     this.registerSubscription(
       this.wertungsrichterService
         .getEingeteilteWertungsrichter(this.anlass, 1)
-        .subscribe((assignedWrs) => (this.assignedWr1s = assignedWrs))
+        .subscribe((assignedWrs) => (this.assignedWr1s = assignedWrs)),
     );
     this.registerSubscription(
       this.wertungsrichterService
         .getEingeteilteWertungsrichter(this.anlass, 2)
-        .subscribe((assignedWrs) => (this.assignedWr2s = assignedWrs))
+        .subscribe((assignedWrs) => (this.assignedWr2s = assignedWrs)),
     );
   }
 }

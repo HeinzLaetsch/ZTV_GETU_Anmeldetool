@@ -1,4 +1,4 @@
-@import "src/assets/styles/colors.scss";
+@use 'src/assets/styles/colors' as colors;
 
 #main-menu {
   position: sticky;
@@ -7,7 +7,7 @@
   flex-direction: row;
   box-sizing: border-box;
   height: 55px;
-  background-color: $nav-backgroud;
+  background-color: colors.$nav-backgroud;
   z-index: 9;
 }
 
@@ -32,11 +32,11 @@
 }
 
 .active {
-  background-color: $white !important;
+  background-color: colors.$white !important;
 }
 
 .active:hover {
-  background-color: $white !important;
+  background-color: colors.$white !important;
 }
 
 .task-add-btn {

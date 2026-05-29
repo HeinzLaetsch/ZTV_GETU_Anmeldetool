@@ -2,15 +2,15 @@
   <mat-tab-group #tabs mat-align-tabs="start">
     <mat-tab>
       <ng-template mat-tab-label>Erfassen </ng-template>
-      <app-erfassen [anlass]="anlass" [modeErfassen]="true"></app-erfassen>
+      <lxt-erfassen [anlass]="anlass" [modeErfassen]="true"></lxt-erfassen>
     </mat-tab>
     <mat-tab>
       <ng-template mat-tab-label>Überprüfen </ng-template>
-      <app-erfassen [anlass]="anlass" [modeErfassen]="false"></app-erfassen>
+      <lxt-erfassen [anlass]="anlass" [modeErfassen]="false"></lxt-erfassen>
     </mat-tab>
     <mat-tab *ngIf="authService.isAdministrator()">
       <ng-template mat-tab-label>Ranglisten </ng-template>
-      <app-ranglisten></app-ranglisten>
+      <lxt-ranglisten></lxt-ranglisten>
     </mat-tab>
   </mat-tab-group>
   <div class="anlass-title">

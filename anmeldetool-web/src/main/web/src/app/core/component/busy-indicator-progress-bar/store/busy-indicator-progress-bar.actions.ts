@@ -1,13 +1,13 @@
+import type { Update } from "@ngrx/entity";
 import { createActionGroup, props } from "@ngrx/store";
-import { ILoading } from "./busy-indicator-progress-bar.state";
-import { Update } from "@ngrx/entity";
+import type { ILoading } from "./busy-indicator-progress-bar.state";
 
 export const LoadingActions = createActionGroup({
-  source: "loading",
-  events: {
-    "Loading Event STARTET": props<{ payload: ILoading }>(),
-    "Loading Event FINISHED": props<{ payload: Update<ILoading> }>(),
-    "Loading Event FEHLER": props<{ payload: Update<ILoading> }>(),
-    "Loading Event PROCESSED": props<{ payload: string }>(),
-  },
+	source: "loading",
+	events: {
+		"Loading Event Startet": props<{ payload: ILoading }>(),
+		"Loading Event finished": props<{ payload: Update<ILoading> }>(),
+		"Loading Event fehler": props<{ payload: Update<ILoading> }>(),
+		"Loading Event processed": props<{ payload: string }>(),
+	},
 });

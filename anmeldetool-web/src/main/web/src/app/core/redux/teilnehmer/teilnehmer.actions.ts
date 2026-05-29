@@ -1,23 +1,23 @@
 import { createActionGroup, emptyProps, props } from "@ngrx/store";
-import { ITeilnehmer } from "../../model/ITeilnehmer";
+import type { ITeilnehmer } from "../../model/ITeilnehmer";
 
 export const TeilnehmerActions = createActionGroup({
-  source: "teilnehmer",
-  events: {
-    "Load All TEILNEHMER INVOKED": emptyProps(),
-    "Load All TEILNEHMER SUCCESS": props<{
-      payload: ITeilnehmer[];
-    }>(),
-    "Load All TEILNEHMER ERROR": props<{ error: string }>(),
+	source: "teilnehmer",
+	events: {
+		"Load All teilnehmer invoked": emptyProps(),
+		"Load All teilnehmer success": props<{
+			payload: ITeilnehmer[];
+		}>(),
+		"Load All teilnehmer error": props<{ error: string }>(),
 
-    "Add TEILNEHMER INVOKED": props<{ payload: ITeilnehmer }>(),
-    "Add TEILNEHMER SUCCESS": props<{ payload: ITeilnehmer }>(),
-    "Add TEILNEHMER ERROR": props<{ error: string }>(),
+		"Add teilnehmer invoked": props<{ payload: ITeilnehmer }>(),
+		"Add teilnehmer success": props<{ payload: ITeilnehmer }>(),
+		"Add teilnehmer error": props<{ error: string }>(),
 
-    "Delete TEILNEHMER INVOKED": props<{ payload: ITeilnehmer }>(),
-    "Delete TEILNEHMER SUCCESS": emptyProps(),
-    "Delete TEILNEHMER ERROR": props<{ error: string }>(),
-  },
+		"Delete teilnehmer invoked": props<{ payload: ITeilnehmer }>(),
+		"Delete teilnehmer success": emptyProps(),
+		"Delete teilnehmer error": props<{ error: string }>(),
+	},
 });
 
 /*

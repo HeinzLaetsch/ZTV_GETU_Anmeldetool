@@ -1,9 +1,9 @@
-import { Injectable } from "@angular/core";
-import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { catchError, mergeMap, of, switchMap } from "rxjs";
-import { UserActions } from "./user.actions";
-import { UserService } from "../../service/user/user.service";
-import { AuthService } from "../../service/auth/auth.service";
+import { Injectable } from '@angular/core';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { catchError, mergeMap, of, switchMap } from 'rxjs';
+import { UserActions } from './user.actions';
+import { UserService } from '../../service/user/user.service';
+import { AuthService } from '../../service/auth/auth.service';
 
 @Injectable()
 export class UserEffects {
@@ -18,9 +18,7 @@ export class UserEffects {
       ofType(UserActions.loadAllUserInvoked),
       mergeMap((action) => {
         return this.userService.getUser().pipe(
-          switchMap((user) => [
-            UserActions.loadAllUserSuccess({ payload: user }),
-          ]),
+          switchMap((user) => [UserActions.loadAllUserSuccess({ payload: user })]),
           catchError((error) => {
             return of(UserActions.loadAllUserError({ error: error }));
           }),
@@ -59,4 +57,3 @@ export class UserEffects {
     );
   });
 }
-

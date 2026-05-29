@@ -1,9 +1,9 @@
-import { AbteilungEnum } from "./AbteilungEnum";
-import { AnlageEnum } from "./AnlageEnum";
-import { GeraeteEnum } from "./GeraeteEnum";
-import { ILauflistenEintrag } from "./ILauflistenEintrag";
+import { AbteilungEnum } from './AbteilungEnum';
+import { AnlageEnum } from './AnlageEnum';
+import { GeraeteEnum } from './GeraeteEnum';
+import { ILauflistenEintrag } from './ILauflistenEintrag';
 
-export interface ILaufliste {
+export type ILaufliste = {
   id: string;
   laufliste: string;
   geraet: GeraeteEnum;

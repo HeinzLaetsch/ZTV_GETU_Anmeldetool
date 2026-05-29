@@ -1,10 +1,10 @@
-export * from "./anlass.state";
+export * from './anlass.state';
 
-export * from "./anlass.actions";
+export * from './anlass.actions';
 
-export * from "./anlass.selector";
+export * from './anlass.selector';
 
-export * from "./anlass.effects";
+export * from './anlass.effects';
 
 /*
 export const anlassReducers: ActionReducerMap<AnlassState> = {

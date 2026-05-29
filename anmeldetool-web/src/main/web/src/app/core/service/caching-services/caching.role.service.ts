@@ -1,12 +1,12 @@
-import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
-import { IRolle } from "../../model/IRolle";
-import { IUser } from "../../model/IUser";
-import { AuthService } from "../auth/auth.service";
-import { RoleService } from "../role/role.service";
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { IRolle } from '../../model/IRolle';
+import { IUser } from '../../model/IUser';
+import { AuthService } from '../auth/auth.service';
+import { RoleService } from '../role/role.service';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class CachingRoleService {
   private rolesLoaded: BehaviorSubject<boolean>;
@@ -19,7 +19,7 @@ export class CachingRoleService {
 
   constructor(
     private roleService: RoleService,
-    private authService: AuthService
+    private authService: AuthService,
   ) {
     this.rolesLoaded = new BehaviorSubject<boolean>(undefined);
   }

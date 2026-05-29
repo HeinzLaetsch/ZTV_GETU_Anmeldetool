@@ -1,1 +1,1 @@
-export * from "./event-register-summary.component";
+export * from './event-register-summary.component';

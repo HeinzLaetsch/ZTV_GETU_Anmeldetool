@@ -1,4 +1,4 @@
-export interface IVerein {
+export type IVerein = {
   id: string;
   name: string;
   verbandId: string;

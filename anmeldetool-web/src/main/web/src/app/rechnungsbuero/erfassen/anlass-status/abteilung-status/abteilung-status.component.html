@@ -3,30 +3,14 @@
     <mat-panel-title> {{ abteilung }} </mat-panel-title>
     <mat-panel-description>
       erfasst
-      <img
-        *ngIf="!erfasst"
-        class="smallIcon"
-        src="assets/images/skype/white-question-mark.png"
-      />
-      <img
-        *ngIf="erfasst"
-        class="smallIcon"
-        src="assets/images/skype/check-mark.png"
-      />
+      <img *ngIf="!erfasst" class="smallIcon" src="assets/images/skype/white-question-mark.png" />
+      <img *ngIf="erfasst" class="smallIcon" src="assets/images/skype/check-mark.png" />
       checked
-      <img
-        *ngIf="!checked"
-        class="smallIcon"
-        src="assets/images/skype/white-question-mark.png"
-      />
-      <img
-        *ngIf="checked"
-        class="smallIcon"
-        src="assets/images/skype/check-mark.png"
-      />
+      <img *ngIf="!checked" class="smallIcon" src="assets/images/skype/white-question-mark.png" />
+      <img *ngIf="checked" class="smallIcon" src="assets/images/skype/check-mark.png" />
     </mat-panel-description>
   </mat-expansion-panel-header>
-  <app-anlage-status
+  <lxt-anlage-status
     *ngFor="let anlage of anlagen"
     [anlass]="anlass"
     [kategorie]="kategorie"
@@ -37,5 +21,5 @@
     (erfasstEvent)="erfasstChanged($event)"
     (checkedEvent)="checkedChanged($event)"
     (lauflisteSelectedEvent)="lauflisteSelected($event)"
-  ></app-anlage-status>
+  ></lxt-anlage-status>
 </mat-expansion-panel>

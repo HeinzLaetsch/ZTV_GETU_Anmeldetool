@@ -1,8 +1,8 @@
-import { createFeatureSelector, createSelector } from "@ngrx/store";
-import { OtsState } from "./ots.state";
-import { otsFeature } from "./ots.reducer";
-import * as fromOts from "./ots.reducer";
-import { KategorieEnum } from "../../model/KategorieEnum";
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { OtsState } from './ots.state';
+import { otsFeature } from './ots.reducer';
+import * as fromOts from './ots.reducer';
+import { KategorieEnum } from '../../model/KategorieEnum';
 
 export const selectOtsState = createFeatureSelector<OtsState>(otsFeature.name);
 

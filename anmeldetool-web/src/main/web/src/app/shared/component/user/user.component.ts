@@ -1,32 +1,23 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-} from "@angular/core";
-import {
-  UntypedFormBuilder,
-  UntypedFormControl,
-  UntypedFormGroup,
-  Validators,
-} from "@angular/forms";
-import { MatDialog } from "@angular/material/dialog";
-import { IUser } from "src/app/core/model/IUser";
-import { ConfirmedValidator } from "../../validators/ConfirmedValidator";
-import { MyTel } from "../phonenumber/phone-input-component";
-import { UserExists } from "./user-exists/user-exists.component";
-import { Store } from "@ngrx/store";
-import { AppState } from "src/app/core/redux/core.state";
-import { UserActions } from "src/app/core/redux/user";
-import { Update } from "@ngrx/entity";
+import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Input, type OnChanges, type OnInit, Output, type SimpleChanges } from '@angular/core';
+import { FormsModule, ReactiveFormsModule, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import type { Update } from '@ngrx/entity';
+import { Store } from '@ngrx/store';
+import type { IUser } from 'src/app/core/model/IUser';
+import type { AppState } from 'src/app/core/redux/core.state';
+import { UserActions } from 'src/app/core/redux/user';
+import { MaterialModule } from '../../material-module';
+import { ConfirmedValidator } from '../../validators/ConfirmedValidator';
+import { MyTel, PhoneInput } from '../phonenumber/phone-input-component';
+import { UserExists } from './user-exists/user-exists.component';
 
 @Component({
-  selector: "app-user",
-  templateUrl: "./user.component.html",
-  styleUrls: ["./user.component.css"],
+  selector: 'lxt-user',
+  templateUrl: './user.component.html',
+  styleUrls: ['./user.component.scss'],
+  standalone: true,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule, PhoneInput],
 })
 export class UserComponent implements OnInit, OnChanges {
   @Input()
@@ -48,46 +39,38 @@ export class UserComponent implements OnInit, OnChanges {
   valid = new EventEmitter<boolean>();
 
   //floatLabel = 'Always';
-  appearance = "outline";
+  appearance = 'outline';
 
-  enteredPassword = "";
+  enteredPassword = '';
 
   userAlreadyExists = false;
   showPasswordAendern = false;
 
   form: UntypedFormGroup = new UntypedFormGroup({
-    benutzernameControl: new UntypedFormControl("", [
+    benutzernameControl: new UntypedFormControl('', [
       Validators.required,
       Validators.email,
-      Validators.pattern("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$"),
+      Validators.pattern('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$'),
     ]),
-    nachnameControl: new UntypedFormControl("", Validators.required),
-    vornameControl: new UntypedFormControl("", Validators.required),
+    nachnameControl: new UntypedFormControl('', Validators.required),
+    vornameControl: new UntypedFormControl('', Validators.required),
     passwortAendernControl: new UntypedFormControl(false),
-    passwortControl: new UntypedFormControl("", Validators.required),
-    passwort2Control: new UntypedFormControl("", Validators.required),
-    eMailAdresseControl: new UntypedFormControl(
-      { value: "", disabled: false },
-      [
-        Validators.required,
-        Validators.email,
-        Validators.pattern(
-          "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$",
-        ),
-      ],
-    ),
-    mobilNummerControl: new UntypedFormControl(new MyTel("", "", "", "")),
+    passwortControl: new UntypedFormControl('', Validators.required),
+    passwort2Control: new UntypedFormControl('', Validators.required),
+    eMailAdresseControl: new UntypedFormControl({ value: '', disabled: false }, [
+      Validators.required,
+      Validators.email,
+      Validators.pattern('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$'),
+    ]),
+    mobilNummerControl: new UntypedFormControl(new MyTel('', '', '', '')),
   });
 
   constructor(
     public dialog: MatDialog,
-    private formBuilder: UntypedFormBuilder,
     private store: Store<AppState>, // private userService: UserService
   ) {
     this.modify = false;
-    this.form.setValidators(
-      ConfirmedValidator("passwortControl", "passwort2Control"),
-    );
+    this.form.setValidators(ConfirmedValidator('passwortControl', 'passwort2Control'));
   }
 
   ngOnInit(): void {
@@ -103,7 +86,7 @@ export class UserComponent implements OnInit, OnChanges {
     this.form.controls.benutzernameControl.valueChanges.subscribe((value) => {
       if (this.user.benutzername !== value) {
         this.user.benutzername = value;
-        let userUpdate: Update<IUser> = {
+        const userUpdate: Update<IUser> = {
           id: this.user.id,
           changes: {
             dirty: true,
@@ -116,7 +99,7 @@ export class UserComponent implements OnInit, OnChanges {
     this.form.controls.nachnameControl.valueChanges.subscribe((value) => {
       if (this.user.name !== value) {
         this.user.name = value;
-        let userUpdate: Update<IUser> = {
+        const userUpdate: Update<IUser> = {
           id: this.user.id,
           changes: {
             dirty: true,
@@ -129,7 +112,7 @@ export class UserComponent implements OnInit, OnChanges {
     this.form.controls.vornameControl.valueChanges.subscribe((value) => {
       if (this.user.vorname !== value) {
         this.user.vorname = value;
-        let userUpdate: Update<IUser> = {
+        const userUpdate: Update<IUser> = {
           id: this.user.id,
           changes: {
             dirty: true,
@@ -143,7 +126,7 @@ export class UserComponent implements OnInit, OnChanges {
       if (this.user.password !== value) {
         this.user.password = value;
         this.enteredPassword = value;
-        let userUpdate: Update<IUser> = {
+        const userUpdate: Update<IUser> = {
           id: this.user.id,
           changes: {
             dirty: true,
@@ -156,7 +139,7 @@ export class UserComponent implements OnInit, OnChanges {
     this.form.controls.passwort2Control.valueChanges.subscribe((value) => {
       if (this.user.password !== value) {
         this.user.password = value;
-        let userUpdate: Update<IUser> = {
+        const userUpdate: Update<IUser> = {
           id: this.user.id,
           changes: {
             dirty: true,
@@ -169,7 +152,7 @@ export class UserComponent implements OnInit, OnChanges {
     this.form.controls.eMailAdresseControl.valueChanges.subscribe((value) => {
       if (this.user.email !== value) {
         this.user.email = value;
-        let userUpdate: Update<IUser> = {
+        const userUpdate: Update<IUser> = {
           id: this.user.id,
           changes: {
             dirty: true,
@@ -183,7 +166,7 @@ export class UserComponent implements OnInit, OnChanges {
       // console.log(this.form.controls.mobilNummerControl.value);
       if (value && this.user.handy !== this.concatHandy(value)) {
         this.user.handy = this.concatHandy(value);
-        let userUpdate: Update<IUser> = {
+        const userUpdate: Update<IUser> = {
           id: this.user.id,
           changes: {
             dirty: true,
@@ -214,9 +197,9 @@ export class UserComponent implements OnInit, OnChanges {
   }
 
   private splitHandy(handy: string): MyTel {
-    const parts = handy.split(" ");
+    const parts = handy.split(' ');
     if (parts.length < 4) {
-      return new MyTel("", "", "", "");
+      return new MyTel('', '', '', '');
     }
     const myTel = new MyTel(parts[0], parts[1], parts[2], parts[3]);
     return myTel;
@@ -246,10 +229,8 @@ export class UserComponent implements OnInit, OnChanges {
       this.form.controls.eMailAdresseControl.setValue(user.email);
     }
     const tmpValue = this.form.controls.mobilNummerControl.value;
-    if (!tmpValue || tmpValue.part1 === "") {
-      this.form.controls.mobilNummerControl.setValue(
-        this.splitHandy(user.handy),
-      );
+    if (!tmpValue || tmpValue.part1 === '') {
+      this.form.controls.mobilNummerControl.setValue(this.splitHandy(user.handy));
     }
   }
   private validate(): boolean {
@@ -259,36 +240,27 @@ export class UserComponent implements OnInit, OnChanges {
       valid = valid && benutzerNameValid && !this.userAlreadyExists;
       if (benutzerNameValid) {
         this.user.email = this.form.controls.benutzernameControl.value;
-        this.form.controls.eMailAdresseControl.setValue(
-          this.form.controls.benutzernameControl.value,
-        );
+        this.form.controls.eMailAdresseControl.setValue(this.form.controls.benutzernameControl.value);
       }
     }
     valid = valid && this.form.controls.nachnameControl.valid;
     valid = valid && this.form.controls.vornameControl.valid;
     if (this.showPassword) {
       if (
-        !(
-          this.modify &&
-          (!this.form.controls.passwortControl.value ||
-            this.form.controls.passwortControl.value === "")
-        )
+        !(this.modify && (!this.form.controls.passwortControl.value || this.form.controls.passwortControl.value === ''))
       ) {
         valid = valid && this.form.controls.passwortControl.valid;
         valid = valid && this.form.controls.passwort2Control.valid;
       }
     }
     if (!this.showBenutzername) {
-      valid =
-        valid &&
-        this.form.controls.eMailAdresseControl.valid &&
-        !this.userAlreadyExists;
+      valid = valid && this.form.controls.eMailAdresseControl.valid && !this.userAlreadyExists;
     }
     valid = valid && this.form.controls.mobilNummerControl.valid;
 
     this.valid.next(valid);
     if (!valid) {
-      console.log("UserComponent not valid: ", this.form.errors);
+      console.log('UserComponent not valid: ', this.form.errors);
     }
     return valid;
   }
@@ -302,10 +274,9 @@ export class UserComponent implements OnInit, OnChanges {
   }
 
   private concatHandy(mytel: MyTel): string {
-    const handy =
-      mytel.part1 + " " + mytel.part2 + " " + mytel.part3 + " " + mytel.part4;
+    const handy = mytel.part1 + ' ' + mytel.part2 + ' ' + mytel.part3 + ' ' + mytel.part4;
     if (handy.trim().length === 0) {
-      return "";
+      return '';
     }
     return handy;
   }

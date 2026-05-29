@@ -1,8 +1,5 @@
 <ng-container *ngIf="loaded$ | async as obs; else loading">
-  <mat-expansion-panel
-    *ngIf="teilnahmeStatistic.totalStartende > 0"
-    [expanded]="expanded"
-  >
+  <mat-expansion-panel *ngIf="teilnahmeStatistic.totalStartende > 0" [expanded]="expanded">
     <mat-expansion-panel-header>
       <mat-panel-title> {{ startgeraet }} </mat-panel-title>
       <mat-panel-description>
@@ -48,10 +45,7 @@
               (selectionChange)="change(rowIndex, 0)"
               [compareWith]="compareWith"
             >
-              <mat-option
-                *ngFor="let option of alleAbteilungen"
-                [value]="option"
-              >
+              <mat-option *ngFor="let option of alleAbteilungen" [value]="option">
                 {{ option }}
               </mat-option>
             </mat-select>
@@ -89,10 +83,7 @@
               (selectionChange)="change(rowIndex, 2)"
               [compareWith]="compareWith"
             >
-              <mat-option
-                *ngFor="let option of alleStartgeraete"
-                [value]="option"
-              >
+              <mat-option *ngFor="let option of alleStartgeraete" [value]="option">
                 {{ option }}
               </mat-option>
             </mat-select>

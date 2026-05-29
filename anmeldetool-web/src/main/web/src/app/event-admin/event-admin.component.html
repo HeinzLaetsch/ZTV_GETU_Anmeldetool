@@ -2,15 +2,13 @@
   <div class="container-lg">
     <div class="row">
       <div class="col-7">
-        <h1>{{ anlass.getCleaned() + " " + anlass.ort }}</h1>
+        <h1>{{ anlass.getCleaned() + ' ' + anlass.ort }}</h1>
       </div>
       <div class="col-sm-1">
         <h1>{{ anlass.tiTu }}</h1>
       </div>
       <div class="col-sm-4" *ngIf="administrator">
-        <mat-checkbox
-          [ngModel]="anlass.toolSperren"
-          (ngModelChange)="toolSperrenClicked($event)"
+        <mat-checkbox [ngModel]="anlass.toolSperren" (ngModelChange)="toolSperrenClicked($event)"
           >Tool sperren
         </mat-checkbox>
       </div>
@@ -29,15 +27,10 @@
             {{ teilnahmeStatistic.totalZurueckgezogen }}
           </div>
           <div class="col-1">Um / Neugemeldet</div>
-          <div class="col-1">
-            {{ teilnahmeStatistic.ummeldung }}/{{
-              teilnahmeStatistic.neumeldung
-            }}
-          </div>
+          <div class="col-1">{{ teilnahmeStatistic.ummeldung }}/{{ teilnahmeStatistic.neumeldung }}</div>
           <div class="col-1">Abgemeldet</div>
           <div class="col-1">
-            {{ teilnahmeStatistic.abgemeldet_1 }} /
-            {{ teilnahmeStatistic.abgemeldet_2 }} /
+            {{ teilnahmeStatistic.abgemeldet_1 }} / {{ teilnahmeStatistic.abgemeldet_2 }} /
             {{ teilnahmeStatistic.abgemeldet_3 }}
           </div>
           <div class="col-1">Verletzt</div>
@@ -67,9 +60,7 @@
               Exportieren
             </button>
             <div>
-              <mat-checkbox
-                [(ngModel)]="rotieren"
-                (ngModelChange)="teilnehmerRotieren($event)"
+              <mat-checkbox [(ngModel)]="rotieren" (ngModelChange)="teilnehmerRotieren($event)"
                 >Teilnehmer rotieren
               </mat-checkbox>
             </div>
@@ -197,10 +188,7 @@
                     (ngModelChange)="changeKategorie($event)"
                     [ngModel]="selectedKategorie"
                   >
-                    <mat-option
-                      *ngFor="let option of kategorien"
-                      [value]="option"
-                    >
+                    <mat-option *ngFor="let option of kategorien" [value]="option">
                       {{ option }}
                     </mat-option>
                   </mat-select>
@@ -218,10 +206,7 @@
                     (ngModelChange)="changeAbteilung($event)"
                     [ngModel]="selectedAbteilung"
                   >
-                    <mat-option
-                      *ngFor="let option of abteilungen"
-                      [value]="option"
-                    >
+                    <mat-option *ngFor="let option of abteilungen" [value]="option">
                       {{ option }}
                     </mat-option>
                   </mat-select>
@@ -259,10 +244,7 @@
                 </button>
               </div>
               <div class="col-sm-1 move-checkbox">
-                <mat-checkbox
-                  *ngIf="hideOnlyTi"
-                  [(ngModel)]="onlyTi"
-                  [disabled]="isButtonsDisabled"
+                <mat-checkbox *ngIf="hideOnlyTi" [(ngModel)]="onlyTi" [disabled]="isButtonsDisabled"
                   >nur Ti
                 </mat-checkbox>
               </div>
@@ -303,15 +285,12 @@
           <h2>Einteilung</h2>
         </div>
         <div class="col-sm-9">
-          <button mat-button color="primary" (click)="refreshEinteilung()">
-            Refresh Einteilung
-          </button>
+          <button mat-button color="primary" (click)="refreshEinteilung()">Refresh Einteilung</button>
         </div>
       </div>
       <div class="row">
         <div class="col-sm-12">
-          <app-einteilung [anlass]="anlass" [refreshEmitter]="refreshEmitter">
-          </app-einteilung>
+          <lxt-einteilung [anlass]="anlass" [refreshEmitter]="refreshEmitter"> </lxt-einteilung>
         </div>
       </div>
     </mat-tab>

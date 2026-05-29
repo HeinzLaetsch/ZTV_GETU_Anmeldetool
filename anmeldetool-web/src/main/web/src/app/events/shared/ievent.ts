@@ -1,6 +1,6 @@
-export interface IEvent {
-    id: number;
-    name: string;
-    start_datum: Date;
-    end_datum: Date;
+export type IEvent = {
+  id: number;
+  name: string;
+  start_datum: Date;
+  end_datum: Date;
 }

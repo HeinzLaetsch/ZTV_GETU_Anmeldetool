@@ -2,7 +2,7 @@
   <mat-checkbox
     [ngClass]="{
       'label-green': einsatz.eingesetzt,
-      'label-red': !einsatz.eingesetzt
+      'label-red': !einsatz.eingesetzt,
     }"
     [(ngModel)]="einsatz.eingesetzt"
     [disabled]="!canEdit()"

@@ -1,9 +1,9 @@
-import { createFeature, createReducer, on } from "@ngrx/store";
-import { TeilnehmerActions } from "./teilnehmer.actions";
-import { initialState, teilnehmerAdapter } from "./teilnehmer.state";
+import { createFeature, createReducer, on } from '@ngrx/store';
+import { TeilnehmerActions } from './teilnehmer.actions';
+import { initialState, teilnehmerAdapter } from './teilnehmer.state';
 
 export const teilnehmerFeature = createFeature({
-  name: "teilnehmer",
+  name: 'teilnehmer',
   reducer: createReducer(
     initialState,
     on(TeilnehmerActions.loadAllTeilnehmerSuccess, (state, action) => {
@@ -14,12 +14,11 @@ export const teilnehmerFeature = createFeature({
       const teilnehmer = action.payload;
       const newState = teilnehmerAdapter.addOne(teilnehmer, state);
       return newState;
-    })
+    }),
   ),
 });
 
-export const { selectAll, selectEntities, selectIds, selectTotal } =
-  teilnehmerAdapter.getSelectors();
+export const { selectAll, selectEntities, selectIds, selectTotal } = teilnehmerAdapter.getSelectors();
 
 /*
 export interface ReducerTeilnehmerState {

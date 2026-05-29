@@ -1,44 +1,44 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { MatTabGroup } from "@angular/material/tabs";
-import { IRolle } from "src/app/core/model/IRolle";
-import { IUser } from "src/app/core/model/IUser";
-import { AuthService } from "src/app/core/service/auth/auth.service";
-import { IVerein } from "../verein";
-import { IChangeEvent } from "./IChangeEvent";
-import { SubscriptionHelper } from "src/app/utils/subscription-helper";
-import { AppState } from "src/app/core/redux/core.state";
-import { select, Store } from "@ngrx/store";
-import { Observable, timeout } from "rxjs";
-import {
-  selectAktivUser,
-  selectDirtyUser,
-  selectUser,
-  UserActions,
-} from "src/app/core/redux/user";
-import { v4 as uuidv4 } from "uuid";
+import { Component, type OnInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import type { MatTabGroup } from '@angular/material/tabs';
+import { select, Store } from '@ngrx/store';
+import type { Observable } from 'rxjs';
+import type { IRolle } from 'src/app/core/model/IRolle';
+import type { IUser } from 'src/app/core/model/IUser';
+import type { AppState } from 'src/app/core/redux/core.state';
+import { selectAktivUser, selectDirtyUser, UserActions } from 'src/app/core/redux/user';
+import { AuthService } from 'src/app/core/service/auth/auth.service';
+import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
+import { v4 as uuidv4 } from 'uuid';
+import type { IVerein } from '../verein';
+import type { IChangeEvent } from './IChangeEvent';
+import { MaterialModule } from 'src/app/shared/material-module';
+import { UserFormComponent } from '../user-form/user-form.component';
 
 @Component({
-  selector: "app-profile",
-  templateUrl: "./profile.component.html",
-  styleUrls: ["./profile.component.css"],
+  selector: 'lxt-profile',
+  templateUrl: './profile.component.html',
+  styleUrls: ['./profile.component.scss'],
+  standalone: true,
+  imports: [CommonModule, MaterialModule, UserFormComponent],
 })
 export class ProfileComponent extends SubscriptionHelper implements OnInit {
-  appearance = "outline";
-  user$: Observable<IUser[]>;
-  dirty$: Observable<IUser[]>;
-  currentUser: IUser;
+  appearance = 'outline';
+  user$!: Observable<IUser[]>;
+  dirty$!: Observable<IUser[]>;
+  currentUser!: IUser;
   vereinsUsers: IUser[] = [];
-  dirtyUsers: IUser[];
+  dirtyUsers: IUser[] = [];
   _changeEvents: IChangeEvent[];
 
-  @ViewChild("tabs") tabGroup: MatTabGroup;
+  @ViewChild('tabs') tabGroup!: MatTabGroup;
 
   constructor(
     private authService: AuthService,
     private store: Store<AppState>, // private userService: CachingUserService
   ) {
     super();
-    this._changeEvents = new Array();
+    this._changeEvents = [];
     this.store.dispatch(UserActions.loadAllUserInvoked());
   }
 
@@ -64,7 +64,7 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
     );
 
     //this._vereinsUser = this.userService.getUser();
-    let index = 0;
+    const index = 0;
   }
 
   processUsers(users: IUser[]) {
@@ -81,16 +81,16 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
       this._changeEvents = [];
       let index = 0;
       this.vereinsUsers = users.map((user) => {
-        let asUString = JSON.stringify(user);
+        const asUString = JSON.stringify(user);
         this._changeEvents.push(this.getNewChangeEvent(index));
         index++;
-        let newUser = JSON.parse(asUString);
+        const newUser = JSON.parse(asUString);
         return newUser;
       });
     }
   }
 
-  public disAllowTab(): boolean {
+  disAllowTab(): boolean {
     return this.dirtyUsers.length > 0;
   }
   private getNewChangeEvent(index: number): IChangeEvent {
@@ -139,10 +139,7 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
     this.currentUser = value;
   }
   getTabIndex() {
-    console.log(
-      "Index: ",
-      this.vereinsUsers[this.vereinsUsers.length - 1].benutzername,
-    );
+    console.log('Index: ', this.vereinsUsers[this.vereinsUsers.length - 1].benutzername);
     if (this.vereinsUsers[this.vereinsUsers.length - 1].benutzername) {
       return 0;
     }
@@ -151,15 +148,13 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
 
   getTabName(name: string, tabIndex: number) {
     if (this.hasUnsafedWork(tabIndex)) {
-      return name + " *";
+      return name + ' *';
     } else {
       return name;
     }
   }
   hasUnsafedWork(tabIndex: number): boolean {
-    let dirtyUser = this.dirtyUsers.filter(
-      (user) => user.id === this.vereinsUsers[tabIndex].id,
-    );
+    const dirtyUser = this.dirtyUsers.filter((user) => user.id === this.vereinsUsers[tabIndex].id);
     return dirtyUser?.length > 0;
   }
 
@@ -167,15 +162,15 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
     const newUser = {
       id: uuidv4(),
       organisationids: [this.authService.currentVerein.id],
-      benutzername: "",
-      name: "",
-      vorname: "",
-      email: "",
-      handy: "",
+      benutzername: '',
+      name: '',
+      vorname: '',
+      email: '',
+      handy: '',
       aktiv: true,
       dirty: true,
-      password: "getu",
-      rollen: new Array<IRolle>(),
+      password: 'getu',
+      rollen: [] as IRolle[],
       userAlreadyExists: false,
     };
     this.vereinsUsers.unshift(JSON.parse(JSON.stringify(newUser)));
@@ -189,7 +184,7 @@ export class ProfileComponent extends SubscriptionHelper implements OnInit {
     });
   }
   saveUser(event: any) {
-    console.log("Saving users: ", this.dirtyUsers);
+    console.log('Saving users: ', this.dirtyUsers);
     this.dirtyUsers.forEach((user) => {
       this.store.dispatch(UserActions.saveUserInvoked({ payload: user }));
     });

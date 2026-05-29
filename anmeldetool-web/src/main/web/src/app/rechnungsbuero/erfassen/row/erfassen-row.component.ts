@@ -1,16 +1,20 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { UntypedFormControl, Validators } from "@angular/forms";
-import { MatDialog } from "@angular/material/dialog";
-import { ToastrService } from "ngx-toastr";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { ILauflistenEintrag } from "src/app/core/model/ILauflistenEintrag";
-import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.service";
-import { NotenBlattZurueckZiehen } from "./delete-dialog/delete-notenblatt.component";
+import { Component, EventEmitter, Input, type OnInit, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { UntypedFormControl, Validators } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import type { IAnlass } from 'src/app/core/model/IAnlass';
+import type { ILauflistenEintrag } from 'src/app/core/model/ILauflistenEintrag';
+import { RanglistenService } from 'src/app/core/service/rangliste/ranglisten.service';
+import { MaterialModule } from 'src/app/shared/material-module';
+import { NotenBlattZurueckZiehen } from './delete-dialog/delete-notenblatt.component';
 
 @Component({
-  selector: "app-erfassen-row",
-  templateUrl: "./erfassen-row.component.html",
-  styleUrls: ["./erfassen-row.component.css"],
+  selector: 'lxt-erfassen-row',
+  templateUrl: './erfassen-row.component.html',
+  styleUrls: ['./erfassen-row.component.css'],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, MaterialModule],
 })
 export class ErfassenRowComponent implements OnInit {
   @Input()
@@ -32,29 +36,29 @@ export class ErfassenRowComponent implements OnInit {
 
   constructor(
     private ranglistenService: RanglistenService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
   ) {
-    this.note_1_Cntr = new UntypedFormControl("", {
-      updateOn: "blur",
+    this.note_1_Cntr = new UntypedFormControl('', {
+      updateOn: 'blur',
       validators: [
         Validators.required,
         Validators.max(10),
         Validators.min(0),
-        Validators.pattern("^[0,1]?[0-9](\\.[0-9]?[0,5]?|$)"),
+        Validators.pattern('^[0,1]?[0-9](\\.[0-9]?[0,5]?|$)'),
       ],
     });
-    this.note_2_Cntr = new UntypedFormControl("", {
-      updateOn: "blur",
+    this.note_2_Cntr = new UntypedFormControl('', {
+      updateOn: 'blur',
       validators: [
         Validators.required,
         Validators.max(10),
         Validators.min(0),
-        Validators.pattern("^[0,1]?[0-9](\\.[0-9]?[0,5]?|$)"),
+        Validators.pattern('^[0,1]?[0-9](\\.[0-9]?[0,5]?|$)'),
       ],
     });
   }
   ngOnInit(): void {
-    console.log("Row und Eintrag" + this.eintrag);
+    console.log('Row und Eintrag' + this.eintrag);
     if (this.modeErfassen) {
       this.note_1_Cntr.setValue(this.eintrag.note_1, { emitEvent: false });
       if (this.eintrag.erfasst) {
@@ -65,7 +69,7 @@ export class ErfassenRowComponent implements OnInit {
         this.note_2_Cntr.enable();
       }
       this.note_1_Cntr.valueChanges.subscribe((value) => {
-        console.log("On Control Blur , Value: ", this.note_1_Cntr.value);
+        console.log('On Control Blur , Value: ', this.note_1_Cntr.value);
         if (this.eintrag.note_1 !== value) {
           const corrected = this.addPoint(value);
           this.note_1_Cntr.setValue(corrected, { emitEvent: false });
@@ -120,15 +124,15 @@ export class ErfassenRowComponent implements OnInit {
     }
   }
   private addPoint(value: string): string {
-    console.log("addPoint: ", value);
-    if (value && value.indexOf(".") === -1) {
-      if (value.indexOf("1") === 0 && value.length > 1) {
+    console.log('addPoint: ', value);
+    if (value && value.indexOf('.') === -1) {
+      if (value.indexOf('1') === 0 && value.length > 1) {
         if (value.length > 2) {
-          value = value.substring(0, 2) + "." + value.substring(2);
+          value = value.substring(0, 2) + '.' + value.substring(2);
         }
       } else {
         if (value.length > 1) {
-          value = value.substring(0, 1) + "." + value.substring(1);
+          value = value.substring(0, 1) + '.' + value.substring(1);
         }
       }
     }
@@ -158,29 +162,27 @@ export class ErfassenRowComponent implements OnInit {
   }
 
   private update() {
-    this.ranglistenService
-      .updateLauflistenEintrag(this.anlass, this.eintrag)
-      .subscribe((eintrag) => {
-        if (eintrag) {
-          this.eintrag = eintrag;
-          this.entryChangedEvent.emit(this.eintrag);
-          if (this.eintrag.note_1 !== -1) {
-            this.note_1_Cntr.disable({ emitEvent: false });
-            if (this.sprung && this.note_2_Cntr.touched) {
-              this.note_2_Cntr.disable({ emitEvent: false });
-            }
+    this.ranglistenService.updateLauflistenEintrag(this.anlass, this.eintrag).subscribe((eintrag) => {
+      if (eintrag) {
+        this.eintrag = eintrag;
+        this.entryChangedEvent.emit(this.eintrag);
+        if (this.eintrag.note_1 !== -1) {
+          this.note_1_Cntr.disable({ emitEvent: false });
+          if (this.sprung && this.note_2_Cntr.touched) {
+            this.note_2_Cntr.disable({ emitEvent: false });
           }
         }
-      });
+      }
+    });
   }
   getNotenStyle(): string {
     if (this.sprung) {
       if (this.note_1_Cntr.touched && this.note_2_Cntr.touched) {
         if (!this.note_1_Cntr.errors && !this.note_2_Cntr.errors) {
           if (this.note_1_correct && this.note_2_correct) {
-            return "show_note";
+            return 'show_note';
           } else {
-            return "show_note_error";
+            return 'show_note_error';
           }
         }
       }
@@ -188,14 +190,14 @@ export class ErfassenRowComponent implements OnInit {
       if (this.note_1_Cntr.touched) {
         if (!this.note_1_Cntr.errors) {
           if (this.note_1_correct) {
-            return "show_note";
+            return 'show_note';
           } else {
-            return "show_note_error";
+            return 'show_note_error';
           }
         }
       }
     }
-    return "hide_note";
+    return 'hide_note';
   }
   getBackground(): string {
     let note1Status = true;
@@ -215,23 +217,18 @@ export class ErfassenRowComponent implements OnInit {
           note2Status = false;
         }
       } else {
-        return "notTouchedBg";
+        return 'notTouchedBg';
       }
     }
 
     if (untouched) {
-      return "notTouchedBg";
+      return 'notTouchedBg';
     }
 
-    if (
-      !note1Status ||
-      !note2Status ||
-      !this.note_1_correct ||
-      (this.sprung && !this.note_2_correct)
-    ) {
-      return "errorBg";
+    if (!note1Status || !note2Status || !this.note_1_correct || (this.sprung && !this.note_2_correct)) {
+      return 'errorBg';
     }
-    return "okBg";
+    return 'okBg';
   }
   leeren() {
     this.eintrag.erfasst = false;
@@ -252,24 +249,22 @@ export class ErfassenRowComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result === "abbrechen") {
+      if (result === 'abbrechen') {
         return;
       }
-      this.ranglistenService
-        .deleteNotenblatt(this.anlass, this.eintrag, result)
-        .subscribe((result) => {
-          if (result) {
-            this.eintrag.deleted = true;
-            this.eintrag.note_1 = -1;
-            this.eintrag.note_2 = -1;
-            this.note_1_Cntr.disable();
-            this.note_2_Cntr.disable();
-            this.update();
-            // this.toasterInfo();
-          } else {
-            //this.toasterError();
-          }
-        });
+      this.ranglistenService.deleteNotenblatt(this.anlass, this.eintrag, result).subscribe((result) => {
+        if (result) {
+          this.eintrag.deleted = true;
+          this.eintrag.note_1 = -1;
+          this.eintrag.note_2 = -1;
+          this.note_1_Cntr.disable();
+          this.note_2_Cntr.disable();
+          this.update();
+          // this.toasterInfo();
+        } else {
+          //this.toasterError();
+        }
+      });
     });
   }
   /*

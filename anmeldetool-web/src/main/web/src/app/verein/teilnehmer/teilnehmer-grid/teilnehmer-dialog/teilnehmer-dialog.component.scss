@@ -1,0 +1,40 @@
+mat-form-field {
+  width: 100%;
+}
+
+.label {
+  color: rgba(0, 0, 0, 0.54);
+  text-align: right;
+}
+
+.close-button {
+  float: right;
+  top: -24px;
+  right: -24px;
+}
+
+.close-icon {
+  transition: 1s ease-in-out;
+
+  &:hover {
+    transform: rotate(180deg);
+  }
+}
+
+::ng-deep {
+  .icon-outside {
+    .close-button {
+      float: right;
+      top: -52px;
+      right: -52px;
+    }
+
+    .mat-dialog-container {
+      overflow: unset;
+    }
+  }
+}
+
+.minimal {
+  min-width: 25em;
+}

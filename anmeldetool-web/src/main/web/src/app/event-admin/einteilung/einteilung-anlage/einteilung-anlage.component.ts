@@ -1,23 +1,17 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  ViewEncapsulation,
-} from "@angular/core";
-import { Subject } from "rxjs";
-import { AbteilungEnum } from "src/app/core/model/AbteilungEnum";
-import { AnlageEnum } from "src/app/core/model/AnlageEnum";
-import { GeraeteEnum } from "src/app/core/model/GeraeteEnum";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { ITeilnahmeStatistic } from "src/app/core/model/ITeilnahmeStatistic";
-import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { CachingAnlassService } from "src/app/core/service/caching-services/caching.anlass.service";
+import { Component, type EventEmitter, Input, type OnInit, ViewEncapsulation } from '@angular/core';
+import { Subject } from 'rxjs';
+import type { AbteilungEnum } from 'src/app/core/model/AbteilungEnum';
+import type { AnlageEnum } from 'src/app/core/model/AnlageEnum';
+import type { GeraeteEnum } from 'src/app/core/model/GeraeteEnum';
+import type { IAnlass } from 'src/app/core/model/IAnlass';
+import type { ITeilnahmeStatistic } from 'src/app/core/model/ITeilnahmeStatistic';
+import type { KategorieEnum } from 'src/app/core/model/KategorieEnum';
+import { CachingAnlassService } from 'src/app/core/service/caching-services/caching.anlass.service';
 
 @Component({
-  selector: "app-einteilung-anlage",
-  templateUrl: "./einteilung-anlage.component.html",
-  styleUrls: ["./einteilung-anlage.component.css"],
+  selector: 'lxt-einteilung-anlage',
+  templateUrl: './einteilung-anlage.component.html',
+  styleUrls: ['./einteilung-anlage.component.css'],
   encapsulation: ViewEncapsulation.None,
 })
 export class EinteilungAnlageComponent implements OnInit {
@@ -49,30 +43,16 @@ export class EinteilungAnlageComponent implements OnInit {
 
   ngOnInit(): void {
     this.anlassService
-      .getTeilnahmeStatistic(
-        this.anlass,
-        this.kategorie,
-        this.abteilung,
-        this.anlage,
-        undefined,
-        this.search
-      )
+      .getTeilnahmeStatistic(this.anlass, this.kategorie, this.abteilung, this.anlage, undefined, this.search)
       .subscribe((statistic) => {
         this.teilnahmeStatistic = statistic;
         this.loaded$.next(true);
       });
     this.refreshEmitter.subscribe((search) => {
-      console.log("EinteilungAnlageComponent, Refresh Kategorie: ", search);
+      console.log('EinteilungAnlageComponent, Refresh Kategorie: ', search);
       this.search = search;
       this.anlassService
-        .getTeilnahmeStatistic(
-          this.anlass,
-          this.kategorie,
-          this.abteilung,
-          this.anlage,
-          undefined,
-          search
-        )
+        .getTeilnahmeStatistic(this.anlass, this.kategorie, this.abteilung, this.anlage, undefined, search)
         .subscribe((statistic) => {
           this.teilnahmeStatistic = statistic;
         });

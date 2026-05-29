@@ -1,28 +1,28 @@
+import type { Update } from "@ngrx/entity";
 import { createActionGroup, emptyProps, props } from "@ngrx/store";
-import { IUser } from "../../model/IUser";
-import { Update } from "@ngrx/entity";
+import type { IUser } from "../../model/IUser";
 
 export const UserActions = createActionGroup({
-  source: "User",
-  events: {
-    "Add Dirty User": props<{ payload: IUser }>(),
-    "Update User": props<{ payload: Update<IUser> }>(),
-    "Cancel User": props<{ payload: IUser }>(),
+	source: "user",
+	events: {
+		"Add dirty user": props<{ payload: IUser }>(),
+		"Update user": props<{ payload: Update<IUser> }>(),
+		"Cancel user": props<{ payload: IUser }>(),
 
-    "Load All User INVOKED": emptyProps(),
-    "Load All User SUCCESS": props<{ payload: IUser[] }>(),
-    "Load All User ERROR": props<{ error: string }>(),
+		"Load all user invoked": emptyProps(),
+		"Load all user success": props<{ payload: IUser[] }>(),
+		"Load all user error": props<{ error: string }>(),
 
-    "Add No User INVOKED": props<{ payload: IUser }>(),
-    "Add No User SUCCESS": props<{ payload: IUser }>(),
-    "Add No User ERROR": props<{ error: string }>(),
+		"Add no user invoked": props<{ payload: IUser }>(),
+		"Add no user success": props<{ payload: IUser }>(),
+		"Add no user error": props<{ error: string }>(),
 
-    "Save User INVOKED": props<{ payload: IUser }>(),
-    "Save User SUCCESS": props<{ payload: IUser }>(),
-    "Save User ERROR": props<{ error: string }>(),
+		"Save user invoked": props<{ payload: IUser }>(),
+		"Save user success": props<{ payload: IUser }>(),
+		"Save user error": props<{ error: string }>(),
 
-    "Update User INVOKED": props<{ payload: IUser }>(),
-    "Update User SUCCESS": props<{ payload: IUser }>(),
-    "Update User ERROR": props<{ error: string }>(),
-  },
+		"Update user invoked": props<{ payload: IUser }>(),
+		"Update user success": props<{ payload: IUser }>(),
+		"Update user error": props<{ error: string }>(),
+	},
 });

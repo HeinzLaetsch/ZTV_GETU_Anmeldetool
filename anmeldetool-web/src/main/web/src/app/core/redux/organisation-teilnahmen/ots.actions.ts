@@ -1,15 +1,15 @@
 import { createActionGroup, emptyProps, props } from "@ngrx/store";
-import { IOrganisationTeilnahmenStatistik } from "../../model/IOrganisationTeilnahmenStatistik";
+import type { IOrganisationTeilnahmenStatistik } from "../../model/IOrganisationTeilnahmenStatistik";
 
 export const OtsActions = createActionGroup({
-  source: "ots",
-  events: {
-    "Load All OTS INVOKED": props<{ payload: number }>(),
-    "Load All OTS SUCCESS": props<{
-      payload: IOrganisationTeilnahmenStatistik[];
-    }>(),
-    "Load All OTS ERROR": props<{ error: string }>(),
-  },
+	source: "ots",
+	events: {
+		"Load All ots invoked": props<{ payload: number }>(),
+		"Load All ots success": props<{
+			payload: IOrganisationTeilnahmenStatistik[];
+		}>(),
+		"Load All ots error": props<{ error: string }>(),
+	},
 });
 /*
 

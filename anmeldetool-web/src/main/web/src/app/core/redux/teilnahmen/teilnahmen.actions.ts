@@ -1,46 +1,46 @@
+import type { Update } from "@ngrx/entity";
 import { Action, createActionGroup, emptyProps, props } from "@ngrx/store";
-import { ITeilnahmen } from "../../model/ITeilnahmen";
-import { Update } from "@ngrx/entity";
-import { ITeilnehmer } from "../../model/ITeilnehmer";
+import type { ITeilnahmen } from "../../model/ITeilnahmen";
+import type { ITeilnehmer } from "../../model/ITeilnehmer";
 
 export const TeilnahmenActions = createActionGroup({
-  source: "Teilnahmen",
-  events: {
-    "Refresh All TEILNAHMEN": props<{
-      payload: number;
-    }>(),
-    "Load All TEILNAHMEN INVOKED": props<{
-      payload: number;
-    }>(),
-    "Load All TEILNAHMEN SUCCESS": props<{
-      payload: ITeilnahmen[];
-    }>(),
-    "Load All TEILNAHMEN ERROR": props<{ error: string }>(),
+	source: "teilnahmen",
+	events: {
+		"Refresh all teilnahmen": props<{
+			payload: number;
+		}>(),
+		"Load all teilnahmen invoked": props<{
+			payload: number;
+		}>(),
+		"Load all teilnahmen success": props<{
+			payload: ITeilnahmen[];
+		}>(),
+		"Load all teilnahmen error": props<{ error: string }>(),
 
-    "Add TEILNAHMEN INVOKED": props<{
-      payload: ITeilnahmen;
-    }>(),
-    "Add TEILNAHMEN SUCCESS": props<{
-      payload: ITeilnahmen;
-    }>(),
-    "Add TEILNAHMEN ERROR": props<{ error: string }>(),
+		"Add teilnahmen invoked": props<{
+			payload: ITeilnahmen;
+		}>(),
+		"Add teilnahmen success": props<{
+			payload: ITeilnahmen;
+		}>(),
+		"Add teilnahmen error": props<{ error: string }>(),
 
-    "Update TEILNAHMEN INVOKED": props<{
-      payload: ITeilnahmen;
-    }>(),
-    "Update TEILNAHMEN SUCCESS": props<{
-      payload: Update<ITeilnahmen>;
-    }>(),
-    "Update TEILNAHMEN ERROR": props<{ error: string }>(),
+		"Update teilnahmen invoked": props<{
+			payload: ITeilnahmen;
+		}>(),
+		"Update teilnahmen success": props<{
+			payload: Update<ITeilnahmen>;
+		}>(),
+		"Update teilnahmen error": props<{ error: string }>(),
 
-    "Add TEILNEHMER INVOKED": props<{ payload: ITeilnehmer }>(),
-    "Add TEILNEHMER SUCCESS": props<{ payload: ITeilnehmer }>(),
-    "Add TEILNEHMER ERROR": props<{ error: string }>(),
+		"Add teilnehmer invoked": props<{ payload: ITeilnehmer }>(),
+		"Add teilnehmer success": props<{ payload: ITeilnehmer }>(),
+		"Add teilnehmer error": props<{ error: string }>(),
 
-    "Delete TEILNEHMER INVOKED": props<{ payload: ITeilnehmer }>(),
-    "Delete TEILNEHMER SUCCESS": props<{ payload: string }>(),
-    "Delete TEILNEHMER ERROR": props<{ error: string }>(),
-  },
+		"Delete teilnehmer invoked": props<{ payload: ITeilnehmer }>(),
+		"Delete teilnehmer success": props<{ payload: string }>(),
+		"Delete teilnehmer error": props<{ error: string }>(),
+	},
 });
 
 /*

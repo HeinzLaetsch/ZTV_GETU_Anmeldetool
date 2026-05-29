@@ -1,32 +1,26 @@
-import { Component, OnInit } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
-import { Update } from "@ngrx/entity";
-import { select, Store } from "@ngrx/store";
-import * as moment from "moment";
-import { Observable } from "rxjs";
-import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { IAnlassLink } from "src/app/core/model/IAnlassLink";
-import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
-import { ITeilnehmer } from "src/app/core/model/ITeilnehmer";
-import { selectAnlassById } from "src/app/core/redux/anlass";
-import {
-  AnlassSummariesActions,
-  selectAnlassSummaryByAnlassId,
-} from "src/app/core/redux/anlass-summary";
-import { AppState } from "src/app/core/redux/core.state";
-import { AuthService } from "src/app/core/service/auth/auth.service";
-import { SubscriptionHelper } from "src/app/utils/subscription-helper";
+import { Component, type OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import type { Update } from '@ngrx/entity';
+import { select, Store } from '@ngrx/store';
+import moment from 'moment';
+import type { Observable } from 'rxjs';
+import { AnzeigeStatusEnum } from 'src/app/core/model/AnzeigeStatusEnum';
+import type { IAnlass } from 'src/app/core/model/IAnlass';
+import type { IAnlassLink } from 'src/app/core/model/IAnlassLink';
+import type { IAnlassSummary } from 'src/app/core/model/IAnlassSummary';
+import type { ITeilnehmer } from 'src/app/core/model/ITeilnehmer';
+import { selectAnlassById } from 'src/app/core/redux/anlass';
+import { AnlassSummariesActions, selectAnlassSummaryByAnlassId } from 'src/app/core/redux/anlass-summary';
+import type { AppState } from 'src/app/core/redux/core.state';
+import { AuthService } from 'src/app/core/service/auth/auth.service';
+import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
 
 @Component({
-  selector: "app-events-detail",
-  templateUrl: "./events-detail.component.html",
-  styleUrls: ["./events-detail.component.css"],
+  selector: 'lxt-events-detail',
+  templateUrl: './events-detail.component.html',
+  styleUrls: ['./events-detail.component.css'],
 })
-export class EventsDetailComponent
-  extends SubscriptionHelper
-  implements OnInit
-{
+export class EventsDetailComponent extends SubscriptionHelper implements OnInit {
   // @ViewChild("tabs") tabGroup: MatTabGroup;
 
   anlass: IAnlass;
@@ -36,8 +30,8 @@ export class EventsDetailComponent
 
   // starts$: Observable<ReadonlyArray<IOrganisationAnlassLink>>;
   teilnehmer$: Observable<ITeilnehmer[]>;
-  teilnahmenBrevet1$: Observable<ReadonlyArray<IAnlassLink>>;
-  teilnahmenBrevet2$: Observable<ReadonlyArray<IAnlassLink>>;
+  teilnahmenBrevet1$: Observable<readonly IAnlassLink[]>;
+  teilnahmenBrevet2$: Observable<readonly IAnlassLink[]>;
 
   // starts: Array<IOrganisationAnlassLink>;
   // orgAnlassLink: IOrganisationAnlassLink;
@@ -63,9 +57,7 @@ export class EventsDetailComponent
     const anlassId: string = this.route.snapshot.params.id;
 
     this.anlass$ = this.store.pipe(select(selectAnlassById(anlassId)));
-    this.anlassSummary$ = this.store.pipe(
-      select(selectAnlassSummaryByAnlassId(anlassId)),
-    );
+    this.anlassSummary$ = this.store.pipe(select(selectAnlassSummaryByAnlassId(anlassId)));
 
     this.registerSubscription(
       this.anlass$.subscribe((anlass) => {
@@ -92,12 +84,8 @@ export class EventsDetailComponent
     // wrInit();
   }
   isChangeAllowed(): boolean {
-    if (
-      !this.anlass?.anzeigeStatus.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)
-    ) {
-      if (
-        !this.anlass?.anzeigeStatus.hasStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED)
-      ) {
+    if (!this.anlass?.anzeigeStatus.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)) {
+      if (!this.anlass?.anzeigeStatus.hasStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED)) {
         return true;
       }
     }
@@ -105,12 +93,12 @@ export class EventsDetailComponent
   }
 
   handleClickMe(event: PointerEvent) {
-    this.router.navigate(["anlass/anmeldungen/", this.anlass?.id]);
+    this.router.navigate(['anlass/anmeldungen/', this.anlass?.id]);
   }
 
   startetChanged(start: boolean) {
     // Hier update des via AnlassSummary
-    let anlassSummaryUpdate: Update<IAnlassSummary> = {
+    const anlassSummaryUpdate: Update<IAnlassSummary> = {
       id: this.anlassSummary.anlassId,
       changes: {
         startet: start,
@@ -144,11 +132,11 @@ export class EventsDetailComponent
       OalActions.updateVereinsStartInvoked({ payload: tempLink })
     );
     */
-    let anlassSummaryUpdate: Update<IAnlassSummary> = {
+    const anlassSummaryUpdate: Update<IAnlassSummary> = {
       id: this.anlassSummary.anlassId,
       changes: {
         startet: this.anlassSummary.startet,
-        verlaengerungsDate: asMoment.add(1, "h").toDate(),
+        verlaengerungsDate: asMoment.add(1, 'h').toDate(),
       },
     };
     this.store.dispatch(

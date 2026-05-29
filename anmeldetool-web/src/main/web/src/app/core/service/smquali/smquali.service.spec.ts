@@ -1,11 +1,11 @@
-import { TestBed } from "@angular/core/testing";
+import { TestBed } from '@angular/core/testing';
 
-import { SmQualiService } from "../smquali/smquali.service";
+import { SmQualiService } from '../smquali/smquali.service';
 
-describe("SmQualiService", () => {
+describe('SmQualiService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
-  it("should be created", () => {
+  it('should be created', () => {
     const service: SmQualiService = TestBed.get(SmQualiService);
     expect(service).toBeTruthy();
   });

@@ -1,7 +1,7 @@
-import { IAnlass } from "./IAnlass";
-import { IAnlassLink } from "./IAnlassLink";
+import { IAnlass } from './IAnlass';
+import { IAnlassLink } from './IAnlassLink';
 
-export interface IAnlassLinks {
+export type IAnlassLinks = {
   dirty: boolean;
   anlass: IAnlass;
   anlassLinks: IAnlassLink[];

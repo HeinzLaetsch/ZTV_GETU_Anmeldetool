@@ -46,3 +46,10 @@ testem.log
 .DS_Store
 Thumbs.db
 \"
+
+.nx/cache
+.nx/workspace-data
+.claude/worktrees
+.nx/polygraph
+.nx/self-healing
+.claude/settings.local.json

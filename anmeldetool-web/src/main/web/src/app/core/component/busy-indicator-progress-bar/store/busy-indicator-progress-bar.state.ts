@@ -1,19 +1,18 @@
-import { createEntityAdapter, EntityAdapter, EntityState } from "@ngrx/entity";
+import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
 
-export const loadingAdapter: EntityAdapter<ILoading> =
-  createEntityAdapter<ILoading>({
-    sortComparer: sortByCreationDate,
-  });
+export const loadingAdapter: EntityAdapter<ILoading> = createEntityAdapter<ILoading>({
+  sortComparer: sortByCreationDate,
+});
 
 export function sortByCreationDate(a: ILoading, b: ILoading): any {
   return a.creationDate.getTime() - b.creationDate.getTime();
 }
 
-export interface LoadingState extends EntityState<ILoading> {}
+export type LoadingState = {} & EntityState<ILoading>
 
 export const initialState: LoadingState = loadingAdapter.getInitialState();
 
-export interface ILoading {
+export type ILoading = {
   id: string; // Name of Action
   creationDate: Date;
   finishedDate: Date;

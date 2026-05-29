@@ -1,6 +1,6 @@
-import { MeldeStatusEnum } from "./MeldeStatusEnum";
+import { MeldeStatusEnum } from './MeldeStatusEnum';
 
-export interface IMeldeStatusStati {
+export type IMeldeStatusStati = {
   meldeStatus: MeldeStatusEnum;
   count: number;
 }

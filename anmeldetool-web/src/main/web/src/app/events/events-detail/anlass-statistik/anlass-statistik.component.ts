@@ -1,29 +1,18 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { select, Store } from "@ngrx/store";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { IAnlassSummary } from "src/app/core/model/IAnlassSummary";
-import { AppState } from "src/app/core/redux/core.state";
-import { AnlassService } from "src/app/core/service/anlass/anlass.service";
-import { AuthService } from "src/app/core/service/auth/auth.service";
-import { AnzeigeStatusEnum } from "src/app/core/model/AnzeigeStatusEnum";
-import { Observable } from "rxjs";
-import { IOrganisationAnlassLink } from "src/app/core/model/IOrganisationAnlassLink";
-import {
-  OalActions,
-  selectOalForKeys,
-} from "src/app/core/redux/organisation-anlass";
-import { SubscriptionHelper } from "src/app/utils/subscription-helper";
-import * as moment from "moment";
+import { Component, EventEmitter, Input, type OnInit, Output } from '@angular/core';
+import moment from 'moment';
+import { AnzeigeStatusEnum } from 'src/app/core/model/AnzeigeStatusEnum';
+import type { IAnlass } from 'src/app/core/model/IAnlass';
+import type { IAnlassSummary } from 'src/app/core/model/IAnlassSummary';
+import type { IOrganisationAnlassLink } from 'src/app/core/model/IOrganisationAnlassLink';
+import { AuthService } from 'src/app/core/service/auth/auth.service';
+import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
 
 @Component({
-  selector: "app-anlass-statistik",
-  templateUrl: "./anlass-statistik.component.html",
-  styleUrls: ["./anlass-statistik.component.css"],
+  selector: 'lxt-anlass-statistik',
+  templateUrl: './anlass-statistik.component.html',
+  styleUrls: ['./anlass-statistik.component.css'],
 })
-export class AnlassStatistikComponent
-  extends SubscriptionHelper
-  implements OnInit
-{
+export class AnlassStatistikComponent extends SubscriptionHelper implements OnInit {
   @Input()
   anlass: IAnlass;
   @Input()
@@ -40,9 +29,9 @@ export class AnlassStatistikComponent
   startet: boolean;
 
   constructor(
-    public authService: AuthService //private store: Store<AppState>,
-  ) //private anlassService: AnlassService
-  {
+    public authService: AuthService, //private store: Store<AppState>,
+  ) {
+    //private anlassService: AnlassService
     super();
   }
   ngOnInit() {
@@ -80,14 +69,10 @@ export class AnlassStatistikComponent
     */
   }
   isStartedCheckboxDisabled(): boolean {
-    if (
-      !this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)
-    ) {
+    if (!this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)) {
       const asMoment = moment(this.anlassSummary.verlaengerungsDate);
       if (
-        !this.anlass.anzeigeStatus.hasStatus(
-          AnzeigeStatusEnum.ERFASSEN_CLOSED
-        ) ||
+        !this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED) ||
         asMoment.isSameOrAfter(moment.now())
       ) {
         return false;
@@ -97,7 +82,7 @@ export class AnlassStatistikComponent
   }
 
   vereinStartedClicked(check: boolean) {
-    console.log("VereinStartedClicked: ", check);
+    console.log('VereinStartedClicked: ', check);
     /*
     const newOAL = JSON.parse(JSON.stringify(this.orgAnlassLink));
     newOAL.startet = check;

@@ -1,31 +1,34 @@
-import { Injectable } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
-import { CanDeactivate } from "@angular/router";
-import { Observable, of, Subject } from "rxjs";
-import { map } from "rxjs/operators";
-import { TeilnehmerComponent } from "../teilnehmer.component";
-import { HasChangesComponent } from "./has-changes.component";
+import { Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { CanDeactivate } from '@angular/router';
+import { Observable, of, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { HasChangesComponent } from './has-changes.component';
+
+type HasUnsavedTeilnehmerChanges = {
+  disAllowTab: () => boolean;
+};
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
-export class CanDeactivateGuard implements CanDeactivate<TeilnehmerComponent> {
+export class CanDeactivateGuard implements CanDeactivate<HasUnsavedTeilnehmerChanges> {
   dialogResult: Subject<string>;
   constructor(public dialog: MatDialog) {
     this.dialogResult = new Subject();
   }
-  canDeactivate(component: TeilnehmerComponent): Observable<boolean> {
+  canDeactivate(component: HasUnsavedTeilnehmerChanges): Observable<boolean> {
     if (component.disAllowTab()) {
       // this.openDialog().subscribe((result) => {
       return this.openDialog().pipe(
         map((result) => {
           console.log(result);
-          if (result === "Cancel") {
+          if (result === 'Cancel') {
             return true;
           } else {
             return false;
           }
-        })
+        }),
       );
     }
     return of(true);

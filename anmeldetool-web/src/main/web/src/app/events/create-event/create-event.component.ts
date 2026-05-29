@@ -1,16 +1,16 @@
-import { Component, OnInit } from "@angular/core";
-import { UntypedFormControl, UntypedFormGroup, Validators } from "@angular/forms";
-import { Router } from "@angular/router";
-import { IEvent } from "../shared";
+import { Component, type OnInit } from '@angular/core';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import type { IEvent } from '../shared';
 
 @Component({
-  selector: "app-create-event",
-  templateUrl: "./create-event.component.html",
-  styleUrls: ["./create-event.component.css"],
+  selector: 'lxt-create-event',
+  templateUrl: './create-event.component.html',
+  styleUrls: ['./create-event.component.css'],
 })
 export class CreateEventComponent implements OnInit {
   newEvent: IEvent;
-  isDirty: boolean = true;
+  isDirty = true;
 
   newEventForm: UntypedFormGroup;
   name: UntypedFormControl;
@@ -20,9 +20,9 @@ export class CreateEventComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit() {
-    this.name = new UntypedFormControl("", Validators.required);
-    this.startDate = new UntypedFormControl("", Validators.required);
-    this.endDate = new UntypedFormControl("", Validators.required);
+    this.name = new UntypedFormControl('', Validators.required);
+    this.startDate = new UntypedFormControl('', Validators.required);
+    this.endDate = new UntypedFormControl('', Validators.required);
 
     this.newEventForm = new UntypedFormGroup({
       name: this.name,
@@ -32,14 +32,14 @@ export class CreateEventComponent implements OnInit {
   }
 
   cancel() {
-    console.log("Cancel called");
-    this.router.navigate(["/events/"]);
+    console.log('Cancel called');
+    this.router.navigate(['/events/']);
   }
 
   saveEvent(formValues) {
     // this.eventService.saveEvent(formValues);
     this.isDirty = false;
-    this.router.navigate(["/events/"]);
+    this.router.navigate(['/events/']);
   }
 
   getCurrentDate(): string {

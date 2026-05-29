@@ -18,13 +18,8 @@
         class="drag-drop-list col"
         (cdkDropListDropped)="drop($event)"
       >
-        <div
-          class="drag-drop-box"
-          *ngFor="let role of allRoles"
-          cdkDrag
-          [cdkDragDisabled]="disableRole(role)"
-        >
-          <app-role-chip [role]="role" [isAllRolesList]="true"></app-role-chip>
+        <div class="drag-drop-box" *ngFor="let role of allRoles" cdkDrag [cdkDragDisabled]="disableRole(role)">
+          <lxt-role-chip [role]="role" [isAllRolesList]="true"></lxt-role-chip>
         </div>
       </div>
       <div
@@ -35,19 +30,14 @@
         class="drag-drop-list col"
         (cdkDropListDropped)="drop($event)"
       >
-        <div
-          class="drag-drop-box"
-          *ngFor="let role of assignedRoles"
-          cdkDrag
-          [cdkDragDisabled]="disableRole(role)"
-        >
-          <app-role-chip
+        <div class="drag-drop-box" *ngFor="let role of assignedRoles" cdkDrag [cdkDragDisabled]="disableRole(role)">
+          <lxt-role-chip
             [role]="role"
             [isAllRolesList]="false"
             [isVereinsVerantwortlicher]="isVereinsAnmelder"
             [isVereinsAnmelder]="isVereinsAnmelder"
             (roleChange)="aktivChange($event)"
-          ></app-role-chip>
+          ></lxt-role-chip>
         </div>
       </div>
     </div>

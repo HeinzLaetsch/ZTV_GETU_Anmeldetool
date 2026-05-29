@@ -1,4 +1,4 @@
-export interface IAnlassSummary {
+export type IAnlassSummary = {
   anlassId: string;
   organisationsId: string;
   startet: boolean;

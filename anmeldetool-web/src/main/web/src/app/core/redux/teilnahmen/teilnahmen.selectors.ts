@@ -1,17 +1,12 @@
-import { createFeatureSelector, createSelector } from "@ngrx/store";
-import { TeilnahmenState } from "./teilnahmen.state";
-import { teilnahmenFeature } from "./teilnahmen.reducer";
-import * as fromTeilnahmen from "./teilnahmen.reducer";
-import { TiTuEnum } from "../../model/TiTuEnum";
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { TeilnahmenState } from './teilnahmen.state';
+import { teilnahmenFeature } from './teilnahmen.reducer';
+import * as fromTeilnahmen from './teilnahmen.reducer';
+import { isTiTuEnumEqual, TiTuEnum } from '../../model/TiTuEnum';
 
-export const selectTeilnahmenState = createFeatureSelector<TeilnahmenState>(
-  teilnahmenFeature.name
-);
+export const selectTeilnahmenState = createFeatureSelector<TeilnahmenState>(teilnahmenFeature.name);
 
-export const selectAllTeilnahmen = createSelector(
-  selectTeilnahmenState,
-  fromTeilnahmen.selectAll
-);
+export const selectAllTeilnahmen = createSelector(selectTeilnahmenState, fromTeilnahmen.selectAll);
 
 export const selectTeilnahmen = () =>
   createSelector(selectAllTeilnahmen, (teilnahmenState) => {
@@ -20,25 +15,21 @@ export const selectTeilnahmen = () =>
 
 export const selectTuTeilnahmen = () =>
   createSelector(selectAllTeilnahmen, (teilnahmenState) => {
-    const ret = teilnahmenState.filter((x) =>
-      TiTuEnum.equals(TiTuEnum.Tu, x.teilnehmer.tiTu)
-    );
+    const ret = teilnahmenState.filter((x) => isTiTuEnumEqual(TiTuEnum.Tu, x.teilnehmer.tiTu));
     return ret;
   });
 
 export const selectTiTeilnahmen = () =>
   createSelector(selectAllTeilnahmen, (teilnahmenState) => {
-    const ret = teilnahmenState.filter((x) =>
-      TiTuEnum.equals(TiTuEnum.Ti, x.teilnehmer.tiTu)
-    );
+    const ret = teilnahmenState.filter((x) => isTiTuEnumEqual(TiTuEnum.Ti, x.teilnehmer.tiTu));
     return ret;
   });
 
-export const selectTeilnahmenByAnlassId = (anlassId: String) =>
+export const selectTeilnahmenByAnlassId = (anlassId: string) =>
   createSelector(selectAllTeilnahmen, (teilnahmenState) => {
     const ret = teilnahmenState
       .map((x) => {
-        const tals = x.talDTOList.filter((y) => y.anlassId === anlassId);
+        const tals = (x.talDTOList ?? []).filter((y) => y.anlassId === anlassId);
         if (tals.length > 0) {
           return {
             ...x,

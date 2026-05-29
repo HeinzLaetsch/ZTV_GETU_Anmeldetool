@@ -1,7 +1,7 @@
-import { MeldeStatusEnum } from "./MeldeStatusEnum";
-import { TiTuEnum } from "./TiTuEnum";
+import { MeldeStatusEnum } from './MeldeStatusEnum';
+import { TiTuEnum } from './TiTuEnum';
 
-export interface ITeilnehmerStart {
+export type ITeilnehmerStart = {
   id: string;
   name: string;
   vorname: string;

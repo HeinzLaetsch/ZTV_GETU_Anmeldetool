@@ -1,25 +1,22 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewEncapsulation,
-} from "@angular/core";
-import { AbteilungEnum } from "src/app/core/model/AbteilungEnum";
-import { AnlageEnum } from "src/app/core/model/AnlageEnum";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { ILaufliste } from "src/app/core/model/ILaufliste";
-import { IUser } from "src/app/core/model/IUser";
-import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.service";
-import { ChangeEvent } from "src/app/rechnungsbuero/model/change-event";
+import { Component, EventEmitter, Input, type OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import type { AbteilungEnum } from 'src/app/core/model/AbteilungEnum';
+import type { AnlageEnum } from 'src/app/core/model/AnlageEnum';
+import type { IAnlass } from 'src/app/core/model/IAnlass';
+import type { ILaufliste } from 'src/app/core/model/ILaufliste';
+import type { KategorieEnum } from 'src/app/core/model/KategorieEnum';
+import { RanglistenService } from 'src/app/core/service/rangliste/ranglisten.service';
+import type { ChangeEvent } from 'src/app/rechnungsbuero/model/change-event';
+import { MaterialModule } from 'src/app/shared/material-module';
+import { LauflisteStatusComponent } from '../laufliste-status/laufliste-status.component';
 
 @Component({
-  selector: "app-anlage-status",
-  templateUrl: "./anlage-status.component.html",
-  styleUrls: ["./anlage-status.component.css"],
+  selector: 'lxt-anlage-status',
+  templateUrl: './anlage-status.component.html',
+  styleUrls: ['./anlage-status.component.css'],
   encapsulation: ViewEncapsulation.None,
+  standalone: true,
+  imports: [CommonModule, MaterialModule, LauflisteStatusComponent],
 })
 export class AnlageStatusComponent implements OnInit {
   @Input()
@@ -44,15 +41,10 @@ export class AnlageStatusComponent implements OnInit {
   lauflisten: ILaufliste[];
 
   erfasst = true;
-  // erfasstLauflisten: boolean[];
 
   checked = true;
-  // checkedLauflisten: boolean[];
 
-  constructor(private ranglistenService: RanglistenService) {
-    // this.erfasstLauflisten = new Array<boolean>();
-    // this.checkedLauflisten = new Array<boolean>();
-  }
+  constructor(private ranglistenService: RanglistenService) {}
 
   ngOnInit(): void {
     this.ranglistenService
@@ -67,10 +59,6 @@ export class AnlageStatusComponent implements OnInit {
           }
           return 0;
         });
-        // this.lauflisten.forEach((laufliste) => {
-        // this.erfasstLauflisten.push(laufliste.erfasst);
-        // this.checkedLauflisten.push(laufliste.checked);
-        // });
         this.erfasstChanged();
         this.checkedChanged();
       });

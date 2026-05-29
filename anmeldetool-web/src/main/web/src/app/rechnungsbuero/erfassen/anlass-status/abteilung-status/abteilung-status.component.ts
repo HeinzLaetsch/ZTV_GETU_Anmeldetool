@@ -1,25 +1,22 @@
-import {
-  Component,
-  Input,
-  OnInit,
-  Output,
-  ViewEncapsulation,
-  EventEmitter,
-} from "@angular/core";
-import { AbteilungEnum } from "src/app/core/model/AbteilungEnum";
-import { AnlageEnum } from "src/app/core/model/AnlageEnum";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { ILaufliste } from "src/app/core/model/ILaufliste";
-import { IUser } from "src/app/core/model/IUser";
-import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { RanglistenService } from "src/app/core/service/rangliste/ranglisten.service";
-import { ChangeEvent } from "src/app/rechnungsbuero/model/change-event";
+import { Component, EventEmitter, Input, type OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import type { AbteilungEnum } from 'src/app/core/model/AbteilungEnum';
+import { AnlageEnum } from 'src/app/core/model/AnlageEnum';
+import type { IAnlass } from 'src/app/core/model/IAnlass';
+import type { ILaufliste } from 'src/app/core/model/ILaufliste';
+import type { KategorieEnum } from 'src/app/core/model/KategorieEnum';
+import { RanglistenService } from 'src/app/core/service/rangliste/ranglisten.service';
+import type { ChangeEvent } from 'src/app/rechnungsbuero/model/change-event';
+import { MaterialModule } from 'src/app/shared/material-module';
+import { AnlageStatusComponent } from '../anlage-status/anlage-status.component';
 
 @Component({
-  selector: "app-abteilung-status",
-  templateUrl: "./abteilung-status.component.html",
-  styleUrls: ["./abteilung-status.component.css"],
+  selector: 'lxt-abteilung-status',
+  templateUrl: './abteilung-status.component.html',
+  styleUrls: ['./abteilung-status.component.css'],
   encapsulation: ViewEncapsulation.None,
+  standalone: true,
+  imports: [CommonModule, MaterialModule, AnlageStatusComponent],
 })
 export class AbteilungStatusComponent implements OnInit {
   @Input()
@@ -51,11 +48,9 @@ export class AbteilungStatusComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.ranglistenService
-      .getAnlagenForAnlass(this.anlass, this.kategorie, this.abteilung)
-      .subscribe((anlagen) => {
-        this.anlagen = anlagen;
-      });
+    this.ranglistenService.getAnlagenForAnlass(this.anlass, this.kategorie, this.abteilung).subscribe((anlagen) => {
+      this.anlagen = anlagen;
+    });
     this.erfasstChangedEmitter.subscribe((laufliste) => {
       // console.log("AbteilungStatusComponent: Laufliste changed: ", laufliste);
     });

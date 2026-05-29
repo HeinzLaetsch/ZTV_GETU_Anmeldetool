@@ -1,20 +1,20 @@
-import { RouterModule, Routes } from "@angular/router";
-import { AuthRouteActivatorService } from "../core/routing/auth-route-activator.service";
-import { RechnungsbueroComponent } from "./rechnungsbuero.component";
-import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from '@angular/router';
+import { AuthRouteActivatorService } from '../core/routing/auth-route-activator.service';
+import { RechnungsbueroComponent } from './rechnungsbuero.component';
+import { NgModule } from '@angular/core';
 
 export const rechnungsbueroRoutes: Routes = [
   {
-    path: ":id",
+    path: ':id',
     component: RechnungsbueroComponent,
     canActivate: [AuthRouteActivatorService],
-    data: { roles: ["RECHNUNGSBUERO"] },
+    data: { roles: ['RECHNUNGSBUERO'] },
   },
   {
-    path: "",
+    path: '',
     component: RechnungsbueroComponent,
     canActivate: [AuthRouteActivatorService],
-    data: { roles: ["RECHNUNGSBUERO"] },
+    data: { roles: ['RECHNUNGSBUERO'] },
   },
   /*
   {

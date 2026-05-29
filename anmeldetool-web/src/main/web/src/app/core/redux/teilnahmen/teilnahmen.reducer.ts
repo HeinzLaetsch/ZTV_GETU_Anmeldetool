@@ -1,9 +1,9 @@
-import { createFeature, createReducer, createSelector, on } from "@ngrx/store";
-import { initialState, teilnahmenAdapter } from "./teilnahmen.state";
-import { TeilnahmenActions } from "./teilnahmen.actions";
+import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
+import { initialState, teilnahmenAdapter } from './teilnahmen.state';
+import { TeilnahmenActions } from './teilnahmen.actions';
 
 export const teilnahmenFeature = createFeature({
-  name: "teilnahmen",
+  name: 'teilnahmen',
   reducer: createReducer(
     initialState,
     on(TeilnahmenActions.loadAllTeilnahmenSuccess, (state, action) => {
@@ -12,7 +12,7 @@ export const teilnahmenFeature = createFeature({
     }),
     on(TeilnahmenActions.updateTeilnahmenSuccess, (state, action) => {
       const teilnahme = action.payload;
-      console.log("Store updated : true");
+      console.log('Store updated : true');
       return teilnahmenAdapter.updateOne(teilnahme, state);
     }),
     on(TeilnahmenActions.addTeilnehmerSuccess, (state, action) => {
@@ -26,15 +26,13 @@ export const teilnahmenFeature = createFeature({
     }),
     on(TeilnahmenActions.deleteTeilnehmerSuccess, (state, action) => {
       const teilnehmerId = action.payload;
-      console.log("Store updated : deletion of teilnehmer " + teilnehmerId);
+      console.log('Store updated : deletion of teilnehmer ' + teilnehmerId);
       const newState = teilnahmenAdapter.removeOne(teilnehmerId, state);
       return newState;
-    })
+    }),
   ),
 });
 
-export const { selectAll, selectEntities, selectIds, selectTotal } =
-  teilnahmenAdapter.getSelectors();
+export const { selectAll, selectEntities, selectIds, selectTotal } = teilnahmenAdapter.getSelectors();
 
-export const selectEntityById = (id) =>
-  createSelector(selectEntities, (entities) => entities[id]);
+export const selectEntityById = (id) => createSelector(selectEntities, (entities) => entities[id]);

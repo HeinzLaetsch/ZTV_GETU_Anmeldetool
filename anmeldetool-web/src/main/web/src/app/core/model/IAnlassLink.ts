@@ -1,6 +1,6 @@
-import { MeldeStatusEnum } from "./MeldeStatusEnum";
+import { MeldeStatusEnum } from './MeldeStatusEnum';
 
-export interface IAnlassLink {
+export type IAnlassLink = {
   kategorie: string;
   meldeStatus?: MeldeStatusEnum;
   anlassId: string;

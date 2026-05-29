@@ -8,9 +8,8 @@ describe('EventThumbnailComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EventThumbnailComponent ]
-    })
-    .compileComponents();
+      declarations: [EventThumbnailComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

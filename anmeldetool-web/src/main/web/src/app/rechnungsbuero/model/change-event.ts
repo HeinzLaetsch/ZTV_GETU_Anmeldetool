@@ -1,4 +1,4 @@
-export interface ChangeEvent {
+export type ChangeEvent = {
   topic: any;
   status: boolean;
 }

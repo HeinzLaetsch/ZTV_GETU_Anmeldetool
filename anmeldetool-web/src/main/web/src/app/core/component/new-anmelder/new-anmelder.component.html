@@ -13,26 +13,20 @@
               {{ verein.name }}
             </mat-option>
           </mat-select>
-          <mat-error
-            *ngIf="form.controls['vereinFormControl'].hasError('required')"
-          >
-            Pflichtfeld
-          </mat-error>
+          <mat-error *ngIf="form.controls['vereinFormControl'].hasError('required')"> Pflichtfeld </mat-error>
           <mat-hint>Wähle Deinen Verein aus</mat-hint>
         </mat-form-field>
       </p>
-      <app-user
+      <lxt-user
         [(user)]="anmelder"
         (valid)="updateUserValid($event)"
         [showPassword]="true"
         [showBenutzername]="false"
         [mustShowPassword]="true"
-      ></app-user>
+      ></lxt-user>
     </mat-dialog-content>
     <mat-error *ngIf="error" class="error"> {{ errorMessage }}</mat-error>
     <button mat-button type="button" (click)="cancel()">Abbrechen</button>
-    <button mat-button type="submit" [disabled]="!form.valid || !userValid">
-      Speichern
-    </button>
+    <button mat-button type="submit" [disabled]="!form.valid || !userValid">Speichern</button>
   </form>
 </div>

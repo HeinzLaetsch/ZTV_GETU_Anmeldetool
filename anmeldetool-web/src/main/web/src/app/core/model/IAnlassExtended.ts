@@ -1,7 +1,7 @@
-import { IAnlass } from "./IAnlass";
-import { IAnlassSummary } from "./IAnlassSummary";
+import { IAnlass } from './IAnlass';
+import { IAnlassSummary } from './IAnlassSummary';
 
-export interface IAnlassExtended {
+export type IAnlassExtended = {
   anlass: IAnlass;
   summary: IAnlassSummary;
 }

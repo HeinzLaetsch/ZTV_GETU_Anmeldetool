@@ -1,11 +1,11 @@
-import * as moment from "moment";
-import { Anzeigestatus, AnzeigeStatusEnum } from "./AnzeigeStatusEnum";
-import { GeraeteEnum } from "./GeraeteEnum";
-import { IWertungsrichterSlot } from "./IWertungsrichterSlot";
-import { KategorieEnum } from "./KategorieEnum";
-import { TiTuEnum } from "./TiTuEnum";
-import { IOrganisationTeilnahmenStatistik } from "./IOrganisationTeilnahmenStatistik";
-import { IAnlassSummary } from "./IAnlassSummary";
+import moment from 'moment';
+import { Anzeigestatus, AnzeigeStatusEnum } from './AnzeigeStatusEnum';
+import { GeraeteEnum } from './GeraeteEnum';
+import { IWertungsrichterSlot } from './IWertungsrichterSlot';
+import { KategorieEnum } from './KategorieEnum';
+import { TiTuEnum } from './TiTuEnum';
+import { IOrganisationTeilnahmenStatistik } from './IOrganisationTeilnahmenStatistik';
+import { IAnlassSummary } from './IAnlassSummary';
 
 export class IAnlass {
   id: string;
@@ -37,25 +37,25 @@ export class IAnlass {
   }
 
   getCleaned(): string {
-    var step1 = this.anlassBezeichnung.replace("Zürcher Kantonaler ", "");
-    step1 = step1.replace("Zürcher Kantonale ", "");
-    step1 = step1.replace("Zürcher Kant. ", "");
-    return step1.replace("%", " ");
+    let step1 = this.anlassBezeichnung.replace('Zürcher Kantonaler ', '');
+    step1 = step1.replace('Zürcher Kantonale ', '');
+    step1 = step1.replace('Zürcher Kant. ', '');
+    return step1.replace('%', ' ');
   }
 
   getWithDatum(): string {
     const asMoment = moment(this.startDatum);
-    return asMoment.format("YY.MM.DD") + " " + this.getCleaned();
+    return asMoment.format('YY.MM.DD') + ' ' + this.getCleaned();
   }
 
   getPart(first: boolean): string {
-    if (this.anlassBezeichnung.lastIndexOf("%") === -1) {
+    if (this.anlassBezeichnung.lastIndexOf('%') === -1) {
       return this.anlassBezeichnung;
     }
     if (first) {
-      return this.anlassBezeichnung.split("%")[0];
+      return this.anlassBezeichnung.split('%')[0];
     } else {
-      return this.anlassBezeichnung.split("%")[1];
+      return this.anlassBezeichnung.split('%')[1];
     }
   }
   set organisator(organisator: string) {
@@ -115,11 +115,8 @@ export class IAnlass {
   erfassenVerlaengert_: Date;
 
   // Cross Kategorie Aenderungen nicht mehr erlaubt
-  set crossKategorieAenderungenGeschlossen(
-    crossKategorieAenderungenGeschlossen: Date,
-  ) {
-    this.crossKategorieAenderungenGeschlossen_ =
-      crossKategorieAenderungenGeschlossen;
+  set crossKategorieAenderungenGeschlossen(crossKategorieAenderungenGeschlossen: Date) {
+    this.crossKategorieAenderungenGeschlossen_ = crossKategorieAenderungenGeschlossen;
     this.updateAnzeigeStatus();
   }
   get crossKategorieAenderungenGeschlossen(): Date {
@@ -128,9 +125,7 @@ export class IAnlass {
   crossKategorieAenderungenGeschlossen_: Date;
 
   // Aenderungen innerhalb Kategorie nicht mehr erlaubt.
-  set aenderungenInKategorieGeschlossen(
-    aenderungenInKategorieGeschlossen: Date,
-  ) {
+  set aenderungenInKategorieGeschlossen(aenderungenInKategorieGeschlossen: Date) {
     this.aenderungenInKategorieGeschlossen_ = aenderungenInKategorieGeschlossen;
     this.updateAnzeigeStatus();
   }
@@ -179,8 +174,7 @@ export class IAnlass {
   }
   get tiAnlass(): boolean {
     const key = TiTuEnum[this.tiTu];
-    const tiAnlass =
-      key === TiTuEnum.Ti.toString() || key === TiTuEnum.Alle.toString();
+    const tiAnlass = key === TiTuEnum.Ti.toString() || key === TiTuEnum.Alle.toString();
     return tiAnlass;
   }
   get alleAnlass(): boolean {
@@ -211,21 +205,13 @@ export class IAnlass {
   }
 
   getKategorienRaw(): KategorieEnum[] {
-    const k5Index = Object.keys(KategorieEnum).findIndex(
-      (key) => key === KategorieEnum.K5,
-    );
-    const start = Object.keys(KategorieEnum).findIndex(
-      (key) => key === this.tiefsteKategorie,
-    );
-    let end = Object.keys(KategorieEnum).findIndex(
-      (key) => key === this.hoechsteKategorie,
-    );
+    const k5Index = Object.keys(KategorieEnum).findIndex((key) => key === KategorieEnum.K5);
+    const start = Object.keys(KategorieEnum).findIndex((key) => key === this.tiefsteKategorie);
+    const end = Object.keys(KategorieEnum).findIndex((key) => key === this.hoechsteKategorie);
     // Keine Teilnahme
     let filtered = Object.values(KategorieEnum).slice(0, 1);
     if (end > k5Index) {
-      filtered = filtered.concat(
-        Object.values(KategorieEnum).slice(start, k5Index),
-      );
+      filtered = filtered.concat(Object.values(KategorieEnum).slice(start, k5Index));
       if (this.tuAnlass || this.alleAnlass) {
         filtered.push(KategorieEnum.K5);
       }
@@ -240,17 +226,15 @@ export class IAnlass {
       filtered.push(KategorieEnum.K6);
       filtered.push(KategorieEnum.K7);
     } else {
-      filtered = filtered.concat(
-        Object.values(KategorieEnum).slice(start, end + 1),
-      );
+      filtered = filtered.concat(Object.values(KategorieEnum).slice(start, end + 1));
     }
     return filtered;
   }
 
-  public updateAnzeigeStatus(): void {
+  updateAnzeigeStatus(): void {
     if (this.anmeldungBeginn) {
-      const asMoment = moment(this.anmeldungBeginn).startOf("day");
-      asMoment.add(1, "days");
+      const asMoment = moment(this.anmeldungBeginn).startOf('day');
+      asMoment.add(1, 'days');
       if (asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN);
       } else {
@@ -261,12 +245,12 @@ export class IAnlass {
     }
     this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED);
     if (this.erfassenGeschlossen) {
-      const asMoment = moment(this.erfassenGeschlossen).startOf("day");
-      asMoment.add(1, "days");
+      const asMoment = moment(this.erfassenGeschlossen).startOf('day');
+      asMoment.add(1, 'days');
       if (asMoment.isBefore()) {
         if (this.erfassenVerlaengert) {
           const asMoment2 = moment(this.erfassenVerlaengert);
-          asMoment2.add(1, "days");
+          asMoment2.add(1, 'days');
           if (asMoment2.isBefore()) {
             this.anzeigeStatus.setStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED);
           }
@@ -281,25 +265,19 @@ export class IAnlass {
     }
 
     if (this.crossKategorieAenderungenGeschlossen) {
-      const asMoment = moment(
-        this.crossKategorieAenderungenGeschlossen,
-      ).startOf("day");
-      asMoment.add(1, "days");
+      const asMoment = moment(this.crossKategorieAenderungenGeschlossen).startOf('day');
+      asMoment.add(1, 'days');
       if (asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.CROSS_KATEGORIE_CLOSED);
       } else {
-        this.anzeigeStatus.resetStatus(
-          AnzeigeStatusEnum.CROSS_KATEGORIE_CLOSED,
-        );
+        this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.CROSS_KATEGORIE_CLOSED);
       }
     } else {
       this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.CROSS_KATEGORIE_CLOSED);
     }
     if (this.aenderungenInKategorieGeschlossen) {
-      const asMoment = moment(this.aenderungenInKategorieGeschlossen).startOf(
-        "day",
-      );
-      asMoment.add(1, "days");
+      const asMoment = moment(this.aenderungenInKategorieGeschlossen).startOf('day');
+      asMoment.add(1, 'days');
       if (asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.IN_KATEGORIE_CLOSED);
       } else {
@@ -310,22 +288,20 @@ export class IAnlass {
     }
 
     if (this.aenderungenNichtMehrErlaubt) {
-      const asMoment = moment(this.aenderungenNichtMehrErlaubt).startOf("day");
-      asMoment.add(1, "days");
+      const asMoment = moment(this.aenderungenNichtMehrErlaubt).startOf('day');
+      asMoment.add(1, 'days');
       if (asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED);
       } else {
-        this.anzeigeStatus.resetStatus(
-          AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED,
-        );
+        this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED);
       }
     } else {
       this.anzeigeStatus.resetStatus(AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED);
     }
 
     if (this.endDatum) {
-      const asMoment = moment(this.endDatum).startOf("day");
-      asMoment.add(1, "days");
+      const asMoment = moment(this.endDatum).startOf('day');
+      asMoment.add(1, 'days');
       if (asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.CLOSED);
       } else {
@@ -342,8 +318,8 @@ export class IAnlass {
     }
 
     if (this.erfassenVerlaengert) {
-      const asMoment = moment(this.erfassenVerlaengert).startOf("day");
-      asMoment.add(1, "days");
+      const asMoment = moment(this.erfassenVerlaengert).startOf('day');
+      asMoment.add(1, 'days');
       if (!asMoment.isBefore()) {
         this.anzeigeStatus.setStatus(AnzeigeStatusEnum.VERLAENGERT);
       } else {

@@ -1,43 +1,38 @@
-import { Component, OnInit } from "@angular/core";
-import { SubscriptionHelper } from "../utils/subscription-helper";
-import { IUser } from "../core/model/IUser";
-import { IAnlass } from "../core/model/IAnlass";
-import { Observable } from "rxjs";
-import { AuthService } from "../core/service/auth/auth.service";
-import { select, Store } from "@ngrx/store";
-import { AppState } from "../core/redux/core.state";
-import { ActivatedRoute } from "@angular/router";
-import { selectAnlassById } from "../core/redux/anlass";
+import { CommonModule } from '@angular/common';
+import { Component, type OnInit } from '@angular/core';
+import { MatTabsModule } from '@angular/material/tabs';
+import { ActivatedRoute } from '@angular/router';
+import { select, Store } from '@ngrx/store';
+import type { IAnlass } from '../core/model/IAnlass';
+import { selectAnlassById } from '../core/redux/anlass';
+import type { AppState } from '../core/redux/core.state';
+import { AuthService } from '../core/service/auth/auth.service';
+import { ErfassenComponent } from './erfassen/erfassen.component';
+import { RanglistenComponent } from './rangliste/ranglisten.component';
 
 @Component({
-  selector: "app-rechnungsbuero",
-  templateUrl: "./rechnungsbuero.component.html",
-  styleUrls: ["./rechnungsbuero.component.css"],
+  selector: 'lxt-rechnungsbuero',
+  templateUrl: './rechnungsbuero.component.html',
+  styleUrls: ['./rechnungsbuero.component.scss'],
+  imports: [CommonModule, MatTabsModule, ErfassenComponent, RanglistenComponent],
 })
-export class RechnungsbueroComponent
-  extends SubscriptionHelper
-  implements OnInit
-{
-  currentUser: IUser;
-  anlass: IAnlass;
-  anlass$: Observable<IAnlass>;
+export class RechnungsbueroComponent implements OnInit {
+  anlass!: IAnlass;
 
   constructor(
-    public authService: AuthService,
+    private route: ActivatedRoute,
     private store: Store<AppState>,
-    private route: ActivatedRoute
-  ) {
-    super();
-  }
+    protected authService: AuthService,
+  ) {}
 
-  ngOnInit() {
-    this.currentUser = this.authService.currentUser;
-    const anlassId: string = this.route.snapshot.params.id;
-    this.anlass$ = this.store.pipe(select(selectAnlassById(anlassId)));
-    this.registerSubscription(
-      this.anlass$.subscribe((anlass) => {
-        this.anlass = anlass;
-      })
-    );
+  ngOnInit(): void {
+    const anlassId = this.route.snapshot.params['id'];
+    if (anlassId) {
+      this.store.pipe(select(selectAnlassById(anlassId))).subscribe((anlass) => {
+        if (anlass) {
+          this.anlass = anlass;
+        }
+      });
+    }
   }
 }

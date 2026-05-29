@@ -1,24 +1,22 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewEncapsulation,
-} from "@angular/core";
-import { AbteilungEnum } from "src/app/core/model/AbteilungEnum";
-import { AnlageEnum } from "src/app/core/model/AnlageEnum";
-import { IAnlass } from "src/app/core/model/IAnlass";
-import { ILaufliste } from "src/app/core/model/ILaufliste";
-import { IUser } from "src/app/core/model/IUser";
-import { KategorieEnum } from "src/app/core/model/KategorieEnum";
-import { AuthService } from "src/app/core/service/auth/auth.service";
+import { Component, EventEmitter, Input, type OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import type { AbteilungEnum } from 'src/app/core/model/AbteilungEnum';
+import type { AnlageEnum } from 'src/app/core/model/AnlageEnum';
+import type { IAnlass } from 'src/app/core/model/IAnlass';
+import type { ILaufliste } from 'src/app/core/model/ILaufliste';
+import type { IUser } from 'src/app/core/model/IUser';
+import type { KategorieEnum } from 'src/app/core/model/KategorieEnum';
+import { AuthService } from 'src/app/core/service/auth/auth.service';
+import { MaterialModule } from 'src/app/shared/material-module';
+import { KategorieStatusComponent } from './kategorie-status/kategorie-status.component';
 
 @Component({
-  selector: "app-anlass-status",
-  templateUrl: "./anlass-status.component.html",
-  styleUrls: ["./anlass-status.component.css"],
+  selector: 'lxt-anlass-status',
+  templateUrl: './anlass-status.component.html',
+  styleUrls: ['./anlass-status.component.css'],
   encapsulation: ViewEncapsulation.None,
+  standalone: true,
+  imports: [CommonModule, MaterialModule, KategorieStatusComponent],
 })
 export class AnlassStatusComponent implements OnInit {
   @Input()
@@ -39,7 +37,7 @@ export class AnlassStatusComponent implements OnInit {
   anlagen: AnlageEnum;
 
   constructor(private authService: AuthService) {
-    this.abteilungen = new Array();
+    this.abteilungen = [];
   }
 
   ngOnInit() {

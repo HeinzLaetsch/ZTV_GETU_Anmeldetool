@@ -8,30 +8,15 @@
     <ng-container *ngIf="modeErfassen">
       <ng-container *ngIf="sprung">
         <div class="col-1 data centered">
-          <input
-            matInput
-            [formControl]="note_1_Cntr"
-            type="text"
-            class="note"
-          />
+          <input matInput [formControl]="note_1_Cntr" type="text" class="note" />
         </div>
         <div class="col-1 data centered">
-          <input
-            matInput
-            [formControl]="note_2_Cntr"
-            type="text"
-            class="note"
-          />
+          <input matInput [formControl]="note_2_Cntr" type="text" class="note" />
         </div>
       </ng-container>
       <ng-container *ngIf="!sprung">
         <div class="col-1 data centered">
-          <input
-            matInput
-            [formControl]="note_1_Cntr"
-            type="text"
-            class="note"
-          />
+          <input matInput [formControl]="note_1_Cntr" type="text" class="note" />
         </div>
       </ng-container>
     </ng-container>
@@ -39,70 +24,31 @@
     <ng-container *ngIf="!modeErfassen">
       <ng-container *ngIf="sprung">
         <div class="col-1 data centered">
-          <span [ngClass]="getNotenStyle()">{{
-            eintrag.note_1 | number : "1.2-2"
-          }}</span>
-          <input
-            #control1
-            matInput
-            [formControl]="note_1_Cntr"
-            type="text"
-            class="note"
-          />
+          <span [ngClass]="getNotenStyle()">{{ eintrag.note_1 | number: '1.2-2' }}</span>
+          <input #control1 matInput [formControl]="note_1_Cntr" type="text" class="note" />
         </div>
         <div class="col-1 data centered">
-          <span [ngClass]="getNotenStyle()">{{
-            eintrag.note_2 | number : "1.2-2"
-          }}</span>
-          <input
-            matInput
-            [formControl]="note_2_Cntr"
-            type="text"
-            class="note"
-          />
+          <span [ngClass]="getNotenStyle()">{{ eintrag.note_2 | number: '1.2-2' }}</span>
+          <input matInput [formControl]="note_2_Cntr" type="text" class="note" />
         </div>
       </ng-container>
       <ng-container *ngIf="!sprung">
         <div class="col-1 data centered">
-          <span [ngClass]="getNotenStyle()">{{
-            eintrag.note_1 | number : "1.2-2"
-          }}</span>
+          <span [ngClass]="getNotenStyle()">{{ eintrag.note_1 | number: '1.2-2' }}</span>
         </div>
         <div class="col-1 data centered">
-          <input
-            #control1
-            matInput
-            [formControl]="note_1_Cntr"
-            type="text"
-            class="note"
-          />
+          <input #control1 matInput [formControl]="note_1_Cntr" type="text" class="note" />
         </div>
       </ng-container>
     </ng-container>
 
     <div class="col-1 data centered">
-      <img
-        *ngIf="!eintrag.erfasst"
-        class="icon"
-        src="assets/images/skype/white-question-mark.png"
-      />
-      <img
-        *ngIf="eintrag.erfasst"
-        class="icon"
-        src="assets/images/skype/check-mark.png"
-      />
+      <img *ngIf="!eintrag.erfasst" class="icon" src="assets/images/skype/white-question-mark.png" />
+      <img *ngIf="eintrag.erfasst" class="icon" src="assets/images/skype/check-mark.png" />
     </div>
     <div class="col-1 data centered">
-      <img
-        *ngIf="!eintrag.checked"
-        class="icon"
-        src="assets/images/skype/white-question-mark.png"
-      />
-      <img
-        *ngIf="eintrag.checked"
-        class="icon"
-        src="assets/images/skype/check-mark.png"
-      />
+      <img *ngIf="!eintrag.checked" class="icon" src="assets/images/skype/white-question-mark.png" />
+      <img *ngIf="eintrag.checked" class="icon" src="assets/images/skype/check-mark.png" />
     </div>
     <div *ngIf="!eintrag.deleted" class="col-1 centered">
       <button mat-raised-button tabindex="-1">

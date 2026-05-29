@@ -1,4 +1,4 @@
-export interface ISmQuali {
+export type ISmQuali = {
   id: string;
   name: string;
   vorname: string;

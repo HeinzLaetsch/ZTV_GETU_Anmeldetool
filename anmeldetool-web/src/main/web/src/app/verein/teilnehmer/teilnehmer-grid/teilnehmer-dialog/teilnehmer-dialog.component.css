@@ -28,7 +28,7 @@ mat-form-field {
 }
 
 ::ng-deep .icon-outside .mat-dialog-container {
-  overflow: unset
+  overflow: unset;
 }
 /*
 :host {
