@@ -1,6 +1,6 @@
 import { Component, EventEmitter, type OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, UntypedFormControl, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -24,11 +24,10 @@ import { selectAlleVereine } from '../../redux/verein';
 @Component({
   selector: 'lxt-login-dialog',
   templateUrl: './login-dialog.component.html',
-  styleUrls: ['./login-dialog.component.css'],
+  styleUrls: ['./login-dialog.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatAutocompleteModule,
@@ -48,18 +47,25 @@ export class LoginDialogComponent extends SubscriptionHelper implements OnInit {
 
   appearance = 'outline';
   loginError: boolean;
-  errorMessage = undefined;
+  errorMessage: string | undefined = undefined;
 
   vereine$: Observable<IVerein[]>;
-  vereine: IVerein[];
-  username: string;
-  password: string;
+  vereine: IVerein[] = [];
+  loginForm = new FormGroup({
+    verein: new FormControl<IVerein | string | null>(null, {
+      validators: [Validators.required, this.vereinSelectionValidator],
+    }),
+    userName: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    password: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+  });
 
-  vwVereinControl = new UntypedFormControl('', Validators.required);
-  vwUserNameControl = new UntypedFormControl('', Validators.required);
-  vwPasswordControl = new UntypedFormControl('', Validators.required);
-
-  filteredOptions: Observable<IVerein[]>;
+  filteredOptions: Observable<IVerein[]> = of([]);
 
   constructor(
     public dialogRef: MatDialogRef<LoginDialogComponent>,
@@ -77,14 +83,35 @@ export class LoginDialogComponent extends SubscriptionHelper implements OnInit {
     this.registerSubscription(
       this.vereine$.subscribe((data) => {
         this.vereine = data;
-        this.filteredOptions = this.vwVereinControl.valueChanges.pipe(
-          startWith(''),
-          map((value) => (typeof value === 'string' ? value : value.name)),
+        this.filteredOptions = this.vereinControl.valueChanges.pipe(
+          startWith(this.vereinControl.value),
+          map((value) => (typeof value === 'string' ? value : (value?.name ?? ''))),
           map((name) => (name ? this._filter(name) : this.vereine.slice())),
         );
       }),
     );
   }
+
+  get vereinControl(): FormControl<IVerein | string | null> {
+    return this.loginForm.controls.verein;
+  }
+
+  get userNameControl(): FormControl<string> {
+    return this.loginForm.controls.userName;
+  }
+
+  get passwordControl(): FormControl<string> {
+    return this.loginForm.controls.password;
+  }
+
+  private vereinSelectionValidator(control: AbstractControl<IVerein | string | null>) {
+    const value = control.value;
+    if (!value) {
+      return null;
+    }
+    return typeof value === 'string' ? { vereinSelection: true } : null;
+  }
+
   private _filter(name: string): IVerein[] {
     const filterValue = name.toLowerCase();
 
@@ -96,11 +123,24 @@ export class LoginDialogComponent extends SubscriptionHelper implements OnInit {
   }
 
   login() {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+
+    const verein = this.vereinControl.value;
+    if (!verein || typeof verein === 'string') {
+      this.vereinControl.setErrors({ vereinSelection: true });
+      this.vereinControl.markAsTouched();
+      return;
+    }
+
+    const { userName, password } = this.loginForm.getRawValue();
+
     this.loginError = false;
-    // console.log("Login: ", this.vwUserNameControl.value);
     try {
       this.authService
-        .login(this.vwVereinControl.value, this.vwUserNameControl.value, this.vwPasswordControl.value)
+        .login(verein, userName, password)
         // .pipe(catchError(this.handleError<boolean>("login")))
         .subscribe(
           (result) => {

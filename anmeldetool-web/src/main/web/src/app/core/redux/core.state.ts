@@ -1,8 +1,6 @@
 import { routerReducer, RouterReducerState } from '@ngrx/router-store';
 import { ActionReducerMap, MetaReducer } from '@ngrx/store';
 import { environment } from 'src/environments/environment';
-import { loadingFeature } from '../component/busy-indicator-progress-bar/store/busy-indicator-progress-bar.reducers';
-import { LoadingState } from '../component/busy-indicator-progress-bar/store/busy-indicator-progress-bar.state';
 import { AnlassState } from './anlass';
 import { anlassFeature } from './anlass/anlass.reducer';
 import { debug } from './meta-reducers/debug.reducer';
@@ -15,6 +13,8 @@ import { otsFeature } from './organisation-teilnahmen/ots.reducer';
 import { OtsState } from './organisation-teilnahmen';
 import { userFeature } from './user/user.reducer';
 import { UserState } from './user';
+import { loadingFeature } from './busy-indicator-progress-bar/busy-indicator-progress-bar.reducers';
+import { LoadingState } from './busy-indicator-progress-bar/busy-indicator-progress-bar.state';
 
 export const reducers: ActionReducerMap<AppState> = {
   router: routerReducer,

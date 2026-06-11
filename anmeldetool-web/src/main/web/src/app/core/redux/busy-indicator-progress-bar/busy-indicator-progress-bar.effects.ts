@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect } from '@ngrx/effects';
 import type { Update } from '@ngrx/entity';
 import { filter, map } from 'rxjs/operators';
 import { LoadingActions } from './busy-indicator-progress-bar.actions';
 import type { ILoading } from './busy-indicator-progress-bar.state';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class BusyIndicatorProgressBarEffects {
-  constructor(private actions$: Actions) {}
+  private actions$ = inject(Actions);
 
   loadingProcessRunning$ = createEffect(() => {
     return this.actions$.pipe(
@@ -20,7 +20,7 @@ export class BusyIndicatorProgressBarEffects {
           payload: {
             id: action.type.substring(0, action.type.indexOf('invoked')).toLowerCase(),
             creationDate: new Date(),
-            finishedDate: null,
+            finishedDate: new Date(),
             isLoading: true,
             isFinished: false,
             hasError: false,

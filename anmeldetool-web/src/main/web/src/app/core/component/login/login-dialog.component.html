@@ -1,57 +1,51 @@
 <div class="container">
   <h1>Login</h1>
   <hr />
-  <mat-dialog-content>
-    <p>
-      <mat-form-field [appearance]="appearance">
-        <mat-label>Verein</mat-label>
-        <input matInput type="text" [formControl]="vwVereinControl" [matAutocomplete]="auto" />
-        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFn">
-          <mat-option value=""></mat-option>
-          <mat-option *ngFor="let verein of filteredOptions | async" [value]="verein">
-            {{ verein.name }}
-          </mat-option>
-        </mat-autocomplete>
-        <mat-error *ngIf="vwUserNameControl.hasError('required')"> Pflichtfeld </mat-error>
-        <mat-hint>Wähle deinen Verein aus</mat-hint>
-      </mat-form-field>
-    </p>
+  <form [formGroup]="loginForm" (ngSubmit)="login()">
+    <mat-dialog-content>
+      <p>
+        <mat-form-field [appearance]="appearance">
+          <mat-label>Verein</mat-label>
+          <input matInput type="text" formControlName="verein" [matAutocomplete]="auto" />
+          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFn">
+            <mat-option *ngFor="let verein of filteredOptions | async" [value]="verein">
+              {{ verein.name }}
+            </mat-option>
+          </mat-autocomplete>
+          <mat-error *ngIf="vereinControl.hasError('required')"> Pflichtfeld </mat-error>
+          <mat-error *ngIf="vereinControl.hasError('vereinSelection')">
+            Bitte einen Verein aus der Liste auswaehlen
+          </mat-error>
+          <mat-hint>Wähle deinen Verein aus</mat-hint>
+        </mat-form-field>
+      </p>
 
-    <p>
-      <mat-form-field [appearance]="appearance">
-        <mat-label>Benutzername</mat-label>
-        <input matInput placeholder="Benutzername" [formControl]="vwUserNameControl" />
-        <mat-error *ngIf="vwUserNameControl.hasError('required')"> Pflichtfeld </mat-error>
-        <mat-hint>Gib den Benutzernamen(eMail) ein</mat-hint>
-      </mat-form-field>
-    </p>
+      <p>
+        <mat-form-field [appearance]="appearance">
+          <mat-label>Benutzername</mat-label>
+          <input matInput placeholder="Benutzername" formControlName="userName" />
+          <mat-error *ngIf="userNameControl.hasError('required')"> Pflichtfeld </mat-error>
+          <mat-hint>Gib den Benutzernamen(eMail) ein</mat-hint>
+        </mat-form-field>
+      </p>
 
-    <p>
-      <mat-form-field [appearance]="appearance">
-        <mat-label>Passwort</mat-label>
-        <input matInput type="password" placeholder="Passwort" [formControl]="vwPasswordControl" />
-        <mat-error *ngIf="vwPasswordControl.hasError('required')"> Pflichtfeld </mat-error>
-        <mat-hint>Gib das Passwort ein</mat-hint>
-      </mat-form-field>
-    </p>
-  </mat-dialog-content>
-  <!--mat-dialog-actions-->
-  <div>
-    <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
-    <button
-      [disabled]="
-        vwVereinControl.hasError('required') ||
-        vwUserNameControl.hasError('required') ||
-        vwPasswordControl.hasError('required')
-      "
-      mat-button
-      (click)="login()"
-    >
-      Login
-    </button>
-    <mat-error *ngIf="loginError" class="error"> {{ errorMessage }}</mat-error>
-    <!--button mat-button mat-dialog-close>Abbrechen</button-->
-  </div>
+      <p>
+        <mat-form-field [appearance]="appearance">
+          <mat-label>Passwort</mat-label>
+          <input matInput type="password" placeholder="Passwort" formControlName="password" />
+          <mat-error *ngIf="passwordControl.hasError('required')"> Pflichtfeld </mat-error>
+          <mat-hint>Gib das Passwort ein</mat-hint>
+        </mat-form-field>
+      </p>
+    </mat-dialog-content>
+    <!--mat-dialog-actions-->
+    <div>
+      <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+      <button [disabled]="loginForm.invalid" mat-button type="submit">Login</button>
+      <mat-error *ngIf="loginError" class="error"> {{ errorMessage }}</mat-error>
+      <!--button mat-button mat-dialog-close>Abbrechen</button-->
+    </div>
+  </form>
   <div>
     <button mat-button (click)="newVereinClicked()">Neues Vereinslogin beantragen</button>
   </div>

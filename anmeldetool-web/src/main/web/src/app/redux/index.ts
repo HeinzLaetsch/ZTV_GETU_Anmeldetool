@@ -1,1 +1,1 @@
-export * from "./app.reducer";
+export * from '../core/redux/app.reducer';

@@ -1,24 +1,22 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, map, mergeMap, of, switchMap } from 'rxjs';
+import { catchError, map, mergeMap, of } from 'rxjs';
 import { OalActions } from './oal.actions';
 import { VereinService } from '../../service/verein/verein.service';
 import { AnlassService } from '../../service/anlass/anlass.service';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class OalEffects {
-  constructor(
-    private actions$: Actions,
-    private vereinService: VereinService,
-    private anlassService: AnlassService,
-  ) {}
+  private actions$ = inject(Actions);
+  private vereinService = inject(VereinService);
+  private anlassService = inject(AnlassService);
 
   loadOal$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(OalActions.loadAllOalInvoked),
-      mergeMap((action) => {
+      mergeMap(() => {
         return this.vereinService.getStarts().pipe(
-          switchMap((oals) => [OalActions.loadAllOalSuccess({ payload: oals })]),
+          map((oals) => OalActions.loadAllOalSuccess({ payload: oals })),
           catchError((error) => {
             return of(OalActions.loadAllOalError({ error: error }));
           }),

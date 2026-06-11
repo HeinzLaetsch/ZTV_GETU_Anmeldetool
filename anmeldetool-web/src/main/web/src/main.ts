@@ -6,17 +6,15 @@ import { provideStore } from '@ngrx/store';
 import { routingProviders } from './app/app.routing';
 import { AnmeldeToolComponent } from './app/core/component/app/app.component';
 import { AnlassActions } from './app/core/redux/anlass';
-import { AnlassEffects } from './app/core/redux/anlass/anlass.effects';
 import { VereinActions } from './app/core/redux/verein';
-import { appEffects } from './app/redux/app.effects';
-import { appReducers } from './app/redux/app.reducer';
+import { appEffects } from './app/core/redux/app.effects';
+import { appReducers } from './app/core/redux/app.reducer';
 
 bootstrapApplication(AnmeldeToolComponent, {
   providers: [
     routingProviders,
     provideStore(appReducers),
-    //provideEffects(...appEffects),
-    provideEffects([AnlassEffects]),
+    provideEffects(...appEffects),
     {
       provide: APP_INITIALIZER,
       multi: true,

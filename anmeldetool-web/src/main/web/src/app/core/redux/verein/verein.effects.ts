@@ -1,15 +1,13 @@
-import { Injectable } from '@angular/core';
+import { inject, Inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, mergeMap, of, switchMap } from 'rxjs';
 import { VereinService } from '../../service/verein/verein.service';
 import { VereinActions } from './verein.actions';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class VereinEffects {
-  constructor(
-    private actions$: Actions,
-    private vereinService: VereinService,
-  ) {}
+  private actions$ = inject(Actions);
+  private vereinService = inject(VereinService);
 
   loadVereine$ = createEffect(() => {
     return this.actions$.pipe(

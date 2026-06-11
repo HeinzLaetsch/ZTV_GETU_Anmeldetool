@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, map, mergeMap, of, switchMap } from 'rxjs';
 import { AuthService } from '../../service/auth/auth.service';
@@ -6,13 +6,11 @@ import { AnlassService } from '../../service/anlass/anlass.service';
 import { AnlassSummariesActions } from './anlass-summary.actions';
 import { IOrganisationAnlassLink } from '../../model/IOrganisationAnlassLink';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AnlassSummaryEffects {
-  constructor(
-    private actions$: Actions,
-    private authService: AuthService,
-    private anlassService: AnlassService,
-  ) {}
+  private actions$ = inject(Actions);
+  private authService = inject(AuthService);
+  private anlassService = inject(AnlassService);
 
   loadAnlassSummaries$ = createEffect(() => {
     return this.actions$.pipe(

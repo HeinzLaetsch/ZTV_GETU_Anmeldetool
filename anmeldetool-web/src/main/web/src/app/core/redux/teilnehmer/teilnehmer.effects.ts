@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, mergeMap, switchMap } from 'rxjs/operators';
@@ -6,13 +6,11 @@ import { AuthService } from '../../service/auth/auth.service';
 import { TeilnehmerService } from '../../service/teilnehmer/teilnehmer.service';
 import { TeilnehmerActions } from './teilnehmer.actions';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class TeilnehmerEffects {
-  constructor(
-    private actions$: Actions,
-    private authService: AuthService,
-    private teilnehmerService: TeilnehmerService,
-  ) {}
+  private actions$ = inject(Actions);
+  private authService = inject(AuthService);
+  private teilnehmerService = inject(TeilnehmerService);
 
   loadAllTeilnehmer$ = createEffect(() => {
     return this.actions$.pipe(

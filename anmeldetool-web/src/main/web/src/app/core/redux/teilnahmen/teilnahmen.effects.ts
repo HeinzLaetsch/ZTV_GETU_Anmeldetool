@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { AnlassService } from '../../service/anlass/anlass.service';
 import { AuthService } from '../../service/auth/auth.service';
@@ -8,14 +8,12 @@ import { TeilnehmerService } from '../../service/teilnehmer/teilnehmer.service';
 import { ITeilnahmen } from '../../model/ITeilnahmen';
 import { Update } from '@ngrx/entity';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class TeilnahmenEffects {
-  constructor(
-    private actions$: Actions,
-    private authService: AuthService,
-    private anlassService: AnlassService,
-    private teilnehmerService: TeilnehmerService,
-  ) {}
+  private actions$ = inject(Actions);
+  private authService = inject(AuthService);
+  private anlassService = inject(AnlassService);
+  private teilnehmerService = inject(TeilnehmerService);
 
   loadTeilnahmen$ = createEffect(() => {
     return this.actions$.pipe(

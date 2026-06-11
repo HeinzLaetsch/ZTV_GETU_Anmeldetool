@@ -8,9 +8,13 @@ import type { Observable } from 'rxjs';
 import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
 import type { AppState } from '../../redux/core.state';
 import { SnackBarComponent } from './snack-bar/snack-bar.component';
-import { LoadingActions } from './store/busy-indicator-progress-bar.actions';
-import { selectErrors, selectLoading, selectTransactions } from './store/busy-indicator-progress-bar.selectors';
-import type { ILoading } from './store/busy-indicator-progress-bar.state';
+import { ILoading } from '../../redux/busy-indicator-progress-bar/busy-indicator-progress-bar.state';
+import {
+  selectErrors,
+  selectLoading,
+  selectTransactions,
+} from '../../redux/busy-indicator-progress-bar/busy-indicator-progress-bar.selectors';
+import { LoadingActions } from '../../redux/busy-indicator-progress-bar/busy-indicator-progress-bar.actions';
 
 @Component({
   selector: 'lxt-busy-indicator-progress-bar',
@@ -35,6 +39,7 @@ export class BusyIndicatorProgressBarComponent extends SubscriptionHelper {
     this.isLoading$ = this.store.pipe(select(selectLoading()));
     this.isTransactions$ = this.store.pipe(select(selectTransactions()));
     this.isError$ = this.store.pipe(select(selectErrors()));
+
     this.registerSubscription(
       this.isLoading$.subscribe((data) => {
         if (data && data.length > 0) {

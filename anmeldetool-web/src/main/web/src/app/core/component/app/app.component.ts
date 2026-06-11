@@ -50,7 +50,7 @@ export class AnmeldeToolComponent extends SubscriptionHelper implements OnInit, 
         }
         if (!this.appBlocked && !this.authService.isAuthenticated()) {
           this.dialogOpen = true;
-          this.openLoginDialog();
+          //this.openLoginDialog();
         }
       }),
     );
@@ -87,10 +87,6 @@ export class AnmeldeToolComponent extends SubscriptionHelper implements OnInit, 
   }*/
 
   openLoginDialog(): void {
-    // this.dialogOpen = true;
-
-    // console.log("Dialog open");
-
     const dialogRef = this.dialog.open(LoginDialogComponent, {
       height: '500px',
       width: '500px',

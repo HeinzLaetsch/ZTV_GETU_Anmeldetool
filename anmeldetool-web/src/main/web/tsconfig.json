@@ -4,7 +4,9 @@
     "rootDir": ".",
     "baseUrl": "./",
     "paths": {
-      "src/*": ["src/*"]
+      "src/*": ["src/*"],
+      "@angular/forms": ["./node_modules/@angular/forms"],
+      "@angular/forms/*": ["./node_modules/@angular/forms/*"]
     },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
