@@ -15,7 +15,7 @@ import {
   ValueGetterParams,
   ValueSetterParams,
 } from "ag-grid-community";
-import { combineLatest, Observable, of } from "rxjs";
+import { combineLatest, filter, Observable, of } from "rxjs";
 import { IAnlass } from "src/app/core/model/IAnlass";
 import {
   KategorieEnum,
@@ -537,12 +537,14 @@ export class TeilnehmerGridComponent
           const meldeStati = ots.kategorieStati.find(
             (kategorieStatus) => kat === kategorieStatus.kategorie,
           );
-          const neumeldungen = meldeStati?.meldeStati.filter((m) => {
-            return m.meldeStatus === MeldeStatusEnum.NEUMELDUNG;
-          });
-          const abmeldungen = meldeStati?.meldeStati.filter((m) => {
-            return m.meldeStatus.toUpperCase().startsWith("ABGEMELDET");
-          });
+          const neumeldungen =
+            meldeStati?.meldeStati.filter((m) => {
+              return m.meldeStatus === MeldeStatusEnum.NEUMELDUNG;
+            }) || [];
+          const abmeldungen =
+            meldeStati?.meldeStati.filter((m) => {
+              return m.meldeStatus.toUpperCase().startsWith("ABGEMELDET");
+            }) || [];
           console.log(
             "Kategorie: %s , Abmeldungen: %d, Neumeldungen: %d",
             kat,
