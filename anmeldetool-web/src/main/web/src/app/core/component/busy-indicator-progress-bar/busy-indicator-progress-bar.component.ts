@@ -17,7 +17,7 @@ import {
 import { LoadingActions } from '../../redux/busy-indicator-progress-bar/busy-indicator-progress-bar.actions';
 
 @Component({
-  selector: 'lxt-busy-indicator-progress-bar',
+  selector: 'ztv-busy-indicator-progress-bar',
   templateUrl: './busy-indicator-progress-bar.component.html',
   styleUrls: ['./busy-indicator-progress-bar.component.scss'],
   standalone: true,

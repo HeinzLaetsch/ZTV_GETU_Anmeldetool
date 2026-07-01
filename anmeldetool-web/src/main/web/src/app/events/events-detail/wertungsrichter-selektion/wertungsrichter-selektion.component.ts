@@ -15,6 +15,7 @@ import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
   selector: 'lxt-wertungsrichter-selektion',
   templateUrl: './wertungsrichter-selektion.component.html',
   styleUrls: ['./wertungsrichter-selektion.component.css'],
+  standalone: true,
 })
 export class WertungsrichterSelektionComponent extends SubscriptionHelper implements OnInit, AfterViewInit {
   @ViewChild('tabs') tabGroup: MatTabGroup;

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<?xml-stylesheet href="file:///usr/bin/../share/nmap/nmap.xsl" type="text/xsl"?>
+<!-- Nmap 7.95 scan initiated Thu Jan  8 17:43:15 2026 as: nmap -sC -sV -p- -oA labscan-sC-sV-allports 192.168.99.8 -->
+<nmaprun scanner="nmap" args="nmap -sC -sV -p- -oA labscan-sC-sV-allports 192.168.99.8" start="1767890595" startstr="Thu Jan  8 17:43:15 2026" version="7.95" xmloutputversion="1.05">
+<scaninfo type="connect" protocol="tcp" numservices="65535" services="1-65535"/>
+<verbose level="0"/>
+<debugging level="0"/>
+<hosthint><status state="up" reason="unknown-response" reason_ttl="0"/>
+<address addr="192.168.99.8" addrtype="ipv4"/>
+<hostnames>
+</hostnames>
+</hosthint>
+<host starttime="1767890595" endtime="1767890709"><status state="up" reason="conn-refused" reason_ttl="0"/>
+<address addr="192.168.99.8" addrtype="ipv4"/>
+<hostnames>
+<hostname name="Homeserver" type="PTR"/>
+</hostnames>
+<ports><extraports state="closed" count="65531">
+<extrareasons reason="conn-refused" count="65531" proto="tcp" ports="1-21,23-110,112-3127,3129-8005,8007-65535"/>
+</extraports>
+<port protocol="tcp" portid="22"><state state="open" reason="syn-ack" reason_ttl="0"/><service name="ssh" product="OpenSSH" version="10.0p2 Debian 7" extrainfo="protocol 2.0" ostype="Linux" method="probed" conf="10"><cpe>cpe:/a:openbsd:openssh:10.0p2</cpe><cpe>cpe:/o:linux:linux_kernel</cpe></service></port>
+<port protocol="tcp" portid="111"><state state="open" reason="syn-ack" reason_ttl="0"/><service name="rpcbind" version="2-4" extrainfo="RPC #100000" method="probed" conf="10"/><script id="rpcinfo" output="&#xa;  program version    port/proto  service&#xa;  100000  2,3,4        111/tcp   rpcbind&#xa;  100000  2,3,4        111/udp   rpcbind&#xa;  100000  3,4          111/tcp6  rpcbind&#xa;  100000  3,4          111/udp6  rpcbind&#xa;"><table key="100000">
+<table key="udp">
+<elem key="port">111</elem>
+<elem key="owner">superuser</elem>
+<table key="version">
+<elem>2</elem>
+<elem>3</elem>
+<elem>4</elem>
+</table>
+<elem key="addr">0.0.0.0</elem>
+</table>
+<table key="tcp6">
+<elem key="port">111</elem>
+<elem key="owner">superuser</elem>
+<table key="version">
+<elem>3</elem>
+<elem>4</elem>
+</table>
+<elem key="addr">::</elem>
+</table>
+<table key="local">
+<elem key="addr">/run/rpcbind.sock</elem>
+<table key="version">
+<elem>3</elem>
+<elem>4</elem>
+</table>
+<elem key="owner">superuser</elem>
+</table>
+<table key="udp6">
+<elem key="port">111</elem>
+<elem key="owner">superuser</elem>
+<table key="version">
+<elem>3</elem>
+<elem>4</elem>
+</table>
+<elem key="addr">::</elem>
+</table>
+<table key="tcp">
+<elem key="port">111</elem>
+<elem key="owner">superuser</elem>
+<table key="version">
+<elem>2</elem>
+<elem>3</elem>
+<elem>4</elem>
+</table>
+<elem key="addr">0.0.0.0</elem>
+</table>
+</table>
+</script></port>
+<port protocol="tcp" portid="3128"><state state="open" reason="syn-ack" reason_ttl="0"/><service name="http" product="Proxmox Virtual Environment REST API" version="3.0" method="probed" conf="10"><cpe>cpe:/a:proxmox:proxmox_virtual_environment:3.0</cpe></service><script id="http-title" output="Site doesn&apos;t have a title."></script><script id="http-server-header" output="pve-api-daemon/3.0"><elem>pve-api-daemon/3.0</elem>
+</script></port>
+<port protocol="tcp" portid="8006"><state state="open" reason="syn-ack" reason_ttl="0"/><service name="wpl-analytics" servicefp="SF-Port8006-TCP:V=7.95%I=7%D=1/8%Time=695FDEC4%P=x86_64-pc-linux-gnu%r(HTTPOptions,D7,&quot;HTTP/1\.0\x20501\x20method\x20&apos;OPTIONS&apos;\x20not\x20available\r\nCache-Control:\x20max-age=0\r\nConnection:\x20close\r\nDate:\x20Thu,\x2008\x20Jan\x202026\x2016:43:48\x20GMT\r\nPragma:\x20no-cache\r\nServer:\x20pve-api-daemon/3\.0\r\nExpires:\x20Thu,\x2008\x20Jan\x202026\x2016:43:48\x20GMT\r\n\r\n&quot;)%r(RTSPRequest,E3,&quot;HTTP/1\.0\x20400\x20bad\x20request\r\nCache-Control:\x20max-age=0\r\nConnection:\x20close\r\nDate:\x20Thu,\x2008\x20Jan\x202026\x2016:43:48\x20GMT\r\nPragma:\x20no-cache\r\nServer:\x20pve-api-daemon/3\.0\r\nContent-Length:\x2011\r\nExpires:\x20Thu,\x2008\x20Jan\x202026\x2016:43:48\x20GMT\r\n\r\nbad\x20request&quot;)%r(Help,E3,&quot;HTTP/1\.0\x20400\x20bad\x20request\r\nCache-Control:\x20max-age=0\r\nConnection:\x20close\r\nDate:\x20Thu,\x2008\x20Jan\x202026\x2016:44:03\x20GMT\r\nPragma:\x20no-cache\r\nServer:\x20pve-api-daemon/3\.0\r\nContent-Length:\x2011\r\nExpires:\x20Thu,\x2008\x20Jan\x202026\x2016:44:03\x20GMT\r\n\r\nbad\x20request&quot;)%r(TerminalServerCookie,E3,&quot;HTTP/1\.0\x20400\x20bad\x20request\r\nCache-Control:\x20max-age=0\r\nConnection:\x20close\r\nDate:\x20Thu,\x2008\x20Jan\x202026\x2016:44:03\x20GMT\r\nPragma:\x20no-cache\r\nServer:\x20pve-api-daemon/3\.0\r\nContent-Length:\x2011\r\nExpires:\x20Thu,\x2008\x20Jan\x202026\x2016:44:03\x20GMT\r\n\r\nbad\x20request&quot;)%r(Kerberos,E3,&quot;HTTP/1\.0\x20400\x20bad\x20request\r\nCache-Control:\x20max-age=0\r\nConnection:\x20close\r\nDate:\x20Thu,\x2008\x20Jan\x202026\x2016:44:03\x20GMT\r\nPragma:\x20no-cache\r\nServer:\x20pve-api-daemon/3\.0\r\nContent-Length:\x2011\r\nExpires:\x20Thu,\x2008\x20Jan\x202026\x2016:44:03\x20GMT\r\n\r\nbad\x20request&quot;)%r(LPDString,E3,&quot;HTTP/1\.0\x20400\x20bad\x20request\r\nCache-Control:\x20max-age=0\r\nConnection:\x20close\r\nDate:\x20Thu,\x2008\x20Jan\x202026\x2016:44:13\x20GMT\r\nPragma:\x20no-cache\r\nServer:\x20pve-api-daemon/3\.0\r\nContent-Length:\x2011\r\nExpires:\x20Thu,\x2008\x20Jan\x202026\x2016:44:13\x20GMT\r\n\r\nbad\x20request&quot;)%r(LDAPSearchReq,E3,&quot;HTTP/1\.0\x20400\x20bad\x20request\r\nCache-Control:\x20max-age=0\r\nConnection:\x20close\r\nDate:\x20Thu,\x2008\x20Jan\x202026\x2016:44:13\x20GMT\r\nPragma:\x20no-cache\r\nServer:\x20pve-api-daemon/3\.0\r\nContent-Length:\x2011\r\nExpires:\x20Thu,\x2008\x20Jan\x202026\x2016:44:13\x20GMT\r\n\r\nbad\x20request&quot;);" method="table" conf="3"/><script id="fingerprint-strings" output="&#xa;  HTTPOptions: &#xa;    HTTP/1.0 501 method &apos;OPTIONS&apos; not available&#xa;    Cache-Control: max-age=0&#xa;    Connection: close&#xa;    Date: Thu, 08 Jan 2026 16:43:48 GMT&#xa;    Pragma: no-cache&#xa;    Server: pve-api-daemon/3.0&#xa;    Expires: Thu, 08 Jan 2026 16:43:48 GMT&#xa;  Help, Kerberos, TerminalServerCookie: &#xa;    HTTP/1.0 400 bad request&#xa;    Cache-Control: max-age=0&#xa;    Connection: close&#xa;    Date: Thu, 08 Jan 2026 16:44:03 GMT&#xa;    Pragma: no-cache&#xa;    Server: pve-api-daemon/3.0&#xa;    Content-Length: 11&#xa;    Expires: Thu, 08 Jan 2026 16:44:03 GMT&#xa;    request&#xa;  LDAPSearchReq, LPDString: &#xa;    HTTP/1.0 400 bad request&#xa;    Cache-Control: max-age=0&#xa;    Connection: close&#xa;    Date: Thu, 08 Jan 2026 16:44:13 GMT&#xa;    Pragma: no-cache&#xa;    Server: pve-api-daemon/3.0&#xa;    Content-Length: 11&#xa;    Expires: Thu, 08 Jan 2026 16:44:13 GMT&#xa;    request&#xa;  RTSPRequest: &#xa;    HTTP/1.0 400 bad request&#xa;    Cache-Control: max-age=0&#xa;    Connection: close&#xa;    Date: Thu, 08 Jan 2026 16:43:48 GMT&#xa;    Pragma: no-cache&#xa;    Server: pve-api-daemon/3.0&#xa;    Content-Length: 11&#xa;    Expires: Thu, 08 Jan 2026 16:43:48 GMT&#xa;    request"><elem key="HTTPOptions">&#xa;    HTTP/1.0 501 method &apos;OPTIONS&apos; not available&#xa;    Cache-Control: max-age=0&#xa;    Connection: close&#xa;    Date: Thu, 08 Jan 2026 16:43:48 GMT&#xa;    Pragma: no-cache&#xa;    Server: pve-api-daemon/3.0&#xa;    Expires: Thu, 08 Jan 2026 16:43:48 GMT</elem>
+<elem key="Help, Kerberos, TerminalServerCookie">&#xa;    HTTP/1.0 400 bad request&#xa;    Cache-Control: max-age=0&#xa;    Connection: close&#xa;    Date: Thu, 08 Jan 2026 16:44:03 GMT&#xa;    Pragma: no-cache&#xa;    Server: pve-api-daemon/3.0&#xa;    Content-Length: 11&#xa;    Expires: Thu, 08 Jan 2026 16:44:03 GMT&#xa;    request</elem>
+<elem key="LDAPSearchReq, LPDString">&#xa;    HTTP/1.0 400 bad request&#xa;    Cache-Control: max-age=0&#xa;    Connection: close&#xa;    Date: Thu, 08 Jan 2026 16:44:13 GMT&#xa;    Pragma: no-cache&#xa;    Server: pve-api-daemon/3.0&#xa;    Content-Length: 11&#xa;    Expires: Thu, 08 Jan 2026 16:44:13 GMT&#xa;    request</elem>
+<elem key="RTSPRequest">&#xa;    HTTP/1.0 400 bad request&#xa;    Cache-Control: max-age=0&#xa;    Connection: close&#xa;    Date: Thu, 08 Jan 2026 16:43:48 GMT&#xa;    Pragma: no-cache&#xa;    Server: pve-api-daemon/3.0&#xa;    Content-Length: 11&#xa;    Expires: Thu, 08 Jan 2026 16:43:48 GMT&#xa;    request</elem>
+</script></port>
+</ports>
+<times srtt="11179" rttvar="1299" to="100000"/>
+</host>
+<runstats><finished time="1767890709" timestr="Thu Jan  8 17:45:09 2026" summary="Nmap done at Thu Jan  8 17:45:09 2026; 1 IP address (1 host up) scanned in 114.64 seconds" elapsed="114.64" exit="success"/><hosts up="1" down="0" total="1"/>
+</runstats>
+</nmaprun>

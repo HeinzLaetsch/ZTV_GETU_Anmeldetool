@@ -1,0 +1,19 @@
+select * from organisation_person_link where person_id in (select id from person where email='n.mattli@bluemail.ch')
+
+chcon -Rt svirt_sandbox_file_t /root/anmeldetool/docker/backend/timezone
+
+psql -h localhost -d getuwettkaempfe -U postgres
+
+docker-compose up -d --build
+
+pg_dump -h localhost -U postgres getuwettkaempfe > getuwettkaempfe.sql.bak
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+
+ALTER DATABASE getuwettkaempfe SET timezone TO 'Europe/Zurich';
+
+show timezone;
+
+docker logs <id>
+docker system df -v
+docker inspect <volume>

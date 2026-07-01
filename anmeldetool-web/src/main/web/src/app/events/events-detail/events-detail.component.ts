@@ -19,6 +19,7 @@ import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
   selector: 'lxt-events-detail',
   templateUrl: './events-detail.component.html',
   styleUrls: ['./events-detail.component.css'],
+  standalone: true,
 })
 export class EventsDetailComponent extends SubscriptionHelper implements OnInit {
   // @ViewChild("tabs") tabGroup: MatTabGroup;

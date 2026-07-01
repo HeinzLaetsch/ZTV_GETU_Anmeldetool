@@ -1,0 +1,58 @@
+image:
+  # -- The image registry to pull the image from.
+  registry: registry.laetsch.duckdns.org
+    # -- Pull policy for the image.
+  pullPolicy: Always
+
+backend:
+  image:
+    # -- The image repository to pull the image from.
+    repository: ztv-anmeldetool
+    # -- Overrides the image tag whose default is the chart appVersion.
+    tag: "0.0.2"
+
+  replicaCount: 1
+  database:
+    url: jdbc:postgresql://postgres-service.infra.svc.cluster.local:5432/getuwettkaempfe
+    username: "username"
+    password: "password"    
+  mail:
+    enabled: false
+    host: "mail.host"
+    port: "587"
+    username: "username"
+    password: "password"
+    templates: 
+      path: "path"
+    simulate:
+      enable: false
+      email: "simulate@email.ch"
+  port: 8080
+
+frontend:
+  image:
+    # -- The image repository to pull the image from.
+    repository: ztv-anmeldetool-web
+    # -- Overrides the image tag whose default is the chart appVersion.
+    tag: "0.0.1"
+
+  replicaCount: 1
+  port: 80
+  
+# -- Expose the service via gateway-api HTTPRoute
+# Requires Gateway API resources and suitable controller installed within the cluster
+# (see: https://gateway-api.sigs.k8s.io/guides/)
+httpRoute:
+  # HTTPRoute enabled.
+  enabled: true
+  # HTTPRoute annotations.
+  annotations: {}
+  # Which Gateways this Route is attached to.
+  parentRefs:
+  - name: traefik-gateway
+    sectionName: websecure
+    namespace: kube-system
+  # Hostnames matching HTTP header.
+  hostnames:
+  - ztv-anmeldetool.duckdns.org
+

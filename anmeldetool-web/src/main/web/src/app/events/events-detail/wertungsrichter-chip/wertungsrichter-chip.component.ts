@@ -12,6 +12,7 @@ import { CachingUserService } from 'src/app/core/service/caching-services/cachin
   selector: 'lxt-wertungsrichter-chip',
   templateUrl: './wertungsrichter-chip.component.html',
   styleUrls: ['./wertungsrichter-chip.component.css'],
+  standalone: true,
 })
 export class WertungsrichterChipComponent implements OnInit, OnChanges {
   @Input()

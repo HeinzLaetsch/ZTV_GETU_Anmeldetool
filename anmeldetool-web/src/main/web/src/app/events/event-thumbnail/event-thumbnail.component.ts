@@ -15,6 +15,7 @@ import type { IVerein } from 'src/app/verein/verein';
   selector: 'lxt-event-thumbnail',
   templateUrl: './event-thumbnail.component.html',
   styleUrls: ['./event-thumbnail.component.css'],
+  standalone: true,
 })
 export class EventThumbnailComponent extends SubscriptionHelper implements OnInit {
   @Input() anlassExtended: IAnlassExtended;

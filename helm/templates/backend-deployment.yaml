@@ -1,0 +1,32 @@
+{{- $fullName := print (include "ztv-anmeldetool.fullname" .) "-" "backend" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName | quote }}
+  labels:
+    {{- include "ztv-anmeldetool.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ $fullName | quote }}
+  template:
+    metadata:
+      labels:
+        app: {{ $fullName | quote }}
+    spec:
+      containers:
+        - name: {{ $fullName | quote }}
+          image: "{{ .Values.image.registry }}/{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          
+          envFrom:
+          - secretRef:
+              name: {{ print $fullName "-db-secret" | quote }}
+          - secretRef:
+              name: {{ $fullName }}-mail-secret
+          - configMapRef:
+              name: {{ $fullName }}-configmap 
+          ports:
+            - containerPort: {{ .Values.backend.port }}
+

@@ -1,5 +1,5 @@
 import { type AfterContentChecked, type AfterViewInit, Component, type OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { select, Store } from '@ngrx/store';
 import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
 import type { IAnlass } from '../../model/IAnlass';
@@ -14,20 +14,21 @@ import { NewVereinComponent } from '../new-verein/new-verein.component';
 
 /** @title Main Component */
 @Component({
-  selector: 'lxt-anmelde-tool',
+  selector: 'app-anmelde-tool',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   standalone: true,
   imports: [BusyIndicatorProgressBarComponent, NavComponent],
 })
-export class AnmeldeToolComponent extends SubscriptionHelper implements OnInit, AfterViewInit, AfterContentChecked {
+export class AnmeldeToolComponent extends SubscriptionHelper implements OnInit, AfterContentChecked {
   localeTextDE = {
     contains: 'Beinhaltet',
   };
   private showPage = 0;
   dialogOpen = false;
   appBlocked = false;
-  _authenticated = false;
+  _authenticated = true;
+  private loginDialogScheduled = false;
   anlass: IAnlass | undefined;
 
   fillerNav = Array.from({ length: 10 }, (_, i) => `Nav Item ${i + 1}`);
@@ -50,7 +51,6 @@ export class AnmeldeToolComponent extends SubscriptionHelper implements OnInit, 
         }
         if (!this.appBlocked && !this.authService.isAuthenticated()) {
           this.dialogOpen = true;
-          //this.openLoginDialog();
         }
       }),
     );
@@ -60,41 +60,39 @@ export class AnmeldeToolComponent extends SubscriptionHelper implements OnInit, 
 
   ngAfterContentChecked(): void {
     if (!this.appBlocked && !this.authService.isAuthenticated() && this._authenticated) {
-      this._authenticated = false;
-      console.log('AnmeldeToolComponent::ngAfterContentChecked');
-      this.openLoginDialog();
+      if (this.loginDialogScheduled) {
+        return;
+      }
+      this.loginDialogScheduled = true;
+      queueMicrotask(() => {
+        this.loginDialogScheduled = false;
+        if (!this.appBlocked && !this.authService.isAuthenticated() && this._authenticated) {
+          this._authenticated = false;
+          console.log('AnmeldeToolComponent::ngAfterContentChecked');
+          this.openLoginDialog();
+        }
+      });
     }
-  }
-
-  ngAfterViewInit(): void {
-    /*
-    if (!this.appBlocked && !this.authService.isAuthenticated()) {
-      console.log("AnmeldeToolComponent::ngAfterViewInit: ");
-      this.openLoginDialog();
-    }
-    */
   }
 
   get administrator(): boolean {
     return this.authService.isAdministrator();
   }
 
-  /* todo
-  toolSperrenClicked(event: any): void {
-    this.anlassService
-      .updateAnlass(this.anlass)
-      .subscribe((anlass) => (this.anlass = anlass));
-  }*/
+  /*
+        width: '500px',
+      height: 'auto',
+
+  */
 
   openLoginDialog(): void {
-    const dialogRef = this.dialog.open(LoginDialogComponent, {
-      height: '500px',
-      width: '500px',
-      disableClose: true,
-      autoFocus: true,
-    });
+    const dialogConfig = new MatDialogConfig();
+
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+    dialogConfig.panelClass = 'login-dialog-panel';
+    const dialogRef = this.dialog.open(LoginDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe((result) => {
-      // console.log("Dialog Closed", result);
       if (result === 'OK') {
         this.dialogOpen = false;
         this._authenticated = true;
@@ -133,13 +131,8 @@ export class AnmeldeToolComponent extends SubscriptionHelper implements OnInit, 
       this.openLoginDialog();
     });
   }
-  /*
-  get vereineLoaded(): Observable<boolean> {
-    return this.vereinService.isVereineLoaded();
-  }*/
 
   get authenticated(): boolean {
-    // console.log('ngOnInit 2: ');
     return this.authService.isAuthenticated();
   }
   onShowPage(showPage: number): void {

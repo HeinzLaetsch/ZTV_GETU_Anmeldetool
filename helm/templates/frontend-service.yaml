@@ -1,0 +1,12 @@
+{{- $fullName := print (include "ztv-anmeldetool.fullname" .) "-" "web" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ print $fullName "-service" | quote }}
+spec:
+  selector:
+    app: {{ $fullName | quote }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.frontend.port }}
+      targetPort: {{ .Values.frontend.port }}

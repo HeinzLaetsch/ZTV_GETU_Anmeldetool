@@ -19,7 +19,6 @@ import {
   type FormGroup,
   NgControl,
   ReactiveFormsModule,
-  type ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { MAT_FORM_FIELD, type MatFormField, MatFormFieldControl } from '@angular/material/form-field';
@@ -41,7 +40,7 @@ export class MyTel {
 @Component({
   selector: 'lxt-phone-input',
   templateUrl: './phone-input.html',
-  styleUrls: ['./phone-input.css'],
+  styleUrls: ['./phone-input.scss'],
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   providers: [
@@ -53,10 +52,10 @@ export class MyTel {
 })
 export class PhoneInput implements ControlValueAccessor, MatFormFieldControl<MyTel>, OnDestroy {
   static nextId = 0;
-  @ViewChild('part1') part1Input: HTMLInputElement;
-  @ViewChild('part2') part2Input: HTMLInputElement;
-  @ViewChild('part3') part3Input: HTMLInputElement;
-  @ViewChild('part4') part4Input: HTMLInputElement;
+  @ViewChild('part1') part1Input!: ElementRef<HTMLInputElement>;
+  @ViewChild('part2') part2Input!: ElementRef<HTMLInputElement>;
+  @ViewChild('part3') part3Input!: ElementRef<HTMLInputElement>;
+  @ViewChild('part4') part4Input!: ElementRef<HTMLInputElement>;
 
   parts: FormGroup;
   stateChanges = new Subject<void>();
@@ -79,7 +78,7 @@ export class PhoneInput implements ControlValueAccessor, MatFormFieldControl<MyT
     return this.focused || !this.empty;
   }
 
-  @Input('aria-describedby') userAriaDescribedBy: string;
+  @Input('aria-describedby') userAriaDescribedBy = '';
 
   get placeholder(): string {
     return this._placeholder;
@@ -89,7 +88,7 @@ export class PhoneInput implements ControlValueAccessor, MatFormFieldControl<MyT
     this._placeholder = value;
     this.stateChanges.next();
   }
-  private _placeholder: string;
+  private _placeholder = '';
 
   get required(): boolean {
     return this._required;
@@ -134,14 +133,7 @@ export class PhoneInput implements ControlValueAccessor, MatFormFieldControl<MyT
   get errorState(): boolean {
     // Shows error only after its touched
     // return this.parts.invalid && this.touched;
-    const errors: ValidationErrors = {
-      required: this.parts.hasError('required'),
-      minLength: this.parts.hasError('minLength'),
-      maxLength: this.parts.hasError('maxLength'),
-      pattern: this.parts.hasError('pattern'),
-    };
-
-    this.ngControl.control.updateValueAndValidity();
+    this.ngControl?.control?.updateValueAndValidity();
 
     return this.parts.invalid;
   }
@@ -155,7 +147,7 @@ export class PhoneInput implements ControlValueAccessor, MatFormFieldControl<MyT
     public _formField: MatFormField,
     @Optional()
     @Self()
-    public ngControl: NgControl,
+    public ngControl: NgControl | null,
   ) {
     this.parts = this._formBuilder.group({
       part1: [
@@ -221,15 +213,15 @@ export class PhoneInput implements ControlValueAccessor, MatFormFieldControl<MyT
 
   onContainerClick() {
     if (this.parts.controls.part4.valid) {
-      this._focusMonitor.focusVia(this.part4Input, 'program');
+      this._focusMonitor.focusVia(this.part4Input.nativeElement, 'program');
     } else if (this.parts.controls.part3.valid) {
-      this._focusMonitor.focusVia(this.part4Input, 'program');
+      this._focusMonitor.focusVia(this.part4Input.nativeElement, 'program');
     } else if (this.parts.controls.part2.valid) {
-      this._focusMonitor.focusVia(this.part3Input, 'program');
+      this._focusMonitor.focusVia(this.part3Input.nativeElement, 'program');
     } else if (this.parts.controls.part1.valid) {
-      this._focusMonitor.focusVia(this.part2Input, 'program');
+      this._focusMonitor.focusVia(this.part2Input.nativeElement, 'program');
     } else {
-      this._focusMonitor.focusVia(this.part1Input, 'program');
+      this._focusMonitor.focusVia(this.part1Input.nativeElement, 'program');
     }
   }
 

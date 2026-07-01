@@ -1,4 +1,6 @@
 import { APP_INITIALIZER } from '@angular/core';
+import { isDevMode } from '@angular/core';
+import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideEffects } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
@@ -15,6 +17,10 @@ bootstrapApplication(AnmeldeToolComponent, {
     routingProviders,
     provideStore(appReducers),
     provideEffects(...appEffects),
+    provideStoreDevtools({
+    maxAge: 25,
+    logOnly: !isDevMode()
+  }),
     {
       provide: APP_INITIALIZER,
       multi: true,

@@ -1,21 +1,14 @@
-<lxt-busy-indicator-progress-bar></lxt-busy-indicator-progress-bar>
-<lxt-nav></lxt-nav>
-<ng-container *ngIf="authenticated; else login">
-  <router-outlet></router-outlet>
-</ng-container>
-
-<ng-template #login>
-  <div *ngIf="dialogOpen && !appBlocked" class="overlay"></div>
-  <div *ngIf="!dialogOpen && appBlocked" class="overlay">
-    <h1 class="center">
-      Das AnmeldeTool ist gesperrt !!! Im Moment findet ein Wettkampf statt.
-      <!--div *ngIf="anlass && administrator" class="col-sm-4">
-        <mat-checkbox
-          [(ngModel)]="anlass.toolSperren"
-          (ngModelChange)="toolSperrenClicked($event)"
-          >Tool sperren
-        </mat-checkbox>
-      </div-->
-    </h1>
-  </div>
-</ng-template>
+<ztv-busy-indicator-progress-bar></ztv-busy-indicator-progress-bar>
+<ztv-navigation></ztv-navigation>
+@if (authenticated) {
+  <!--router-outlet></router-outlet-->
+} @else {
+  @if (dialogOpen && !appBlocked) {
+    <div class="overlay"></div>
+  }
+  @if (!dialogOpen && appBlocked) {
+    <div class="overlay">
+      <h1 class="center">Das AnmeldeTool ist gesperrt !!! Im Moment findet ein Wettkampf statt.</h1>
+    </div>
+  }
+}

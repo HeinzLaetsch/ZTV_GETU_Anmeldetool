@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, type OnChanges, type OnInit, Output, type SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import type { Update } from '@ngrx/entity';
 import { Store } from '@ngrx/store';
 import type { IUser } from 'src/app/core/model/IUser';
@@ -13,38 +13,36 @@ import { MyTel, PhoneInput } from '../phonenumber/phone-input-component';
 import { UserExists } from './user-exists/user-exists.component';
 
 @Component({
-  selector: 'lxt-user',
+  selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule, PhoneInput],
 })
-export class UserComponent implements OnInit, OnChanges {
-  @Input()
-  modify: boolean;
-  @Input()
-  readOnly: boolean;
-  @Input()
-  showPassword: boolean;
-  @Input()
-  mustShowPassword: boolean;
-  @Input()
-  showBenutzername: boolean;
-  @Input()
-  user: IUser;
-  @Output()
-  userChange = new EventEmitter<IUser>();
+export class UserComponent {
+  // Inputs
+  modify = input(false);
+  readOnly = input(false);
+  showPassword = input(false);
+  mustShowPassword = input(false);
+  showBenutzername = input(false);
+  user = input<IUser | null>(null);
 
-  @Output()
-  valid = new EventEmitter<boolean>();
+  // Outputs
+  userChange = output<IUser>();
+  valid = output<boolean>();
 
-  //floatLabel = 'Always';
-  appearance = 'outline';
+  // Services
+  private dialog = inject(MatDialog);
+  private store = inject(Store<AppState>);
 
-  enteredPassword = '';
+  // Local state
+  readonly enteredPassword = signal('');
+  readonly userAlreadyExists = signal(false);
+  readonly showPasswordAendern = signal(false);
 
-  userAlreadyExists = false;
-  showPasswordAendern = false;
+  readonly appearance = 'outline';
 
   form: UntypedFormGroup = new UntypedFormGroup({
     benutzernameControl: new UntypedFormControl('', [
@@ -65,127 +63,100 @@ export class UserComponent implements OnInit, OnChanges {
     mobilNummerControl: new UntypedFormControl(new MyTel('', '', '', '')),
   });
 
-  constructor(
-    public dialog: MatDialog,
-    private store: Store<AppState>, // private userService: UserService
-  ) {
-    this.modify = false;
+  constructor() {
     this.form.setValidators(ConfirmedValidator('passwortControl', 'passwort2Control'));
-  }
 
-  ngOnInit(): void {
-    this.updateUser(this.user);
-    this.validate();
-    if (this.readOnly) {
-      this.form.disable();
-    }
-    if (this.showBenutzername) {
-      this.form.controls.eMailAdresseControl.disable();
-    }
+    // React to user input changes (mirrors ngOnInit + ngOnChanges)
+    effect(() => {
+      const user = this.user();
+      if (!user) {
+        return;
+      }
+      untracked(() => {
+        this.updateUser(user);
+        this.validate();
+        if (this.readOnly()) {
+          this.form.disable();
+        }
+        if (this.showBenutzername()) {
+          this.form.controls.eMailAdresseControl.disable();
+        }
+      });
+    });
 
     this.form.controls.benutzernameControl.valueChanges.subscribe((value) => {
-      if (this.user.benutzername !== value) {
-        this.user.benutzername = value;
-        const userUpdate: Update<IUser> = {
-          id: this.user.id,
-          changes: {
-            dirty: true,
-            benutzername: this.user.benutzername,
-          },
-        };
-        this.emitChange(userUpdate);
+      const user = this.user();
+      if (!user) {
+        return;
+      }
+      if (user.benutzername !== value) {
+        user.benutzername = value;
+        this.emitChange({ id: user.id ?? '', changes: { dirty: true, benutzername: user.benutzername } });
       }
     });
     this.form.controls.nachnameControl.valueChanges.subscribe((value) => {
-      if (this.user.name !== value) {
-        this.user.name = value;
-        const userUpdate: Update<IUser> = {
-          id: this.user.id,
-          changes: {
-            dirty: true,
-            name: this.user.name,
-          },
-        };
-        this.emitChange(userUpdate);
+      const user = this.user();
+      if (!user) {
+        return;
+      }
+      if (user.name !== value) {
+        user.name = value;
+        this.emitChange({ id: user.id ?? '', changes: { dirty: true, name: user.name } });
       }
     });
     this.form.controls.vornameControl.valueChanges.subscribe((value) => {
-      if (this.user.vorname !== value) {
-        this.user.vorname = value;
-        const userUpdate: Update<IUser> = {
-          id: this.user.id,
-          changes: {
-            dirty: true,
-            vorname: this.user.vorname,
-          },
-        };
-        this.emitChange(userUpdate);
+      const user = this.user();
+      if (!user) {
+        return;
+      }
+      if (user.vorname !== value) {
+        user.vorname = value;
+        this.emitChange({ id: user.id ?? '', changes: { dirty: true, vorname: user.vorname } });
       }
     });
     this.form.controls.passwortControl.valueChanges.subscribe((value) => {
-      if (this.user.password !== value) {
-        this.user.password = value;
-        this.enteredPassword = value;
-        const userUpdate: Update<IUser> = {
-          id: this.user.id,
-          changes: {
-            dirty: true,
-            password: this.user.password,
-          },
-        };
-        this.emitChange(userUpdate);
+      const user = this.user();
+      if (!user) {
+        return;
+      }
+      if (user.password !== value) {
+        user.password = value;
+        this.enteredPassword.set(value);
+        this.emitChange({ id: user.id ?? '', changes: { dirty: true, password: user.password } });
       }
     });
     this.form.controls.passwort2Control.valueChanges.subscribe((value) => {
-      if (this.user.password !== value) {
-        this.user.password = value;
-        const userUpdate: Update<IUser> = {
-          id: this.user.id,
-          changes: {
-            dirty: true,
-            password: this.user.password,
-          },
-        };
-        this.emitChange(userUpdate);
+      const user = this.user();
+      if (!user) {
+        return;
+      }
+      if (user.password !== value) {
+        user.password = value;
+        this.emitChange({ id: user.id ?? '', changes: { dirty: true, password: user.password } });
       }
     });
     this.form.controls.eMailAdresseControl.valueChanges.subscribe((value) => {
-      if (this.user.email !== value) {
-        this.user.email = value;
-        const userUpdate: Update<IUser> = {
-          id: this.user.id,
-          changes: {
-            dirty: true,
-            email: this.user.email,
-          },
-        };
-        this.emitChange(userUpdate);
+      const user = this.user();
+      if (!user) {
+        return;
+      }
+      if (user.email !== value) {
+        user.email = value;
+        this.emitChange({ id: user.id ?? '', changes: { dirty: true, email: user.email } });
       }
     });
     this.form.controls.mobilNummerControl.valueChanges.subscribe((value) => {
-      // console.log(this.form.controls.mobilNummerControl.value);
-      if (value && this.user.handy !== this.concatHandy(value)) {
-        this.user.handy = this.concatHandy(value);
-        const userUpdate: Update<IUser> = {
-          id: this.user.id,
-          changes: {
-            dirty: true,
-            handy: this.user.handy,
-          },
-        };
-        this.emitChange(userUpdate);
+      const user = this.user();
+      if (!user) {
+        return;
+      }
+      if (value && user.handy !== this.concatHandy(value)) {
+        user.handy = this.concatHandy(value);
+        this.emitChange({ id: user.id ?? '', changes: { dirty: true, handy: user.handy } });
       }
     });
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    for (const propName in changes) {
-      if (changes.user) {
-        // console.log('ngOnChanges: ' , changes.user.previousValue, ', ' , changes.user.currentValue);
-        //this.updateUser(changes.user.currentValue);
-      }
-    }
-  }
   private openDialog(existingUser: IUser) {
     const dialogRef = this.dialog.open(UserExists, {
       data: existingUser,
@@ -207,70 +178,80 @@ export class UserComponent implements OnInit, OnChanges {
 
   private updateUser(user: IUser) {
     if (this.form.controls.benutzernameControl.value !== user.benutzername) {
-      this.form.controls.benutzernameControl.setValue(user.benutzername);
+      this.form.controls.benutzernameControl.setValue(user.benutzername, { emitEvent: false });
     }
     if (this.form.controls.nachnameControl.value !== user.name) {
-      this.form.controls.nachnameControl.setValue(user.name);
+      this.form.controls.nachnameControl.setValue(user.name, { emitEvent: false });
     }
     if (this.form.controls.vornameControl.value !== user.vorname) {
-      this.form.controls.vornameControl.setValue(user.vorname);
+      this.form.controls.vornameControl.setValue(user.vorname, { emitEvent: false });
     }
     // Password is not returned by the server
     if (this.form.controls.passwortControl.value !== user.password) {
-      if (this.enteredPassword && this.enteredPassword.length > 0) {
-        this.form.controls.passwortControl.setValue(this.enteredPassword);
-        this.form.controls.passwort2Control.setValue(this.enteredPassword);
+      const ep = this.enteredPassword();
+      if (ep && ep.length > 0) {
+        this.form.controls.passwortControl.setValue(ep, { emitEvent: false });
+        this.form.controls.passwort2Control.setValue(ep, { emitEvent: false });
       } else {
-        this.form.controls.passwortControl.setValue(user.password);
-        this.form.controls.passwort2Control.setValue(user.password);
+        this.form.controls.passwortControl.setValue(user.password, { emitEvent: false });
+        this.form.controls.passwort2Control.setValue(user.password, { emitEvent: false });
       }
     }
     if (this.form.controls.eMailAdresseControl.value !== user.email) {
-      this.form.controls.eMailAdresseControl.setValue(user.email);
+      this.form.controls.eMailAdresseControl.setValue(user.email, { emitEvent: false });
     }
     const tmpValue = this.form.controls.mobilNummerControl.value;
     if (!tmpValue || tmpValue.part1 === '') {
-      this.form.controls.mobilNummerControl.setValue(this.splitHandy(user.handy));
+      this.form.controls.mobilNummerControl.setValue(this.splitHandy(user.handy), { emitEvent: false });
     }
   }
+
   private validate(): boolean {
     let valid = true;
-    if (this.showBenutzername) {
+    const user = this.user();
+    if (this.showBenutzername()) {
       const benutzerNameValid = this.form.controls.benutzernameControl.valid;
-      valid = valid && benutzerNameValid && !this.userAlreadyExists;
-      if (benutzerNameValid) {
-        this.user.email = this.form.controls.benutzernameControl.value;
-        this.form.controls.eMailAdresseControl.setValue(this.form.controls.benutzernameControl.value);
+      valid = valid && benutzerNameValid && !this.userAlreadyExists();
+      if (benutzerNameValid && user) {
+        user.email = this.form.controls.benutzernameControl.value;
+        this.form.controls.eMailAdresseControl.setValue(this.form.controls.benutzernameControl.value, {
+          emitEvent: false,
+        });
       }
     }
     valid = valid && this.form.controls.nachnameControl.valid;
     valid = valid && this.form.controls.vornameControl.valid;
-    if (this.showPassword) {
+    if (this.showPassword()) {
       if (
-        !(this.modify && (!this.form.controls.passwortControl.value || this.form.controls.passwortControl.value === ''))
+        !(
+          this.modify() &&
+          (!this.form.controls.passwortControl.value || this.form.controls.passwortControl.value === '')
+        )
       ) {
         valid = valid && this.form.controls.passwortControl.valid;
         valid = valid && this.form.controls.passwort2Control.valid;
       }
     }
-    if (!this.showBenutzername) {
-      valid = valid && this.form.controls.eMailAdresseControl.valid && !this.userAlreadyExists;
+    if (!this.showBenutzername()) {
+      valid = valid && this.form.controls.eMailAdresseControl.valid && !this.userAlreadyExists();
     }
     valid = valid && this.form.controls.mobilNummerControl.valid;
 
-    this.valid.next(valid);
+    queueMicrotask(() => this.valid.emit(valid));
     if (!valid) {
       console.log('UserComponent not valid: ', this.form.errors);
     }
     return valid;
   }
+
   private emitChange(userUpdate: Update<IUser>) {
-    //includeUser: boolean) {
-    // const valid =
-    //if (valid) {
+    const user = this.user();
+    if (!user) {
+      return;
+    }
+    queueMicrotask(() => this.userChange.emit(user));
     this.store.dispatch(UserActions.updateUser({ payload: userUpdate }));
     this.validate();
-    //}
   }
 
   private concatHandy(mytel: MyTel): string {

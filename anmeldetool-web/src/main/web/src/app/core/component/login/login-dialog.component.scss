@@ -1,20 +1,19 @@
+.login-dialog-panel .mat-mdc-dialog-surface {
+  min-width: 450px;
+  min-height: 500px;
+}
+
+.container {
+  width: min(100%, 48rem);
+  height: min(100%, 90vh);
+  margin: 0 auto;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  box-sizing: border-box;
+}
+
+mat-form-field,
 .mat-form-field {
   width: 100%;
-}
-.label {
-  color: rgba(0, 0, 0, 0.54);
-}
-button {
-  margin-right: 10px;
-}
-.error {
-  padding-top: 5px;
-  margin-left: 15px;
-  font-weight: 700;
-  font-size: 1rem;
-}
-.mat-option {
-  line-height: 24px;
-  height: 24px;
-  font-size: 12px;
+  min-width: 350px;
+  box-sizing: border-box;
 }

@@ -14,20 +14,18 @@ import { AuthService } from '../../service/auth/auth.service';
 import { MaterialModule } from 'src/app/shared/material-module';
 
 @Component({
-  selector: 'lxt-nav',
+  selector: 'ztv-navigation',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss'],
   standalone: true,
   imports: [CommonModule, RouterModule, MaterialModule],
 })
 export class NavComponent extends SubscriptionHelper implements OnInit {
-  anlaesse: IAnlass[];
+  anlaesse: IAnlass[] = [];
   anlaesse$!: Observable<IAnlass[]>;
 
-  vereine: IVerein[];
+  vereine: IVerein[] = [];
   vereine$!: Observable<IVerein[]>;
-
-  organisator: IVerein;
 
   constructor(
     public authService: AuthService,
@@ -69,7 +67,7 @@ export class NavComponent extends SubscriptionHelper implements OnInit {
     }
   }
 
-  getOrganisator(anlass: IAnlass): Observable<IVerein> {
+  getOrganisator(anlass: IAnlass): Observable<IVerein | undefined> {
     return this.store.pipe(select(selectVereinById(anlass.organisatorId)));
   }
 

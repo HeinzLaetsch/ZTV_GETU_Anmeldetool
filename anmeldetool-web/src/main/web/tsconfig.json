@@ -24,6 +24,7 @@
     "lib": ["ES2022", "dom"]
   },
   "angularCompilerOptions": {
+    "_enabledBlockTypes": ["if", "for", "switch", "defer"],
     "strictInjectionParameters": true,
     "strictTemplates": false
   },

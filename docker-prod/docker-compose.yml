@@ -1,0 +1,40 @@
+version: '2'
+# run on host
+# chcon -Rt svirt_sandbox_file_t /root/anmeldetool/docker/backend/timezone
+
+volumes:
+  postgres_data:
+
+services:
+  db:
+    image: postgres
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data 
+    environment:
+      - POSTGRES_PASSWORD=getu@ztv
+    ports:
+      - 5432:5432
+
+  backend:
+    build: 
+      context: ../
+      dockerfile: ./docker/backend/Dockerfile
+    ports:
+      - 8088:8080
+    links:
+      - db
+    restart: always
+    volumes:
+     - ./backend/timezone:/etc/timezone
+     
+  app:
+    build: 
+      context: ../
+      dockerfile: ./docker/at-app/Dockerfile
+    ports:
+      - 8081:80
+    links:
+      - backend
+    restart: always
+

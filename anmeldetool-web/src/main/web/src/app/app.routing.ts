@@ -6,6 +6,7 @@ import { SmQualiViewerComponent } from './smquali/smquali-viewer/smquali-viewer.
 import { TeilnehmerGridComponent } from './verein/teilnehmer/teilnehmer-grid/teilnehmer-grid';
 
 export const AppRouting: Routes = [
+  /*
   {
     path: 'anlaesse',
     loadChildren: () => import('./events/events.module').then((m) => m.EventsModule),
@@ -42,6 +43,7 @@ export const AppRouting: Routes = [
     component: SmQualiViewerComponent,
   },
   { path: '**', redirectTo: 'page404' },
+  */
 ];
 
 export const routingProviders = provideRouter(AppRouting, withHashLocation());

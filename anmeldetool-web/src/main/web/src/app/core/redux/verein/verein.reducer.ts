@@ -12,6 +12,5 @@ export const vereinFeature = createFeature({
     }),
   ),
 });
-// Spread         ...state,
 
 export const { selectAll, selectEntities, selectIds, selectTotal } = vereinAdapter.getSelectors();

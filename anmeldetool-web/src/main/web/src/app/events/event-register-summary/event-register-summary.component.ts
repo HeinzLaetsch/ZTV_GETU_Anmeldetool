@@ -22,6 +22,7 @@ import type { IVerein } from 'src/app/verein/verein';
   selector: 'lxt-event-register-summary',
   templateUrl: './event-register-summary.component.html',
   styleUrls: ['./event-register-summary.component.css'],
+  standalone: true,
 })
 export class EventRegisterSummaryComponent extends SubscriptionHelper implements OnInit {
   anlass: IAnlass;

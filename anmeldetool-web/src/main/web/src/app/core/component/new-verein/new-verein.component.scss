@@ -1,0 +1,24 @@
+.container {
+  width: min(100%, 35rem);
+  height: min(100%, 90vh);
+  margin: 0 auto;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  box-sizing: border-box;
+}
+
+mat-form-field,
+.mat-form-field {
+  width: 100%;
+  min-width: 25rem;
+  box-sizing: border-box;
+}
+
+mat-hint,
+.mat-mdc-form-field-hint {
+  white-space: normal;
+  line-height: 1.3;
+}
+
+p {
+  margin-bottom: 20px;
+}

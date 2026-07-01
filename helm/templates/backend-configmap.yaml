@@ -1,0 +1,17 @@
+{{- $fullName := print (include "ztv-anmeldetool.fullname" .) "-" "backend" -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullName }}-configmap
+  labels:
+    app: {{ $fullName }}
+data:
+  BACKEND_PORT: {{ .Values.backend.port | quote }}
+  SPRING_DATASOURCE_URL: {{ .Values.backend.database.url | quote }}
+  MAIL_ENABLED: {{ .Values.backend.mail.enabled | quote }}
+  MAIL_HOST: {{ .Values.backend.mail.host | quote }}
+  MAIL_PORT: {{ .Values.backend.mail.port | quote }}
+  MAIL_TEMPLATES_PATH: {{ .Values.backend.mail.templates.path | quote }}
+  SIMULATE_ENABLED: {{ .Values.backend.mail.simulate.enabled | quote }}
+  SIMULATE_EMAIL: {{ .Values.backend.mail.simulate.email | quote }}
+

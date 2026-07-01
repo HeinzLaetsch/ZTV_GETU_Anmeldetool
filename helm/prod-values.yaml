@@ -1,0 +1,20 @@
+frontend:
+  image:
+    tag: "0.0.4"
+backend:
+  image:
+    tag: "0.0.4"
+  database:
+    url: "jdbc:postgresql://postgres-service.infra.svc.cluster.local:5432/getuwettkaempfe"
+    username: "getu"
+    password: "getu@ztv"
+  mail:
+    enabled: true
+    host: "smtp.office365.com"
+    port: "587"
+    username: "getu-wettkaempfe@ztv.ch"
+    password: "GeTuWL@ztv.ch"
+    simulate:
+      enabled: false
+      email: "heinz.laetsch@gmx.ch"
+

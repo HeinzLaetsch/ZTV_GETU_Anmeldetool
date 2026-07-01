@@ -1,4 +1,4 @@
-import { Component, EventEmitter, type OnInit, Output } from '@angular/core';
+import { Component, type OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -13,13 +13,14 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router, RouterModule } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 import { type Observable, of } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { map, skip, startWith } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/service/auth/auth.service';
 import { CachingUserService } from 'src/app/core/service/caching-services/caching.user.service';
 import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
 import type { IVerein } from 'src/app/verein/verein';
 import type { AppState } from '../../redux/core.state';
 import { selectAlleVereine } from '../../redux/verein';
+import { filter } from 'node_modules/cypress/types/lodash';
 
 @Component({
   selector: 'lxt-login-dialog',
@@ -42,9 +43,6 @@ import { selectAlleVereine } from '../../redux/verein';
   ],
 })
 export class LoginDialogComponent extends SubscriptionHelper implements OnInit {
-  @Output()
-  showDialog = new EventEmitter<number>();
-
   appearance = 'outline';
   loginError: boolean;
   errorMessage: string | undefined = undefined;
@@ -75,7 +73,7 @@ export class LoginDialogComponent extends SubscriptionHelper implements OnInit {
     private router: Router,
   ) {
     super();
-    this.vereine$ = this.store.pipe(select(selectAlleVereine));
+    this.vereine$ = this.store.select(selectAlleVereine).pipe(skip(1));
     this.loginError = false;
   }
 
@@ -139,30 +137,20 @@ export class LoginDialogComponent extends SubscriptionHelper implements OnInit {
 
     this.loginError = false;
     try {
-      this.authService
-        .login(verein, userName, password)
-        // .pipe(catchError(this.handleError<boolean>("login")))
-        .subscribe(
-          (result) => {
-            this.dialogRef.close('OK');
-            this.loginError = false;
-            this.userService.loadUser().subscribe((result) => {
-              // TODO register Error
-            });
-            // TODO check if preload is realy neccessary
-            /*
-            self.teilnehmerService
-              .loadTeilnehmer(self.vwVereinControl.value)
-              .subscribe((result) => {
-                // TODO register Error
-              });
-              */
-          },
-          (error) => {
-            this.loginError = true;
-            this.errorMessage = 'Fehler beim Login, Verein, Name oder Passwort falsch';
-          },
-        );
+      this.authService.login(verein, userName, password).subscribe(
+        (result) => {
+          this.dialogRef.close('OK');
+          this.loginError = false;
+          this.userService.loadUser().subscribe((result) => {
+            // TODO register Error
+          });
+          // TODO check if preload is realy neccessary
+        },
+        (error) => {
+          this.loginError = true;
+          this.errorMessage = 'Fehler beim Login, Verein, Name oder Passwort falsch';
+        },
+      );
     } catch (error) {
       console.error('Error logging in: ' + error);
       this.loginError = true;
@@ -185,12 +173,10 @@ export class LoginDialogComponent extends SubscriptionHelper implements OnInit {
   newVereinClicked(): void {
     console.log('New Anmelder clicked');
     this.dialogRef.close(1);
-    this.showDialog.emit(1);
   }
 
   newAnmelderClicked(): void {
     console.log('New Anmelder clicked');
     this.dialogRef.close(2);
-    this.showDialog.emit(2);
   }
 }

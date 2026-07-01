@@ -11,6 +11,7 @@ import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
   selector: 'lxt-anlass-statistik',
   templateUrl: './anlass-statistik.component.html',
   styleUrls: ['./anlass-statistik.component.css'],
+  standalone: true,
 })
 export class AnlassStatistikComponent extends SubscriptionHelper implements OnInit {
   @Input()

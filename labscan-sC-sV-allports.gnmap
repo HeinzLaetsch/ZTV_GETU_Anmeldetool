@@ -1,0 +1,4 @@
+# Nmap 7.95 scan initiated Thu Jan  8 17:43:15 2026 as: nmap -sC -sV -p- -oA labscan-sC-sV-allports 192.168.99.8
+Host: 192.168.99.8 (Homeserver)	Status: Up
+Host: 192.168.99.8 (Homeserver)	Ports: 22/open/tcp//ssh//OpenSSH 10.0p2 Debian 7 (protocol 2.0)/, 111/open/tcp//rpcbind//2-4 (RPC #100000)/, 3128/open/tcp//http//Proxmox Virtual Environment REST API 3.0/, 8006/open/tcp//wpl-analytics?///	Ignored State: closed (65531)
+# Nmap done at Thu Jan  8 17:45:09 2026 -- 1 IP address (1 host up) scanned in 114.64 seconds

@@ -1,4 +1,4 @@
-import { Component, type OnInit } from '@angular/core';
+import { Component, signal, type OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormsModule,
@@ -15,7 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import type { IVerband } from 'src/app/core/model/IVerband';
 import { AuthService } from 'src/app/core/service/auth/auth.service';
 import { VerbandService } from 'src/app/core/service/verband/verband.service';
@@ -27,9 +27,9 @@ import { UserService } from '../../service/user/user.service';
 import { UserComponent } from 'src/app/shared/component/user/user.component';
 
 @Component({
-  selector: 'lxt-new-verein',
+  selector: 'app-new-verein',
   templateUrl: './new-verein.component.html',
-  styleUrls: ['./new-verein.component.css'],
+  styleUrls: ['./new-verein.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
@@ -48,7 +48,6 @@ import { UserComponent } from 'src/app/shared/component/user/user.component';
   ],
 })
 export class NewVereinComponent implements OnInit {
-  //floatLabel = 'Always';
   appearance = 'outline';
   form: UntypedFormGroup;
   verein: IVerein = {
@@ -57,7 +56,7 @@ export class NewVereinComponent implements OnInit {
     verbandId: '',
   };
 
-  _verantwortlicher: IUser = {
+  readonly verantwortlicher = signal<IUser>({
     id: '',
     organisationids: [''],
     name: '',
@@ -67,27 +66,22 @@ export class NewVereinComponent implements OnInit {
     email: '',
     handy: '',
     aktiv: true,
-  };
+  });
 
-  userValid: boolean;
+  userValid = false;
 
-  selectedVerbandValue: string;
+  selectedVerbandValue = '';
   selectedVerband = '';
 
   vereinsName = '';
-  nachname = '';
-  vorname = '';
-  passwort = '';
-  mobilNummer = '';
-  eMailAdresse = '';
 
-  mouseoverlogin: boolean;
+  mouseoverlogin = false;
 
-  vereine: IVerein[];
-  verbaende: IVerband[];
+  vereine: IVerein[] = [];
+  verbaende: IVerband[] = [];
 
-  error: boolean;
-  errorMessage = undefined;
+  error = false;
+  errorMessage: string | undefined = undefined;
 
   constructor(
     private formBuilder: UntypedFormBuilder,
@@ -96,16 +90,12 @@ export class NewVereinComponent implements OnInit {
     private vereinService: VereinService,
     private verbandService: VerbandService,
     private userService: UserService,
+    private router: Router,
   ) {
     this.form = this.formBuilder.group({
       vereinsNameControl: [this.vereinsName, Validators.required],
       verbandFormControl: ['', Validators.required],
     });
-    this._verantwortlicher.name = this.nachname;
-    this._verantwortlicher.vorname = this.vorname;
-    this._verantwortlicher.password = this.passwort;
-    this._verantwortlicher.email = this.eMailAdresse;
-    this._verantwortlicher.handy = this.mobilNummer;
   }
 
   ngOnInit(): void {
@@ -122,13 +112,10 @@ export class NewVereinComponent implements OnInit {
     // console.log("Valid changed", valid);
   }
 
-  get verantwortlicher() {
-    return this._verantwortlicher;
+  updateVerantwortlicher(user: IUser): void {
+    this.verantwortlicher.set(user);
   }
-  set verantwortlicher(verantwortlicher: IUser) {
-    // console.log("Verantwortlicher changed", verantwortlicher);
-    this._verantwortlicher = verantwortlicher;
-  }
+
   save(): void {
     const rollen: IRolle[] = [
       { id: '', name: 'ANMELDER', aktiv: true },
@@ -148,45 +135,48 @@ export class NewVereinComponent implements OnInit {
       return;
     }
 
-    this.verantwortlicher.benutzername = this.verantwortlicher.email;
-    this._verantwortlicher.aktiv = true;
-    this._verantwortlicher.rollen = rollen;
-    this.userService.getUserByBenutzername(this.verantwortlicher.benutzername).subscribe(
+    const verantwortlicher = {
+      ...this.verantwortlicher(),
+      benutzername: this.verantwortlicher().email,
+      aktiv: true,
+      rollen,
+    };
+    const password = verantwortlicher.password ?? '';
+
+    this.userService.getUserByBenutzername(verantwortlicher.benutzername).subscribe(
       (user) => {
         if (user) {
           this.error = true;
           this.errorMessage =
-            'Es existiert bereits ein Benutzer mit dem Benutzernamen: ' + this.verantwortlicher.benutzername;
+            'Es existiert bereits ein Benutzer mit dem Benutzernamen: ' + verantwortlicher.benutzername;
         } else {
-          this.authService.createVereinAndUser(this.verein, this._verantwortlicher).subscribe(
+          this.authService.createVereinAndUser(this.verein, verantwortlicher).subscribe(
             (loggedInUser) => {
               console.log('Neuer Verein inklusive User kreiert ', loggedInUser.benutzername);
               // Immer erster !!
               this.verein.id = loggedInUser.organisationids[0];
-              this.authService
-                .login(this.verein, loggedInUser.benutzername, this._verantwortlicher.password)
-                .subscribe({
-                  next(data) {
-                    this.router.navigate(['anlass']);
+              this.authService.login(this.verein, loggedInUser.benutzername, password).subscribe({
+                next: () => {
+                  this.router.navigate(['anlass']);
 
-                    /* ToDo check if preload is realy neccessary
+                  /* ToDo check if preload is realy neccessary
                          self.userService.reset().subscribe((result) => {
                            // console.log("Login UserService loaded");
                          });
                          */
-                    // TODO check if preload is realy neccessary
-                    /*
+                  // TODO check if preload is realy neccessary
+                  /*
                          self.teilnehmerService
                            .loadTeilnehmer(self.verein)
                            .subscribe((result) => {
                              // console.log("Login teilnehmerService loaded");
                            });
                            */
-                  },
-                  error(msg) {
-                    console.log('Error: ', msg);
-                  },
-                });
+                },
+                error: (msg) => {
+                  console.log('Error: ', msg);
+                },
+              });
 
               this.dialogRef.close('OK');
             },

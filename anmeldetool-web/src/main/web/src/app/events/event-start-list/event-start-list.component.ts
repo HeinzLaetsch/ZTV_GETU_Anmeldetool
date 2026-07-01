@@ -20,6 +20,7 @@ import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
   selector: 'lxt-event-start-list',
   templateUrl: './event-start-list.component.html',
   styleUrls: ['./event-start-list.component.css'],
+  standalone: true,
 })
 export class EventStartListComponent extends SubscriptionHelper implements OnInit {
   anlass: IAnlass;

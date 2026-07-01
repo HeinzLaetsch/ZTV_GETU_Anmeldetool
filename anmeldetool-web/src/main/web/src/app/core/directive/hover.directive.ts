@@ -3,6 +3,7 @@ import { Anzeigestatus, AnzeigeStatusEnum } from '../model/AnzeigeStatusEnum';
 
 @Directive({
   selector: '[hover]',
+  standalone: true,
 })
 export class HoverOverDirective implements OnChanges {
   @Input()

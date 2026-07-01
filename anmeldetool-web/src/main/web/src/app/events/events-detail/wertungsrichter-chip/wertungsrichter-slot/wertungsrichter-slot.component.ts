@@ -13,6 +13,7 @@ import { CachingAnlassService } from 'src/app/core/service/caching-services/cach
   selector: 'lxt-wertungsrichter-slot',
   templateUrl: './wertungsrichter-slot.component.html',
   styleUrls: ['./wertungsrichter-slot.component.css'],
+  standalone: true,
 })
 export class WertungsrichterSlotComponent implements OnInit {
   @Input()

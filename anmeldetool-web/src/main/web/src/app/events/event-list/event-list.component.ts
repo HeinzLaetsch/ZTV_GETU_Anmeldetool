@@ -14,6 +14,7 @@ import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
   selector: 'lxt-event-list',
   templateUrl: './event-list.component.html',
   styleUrls: ['./event-list.component.css'],
+  standalone: true,
 })
 export class EventListComponent extends SubscriptionHelper implements OnInit {
   // anlaesse: IAnlass[];

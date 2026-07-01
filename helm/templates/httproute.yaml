@@ -1,0 +1,48 @@
+{{- if .Values.httpRoute.enabled -}}
+{{- $fullName := include "ztv-anmeldetool.fullname" . -}}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "ztv-anmeldetool.labels" . | nindent 4 }}
+  {{- with .Values.httpRoute.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  parentRefs:
+    {{- with .Values.httpRoute.parentRefs }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.httpRoute.hostnames }}
+  hostnames:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+  - matches:
+    - path:
+        value: /ztv-anmeldetool/services
+    backendRefs:
+    - name: {{ $fullName }}-backend-service
+      port: {{ .Values.backend.port }}
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+  - matches:
+    - path:
+        value: /ztv-anmeldetool
+    backendRefs:
+    - name: {{ $fullName }}-web-service
+      port: {{ .Values.frontend.port }}
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+
+{{- end }}

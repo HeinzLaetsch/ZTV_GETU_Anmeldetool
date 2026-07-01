@@ -3,28 +3,34 @@
   <hr />
   <form [formGroup]="loginForm" (ngSubmit)="login()">
     <mat-dialog-content>
-      <p>
-        <mat-form-field [appearance]="appearance">
-          <mat-label>Verein</mat-label>
-          <input matInput type="text" formControlName="verein" [matAutocomplete]="auto" />
-          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFn">
-            <mat-option *ngFor="let verein of filteredOptions | async" [value]="verein">
+      <!--p-->
+      <mat-form-field [appearance]="appearance">
+        <mat-label>Verein</mat-label>
+        <input matInput type="text" formControlName="verein" [matAutocomplete]="auto" />
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+          @for (verein of filteredOptions | async; track verein.id) {
+            <mat-option [value]="verein">
               {{ verein.name }}
             </mat-option>
-          </mat-autocomplete>
-          <mat-error *ngIf="vereinControl.hasError('required')"> Pflichtfeld </mat-error>
-          <mat-error *ngIf="vereinControl.hasError('vereinSelection')">
-            Bitte einen Verein aus der Liste auswaehlen
-          </mat-error>
-          <mat-hint>Wähle deinen Verein aus</mat-hint>
-        </mat-form-field>
-      </p>
+          }
+        </mat-autocomplete>
+        @if (vereinControl.hasError('required')) {
+          <mat-error> Pflichtfeld </mat-error>
+        }
+        @if (vereinControl.hasError('vereinSelection')) {
+          <mat-error> Bitte einen Verein aus der Liste auswaehlen </mat-error>
+        }
+        <mat-hint>Wähle deinen Verein aus</mat-hint>
+      </mat-form-field>
+      <!--/p-->
 
       <p>
         <mat-form-field [appearance]="appearance">
           <mat-label>Benutzername</mat-label>
           <input matInput placeholder="Benutzername" formControlName="userName" />
-          <mat-error *ngIf="userNameControl.hasError('required')"> Pflichtfeld </mat-error>
+          @if (userNameControl.hasError('required')) {
+            <mat-error> Pflichtfeld </mat-error>
+          }
           <mat-hint>Gib den Benutzernamen(eMail) ein</mat-hint>
         </mat-form-field>
       </p>
@@ -33,17 +39,19 @@
         <mat-form-field [appearance]="appearance">
           <mat-label>Passwort</mat-label>
           <input matInput type="password" placeholder="Passwort" formControlName="password" />
-          <mat-error *ngIf="passwordControl.hasError('required')"> Pflichtfeld </mat-error>
+          @if (passwordControl.hasError('required')) {
+            <mat-error> Pflichtfeld </mat-error>
+          }
           <mat-hint>Gib das Passwort ein</mat-hint>
         </mat-form-field>
       </p>
     </mat-dialog-content>
-    <!--mat-dialog-actions-->
     <div>
       <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
       <button [disabled]="loginForm.invalid" mat-button type="submit">Login</button>
-      <mat-error *ngIf="loginError" class="error"> {{ errorMessage }}</mat-error>
-      <!--button mat-button mat-dialog-close>Abbrechen</button-->
+      @if (loginError) {
+        <mat-error class="error"> {{ errorMessage }}</mat-error>
+      }
     </div>
   </form>
   <div>
@@ -54,5 +62,4 @@
       Neuen Vereinsanmelder beantragen
     </button>
   </div>
-  <!--/mat-dialog-actions-->
 </div>

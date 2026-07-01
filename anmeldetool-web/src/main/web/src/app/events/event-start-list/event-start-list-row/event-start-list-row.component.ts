@@ -8,6 +8,7 @@ import { AuthService } from 'src/app/core/service/auth/auth.service';
   selector: 'lxt-event-start-list-row',
   templateUrl: './event-start-list-row.component.html',
   styleUrls: ['./event-start-list-row.component.css'],
+  standalone: true,
 })
 export class EventStartListRowComponent implements OnInit {
   @Input()

@@ -7,6 +7,7 @@ import type { IEvent } from '../shared';
   selector: 'lxt-create-event',
   templateUrl: './create-event.component.html',
   styleUrls: ['./create-event.component.css'],
+  standalone: true,
 })
 export class CreateEventComponent implements OnInit {
   newEvent: IEvent;

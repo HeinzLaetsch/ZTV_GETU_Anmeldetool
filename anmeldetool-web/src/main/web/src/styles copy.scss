@@ -1,0 +1,41 @@
+@use 'assets/styles/colors' as *;
+@use 'assets/styles/styles';
+
+// src/styles.scss
+@use 'assets/theme/ztv-gen-theme';
+
+html,
+body {
+  height: 100%;
+}
+
+.login-dialog-panel {
+  max-width: 95vw !important;
+  max-height: 90vh !important;
+}
+
+.login-dialog-panel .mat-mdc-dialog-surface {
+  min-width: 450px;
+  min-height: 500px;
+}
+
+.mat-mdc-autocomplete-panel .mat-mdc-option.mdc-list-item {
+  background-color: #fff;
+}
+
+.mat-mdc-autocomplete-panel,
+.mat-mdc-autocomplete-panel.mdc-menu-surface,
+.mat-mdc-autocomplete-panel .mdc-list {
+  background-color: var(--ztv-white) !important;
+  opacity: 1;
+}
+
+.mdc-text-field--outlined .mat-mdc-form-field-infix,
+.mdc-text-field--no-label .mat-mdc-form-field-infix {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.mat-mdc-option {
+  min-height: 1.5rem;
+}

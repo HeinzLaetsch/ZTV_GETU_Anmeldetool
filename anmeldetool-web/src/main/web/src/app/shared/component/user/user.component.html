@@ -1,21 +1,31 @@
-<div [formGroup]="form" *ngIf="user">
-  <p *ngIf="showBenutzername">
-    <mat-form-field [appearance]="appearance">
-      <mat-label>Benutzername</mat-label>
-      <input matInput placeholder="Benutzername" formControlName="benutzernameControl" required />
-      <mat-error *ngIf="form.controls.benutzernameControl.hasError('required')"> Pflichtfeld </mat-error>
-      <mat-error *ngIf="form.controls.benutzernameControl.invalid">
-        ungültiger Benutzername Beispiel: hans.muster&#64;turnverein.ch
-      </mat-error>
+test 1
+@if (user()) {
+  test 2
+}
+<div [formGroup]="form">
+  @if (showBenutzername()) {
+    <p>
+      <mat-form-field [appearance]="appearance">
+        <mat-label>Benutzername</mat-label>
+        <input matInput placeholder="Benutzername" formControlName="benutzernameControl" required />
+        @if (form.controls.benutzernameControl.hasError('required')) {
+          <mat-error> Pflichtfeld </mat-error>
+        }
+        @if (form.controls.benutzernameControl.invalid) {
+          <mat-error> ungültiger Benutzername Beispiel: hans.muster&#64;turnverein.ch </mat-error>
+        }
 
-      <mat-hint>Gib eine eMail als Benutzername ein</mat-hint>
-    </mat-form-field>
-  </p>
+        <mat-hint>Gib eine eMail als Benutzername ein</mat-hint>
+      </mat-form-field>
+    </p>
+  }
   <p>
     <mat-form-field [appearance]="appearance">
       <mat-label>Nachname</mat-label>
       <input matInput placeholder="Nachname" formControlName="nachnameControl" required />
-      <mat-error *ngIf="form.controls.nachnameControl.hasError('required')"> Pflichtfeld </mat-error>
+      @if (form.controls.nachnameControl.hasError('required')) {
+        <mat-error> Pflichtfeld </mat-error>
+      }
       <mat-hint>Gib den Nachnamen ein</mat-hint>
     </mat-form-field>
   </p>
@@ -23,49 +33,69 @@
     <mat-form-field [appearance]="appearance">
       <mat-label>Vorname</mat-label>
       <input matInput placeholder="Vorname" formControlName="vornameControl" required />
-      <mat-error *ngIf="form.controls.vornameControl.hasError('required')"> Pflichtfeld </mat-error>
+      @if (form.controls.vornameControl.hasError('required')) {
+        <mat-error> Pflichtfeld </mat-error>
+      }
       <mat-hint>Gib den Vornamen ein</mat-hint>
     </mat-form-field>
   </p>
-  <p *ngIf="showPassword && !mustShowPassword">
-    <mat-checkbox formControlName="passwortAendernControl" [(ngModel)]="showPasswordAendern"
-      >Passwort ändern
-    </mat-checkbox>
-  </p>
-  <p *ngIf="showPasswordAendern || mustShowPassword">
-    <mat-form-field [appearance]="appearance">
-      <mat-label>Passwort</mat-label>
-      <input type="password" matInput placeholder="Passwort" formControlName="passwortControl" />
-      <mat-error *ngIf="form.controls.passwortControl.hasError('required')"> Pflichtfeld </mat-error>
-      <mat-hint>Gib das gleiche Passwort nochmals ein</mat-hint>
-    </mat-form-field>
-  </p>
-  <p *ngIf="showPasswordAendern || mustShowPassword">
-    <mat-form-field [appearance]="appearance">
-      <mat-label>Passwort bestätigen</mat-label>
-      <input type="password" matInput placeholder="Passwort" formControlName="passwort2Control" />
-      <mat-error *ngIf="form.controls.passwort2Control.hasError('required')"> Pflichtfeld </mat-error>
-      <mat-hint>Gib das Passwort nochmals ein</mat-hint>
-    </mat-form-field>
-  </p>
+
+  @if (showPassword() && !mustShowPassword()) {
+    <p>
+      <mat-checkbox formControlName="passwortAendernControl" (change)="showPasswordAendern.set($event.checked)"
+        >Passwort ändern
+      </mat-checkbox>
+    </p>
+  }
+  @if (showPasswordAendern() || mustShowPassword()) {
+    <p>
+      <mat-form-field [appearance]="appearance">
+        <mat-label>Passwort</mat-label>
+        <input type="password" matInput placeholder="Passwort" formControlName="passwortControl" />
+        @if (form.controls.passwortControl.hasError('required')) {
+          <mat-error> Pflichtfeld </mat-error>
+        }
+        <mat-hint>Gib das gleiche Passwort nochmals ein</mat-hint>
+      </mat-form-field>
+    </p>
+  }
+  @if (showPasswordAendern() || mustShowPassword()) {
+    <p>
+      <mat-form-field [appearance]="appearance">
+        <mat-label>Passwort bestätigen</mat-label>
+        <input type="password" matInput placeholder="Passwort" formControlName="passwort2Control" />
+        @if (form.controls.passwort2Control.hasError('required')) {
+          <mat-error> Pflichtfeld </mat-error>
+        }
+        <mat-hint>Gib das Passwort nochmals ein</mat-hint>
+      </mat-form-field>
+    </p>
+  }
+  <!--  
   <p>
     <mat-form-field appearance="fill">
       <mat-label>Mobiltelefon</mat-label>
       <lxt-phone-input formControlName="mobilNummerControl" required></lxt-phone-input>
       <mat-icon matSuffix>phone</mat-icon>
       <mat-hint>Gib die Mobilnummer ein Beispiel: 076 111 11 11</mat-hint>
-      <mat-error *ngIf="form.controls.mobilNummerControl.hasError('required')"> Pflichtfeld </mat-error>
-      <mat-error *ngIf="form.controls.mobilNummerControl.invalid">
-        ungültige Mobile Nummer Beispiel: 076 111 11 11
-      </mat-error>
+      @if (form.controls.mobilNummerControl.hasError('required')) {
+        <mat-error> Pflichtfeld </mat-error>
+      }
+      @if (form.controls.mobilNummerControl.invalid) {
+        <mat-error> ungültige Mobile Nummer Beispiel: 076 111 11 11 </mat-error>
+      }
     </mat-form-field>
-  </p>
+  </p-->
   <p>
     <mat-form-field [appearance]="appearance">
       <mat-label>Kontakt eMail Adresse</mat-label>
       <input matInput placeholder="eMail Adresse" formControlName="eMailAdresseControl" />
-      <mat-error *ngIf="form.controls.eMailAdresseControl.hasError('required')"> Pflichtfeld </mat-error>
-      <mat-error *ngIf="form.controls.eMailAdresseControl.hasError('valid')"> ungültige eMail Adresse </mat-error>
+      @if (form.controls.eMailAdresseControl.hasError('required')) {
+        <mat-error> Pflichtfeld </mat-error>
+      }
+      @if (form.controls.eMailAdresseControl.hasError('valid')) {
+        <mat-error> ungültige eMail Adresse </mat-error>
+      }
       <mat-hint>Gib die eMail Adresse ein</mat-hint>
     </mat-form-field>
   </p>

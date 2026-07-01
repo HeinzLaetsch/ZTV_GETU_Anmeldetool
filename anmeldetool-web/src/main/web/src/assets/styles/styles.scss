@@ -58,6 +58,30 @@
   --ztv-cross-kategorie-geschlossen: rgba(255, 128, 128, 0.78);
   --ztv-in-kategorie-geschlossen: rgba(240, 100, 100, 0.78);
   --ztv-mutationen-geschlossen: rgba(220, 220, 220, 0.21);
+
+  //--mat-form-field-container-vertical-padding: 5px;
+  --mat-sys-corner-extra-small: 10px;
+ 
+  //--mat-option-label-text-line-height: 1.0em;
+  //--mat-option-focus-state-layer-color: rgba(72, 141, 214, 0.5);
+  --mat-form-field-outlined-label-text-font: Roboto, 'Helvetica Neue', sans-serif;
+  --mat-form-field-outlined-label-text-size: 0.8rem;
+  --mat-form-field-outlined-label-text-weight: 300;
+
+  --mat-button-text-label-text-color: var(--ztv-black);
+  --mat-button-text-label-text-color-hover: var(--ztv-black);
+  --mat-button-text-label-text-color-focus: var(--ztv-black);
+  --mat-button-text-label-text-color-disabled: var(--ztv-gray);
+
+  --mat-button-text-label-text-font: Roboto, 'Helvetica Neue', sans-serif;
+  --mat-button-text-label-text-size: 0.8rem;
+  --mat-button-text-label-text-weight: 300;
+
+  --mdc-list-list-item-hover-state-layer-color: inverse-primary;
+
+  // OK 
+  --mat-option-hover-state-layer-color: var(--mat-sys-inverse-primary);
+  --mat-option-selected-state-layer-color: var(--ztv-lighter-gray);
 }
 
 .well {

@@ -1,0 +1,22 @@
+{{- $fullName := print (include "ztv-anmeldetool.fullname" .) "-" "web" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName | quote }}
+spec:
+  replicas: {{ .Values.frontend.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ $fullName | quote }}
+  template:
+    metadata:
+      labels:
+        app: {{ $fullName | quote }}
+    spec:
+      containers:        
+        - name: {{ $fullName | quote }}
+          image: "{{ .Values.image.registry }}/{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+     
+          ports:
+            - containerPort: 80

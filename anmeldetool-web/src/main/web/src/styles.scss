@@ -1,6 +1,8 @@
 @use 'assets/styles/colors' as *;
 @use 'assets/styles/styles';
 
+@use 'assets/theme/ztv-gen-theme';
+
 html,
 body {
   height: 100%;
