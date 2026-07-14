@@ -1,37 +1,35 @@
 import { HttpClient } from '@angular/common/http';
-import { EventEmitter, Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { computed, Injectable, signal } from '@angular/core';
+import { catchError, mapTo, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { IUser } from 'src/app/core/model/IUser';
 import { IVerein } from 'src/app/verein/verein';
 import { environment } from 'src/environments/environment';
 import { ILoginData } from '../../model/ILoginData';
 import { CachingUserService } from '../caching-services/caching.user.service';
-import { CachingVereinService } from '../caching-services/caching.verein.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  apiHost = `${environment.apiHost}`;
-  private loginUrl = this.apiHost + '/admin/login';
-  private VereineUrl = this.apiHost + '/admin/organisationen';
-  private userUrl = this.apiHost + '/admin/user';
+  // Privates Signal für den Login-Status
+  private readonly _isLoggedIn = signal(false);
 
-  // isLoggedIn: boolean = false;
-  token: string;
+  // Read-only Signal für die Komponenten
+  readonly isLoggedIn = computed(() => this._isLoggedIn());
 
-  currentUser: IUser;
-  private _currentVerein: IVerein;
-  private _selectedVerein: IVerein;
+  private readonly apiHost = `${environment.apiHost}`;
+  private readonly loginUrl = this.apiHost + '/admin/login';
+
+  private token = '';
+
+  currentUser!: IUser;
+  private _currentVerein!: IVerein;
+  private _selectedVerein!: IVerein;
 
   constructor(
     private http: HttpClient,
-    private vereinService: CachingVereinService,
     private userService: CachingUserService,
-  ) {
-    // console.info("Service created");
-    this.token = 'undefined';
-  }
+  ) {}
   set currentVerein(verein: IVerein) {
     this._currentVerein = verein;
   }
@@ -58,65 +56,6 @@ export class AuthService {
       this._selectedVerein = verein;
     }
   }
-  createVereinAndUser(verein: IVerein, user: IUser): Observable<IUser> {
-    // console.log("Verein 1: ", verein);
-    const emitter = new EventEmitter<IUser>();
-    this.http.post<IVerein>(this.VereineUrl, verein).subscribe(
-      (verein) => {
-        this.currentVerein = verein;
-        // console.log("Verein 2: ", verein);
-        user.organisationids = [verein.id];
-        this.vereinService.reset().subscribe((result) => console.log('Vereins Cache reloaded: ', result));
-        this.createUser(user).subscribe(
-          (user) => {
-            emitter.emit(user);
-          },
-          (error) => {
-            console.error('Error', error);
-            emitter.error('Fehler beim Erstellen des Benutzers');
-          },
-        );
-      },
-      (error) => {
-        console.error('Error', error);
-        emitter.error('Fehler beim Erstellen des Vereins');
-      },
-    );
-    return emitter.asObservable();
-  }
-
-  createUser(user: IUser): Observable<IUser> {
-    const emitter = new EventEmitter<IUser>();
-    this.http.post<IUser>(this.userUrl, user).subscribe(
-      (user) => {
-        // this.currentUser = user;
-        console.log('User: ', user);
-        emitter.emit(user);
-      },
-      (error) => {
-        if (error.status === 409) {
-          console.error(error.error);
-          emitter.error({
-            message: 'User existiert: ' + error.error,
-          });
-        } else {
-          console.error(error);
-          emitter.error('Fehler beim erstellen des Users: ' + error.error);
-        }
-      },
-    );
-    return emitter.asObservable();
-  }
-
-  updateUser(user: IUser): Observable<IUser> {
-    const emitter = new EventEmitter<IUser>();
-    this.http.put<IUser>(this.userUrl + '/' + user.id, user).subscribe((user) => {
-      // this.currentUser = user;
-      // console.log("User: ", user);
-      emitter.emit(user);
-    });
-    return emitter.asObservable();
-  }
 
   login(verein: IVerein, userName: string, password: string): Observable<IUser> {
     const loginData: ILoginData = {
@@ -124,38 +63,30 @@ export class AuthService {
       username: userName,
       password: password,
     };
-    const emitter = new EventEmitter<IUser>();
-    this.http.post<IUser>(this.loginUrl, loginData).subscribe(
-      (user) => {
-        // console.log("Response: ", user);
+
+    return this.http.post<IUser>(this.loginUrl, loginData).pipe(
+      tap((user) => {
         this.currentUser = user;
         this.currentVerein = verein;
-        this.userService.loadUser().subscribe((result) => {
-          // console.log("Users loaded: ", result);
-        });
-        emitter.emit(user);
-      },
-      (error) => {
-        console.log('Error: ', error);
-        emitter.error(error);
-      },
-      () => {
-        console.log('Completed: ');
-      },
+        this._isLoggedIn.set(true);
+      }),
+      switchMap((user) =>
+        this.userService.loadUser().pipe(
+          mapTo(user),
+          // Keep login successful even if user cache refresh fails.
+          catchError(() => of(user)),
+        ),
+      ),
+      catchError((error) => {
+        this._isLoggedIn.set(false);
+        return throwError(() => error);
+      }),
     );
-    return emitter.asObservable();
-    //  .pipe(catchError(this.handleError<IUser>()));
   }
   /*
    */
   isAuthenticated(): boolean {
-    if (this.currentUser == null) {
-      // console.log('not logged in');
-      return false;
-    } else {
-      //console.log('logged in: ' , this.currentUser);
-      return true;
-    }
+    return this.isLoggedIn();
   }
 
   hasRole(roleName: string): boolean {
@@ -171,38 +102,56 @@ export class AuthService {
     if (this.isAdministrator()) {
       return true;
     }
-    if (this.isAuthenticated()) {return this.hasRole('ANMELDER') || this.isVereinsVerantwortlicher();}
-    else {return false;}
+    if (this.isAuthenticated()) {
+      return this.hasRole('ANMELDER') || this.isVereinsVerantwortlicher();
+    } else {
+      return false;
+    }
   }
 
   isVereinsVerantwortlicher(): boolean {
     if (this.isAdministrator()) {
       return true;
     }
-    if (this.isAuthenticated()) {return this.hasRole('VEREINSVERANTWORTLICHER');}
-    else {return false;}
+    if (this.isAuthenticated()) {
+      return this.hasRole('VEREINSVERANTWORTLICHER');
+    } else {
+      return false;
+    }
   }
 
   isWertungsrichter(): boolean {
     if (this.isAdministrator()) {
       return true;
     }
-    if (this.isAuthenticated()) {return this.hasRole('WERTUNGSRICHTER');}
-    else {return false;}
+    if (this.isAuthenticated()) {
+      return this.hasRole('WERTUNGSRICHTER');
+    } else {
+      return false;
+    }
   }
 
   isAdministrator(): boolean {
-    if (this.isAuthenticated()) {return this.hasRole('ADMINISTRATOR');}
-    else {return false;}
+    if (this.isAuthenticated()) {
+      return this.hasRole('ADMINISTRATOR');
+    } else {
+      return false;
+    }
   }
 
   isRechnungsbuero(): boolean {
-    if (this.isAuthenticated()) {return this.hasRole('RECHNUNGSBUERO');}
-    else {return false;}
+    if (this.isAuthenticated()) {
+      return this.hasRole('RECHNUNGSBUERO');
+    } else {
+      return false;
+    }
   }
   isSekretariat(): boolean {
-    if (this.isAuthenticated()) {return this.hasRole('SEKRETARIAT');}
-    else {return false;}
+    if (this.isAuthenticated()) {
+      return this.hasRole('SEKRETARIAT');
+    } else {
+      return false;
+    }
   }
 
   isAnlassUser(): boolean {

@@ -16,6 +16,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router, RouterModule } from '@angular/router';
+import { switchMap } from 'rxjs';
 import type { IVerband } from 'src/app/core/model/IVerband';
 import { AuthService } from 'src/app/core/service/auth/auth.service';
 import { VerbandService } from 'src/app/core/service/verband/verband.service';
@@ -150,41 +151,53 @@ export class NewVereinComponent implements OnInit {
           this.errorMessage =
             'Es existiert bereits ein Benutzer mit dem Benutzernamen: ' + verantwortlicher.benutzername;
         } else {
-          this.authService.createVereinAndUser(this.verein, verantwortlicher).subscribe(
-            (loggedInUser) => {
-              console.log('Neuer Verein inklusive User kreiert ', loggedInUser.benutzername);
-              // Immer erster !!
-              this.verein.id = loggedInUser.organisationids[0];
-              this.authService.login(this.verein, loggedInUser.benutzername, password).subscribe({
-                next: () => {
-                  this.router.navigate(['anlass']);
+          this.vereinService
+            .createVerein(this.verein)
+            .pipe(
+              switchMap((createdVerein) => {
+                const userWithOrganisation: IUser = {
+                  ...verantwortlicher,
+                  organisationids: [createdVerein.id],
+                };
 
-                  /* ToDo check if preload is realy neccessary
-                         self.userService.reset().subscribe((result) => {
-                           // console.log("Login UserService loaded");
-                         });
-                         */
-                  // TODO check if preload is realy neccessary
-                  /*
-                         self.teilnehmerService
-                           .loadTeilnehmer(self.verein)
-                           .subscribe((result) => {
-                             // console.log("Login teilnehmerService loaded");
+                return this.userService.createUser(userWithOrganisation);
+              }),
+            )
+            .subscribe(
+              (createdUser) => {
+                console.log('Neuer Verein inklusive User kreiert ', createdUser.benutzername);
+                // Immer erster !!
+                this.verein.id = createdUser.organisationids[0];
+                this.authService.login(this.verein, createdUser.benutzername, password).subscribe({
+                  next: () => {
+                    this.router.navigate(['anlass']);
+
+                    /* ToDo check if preload is realy neccessary
+                           self.userService.reset().subscribe((result) => {
+                             // console.log("Login UserService loaded");
                            });
                            */
-                },
-                error: (msg) => {
-                  console.log('Error: ', msg);
-                },
-              });
+                    // TODO check if preload is realy neccessary
+                    /*
+                           self.teilnehmerService
+                             .loadTeilnehmer(self.verein)
+                             .subscribe((result) => {
+                               // console.log("Login teilnehmerService loaded");
+                             });
+                             */
+                  },
+                  error: (msg) => {
+                    console.log('Error: ', msg);
+                  },
+                });
 
-              this.dialogRef.close('OK');
-            },
-            (error) => {
-              this.error = true;
-              this.errorMessage = error;
-            },
-          );
+                this.dialogRef.close('OK');
+              },
+              (error) => {
+                this.error = true;
+                this.errorMessage = error;
+              },
+            );
         }
       },
       (error) => {

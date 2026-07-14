@@ -21,8 +21,8 @@ import type { IUser } from 'src/app/core/model/IUser';
 import { AuthService } from 'src/app/core/service/auth/auth.service';
 import { CachingUserService } from 'src/app/core/service/caching-services/caching.user.service';
 import { VereinService } from 'src/app/core/service/verein/verein.service';
+import { UserService } from 'src/app/core/service/user/user.service';
 import type { IVerein } from 'src/app/verein/verein';
-import { UserComponent } from 'src/app/shared/component/user/user.component';
 
 @Component({
   selector: 'lxt-new-anmelder',
@@ -42,7 +42,6 @@ import { UserComponent } from 'src/app/shared/component/user/user.component';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     RouterModule,
-    UserComponent,
   ],
 })
 export class NewAnmelderComponent implements OnInit {
@@ -87,7 +86,8 @@ export class NewAnmelderComponent implements OnInit {
     public dialogRef: MatDialogRef<NewAnmelderComponent>,
     private authService: AuthService,
     private vereinService: VereinService,
-    private userService: CachingUserService,
+    private cachingUserService: CachingUserService,
+    private userService: UserService,
     private router: Router,
   ) {
     this.form = this.formBuilder.group({
@@ -132,12 +132,12 @@ export class NewAnmelderComponent implements OnInit {
     this._anmelder.rollen = rollen;
 
     this.anmelder.benutzername = this.anmelder.email;
-    this.userService.getUserByBenutzername(this.anmelder.benutzername).subscribe((user) => {
+    this.cachingUserService.getUserByBenutzername(this.anmelder.benutzername).subscribe((user) => {
       if (user) {
         this.error = true;
         this.errorMessage = 'Es existiert bereits ein Benutzer mit dem Benutzernamen: ' + this.anmelder.benutzername;
       } else {
-        this.authService.createUser(this.anmelder).subscribe((user) => {
+        this.userService.createUser(this.anmelder).subscribe((user) => {
           console.log('User kreiert ', user.benutzername);
           this.dialogRef.close('OK');
           this.router.navigate(['profile']);

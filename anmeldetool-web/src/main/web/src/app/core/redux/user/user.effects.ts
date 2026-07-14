@@ -29,7 +29,7 @@ export class UserEffects {
       ofType(UserActions.saveUserInvoked),
       mergeMap((action) => {
         if (action.payload.userAlreadyExists) {
-          return this.authService.updateUser(action.payload).pipe(
+          return this.userService.updateUser(action.payload).pipe(
             switchMap((user) => [
               UserActions.saveUserSuccess({
                 payload: user,
@@ -40,7 +40,7 @@ export class UserEffects {
             }),
           );
         } else {
-          return this.authService.createUser(action.payload).pipe(
+          return this.userService.createUser(action.payload).pipe(
             switchMap((user) => [
               UserActions.saveUserSuccess({
                 payload: user,

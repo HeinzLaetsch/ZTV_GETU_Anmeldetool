@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { IVerein } from 'src/app/verein/verein';
 import { environment } from 'src/environments/environment';
@@ -18,6 +18,23 @@ export class UserService extends ServiceHelper {
 
   constructor(private http: HttpClient) {
     super();
+  }
+  createUser(user: IUser): Observable<IUser> {
+    return this.http.post<IUser>(this.url, user).pipe(
+      catchError((error) => {
+        if (error.status === 409) {
+          return throwError(() => ({
+            message: 'User existiert: ' + error.error,
+          }));
+        }
+
+        return throwError(() => 'Fehler beim erstellen des Users: ' + error.error);
+      }),
+    );
+  }
+
+  updateUser(user: IUser): Observable<IUser> {
+    return this.http.put<IUser>(this.url + '/' + user.id, user);
   }
 
   getUser(): Observable<IUser[]> {

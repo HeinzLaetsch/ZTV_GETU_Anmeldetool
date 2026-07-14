@@ -28,6 +28,14 @@ export class VereinService extends ServiceHelper {
     );
   }
 
+  createVerein(verein: IVerein): Observable<IVerein> {
+    return this.http.post<IVerein>(this.url, verein).pipe(
+      catchError((err, caught) => {
+        return this.handleError('createVerein', err, caught);
+      }),
+    );
+  }
+
   getStarts(): Observable<IOrganisationAnlassLink[]> {
     return this.http.get<IOrganisationAnlassLink[]>(this.url).pipe(
       catchError((err, caught) => {

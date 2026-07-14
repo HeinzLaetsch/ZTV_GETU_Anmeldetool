@@ -1,4 +1,4 @@
-import { Component, type OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -11,19 +11,17 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router, RouterModule } from '@angular/router';
-import { select, Store } from '@ngrx/store';
-import { type Observable, of } from 'rxjs';
-import { map, skip, startWith } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+import { type Observable, combineLatest, of } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/service/auth/auth.service';
 import { CachingUserService } from 'src/app/core/service/caching-services/caching.user.service';
-import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
 import type { IVerein } from 'src/app/verein/verein';
 import type { AppState } from '../../redux/core.state';
 import { selectAlleVereine } from '../../redux/verein';
-import { filter } from 'node_modules/cypress/types/lodash';
 
 @Component({
-  selector: 'lxt-login-dialog',
+  selector: 'ztv-login-dialog',
   templateUrl: './login-dialog.component.html',
   styleUrls: ['./login-dialog.component.scss'],
   standalone: true,
@@ -42,13 +40,11 @@ import { filter } from 'node_modules/cypress/types/lodash';
     RouterModule,
   ],
 })
-export class LoginDialogComponent extends SubscriptionHelper implements OnInit {
+export class LoginComponent {
   appearance = 'outline';
-  loginError: boolean;
+  loginError = false;
   errorMessage: string | undefined = undefined;
 
-  vereine$: Observable<IVerein[]>;
-  vereine: IVerein[] = [];
   loginForm = new FormGroup({
     verein: new FormControl<IVerein | string | null>(null, {
       validators: [Validators.required, this.vereinSelectionValidator],
@@ -63,29 +59,25 @@ export class LoginDialogComponent extends SubscriptionHelper implements OnInit {
     }),
   });
 
-  filteredOptions: Observable<IVerein[]> = of([]);
+  readonly vereine$: Observable<IVerein[]>;
+  readonly filteredOptions: Observable<IVerein[]>;
 
   constructor(
-    public dialogRef: MatDialogRef<LoginDialogComponent>,
+    //public dialogRef: MatDialogRef<LoginDialogComponent>,
     private authService: AuthService,
     private store: Store<AppState>,
     private userService: CachingUserService,
     private router: Router,
   ) {
-    super();
-    this.vereine$ = this.store.select(selectAlleVereine).pipe(skip(1));
-    this.loginError = false;
-  }
+    this.vereine$ = this.store.select(selectAlleVereine);
+    this.filteredOptions = combineLatest([
+      this.vereine$,
+      this.vereinControl.valueChanges.pipe(startWith(this.vereinControl.value)),
+    ]).pipe(
+      map(([vereine, value]) => {
+        const name = typeof value === 'string' ? value : (value?.name ?? '');
 
-  ngOnInit() {
-    this.registerSubscription(
-      this.vereine$.subscribe((data) => {
-        this.vereine = data;
-        this.filteredOptions = this.vereinControl.valueChanges.pipe(
-          startWith(this.vereinControl.value),
-          map((value) => (typeof value === 'string' ? value : (value?.name ?? ''))),
-          map((name) => (name ? this._filter(name) : this.vereine.slice())),
-        );
+        return name ? this._filter(vereine, name) : vereine.slice();
       }),
     );
   }
@@ -110,10 +102,10 @@ export class LoginDialogComponent extends SubscriptionHelper implements OnInit {
     return typeof value === 'string' ? { vereinSelection: true } : null;
   }
 
-  private _filter(name: string): IVerein[] {
+  private _filter(vereine: IVerein[], name: string): IVerein[] {
     const filterValue = name.toLowerCase();
 
-    return this.vereine.filter((option) => option.name.toLowerCase().includes(filterValue));
+    return vereine.filter((option) => option.name.toLowerCase().includes(filterValue));
   }
 
   displayFn(verein: IVerein): string {
@@ -139,7 +131,7 @@ export class LoginDialogComponent extends SubscriptionHelper implements OnInit {
     try {
       this.authService.login(verein, userName, password).subscribe(
         (result) => {
-          this.dialogRef.close('OK');
+          //this.dialogRef.close('OK');
           this.loginError = false;
           this.userService.loadUser().subscribe((result) => {
             // TODO register Error
@@ -168,15 +160,15 @@ export class LoginDialogComponent extends SubscriptionHelper implements OnInit {
   }
 
   onNoClick(): void {
-    this.dialogRef.close();
+    //this.dialogRef.close();
   }
   newVereinClicked(): void {
     console.log('New Anmelder clicked');
-    this.dialogRef.close(1);
+    //this.dialogRef.close(1);
   }
 
   newAnmelderClicked(): void {
     console.log('New Anmelder clicked');
-    this.dialogRef.close(2);
+    //this.dialogRef.close(2);
   }
 }
