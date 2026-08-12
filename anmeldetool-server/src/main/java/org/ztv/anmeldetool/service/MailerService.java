@@ -1,17 +1,44 @@
 package org.ztv.anmeldetool.service;
 
+import java.time.LocalDateTime;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.ztv.anmeldetool.models.Anlass;
+import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.Organisation;
+import org.ztv.anmeldetool.transfer.AnlassDTO;
 import org.ztv.anmeldetool.transfer.AnmeldeKontrolleDTO;
 import org.ztv.anmeldetool.transfer.VereinsStartDTO;
 
 @Service
 public class MailerService {
 
+	private String createTitel(String anlassName, String subject, LocalDateTime startDatum, LocalDateTime endDatum) {
+		String art = startDatum.isBefore(endDatum)
+				? "die "
+				: "den ";
+		return subject + " für " + art + anlassName;
+	}
+	public Map<String, Object> getRiegenAufteilungsDaten(Anlass anlass, Map<String, Boolean> aufgeteilt, Organisation organisation,
+			String subject) {
+
+		Map<String, Object> templateModel = new HashMap();
+
+		templateModel.put("vereinsname", organisation.getName());
+
+		String titel = createTitel(anlass.getAnlassBezeichnung(), subject, anlass.getStartDate(), anlass.getEndDate());
+		templateModel.put("titel", titel );
+		templateModel.put("subject", titel);
+
+    templateModel.putAll(aufgeteilt);
+
+		return templateModel;
+	}
 	public Map<String, Object> getAnmeldeDaten(AnmeldeKontrolleDTO anmeldeKontrolle, Organisation organisation,
 			String subject) {
 
@@ -26,6 +53,7 @@ public class MailerService {
 			templateModel.put("startet", "Dein Verein startet nicht");
 		}
 		String anlassName = anmeldeKontrolle.getDetailAnlassName();
+    //TODO wird nachher überschrieben
 		String art = anmeldeKontrolle.getAnlass().getStartDatum().equals(anmeldeKontrolle.getAnlass().getEndDatum())
 				? "den "
 				: "die ";

@@ -54,6 +54,9 @@ logging.level.org:
   ztv.anmeldetool.service: INFO
 # 0 */5 * * * ?
 scheduler:
+   riegenaufteilung:
+    cron: "0 0 1 * * ?"
+    daysbefore: 7
    reminder:
       cron: "0 0 1 * * ?"
       daysbefore: 3

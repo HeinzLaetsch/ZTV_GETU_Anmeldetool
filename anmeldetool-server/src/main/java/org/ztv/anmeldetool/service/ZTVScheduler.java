@@ -4,21 +4,14 @@ import jakarta.activation.DataSource;
 import jakarta.mail.util.ByteArrayDataSource;
 import jakarta.transaction.Transactional;
 import jakarta.transaction.Transactional.TxType;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.ztv.anmeldetool.models.Anlass;
+import org.ztv.anmeldetool.models.KategorieEnum;
+import org.ztv.anmeldetool.models.MailTypeEnum;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.OrganisationPersonLink;
 import org.ztv.anmeldetool.models.Person;
@@ -29,6 +22,18 @@ import org.ztv.anmeldetool.output.AnmeldeKontrolleOutput;
 import org.ztv.anmeldetool.output.WertungsrichterOutput;
 import org.ztv.anmeldetool.repositories.OrganisationAnlassLinkRepository;
 import org.ztv.anmeldetool.transfer.AnmeldeKontrolleDTO;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,6 +50,9 @@ public class ZTVScheduler {
   private final MailerService mailerService;
   private final EmailService mailService;
 
+  @Value("${info.app.web:'https://ztv-anmeldetool.duckdns.org/ztv-anmeldetool'}")
+  private String web;
+
   @Value("${spring.mail.simulate}")
   private boolean simulate;
   @Value("${spring.mail.username:''}")
@@ -59,6 +67,38 @@ public class ZTVScheduler {
 
   @Value("${scheduler.mutationen.daysbefore}")
   private int mutationenDaysBefore;
+
+  @Value("${scheduler.riegenaufteilung.daysbefore}")
+  private int riegenAufteilungDaysBefore;
+
+  @Transactional(value = TxType.REQUIRES_NEW)
+  @Scheduled(cron = "${scheduler.riegenaufteilung.cron}")
+  public void riegenAufteilungCheck() {
+    log.info("Riegenaufteilung check fired");
+
+    List<Anlass> anlaesse = anlassSrv.getAnlaesse(true);
+
+    List<Anlass> filteredAnlaesse = anlaesse.stream().filter(anlass -> {
+      boolean riegenAufteilungSent = !anlass.isRiegenAufteilungSent();
+      boolean isSameDay = anlass.getStartDate().minusDays(riegenAufteilungDaysBefore)
+          .toLocalDate().isEqual(LocalDateTime.now().toLocalDate());
+      return riegenAufteilungSent && isSameDay;
+    }).toList();
+
+    log.info("Found {} Anläss", filteredAnlaesse.size());
+
+    //MOVe
+    filteredAnlaesse.forEach(anlass -> {
+      Map<Organisation, HashMap<String, Boolean>> aufgeteilt = anmeldekontrolSrv.getAufgeteilteRiegen(anlass);
+      boolean success= sendAufteilungsMailIfNeeded(anlass, aufgeteilt, "Riegenaufteilung");
+      if (!success) {
+        log.warn("Senden von Riegenaufteilung für Anlass {} ist fehlgeschlagen", anlass.getAnlassBezeichnung());
+      }
+      anlass.setRiegenAufteilungSent(success);
+      anlassSrv.updateAnlass(anlass);
+
+    });
+  }
 
   @Transactional(value = TxType.REQUIRES_NEW)
   @Scheduled(cron = "${scheduler.reminder.cron}")
@@ -143,7 +183,8 @@ public class ZTVScheduler {
         List<Organisation> allZHOrgs = orgSrv.getAllZuercherOrganisationen();
         allZHOrgs.forEach(org -> {
           if (!simulate || (simulate && !allreadySent.get())) {
-            sendMailToOrg(anlass, org, subject, anlass.getErfassenGeschlossen(), datumText, false);
+            sendMailToOrg(anlass, org, subject, anlass.getErfassenGeschlossen(), datumText,
+                MailTypeEnum.ANLASSPUBLISHEDMAIL, null);
             allreadySent.set(true);
           }
         });
@@ -152,6 +193,22 @@ public class ZTVScheduler {
       }
     });
 
+  }
+
+  private boolean sendAufteilungsMailIfNeeded(Anlass anlass, Map<Organisation, HashMap<String, Boolean>> aufgeteilt, String subject) {
+    AtomicBoolean success = new AtomicBoolean(false);
+    aufgeteilt.forEach((org, kategorieMap) -> {
+      if (kategorieMap.containsValue(true)) {
+        log.info("sendAufteilungsMailIfNeeded Anlass: {}, Org: {}, Wettkampf {}", anlass.getAnlassBezeichnung(), org.getName(), subject);
+        if (!anlass.isRiegenAufteilungSent()) {
+          success.set(sendMailToOrg(anlass, org, subject, anlass.getErfassenGeschlossen(), "Riegenaufteilung", MailTypeEnum.RIEGENAUFTEILUNG,
+                kategorieMap));
+        }
+      } else {
+        log.info("No need to send Mail: Anlass: {}, Org: {}, Wettkampf {}", anlass.getAnlassBezeichnung(), org.getName(), subject);
+      }
+    });
+    return success.get();
   }
 
   private void sendReminderMailIfNeeded(List<Anlass> filteredAnlaesse, String subject,
@@ -164,7 +221,8 @@ public class ZTVScheduler {
         List<Organisation> allZHOrgs = orgSrv.getAllZuercherOrganisationen();
         allZHOrgs.forEach(org -> {
           if (!simulate || (simulate && !allreadySent.get())) {
-            sendMailToOrg(anlass, org, subject, anlass.getErfassenGeschlossen(), datumText, true);
+            sendMailToOrg(anlass, org, subject, anlass.getErfassenGeschlossen(), datumText,
+                MailTypeEnum.ANMELDEKONTROLLMAIL, null);
             allreadySent.set(true);
           }
         });
@@ -177,31 +235,39 @@ public class ZTVScheduler {
 
   private boolean sendMailToOrg(Anlass anlass, Organisation org, String subject,
       LocalDateTime datum,
-      String datumText, boolean kontrollMail) {
+      String datumText, MailTypeEnum mailType, Map data) {
     Stream<OrganisationPersonLink> oplStream = org.getPersonenLinks().stream().filter(pl -> {
-      return pl.getRollenLink().stream().filter(rolle -> {
+      return pl.getRollenLink().stream().anyMatch(rolle -> {
         log.debug("Name : {}", pl.getPerson().getBenutzername());
         return rolle.getRolle().getName().equals(RollenEnum.VEREINSVERANTWORTLICHER.name())
             || rolle.getRolle().getName().equals(RollenEnum.ANMELDER.name());
-      }).count() > 0;
+      });
     });
-    AtomicBoolean error = new AtomicBoolean(false);
+    AtomicBoolean success = new AtomicBoolean(false);
     oplStream.forEach(opl -> {
-      // Person person =
-      // this.personSrv.findPersonByBenutzername("heinz.laetsch@gmx.ch");
-      if (kontrollMail) {
-        log.debug("Sende Mail an: {} / {}", opl.getOrganisation().getName(),
-            opl.getPerson().getEmail());
-        if (!sendAnmeldeKontrolleMail(anlass, org, opl.getPerson(), subject, datum, datumText)) {
-          error.set(true);
-        }
-      } else {
-        if (!sendPublishedMail(anlass, org, opl.getPerson(), subject, datum, datumText)) {
-          error.set(true);
-        }
+      log.info("Sende {} Mail an: {} / {}", mailType.name(), opl.getOrganisation().getName(),
+          opl.getPerson().getEmail());
+      switch (mailType) {
+        case ANMELDEKONTROLLMAIL:
+          if (sendAnmeldeKontrolleMail(anlass, org, opl.getPerson(), subject, datum, datumText)) {
+            success.set(true);
+          }
+          break;
+        case ANLASSPUBLISHEDMAIL:
+          if (sendPublishedMail(anlass, org, opl.getPerson(), subject, datum, datumText)) {
+            success.set(true);
+          }
+          break;
+        case RIEGENAUFTEILUNG:
+          if (sendRiegenAufteilungMail(anlass, org, opl.getPerson(), subject, datum, datumText, data)) {
+            success.set(true);
+          }
+          break;
+        default:
+          throw new IllegalArgumentException("Unsupported mail type: " + mailType);
       }
     });
-    return error.get();
+    return success.get();
   }
 
   private void sendClosedMailIfNeeded(List<Anlass> filteredAnlaesse, String subject,
@@ -211,10 +277,10 @@ public class ZTVScheduler {
       anlass.getOrganisationenLinks().forEach(oal -> {
         Organisation org = oal.getOrganisation();
         if (oal.isAktiv() && !oal.isAnmeldeKontrolleSent()) {
-          boolean error = sendMailToOrg(anlass, org, subject, anlass.getErfassenGeschlossen(),
+          boolean success = sendMailToOrg(anlass, org, subject, anlass.getErfassenGeschlossen(),
               datumText,
-              true);
-          if (!error) {
+              MailTypeEnum.ANMELDEKONTROLLMAIL, null);
+          if (success) {
             oal.setAnmeldeKontrolleSent(true);
             oalRepo.save(oal);
           }
@@ -231,10 +297,10 @@ public class ZTVScheduler {
       anlass.getOrganisationenLinks().forEach(oal -> {
         Organisation org = oal.getOrganisation();
         if (oal.isAktiv() && !oal.isReminderMutationsschlussSent()) {
-          boolean error = sendMailToOrg(anlass, org, subject,
+          boolean success = sendMailToOrg(anlass, org, subject,
               anlass.getAenderungenInKategorieGeschlossen(),
-              datumText, true);
-          if (!error) {
+              datumText, MailTypeEnum.ANMELDEKONTROLLMAIL, null);
+          if (success) {
             oal.setReminderMutationsschlussSent(true);
             oalRepo.save(oal);
           }
@@ -250,7 +316,6 @@ public class ZTVScheduler {
     Map<String, Object> templateModel = mailerService.getPublishedDaten(anmeldeKontrolle, subject,
         org);
 
-    // Map<String, Object> templateModel = new HashMap();
     templateModel.put("recipientName", person.getEmail());
     templateModel.put("text", "AnmeldeKontrolle Daten");
     templateModel.put("senderName", sender);
@@ -260,6 +325,26 @@ public class ZTVScheduler {
 
     this.mailService.sendMessage(person, templateModel.get("subject").toString(), "published.html",
         templateModel);
+    return true;
+  }
+
+  private boolean sendRiegenAufteilungMail(Anlass anlass, Organisation org, Person person,
+      String subject,
+      LocalDateTime datum, String datumText, Map<String, Boolean> data) {
+    if (data != null) {
+      Map<String, Object> templateModel = mailerService.getRiegenAufteilungsDaten(anlass, data, org,
+          subject);
+      templateModel.put("recipientName", person.getEmail());
+      templateModel.put("text", "Riegenaufteilung");
+      templateModel.put("web", web);
+      templateModel.put("senderName", sender);
+      DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+      templateModel.put("datum", datum.format(formatters));
+      templateModel.put("datumText", datumText);
+      this.mailService.sendMessage(person, templateModel.get("subject").toString(),
+          "riegen-aufteilung.html",
+          templateModel);
+    }
     return true;
   }
 
@@ -275,7 +360,6 @@ public class ZTVScheduler {
     Map<String, Object> templateModel = mailerService.getAnmeldeDaten(anmeldeKontrolle, org,
         subject);
 
-    // Map<String, Object> templateModel = new HashMap();
     templateModel.put("recipientName", person.getEmail());
     templateModel.put("text", "AnmeldeKontrolle Daten");
     templateModel.put("senderName", sender);
@@ -307,7 +391,7 @@ public class ZTVScheduler {
         "application/pdf");
     sourceWertungsrichter.setName("Wertungsrichter");
 
-    DataSource[] sources = new ByteArrayDataSource[]{sourceAnmeldekontrolle, sourceWertungsrichter};
+    DataSource[] sources = new ByteArrayDataSource[] {sourceAnmeldekontrolle, sourceWertungsrichter};
 
     this.mailService.sendMessage(person, templateModel.get("subject").toString(),
         "anmelde-status.html",

@@ -78,6 +78,8 @@ public class Anlass extends Base {
 
 	private boolean ausserkantonal;
 
+	private boolean riegenAufteilungSent;
+
 	/*
 	 * @Column(name = "sieger_total_k5") private float siegerTotalK5;
 	 * 

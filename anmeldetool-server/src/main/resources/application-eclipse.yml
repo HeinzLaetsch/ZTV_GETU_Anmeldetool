@@ -7,7 +7,7 @@ spring:
     locations: ["classpath:/db/migration"]
   jpa:
      database-platform: org.hibernate.dialect.PostgreSQLDialect
-     show-sql: "true"
+     show-sql: "false"
      properties:
         hibernate:
            jdbc:
@@ -34,6 +34,7 @@ info:
     name: Anmeldetool
     version: "@version@"
     buildtime: "@timestamp@"
+    web: "https://ztv-anmeldetool.duckdns.org/ztv-anmeldetool"
 
 logging:
   level:
@@ -44,18 +45,21 @@ logging:
     org.hibernate.SQL: INFO
     org.hibernate.type: WARN
     org.ztv.anmeldetool: INFO
-# Sec Min Hours Day_of_Month Month Day_of_week Year    
+# Sec Min Hours Day_of_Month Month Day_of_week Year
 scheduler:
-   reminder:
+    riegenaufteilung:
       cron: "20 * * * * *"
-      daysbefore: 3
-   closed:
-      cron: "20 * * * * *"
-      daysafter: 1
-   mutationen:
+      daysbefore: 24
+    reminder:
       cron: "0/10 1 * * 12 *"
       daysbefore: 3
-   published:
+    closed:
+      cron: "0/10 1 * * 12 *"
+      daysafter: 1
+    mutationen:
+      cron: "0/10 1 * * 12 *"
+      daysbefore: 3
+    published:
       cron: "0/10 1 * * 12 *" 
       
 management:

@@ -100,7 +100,9 @@ public class AnlassService extends AbstractBaseService<Anlass> {
    return getAnlaesse(false).stream()
        .filter(a -> a.getStartDate().isBefore(anlass.getStartDate())
            && a.getTiefsteKategorie().ordinal() <= kategorie.ordinal()
-           && a.getHoechsteKategorie().ordinal() >= kategorie.ordinal())
+           && a.getHoechsteKategorie().ordinal() >= kategorie.ordinal()
+           // ignore GLZ RMS
+       && a.getEndDate().isBefore(LocalDateTime.of(2026, 5,30, 0 , 0)))
        .min((a1, a2) -> a2.getStartDate().compareTo(a1.getStartDate()));
   }
   @Transactional()

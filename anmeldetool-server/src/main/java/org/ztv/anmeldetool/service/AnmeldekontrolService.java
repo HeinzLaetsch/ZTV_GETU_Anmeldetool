@@ -1,16 +1,13 @@
 package org.ztv.anmeldetool.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.ztv.anmeldetool.models.AnlageEnum;
 import org.ztv.anmeldetool.models.Anlass;
+import org.ztv.anmeldetool.models.GeraetEnum;
 import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.Organisation;
-import org.ztv.anmeldetool.models.PersonAnlassLink;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.models.TiTuEnum;
 import org.ztv.anmeldetool.models.WertungsrichterBrevetEnum;
@@ -18,6 +15,16 @@ import org.ztv.anmeldetool.transfer.AnmeldeKontrolleDTO;
 import org.ztv.anmeldetool.transfer.VereinsStartDTO;
 import org.ztv.anmeldetool.util.AnlassMapper;
 import org.ztv.anmeldetool.util.OrganisationMapper;
+import org.ztv.anmeldetool.util.OrganisationPersonLinkMapper;
+
+import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -27,6 +34,7 @@ import org.ztv.anmeldetool.util.OrganisationMapper;
 @Slf4j
 @AllArgsConstructor
 public class AnmeldekontrolService {
+  private final OrganisationPersonLinkMapper organisationPersonLinkMapper;
 
   private final OrganisationAnlassLinkService organisationAnlassLinkService;
 
@@ -75,11 +83,12 @@ public class AnmeldekontrolService {
     }
   }
 
-  private void calculateCounts(VereinsStartDTO vereinsStart, List<TeilnehmerAnlassLink> participations, KategorieEnum category, TiTuEnum titu) {
+  private void calculateCounts(VereinsStartDTO vereinsStart, List<TeilnehmerAnlassLink> participations, KategorieEnum category,
+      TiTuEnum titu) {
     List<TeilnehmerAnlassLink> filteredParticipations = filterParticipations(participations, category, titu);
 
-    String countFieldName = category.name().substring(0,1).toLowerCase()+ category.name().substring(1) + "_"+titu.name();
-    String talsFieldName = "tals_" + category.name() + "_"+titu.name();
+    String countFieldName = category.name().substring(0, 1).toLowerCase() + category.name().substring(1) + "_" + titu.name();
+    String talsFieldName = "tals_" + category.name() + "_" + titu.name();
 
     setFieldValue(vereinsStart, countFieldName, filteredParticipations.size());
     setFieldValue(vereinsStart, talsFieldName, filteredParticipations);
@@ -135,6 +144,7 @@ public class AnmeldekontrolService {
 
     return vereinsStart;
   }
+
   public AnmeldeKontrolleDTO getAnmeldeKontrolle(Anlass anlass, Organisation organisation) {
 
     List<Organisation> orgs = organisationAnlassLinkService.getVereinsStarts(anlass);
@@ -145,12 +155,78 @@ public class AnmeldekontrolService {
     }
 
     List<VereinsStartDTO> vereinsStarts = orgs.stream()
-        .map( org -> createVereinsStartDto(anlass, org))
+        .map(org -> createVereinsStartDto(anlass, org))
         .toList();
 
     return new AnmeldeKontrolleDTO(anlassMapper.toDto(anlass),
         vereinsStarts,
         orgMapper.toDto(anlass.getOrganisator()));
+  }
+
+  List<TeilnehmerAnlassLink> sortParticipants(List<TeilnehmerAnlassLink> participants) {
+      AtomicInteger i = new AtomicInteger();
+      participants = participants.stream()
+          .peek(participant -> log.debug(
+              "Participant before sorting: index {}, Name {}, TiTu: {}, Kategorie: {}, Abteilung: {}, Anlage: {}, Startgeraet: {}",
+              i.getAndIncrement(),
+              participant != null && participant.getTeilnehmer() != null ? participant.getTeilnehmer().getName() : "null",
+              participant != null && participant.getTeilnehmer() != null ? participant.getTeilnehmer().getTiTu() : "null",
+              participant != null ? participant.getKategorie() : "null",
+              participant != null ? participant.getAbteilung() : "null",
+              participant != null ? participant.getAnlage() : "null",
+              participant != null ? participant.getStartgeraet() : "null"))
+          .filter(participant -> (
+              participant != null && participant.getTeilnehmer() != null && participant.getTeilnehmer().getTiTu() != null)
+              && participant.getKategorie() != null
+              && participant.getAbteilung() != null
+              && participant.getAnlage() != null
+              && participant.getStartgeraet() != null)
+          .sorted(
+              //participants.sort(
+              Comparator.nullsFirst(
+                  Comparator.comparing(TeilnehmerAnlassLink::getKategorie)
+//                      .thenComparing(TeilnehmerAnlassLink::getKategorie)
+                      .thenComparing(TeilnehmerAnlassLink::getAbteilung)
+                      .thenComparing(TeilnehmerAnlassLink::getAnlage)
+                      .thenComparing(TeilnehmerAnlassLink::getStartgeraet)
+                      .thenComparing(link -> link.getTeilnehmer().getTiTu())
+              ))
+          .toList();
+    return participants;
+  }
+
+  public Map<Organisation, HashMap<String, Boolean>> getAufgeteilteRiegen(Anlass anlass) {
+    List<Organisation> orgs = organisationAnlassLinkService.getVereinsStarts(anlass);
+    var aufgeteilteRiegen = new HashMap<Organisation, HashMap<String, Boolean>>();
+    orgs.forEach(org -> {
+      List<TeilnehmerAnlassLink> allParticipations = anlassSrv.getTeilnahmen(anlass, org, true);
+
+      allParticipations = sortParticipants(allParticipations);
+      AtomicReference<TiTuEnum> tiTu = new AtomicReference<>(TiTuEnum.Alle);
+      AtomicReference<KategorieEnum> kategorie = new AtomicReference<>(KategorieEnum.KEIN_START);
+      AtomicReference<AnlageEnum> anlage = new AtomicReference<>(AnlageEnum.UNDEFINED);
+      AtomicReference<GeraetEnum> geraet = new AtomicReference<>(GeraetEnum.UNDEFINED);
+      var aufgeteilt = new HashMap<String, Boolean>();
+      allParticipations.forEach(participant -> {
+        if (tiTu.get() != participant.getTeilnehmer().getTiTu() || kategorie.get() != participant.getKategorie()) {
+          tiTu.set(participant.getTeilnehmer().getTiTu());
+          kategorie.set(participant.getKategorie());
+          aufgeteilt.put(tiTu.get().name()+participant.getKategorie().name(), false);
+          anlage.set(participant.getAnlage());
+          geraet.set(participant.getStartgeraet());
+        } else {
+          if (participant.getAnlage() != anlage.get() || participant.getStartgeraet() != geraet.get()) {
+            log.info("Split found for Organisation {}, Kategorie: {}, Anlage: {}/{}, Geraet: {}/{}", org.getName(), participant.getKategorie(), anlage.get(),
+                participant.getAnlage(), geraet.get(), participant.getStartgeraet());
+            aufgeteilt.put(tiTu.get().name()+participant.getKategorie().name(), true);
+            anlage.set(participant.getAnlage());
+            geraet.set(participant.getStartgeraet());
+          }
+        }
+      });
+      aufgeteilteRiegen.put(org, aufgeteilt);
+    });
+    return aufgeteilteRiegen;
   }
 }
 
