@@ -4,7 +4,7 @@ import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validator
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -19,6 +19,7 @@ import { CachingUserService } from 'src/app/core/service/caching-services/cachin
 import type { IVerein } from 'src/app/verein/verein';
 import type { AppState } from '../../redux/core.state';
 import { selectAlleVereine } from '../../redux/verein';
+import { NewVereinComponent } from '../new-verein/new-verein.component';
 
 @Component({
   selector: 'ztv-login-dialog',
@@ -68,6 +69,7 @@ export class LoginComponent {
     private store: Store<AppState>,
     private userService: CachingUserService,
     private router: Router,
+    private dialog: MatDialog,
   ) {
     this.vereine$ = this.store.select(selectAlleVereine);
     this.filteredOptions = combineLatest([
@@ -163,8 +165,14 @@ export class LoginComponent {
     //this.dialogRef.close();
   }
   newVereinClicked(): void {
-    console.log('New Anmelder clicked');
-    //this.dialogRef.close(1);
+    console.log('New Verein clicked');
+    this.dialog.open(NewVereinComponent, {
+      width: '600px',
+      height: 'auto',
+      maxHeight: '90vh',
+      disableClose: true,
+      panelClass: 'ztv-dialog',
+    });
   }
 
   newAnmelderClicked(): void {

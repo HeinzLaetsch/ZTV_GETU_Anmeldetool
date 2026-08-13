@@ -7,3 +7,23 @@ html,
 body {
   height: 100%;
 }
+
+.max-height-dialog {
+  .mat-mdc-dialog-container .mdc-dialog__surface {
+    max-height: 80vh !important; // Bezieht sich auf 80% des Bildschirms
+    height: 100%;
+  }
+}
+
+.ztv-dialog {
+  .mat-mdc-dialog-container .mdc-dialog__surface {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mat-mdc-dialog-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    /* Aktiviert das Scrollen */
+  }
+}
