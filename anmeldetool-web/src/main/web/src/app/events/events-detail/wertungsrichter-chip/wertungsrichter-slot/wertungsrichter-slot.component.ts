@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, EventEmitter, Input, type OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, input, type OnInit, Output } from '@angular/core';
 import { AnzeigeStatusEnum } from 'src/app/core/model/AnzeigeStatusEnum';
 import type { IAnlass } from 'src/app/core/model/IAnlass';
 import type { IPersonAnlassLink } from 'src/app/core/model/IPersonAnlassLink';
@@ -16,22 +16,14 @@ import { CachingAnlassService } from 'src/app/core/service/caching-services/cach
   standalone: true,
 })
 export class WertungsrichterSlotComponent implements OnInit {
-  @Input()
-  isVereinsAnmelder: boolean;
-  @Input()
-  isVereinsVerantwortlicher: boolean;
-  @Input()
-  slot: IWertungsrichterSlot;
-  @Input()
-  wertungsrichter: IUser;
-  @Input()
-  wrAnlassLink: IPersonAnlassLink;
-  @Input()
-  einsatz: IWertungsrichterEinsatz;
-  @Input()
-  private anlass: IAnlass;
-  @Input()
-  private egalIsAktiv: boolean;
+  readonly isVereinsAnmelder = input<boolean>(false);
+  readonly isVereinsVerantwortlicher = input<boolean>(false);
+  readonly slot = input.required<IWertungsrichterSlot>();
+  readonly wertungsrichter = input.required<IUser>();
+  readonly wrAnlassLink = input.required<IPersonAnlassLink>();
+  readonly einsatz = input.required<IWertungsrichterEinsatz>();
+  readonly anlass = input.required<IAnlass>();
+  readonly egalIsAktiv = input<boolean>(false);
 
   @Output()
   wrEinsatzChange = new EventEmitter<IWertungsrichterEinsatz>();
@@ -46,11 +38,11 @@ export class WertungsrichterSlotComponent implements OnInit {
   }
 
   isCheckboxDisabled() {
-    if (this.egalIsAktiv) {
+    if (this.egalIsAktiv()) {
       return true;
     }
-    if (!this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)) {
-      if (!this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED)) {
+    if (!this.anlass().anzeigeStatus.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)) {
+      if (!this.anlass().anzeigeStatus.hasStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED)) {
         return false;
       }
     }
@@ -58,38 +50,38 @@ export class WertungsrichterSlotComponent implements OnInit {
   }
 
   userEingesetztgmodelchange(value): void {
-    this.einsatz.eingesetzt = value;
+    this.einsatz().eingesetzt = value;
     this.anlassService
-      .updateWrEinsatz(this.authservice.currentVerein, this.wrAnlassLink, this.einsatz)
+      .updateWrEinsatz(this.authservice.currentVerein, this.wrAnlassLink(), this.einsatz())
       .subscribe((wrEinsatz) => {
         this.wrEinsatzChange.emit(wrEinsatz);
       });
   }
   getSlotText(): string {
     let text = '';
-    if (this.slot.tag) {
-      const tag = this.datePipe.transform(this.slot.tag, 'dd-yyyy-MM');
+    if (this.slot().tag) {
+      const tag = this.datePipe.transform(this.slot().tag, 'dd-yyyy-MM');
       text += tag;
     }
-    if (this.slot.startzeit) {
-      const start = this.datePipe.transform(this.slot.startzeit, 'hh:mm');
+    if (this.slot().startzeit) {
+      const start = this.datePipe.transform(this.slot().startzeit, 'hh:mm');
       if (text.length > 0) {
         text += ' ';
       }
       text += start;
     }
-    if (this.slot.endzeit) {
-      const end = this.datePipe.transform(this.slot.endzeit, 'hh:mm');
+    if (this.slot().endzeit) {
+      const end = this.datePipe.transform(this.slot().endzeit, 'hh:mm');
       if (text.length > 0) {
         text += ' ';
       }
       text += end;
     }
-    if (this.slot.beschreibung) {
+    if (this.slot().beschreibung) {
       if (text.length > 0) {
         text += ' ';
       }
-      text += this.slot.beschreibung;
+      text += this.slot().beschreibung;
     }
 
     return text;
@@ -99,6 +91,6 @@ export class WertungsrichterSlotComponent implements OnInit {
     if (this.isCheckboxDisabled()) {
       return false;
     }
-    return this.authservice.isVereinsAnmmelder() || this.authservice.isVereinsVerantwortlicher();
+    return this.authservice.isVereinsAnmmelderSig() || this.authservice.isVereinsVerantwortlicherSig();
   }
 }

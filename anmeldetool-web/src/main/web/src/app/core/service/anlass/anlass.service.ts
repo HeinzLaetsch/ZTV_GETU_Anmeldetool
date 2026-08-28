@@ -96,13 +96,13 @@ export class AnlassService extends ServiceHelper {
       brevet +
       '/' +
       'verfuegbar';
-    // console.log("getVerfuegbareWertungsrichter called: ", combinedUrl);
+    console.log("getVerfuegbareWertungsrichter called: ", combinedUrl);
     if (!anlass) {
       return of(undefined as unknown as IUser[]);
     }
     return this.http.get<IUser[]>(combinedUrl).pipe(
-      catchError((err, caught) => {
-        return this.handleError('getVerfuegbareWertungsrichter', err, caught);
+      catchError((err) => {
+        return this.handleError('getVerfuegbareWertungsrichter', err, undefined, []);
       }),
     );
   }
@@ -122,7 +122,7 @@ export class AnlassService extends ServiceHelper {
       brevet +
       '/' +
       'eingeteilt';
-    // console.log("getEingeteilteWertungsrichter called: ", combinedUrl);
+    console.log("getEingeteilteWertungsrichter called: ", combinedUrl);
     if (!anlass) {
       return of(undefined as unknown as IPersonAnlassLink[]);
     }

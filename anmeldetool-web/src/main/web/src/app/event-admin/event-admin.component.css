@@ -30,6 +30,7 @@ mat-form-field {
 .move-checkbox {
   top: 5px;
 }
-.row {
+.row,
+.layout-row {
   margin-right: 0px !important;
 }

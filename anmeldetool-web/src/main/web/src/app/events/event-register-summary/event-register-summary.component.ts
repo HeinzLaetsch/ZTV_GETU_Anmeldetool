@@ -1,7 +1,9 @@
-import { Component, type OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
-import type { Observable } from 'rxjs';
+import { filter, map, switchMap } from 'rxjs';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import type { AnzeigeStatusEnum } from 'src/app/core/model/AnzeigeStatusEnum';
 import type { IAnlass } from 'src/app/core/model/IAnlass';
 import type { IAnlassSummary } from 'src/app/core/model/IAnlassSummary';
@@ -15,238 +17,260 @@ import { selectVereinById } from 'src/app/core/redux/verein';
 import { AnlassService } from 'src/app/core/service/anlass/anlass.service';
 import { AuthService } from 'src/app/core/service/auth/auth.service';
 import { WertungsrichterService } from 'src/app/core/service/wertungsrichter.service';
-import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
 import type { IVerein } from 'src/app/verein/verein';
+
+const EMPTY_ANLASS: IAnlass = {
+  id: '',
+  anzeigeStatus: { hasStatus: () => false },
+  ausserkantonal: false,
+  bank: '',
+  endDatum: '',
+  erfassenGeschlossen: '',
+  getCleaned: () => '',
+  halle: '',
+  hoechsteKategorie: KategorieEnum.K1,
+  iban: '',
+  ort: '',
+  startDatum: '',
+  tiefsteKategorie: KategorieEnum.K1,
+  tiTu: '' as TiTuEnum,
+  zuGunsten: '',
+} as unknown as IAnlass;
+
+const EMPTY_SUMMARY: IAnlassSummary = {
+  startet: false,
+  startendeBr1: 0,
+  startendeBr2: 0,
+  startendeK1: 0,
+  startendeK2: 0,
+  startendeK3: 0,
+  startendeK4: 0,
+  startendeK5: 0,
+  startendeK5A: 0,
+  startendeK5B: 0,
+  startendeK6: 0,
+  startendeKD: 0,
+  startendeKH: 0,
+  startendeK7: 0,
+} as unknown as IAnlassSummary;
+
+const EMPTY_VEREIN: IVerein = {
+  name: '',
+} as unknown as IVerein;
 
 @Component({
   selector: 'lxt-event-register-summary',
   templateUrl: './event-register-summary.component.html',
   styleUrls: ['./event-register-summary.component.css'],
   standalone: true,
+  imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EventRegisterSummaryComponent extends SubscriptionHelper implements OnInit {
-  anlass: IAnlass;
-  anlass$: Observable<IAnlass>;
-  // organisationAnlassLink: IOrganisationAnlassLink;
+export class EventRegisterSummaryComponent {
+  private readonly authService = inject(AuthService);
+  private readonly store = inject<Store<AppState>>(Store);
+  private readonly anlassService = inject(AnlassService);
+  private readonly wertungsrichterService = inject(WertungsrichterService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly angWindow = inject(Window);
 
-  anlassSummary: IAnlassSummary;
-  organisator: IVerein;
+  private readonly anlassIdSig = toSignal(this.route.paramMap.pipe(map((params) => params.get('id') ?? '')), {
+    initialValue: '',
+  });
 
-  assignedWr1s = [] as IUser[];
-  assignedWr2s = [] as IUser[];
+  private readonly anlassSig = toSignal(
+    toObservable(this.anlassIdSig).pipe(switchMap((anlassId) => this.store.pipe(select(selectAnlassById(anlassId))))),
+    {
+      initialValue: undefined as IAnlass | undefined,
+    },
+  );
 
-  //anzahlTeilnehmer;
+  private readonly anlassSummarySig = toSignal(
+    toObservable(this.anlassSig).pipe(
+      filter((anlass): anlass is IAnlass => Boolean(anlass)),
+      switchMap((anlass) => this.anlassService.getAnlassOrganisationSummary(anlass, this.authService.currentVerein)),
+    ),
+    {
+      initialValue: undefined as IAnlassSummary | undefined,
+    },
+  );
 
-  constructor(
-    public authService: AuthService,
-    private store: Store<AppState>,
-    private anlassService: AnlassService,
-    private wertungsrichterService: WertungsrichterService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private angWindow: Window,
-  ) {
-    super();
+  private readonly organisatorSig = toSignal(
+    toObservable(this.anlassSig).pipe(
+      filter((anlass): anlass is IAnlass => Boolean(anlass)),
+      switchMap((anlass) => this.store.pipe(select(selectVereinById(anlass.organisatorId)))),
+    ),
+    {
+      initialValue: undefined as IVerein | undefined,
+    },
+  );
+
+  private readonly assignedWr1sSig = toSignal(
+    toObservable(this.anlassSig).pipe(
+      filter((anlass): anlass is IAnlass => Boolean(anlass)),
+      switchMap((anlass) => this.wertungsrichterService.getEingeteilteWertungsrichter(anlass, 1)),
+    ),
+    {
+      initialValue: [] as IUser[],
+    },
+  );
+
+  private readonly assignedWr2sSig = toSignal(
+    toObservable(this.anlassSig).pipe(
+      filter((anlass): anlass is IAnlass => Boolean(anlass)),
+      switchMap((anlass) => this.wertungsrichterService.getEingeteilteWertungsrichter(anlass, 2)),
+    ),
+    {
+      initialValue: [] as IUser[],
+    },
+  );
+
+  readonly titelSig = computed(() => {
+    const anlass = this.anlassSig();
+    const verein = this.authService.currentVerein;
+
+    if (!anlass || !verein) {
+      return '';
+    }
+
+    return `${anlass.getCleaned()} - ${verein.name}`;
+  });
+
+  readonly vereinStartedSig = computed(() => this.anlassSummarySig()?.startet ?? false);
+
+  readonly totalTeilnehmerSig = computed(
+    () => (this.anlassSummarySig()?.startendeBr1 ?? 0) + (this.anlassSummarySig()?.startendeBr2 ?? 0),
+  );
+
+  readonly hasTeilnehmerSig = computed(() => this.totalTeilnehmerSig() > 0);
+
+  readonly statusWertungsrichterSig = computed(() =>
+    this.wertungsrichterService.getStatusWertungsrichter(
+      this.anlassSummarySig() ?? EMPTY_SUMMARY,
+      this.assignedWr1sSig(),
+      this.assignedWr2sSig(),
+    ),
+  );
+
+  readonly isWertungsrichterOkSig = computed(() => {
+    if (!this.hasTeilnehmerSig()) {
+      return true;
+    }
+
+    const status = this.statusWertungsrichterSig();
+    return status === WertungsrichterStatusEnum.OK || status === WertungsrichterStatusEnum.KEINEPFLICHT;
+  });
+
+  readonly brevet1AnlassSig = computed(() => (this.anlassSig() ?? EMPTY_ANLASS).tiefsteKategorie < KategorieEnum.K5);
+  readonly brevet2AnlassSig = computed(() => (this.anlassSig() ?? EMPTY_ANLASS).hoechsteKategorie > KategorieEnum.K4);
+  readonly tuAnlassSig = computed(() => {
+    const tiTus = Object.keys(TiTuEnum);
+    const tiTu = (this.anlassSig() ?? EMPTY_ANLASS).tiTu;
+
+    return tiTus.indexOf(tiTu) === 1 || tiTus.indexOf(tiTu) === 2;
+  });
+  readonly tiAnlassSig = computed(() => {
+    const tiTus = Object.keys(TiTuEnum);
+    const tiTu = (this.anlassSig() ?? EMPTY_ANLASS).tiTu;
+
+    return tiTus.indexOf(tiTu) === 0 || tiTus.indexOf(tiTu) === 2;
+  });
+
+  get anlass(): IAnlass {
+    return this.anlassSig() ?? EMPTY_ANLASS;
   }
 
-  ngOnInit() {
-    const anlassId: string = this.route.snapshot.params.id;
-    this.anlass$ = this.store.pipe(select(selectAnlassById(anlassId)));
-    this.registerSubscription(
-      this.anlass$.subscribe((data) => {
-        this.anlass = data;
-        this.loadAnlassRelated();
-      }),
-    );
-    // console.log("url param: ", anlassId);
-    // this.anlass = this.anlassService.getAnlassById(anlassId);
+  get anlassSummary(): IAnlassSummary {
+    return this.anlassSummarySig() ?? EMPTY_SUMMARY;
   }
 
-  private loadAnlassRelated() {
-    this.registerSubscription(
-      this.anlassService
-        .getAnlassOrganisationSummary(this.anlass, this.authService.currentVerein)
-        .subscribe((result) => {
-          this.anlassSummary = result;
-        }),
-    );
-    this.registerSubscription(
-      this.store.pipe(select(selectVereinById(this.anlass.organisatorId))).subscribe((result) => {
-        this.organisator = result;
-      }),
-    );
-
-    /*
-
-
-    this.registerSubscription(
-      this.anlassService
-        .getVereinStart(this.anlass, this.authService.currentVerein)
-        .subscribe((result) => {
-          this.organisationAnlassLink = result;
-          this.anlass.erfassenVerlaengert = result.verlaengerungsDate;
-        })
-    );
-    this.anzahlTeilnehmer = 0;
-    // Ersetzen mit Summary ?
-    this.registerSubscription(
-      this.anlassService
-        .loadTeilnahmen(this.anlass, this.authService.currentVerein, true)
-        .subscribe((result) => {
-          if (result) {
-            const links = this.anlassService.getTeilnehmerForAnlass(
-              this.anlass
-            );
-            if (links) {
-              this.anzahlTeilnehmer = links.filter((link) => {
-                return link.kategorie !== KategorieEnum.KEINE_TEILNAHME;
-              }).length;
-            }
-          }
-        })
-    );
-    */
-    this.fillassignedWrs();
+  get organisator(): IVerein {
+    return this.organisatorSig() ?? EMPTY_VEREIN;
   }
 
-  print() {
+  get assignedWr1s(): IUser[] {
+    return this.assignedWr1sSig();
+  }
+
+  get assignedWr2s(): IUser[] {
+    return this.assignedWr2sSig();
+  }
+
+  print(): void {
     this.angWindow.print();
   }
-  printWRs() {
-    this.registerSubscription(
-      this.anlassService
-        .getVereinWertungsrichterKontrollePdf(this.anlass, this.authService.currentVerein)
-        .subscribe((result) => {}),
-    );
+
+  printWRs(): void {
+    this.anlassService.getVereinWertungsrichterKontrollePdf(this.anlass, this.authService.currentVerein).subscribe();
   }
 
   get titel(): string {
-    return this.anlass.getCleaned() + ' - ' + this.authService.currentVerein.name;
+    return this.titelSig();
   }
+
   get vereinStarted(): boolean {
-    // return this.organisationAnlassLink?.startet;
-    return this.anlassSummary?.startet;
+    return this.vereinStartedSig();
   }
 
   getTeilnahmenForKategorieK1(): number {
-    /*
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K1
-    ).length;
-    */
     return this.anlassSummary.startendeK1;
   }
+
   getTeilnahmenForKategorieK2(): number {
-    /*
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K2
-    ).length;
-    */
     return this.anlassSummary.startendeK2;
   }
+
   getTeilnahmenForKategorieK3(): number {
-    /*
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K3
-    ).length;
-    */
     return this.anlassSummary.startendeK3;
   }
+
   getTeilnahmenForKategorieK4(): number {
-    /*
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K4
-    ).length;
-    */
     return this.anlassSummary.startendeK4;
   }
+
   getTeilnahmenForKategorieK5(): number {
-    /*
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K5
-    ).length;
-    */
     return this.anlassSummary.startendeK5;
   }
+
   getTeilnahmenForKategorieK5A(): number {
-    /*
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K5A
-    ).length;
-    */
     return this.anlassSummary.startendeK5A;
   }
+
   getTeilnahmenForKategorieK5B(): number {
-    /*
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K5B
-    ).length;
-    */
     return this.anlassSummary.startendeK5B;
   }
+
   getTeilnahmenForKategorieK6(): number {
-    /*
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K6
-    ).length;
-    */
     return this.anlassSummary.startendeK6;
   }
+
   getTeilnahmenForKategorieKD(): number {
-    /*
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.KD
-    ).length;
-    */
     return this.anlassSummary.startendeKD;
   }
+
   getTeilnahmenForKategorieKH(): number {
-    /*
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.KH
-    ).length;
-    */
     return this.anlassSummary.startendeKH;
   }
+
   getTeilnahmenForKategorieK7(): number {
-    /*
-    return this.anlassService.getTeilnahmenForKategorie(
-      this.anlass,
-      KategorieEnum.K7
-    ).length;
-    */
     return this.anlassSummary.startendeK7;
   }
 
   get brevet1Anlass(): boolean {
-    return this.anlass.tiefsteKategorie < KategorieEnum.K5;
+    return this.brevet1AnlassSig();
   }
 
   get brevet2Anlass(): boolean {
-    const b2 = this.anlass.hoechsteKategorie > KategorieEnum.K4;
-    return b2;
+    return this.brevet2AnlassSig();
   }
 
   get tuAnlass(): boolean {
-    const tiTus = Object.keys(TiTuEnum);
-    const tuAnlass = tiTus.indexOf(this.anlass.tiTu) === 1 || tiTus.indexOf(this.anlass.tiTu) === 2;
-    return tuAnlass;
+    return this.tuAnlassSig();
   }
 
   get tiAnlass(): boolean {
-    const tiTus = Object.keys(TiTuEnum);
-    const tiuAnlass = tiTus.indexOf(this.anlass.tiTu) === 0 || tiTus.indexOf(this.anlass.tiTu) === 2;
-    return tiuAnlass;
+    return this.tiAnlassSig();
   }
 
   isEnabled(): boolean {
@@ -257,86 +281,55 @@ export class EventRegisterSummaryComponent extends SubscriptionHelper implements
     if (this.anlass.anzeigeStatus.hasStatus(anzeigeStatus)) {
       return 'div-red';
     }
+
     return 'div-green';
   }
 
-  getStartedClass() {
-    if (!this.anlassSummary?.startet) {
+  getStartedClass(): { redNoMargin?: boolean; greenNoMargin?: boolean } {
+    if (!this.vereinStarted) {
       return { redNoMargin: true };
-    } else {
-      return { greenNoMargin: true };
     }
+
+    return { greenNoMargin: true };
   }
 
   get totalTeilnehmer(): number {
-    return this.anlassSummary.startendeBr1 + this.anlassSummary.startendeBr2;
+    return this.totalTeilnehmerSig();
   }
 
   get hasTeilnehmer(): boolean {
-    return this.totalTeilnehmer > 0;
+    return this.hasTeilnehmerSig();
   }
 
-  getTeilnehmerClass() {
+  getTeilnehmerClass(): { redNoMargin?: boolean; greenNoMargin?: boolean } {
     if (this.hasTeilnehmer) {
       return { greenNoMargin: true };
-    } else {
-      return { redNoMargin: true };
     }
+
+    return { redNoMargin: true };
   }
 
-  getWertungsrichterClass() {
+  getWertungsrichterClass(): { redNoMargin?: boolean; greenNoMargin?: boolean } {
     if (this.hasTeilnehmer) {
       return { greenNoMargin: true };
-    } else {
-      return { redNoMargin: true };
     }
-  }
-  handleClickMe(event: PointerEvent) {
-    // this.anlassClick.emit(this.anlass.anlassBezeichnung);
-    this.router.navigate(['/anlass/', this.anlass?.id]);
+
+    return { redNoMargin: true };
   }
 
-  vereinStartedClicked(event: PointerEvent) {
+  handleClickMe(_event: PointerEvent): void {
+    this.router.navigate(['/anlass/', this.anlass.id]);
+  }
+
+  vereinStartedClicked(event: PointerEvent): void {
     console.log(event);
-    /*
-    event.cancelBubble = true;
-    this.registerSubscription(
-      this.anlassService
-        .updateVereinsStart(this.organisationAnlassLink)
-        .subscribe((result) => {
-          console.log("Clicked: ", result);
-        })
-    );
-    */
   }
 
   get isWertungsrichterOk(): boolean {
-    if (this.hasTeilnehmer) {
-      return (
-        this.statusWertungsrichter === WertungsrichterStatusEnum.OK ||
-        this.statusWertungsrichter === WertungsrichterStatusEnum.KEINEPFLICHT
-      );
-    }
-    return true;
+    return this.isWertungsrichterOkSig();
   }
 
   get statusWertungsrichter(): WertungsrichterStatusEnum {
-    return this.wertungsrichterService.getStatusWertungsrichter(
-      this.anlassSummary,
-      this.assignedWr1s,
-      this.assignedWr2s,
-    );
-  }
-  fillassignedWrs() {
-    this.registerSubscription(
-      this.wertungsrichterService
-        .getEingeteilteWertungsrichter(this.anlass, 1)
-        .subscribe((assignedWrs) => (this.assignedWr1s = assignedWrs)),
-    );
-    this.registerSubscription(
-      this.wertungsrichterService
-        .getEingeteilteWertungsrichter(this.anlass, 2)
-        .subscribe((assignedWrs) => (this.assignedWr2s = assignedWrs)),
-    );
+    return this.statusWertungsrichterSig();
   }
 }

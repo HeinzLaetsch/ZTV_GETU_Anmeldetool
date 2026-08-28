@@ -34,11 +34,11 @@ export class BusyIndicatorProgressBarEffects {
   loadingProcessStopped$ = createEffect(() => {
     return this.actions$.pipe(
       filter((action) => {
-        return action.type.includes('finished');
+        return action.type.includes('success');
       }),
       map((action) => {
         const updatedLoadingState: Update<ILoading> = {
-          id: action.type.substring(0, action.type.indexOf('finished')).toLowerCase(),
+          id: action.type.substring(0, action.type.indexOf('success')).toLowerCase(),
           changes: {
             finishedDate: new Date(),
             isLoading: false,
@@ -57,12 +57,12 @@ export class BusyIndicatorProgressBarEffects {
   loadingProcessError$ = createEffect(() => {
     return this.actions$.pipe(
       filter((action) => {
-        return action.type.includes('fehler');
+        return action.type.includes('error');
       }),
       map((action: any) => {
         console.log('Action ', action);
         const updatedLoadingState: Update<ILoading> = {
-          id: action.type.toUpperCase().substring(0, action.type.indexOf('FEHLER')),
+          id: action.type.substring(0, action.type.indexOf('error')).toLowerCase(),
           changes: {
             finishedDate: new Date(),
             isLoading: false,
@@ -71,13 +71,13 @@ export class BusyIndicatorProgressBarEffects {
             message: action.error?.message,
           },
         };
-        return LoadingActions.loadingEventFehler({
+        return LoadingActions.loadingEventFinished({
           payload: updatedLoadingState,
         });
       }),
     );
   });
-
+  /*
   loadingProcessProcessed$ = createEffect(() => {
     return this.actions$.pipe(
       filter((action) => {
@@ -89,4 +89,5 @@ export class BusyIndicatorProgressBarEffects {
       }),
     );
   });
+  */
 }

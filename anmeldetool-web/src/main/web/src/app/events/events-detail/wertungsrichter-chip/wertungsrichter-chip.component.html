@@ -1,67 +1,73 @@
-<ng-container *ngIf="wertungsrichter !== undefined; else loading">
+@if (wertungsrichterSig()) {
   <div
-    class="container chip drag-drop-box"
+    class="layout-container chip drag-drop-box"
     cdkDrag
     #tooltip="matTooltip"
     matTooltip="Ziehe (Drag & Drop) den Wertungsrichter rüber"
     matTooltipPosition="above"
     matTooltipHideDelay="100"
   >
-    <div class="row">
-      <div class="col-10">
+    <div class="layout-row">
+      <div class="layout-col-10">
         <span
           [ngClass]="{
-            'h2-green': wertungsrichter.gueltig,
-            'h2-red': !wertungsrichter.gueltig,
+            'h2-green': wertungsrichterSig()?.gueltig,
+            'h2-red': !wertungsrichterSig()?.gueltig,
           }"
-          >{{ wertungsrichterUser.vorname + ' ' + wertungsrichterUser.name }}</span
+          >{{ wertungsrichterUser().vorname + ' ' + wertungsrichterUser().name }}</span
         >
       </div>
-      <div class="col-2">Brevet {{ wertungsrichter.brevet }}</div>
+      <div class="layout-col-2">Brevet {{ wertungsrichterSig()?.brevet }}</div>
     </div>
-    <div class="row" *ngIf="!isAllWertungsrichterList && wertungsrichterUser.pal">
-      <div class="col">Einsätze</div>
-    </div>
-    <div class="row" *ngIf="!isAllWertungsrichterList">
-      <div class="col doubleRow">
-        <lxt-wertungsrichter-slot
-          *ngFor="let slot of getSlotsForBrevet()"
-          [slot]="slot"
-          [wrAnlassLink]="wrAnlassLink"
-          [wertungsrichter]="wertungsrichterUser"
-          [einsatz]="getEinsatzForSlot(slot)"
-          [anlass]="anlass"
-          (wrEinsatzChange)="wrEinsatzChange($event)"
-          [egalIsAktiv]="egalIsAktiv(slot)"
-        >
-        </lxt-wertungsrichter-slot>
-        <mat-form-field *ngIf="wertungsrichterUser.pal" class="full-width" appearance="fill">
-          <mat-label>Kommentar</mat-label>
-          <input
-            matInput
-            placeholder="Kommentar"
-            [(ngModel)]="wertungsrichterUser.pal.kommentar"
-            (change)="kommentarChange($event)"
-            [disabled]="!changeAllowed"
-          />
-          <button
-            *ngIf="wertungsrichterUser.pal.kommentar"
-            [disabled]="!changeAllowed"
-            matSuffix
-            mat-icon-button
-            aria-label="leeren"
-            (click)="wertungsrichterUser.pal.kommentar = ''"
-          >
-            <mat-icon>close</mat-icon>
-          </button>
-        </mat-form-field>
+    @if (!isAllWertungsrichterList() && wertungsrichterUser().pal) {
+      <div class="layout-row">
+        <div class="layout-col">Einsätze</div>
       </div>
-    </div>
+    }
+    @if (!isAllWertungsrichterList()) {
+      <div class="layout-row">
+        <div class="layout-col doubleRow">
+          @for (slot of getSlotsForBrevet(); track slot.id) {
+            <lxt-wertungsrichter-slot
+              [slot]="slot"
+              [wrAnlassLink]="wrAnlassLink"
+              [wertungsrichter]="wertungsrichterUser()"
+              [einsatz]="getEinsatzForSlot(slot)"
+              [anlass]="anlass()"
+              (wrEinsatzChange)="wrEinsatzChange($event)"
+              [egalIsAktiv]="egalIsAktiv(slot)"
+            >
+            </lxt-wertungsrichter-slot>
+          }
+          @if (wertungsrichterUser().pal) {
+            <mat-form-field class="full-width" appearance="fill">
+              <mat-label>Kommentar</mat-label>
+              <input
+                matInput
+                placeholder="Kommentar"
+                [(ngModel)]="wertungsrichterUser().pal.kommentar"
+                (change)="kommentarChange($event)"
+                [disabled]="!changeAllowed()"
+              />
+              @if (wertungsrichterUser().pal.kommentar) {
+                <button
+                  [disabled]="!changeAllowed()"
+                  matSuffix
+                  mat-icon-button
+                  aria-label="leeren"
+                  (click)="wertungsrichterUser().pal.kommentar = ''"
+                >
+                  <mat-icon>close</mat-icon>
+                </button>
+              }
+            </mat-form-field>
+          }
+        </div>
+      </div>
+    }
   </div>
-</ng-container>
-
-<ng-template #loading>
+} @else {
   <div class="center">
     <mat-spinner style="margin: 0 auto"></mat-spinner>
   </div>
-</ng-template>
+}

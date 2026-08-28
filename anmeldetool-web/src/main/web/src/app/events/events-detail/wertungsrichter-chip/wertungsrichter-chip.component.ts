@@ -1,4 +1,14 @@
-import { Component, EventEmitter, Input, type OnChanges, type OnInit, Output, type SimpleChanges } from '@angular/core';
+import {
+  Component,
+  computed,
+  EventEmitter,
+  input,
+  type OnChanges,
+  type OnInit,
+  Output,
+  signal,
+  type SimpleChanges,
+} from '@angular/core';
 import type { IAnlass } from 'src/app/core/model/IAnlass';
 import type { IUser } from 'src/app/core/model/IUser';
 import type { IWertungsrichter } from 'src/app/core/model/IWertungsrichter';
@@ -15,25 +25,20 @@ import { CachingUserService } from 'src/app/core/service/caching-services/cachin
   standalone: true,
 })
 export class WertungsrichterChipComponent implements OnInit, OnChanges {
-  @Input()
-  isVereinsAnmelder: boolean;
-  @Input()
-  isVereinsVerantwortlicher: boolean;
-  @Input()
-  isAllWertungsrichterList: boolean;
-  @Input()
-  wertungsrichterUser: IUser;
-  @Input()
-  anlass: IAnlass;
-  @Input()
-  useBrevet2: boolean;
-  @Input()
-  changeAllowed: boolean;
+  readonly isVereinsAnmelder = input<boolean>(false);
+  readonly isVereinsVerantwortlicher = input<boolean>(false);
+  readonly isAllWertungsrichterList = input<boolean>(false);
+  readonly wertungsrichterUser = input.required<IUser>();
+  readonly anlass = input.required<IAnlass>();
+  readonly useBrevet2 = input<boolean>(false);
+  readonly changeAllowed = input<boolean>(false);
 
   @Output()
   wertungsrichterUserChange = new EventEmitter<IUser>();
 
-  wertungsrichter: IWertungsrichter;
+  readonly wertungsrichterSig = signal<IWertungsrichter | undefined>(undefined);
+
+  readonly hasWertungsrichter = computed(() => this.wertungsrichterSig() !== undefined);
 
   constructor(
     private authservice: AuthService,
@@ -47,31 +52,31 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    this.userService.getWertungsrichter(this.wertungsrichterUser.id).subscribe((value) => {
+    this.userService.getWertungsrichter(this.wertungsrichterUser().id).subscribe((value) => {
       if (value) {
-        this.wertungsrichter = value;
+        this.wertungsrichterSig.set(value);
       }
     });
   }
   wrEinsatzChange(wrEinsatz: IWertungsrichterEinsatz) {
-    this.wertungsrichterUserChange.emit(this.wertungsrichterUser);
+    this.wertungsrichterUserChange.emit(this.wertungsrichterUser());
   }
 
   kommentarChange(value): void {
     console.log('Value changed: ', value);
-    this.wertungsrichterUser.pal.kommentar = value.target.value;
+    this.wertungsrichterUser().pal.kommentar = value.target.value;
     this.anlassService
-      .updateAnlassLink(this.wertungsrichterUser.pal, this.authservice.currentVerein)
+      .updateAnlassLink(this.wertungsrichterUser().pal, this.authservice.currentVerein)
       .subscribe((pal) => {
         console.log('Pal saved: ', pal.kommentar);
       });
   }
   getSlotsForBrevet(): IWertungsrichterSlot[] {
-    const slots = this.anlass.wertungsrichterSlots.filter((slot) => {
-      if (this.useBrevet2) {
+    const slots = this.anlass().wertungsrichterSlots.filter((slot) => {
+      if (this.useBrevet2()) {
         return slot.brevet === 1;
       } else {
-        return slot.brevet === this.wertungsrichter.brevet;
+        return slot.brevet === this.wertungsrichterSig()?.brevet;
       }
     });
     return slots;
@@ -79,7 +84,7 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
 
   getEinsatzForSlot(slot: IWertungsrichterSlot): IWertungsrichterEinsatz {
     // console.log("getEinsatzForSlot: ", slot, this.wertungsrichterUser);
-    const einsatz = this.wertungsrichterUser?.pal?.einsaetze?.filter((einsatz) => {
+    const einsatz = this.wertungsrichterUser()?.pal?.einsaetze?.filter((einsatz) => {
       return einsatz.wertungsrichterSlotId === slot.id;
     })?.[0];
     return einsatz;
@@ -93,7 +98,7 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
     return egalSlot.egalSlot;
   }
   get wrAnlassLink() {
-    return this.wertungsrichterUser.pal;
+    return this.wertungsrichterUser().pal;
   }
 
   private getEgalSlot(): IWertungsrichterSlot {

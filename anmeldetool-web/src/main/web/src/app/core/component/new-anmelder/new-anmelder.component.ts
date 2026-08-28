@@ -1,4 +1,4 @@
-import { Component, type OnInit } from '@angular/core';
+import { Component, inject, signal, type OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormsModule,
@@ -16,12 +16,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router, RouterModule } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 import type { IRolle } from 'src/app/core/model/IRolle';
 import type { IUser } from 'src/app/core/model/IUser';
-import { AuthService } from 'src/app/core/service/auth/auth.service';
 import { CachingUserService } from 'src/app/core/service/caching-services/caching.user.service';
 import { VereinService } from 'src/app/core/service/verein/verein.service';
 import { UserService } from 'src/app/core/service/user/user.service';
+import { UserComponent } from 'src/app/shared/component/user/user.component';
 import type { IVerein } from 'src/app/verein/verein';
 
 @Component({
@@ -42,103 +43,84 @@ import type { IVerein } from 'src/app/verein/verein';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     RouterModule,
+    UserComponent,
   ],
 })
 export class NewAnmelderComponent implements OnInit {
   //floatLabel = 'Always';
   appearance = 'outline';
-  form: UntypedFormGroup;
-  vereine: IVerein[];
-  verein: IVerein = {
+  private readonly formBuilder = inject(UntypedFormBuilder);
+  readonly dialogRef = inject(MatDialogRef<NewAnmelderComponent>);
+  private readonly vereinService = inject(VereinService);
+  private readonly cachingUserService = inject(CachingUserService);
+  private readonly userService = inject(UserService);
+  private readonly router = inject(Router);
+
+  readonly form: UntypedFormGroup = this.formBuilder.group({
+    vereinFormControl: ['', Validators.required],
+  });
+
+  readonly vereine = toSignal(this.vereinService.getVereine(), { initialValue: [] as IVerein[] });
+
+  readonly userValid = signal(false);
+  readonly error = signal(false);
+  readonly errorMessage = signal<string | undefined>(undefined);
+
+  readonly anmelder = signal<IUser>({
     id: '-1',
     name: '',
     verbandId: '',
-  };
-
-  _anmelder: IUser = {
     organisationids: ['-1'],
-    name: '',
     vorname: '',
     password: '',
     benutzername: '',
     email: '',
     handy: '',
     aktiv: true,
-  };
-  vereinsName = '';
-  nachname = '';
-  vorname = '';
-  passwort = '';
-  mobilNummer = '';
-  eMailAdresse = '';
+  });
 
-  selectedCountry: string;
-
-  mouseoverlogin: boolean;
-
-  userValid: boolean;
-
-  error: boolean;
-  errorMessage = undefined;
-
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    public dialogRef: MatDialogRef<NewAnmelderComponent>,
-    private authService: AuthService,
-    private vereinService: VereinService,
-    private cachingUserService: CachingUserService,
-    private userService: UserService,
-    private router: Router,
-  ) {
-    this.form = this.formBuilder.group({
-      vereinFormControl: ['', Validators.required],
-    });
-  }
+  constructor() {}
 
   ngOnInit() {
-    this.vereinService.getVereine().subscribe((vereine) => {
-      this.vereine = vereine;
-    });
-    this._anmelder.name = this.nachname;
-    this._anmelder.vorname = this.vorname;
-    this._anmelder.password = this.passwort;
-    this._anmelder.email = this.eMailAdresse;
-    this._anmelder.handy = this.mobilNummer;
+    this.anmelder.update((current) => ({
+      ...current,
+      organisationids: ['-1'],
+    }));
   }
 
-  updateUserValid(valid: boolean) {
-    this.userValid = valid;
+  updateUserValid(valid: boolean): void {
+    this.userValid.set(valid);
     console.log('Valid changed', valid);
   }
 
-  get anmelder() {
-    return this._anmelder;
-  }
-  set anmelder(anmelder: IUser) {
+  updateAnmelder(anmelder: IUser): void {
     console.log('Anmelder changed', anmelder);
-    this._anmelder = anmelder;
+    this.anmelder.set(anmelder);
   }
 
   save(): void {
     const rollen: IRolle[] = [{ id: '', name: 'ANMELDER', aktiv: false }];
     console.log('Verein: ', this.form.controls.vereinFormControl.value);
-    if (!this.anmelder.organisationids) {
-      this.anmelder.organisationids = [];
+    const currentAnmelder = this.anmelder();
+    if (!currentAnmelder.organisationids) {
+      currentAnmelder.organisationids = [];
     }
-    this.anmelder.organisationids = this.anmelder.organisationids.slice(0, 0);
-    this.anmelder.organisationids.push(this.form.controls.vereinFormControl.value);
+    currentAnmelder.organisationids = currentAnmelder.organisationids.slice(0, 0);
+    currentAnmelder.organisationids.push(this.form.controls.vereinFormControl.value);
 
-    this._anmelder.aktiv = true;
-    this._anmelder.rollen = rollen;
+    currentAnmelder.aktiv = true;
+    currentAnmelder.rollen = rollen;
 
-    this.anmelder.benutzername = this.anmelder.email;
-    this.cachingUserService.getUserByBenutzername(this.anmelder.benutzername).subscribe((user) => {
+    currentAnmelder.benutzername = currentAnmelder.email;
+    this.cachingUserService.getUserByBenutzername(currentAnmelder.benutzername).subscribe((user) => {
       if (user) {
-        this.error = true;
-        this.errorMessage = 'Es existiert bereits ein Benutzer mit dem Benutzernamen: ' + this.anmelder.benutzername;
+        this.error.set(true);
+        this.errorMessage.set(
+          'Es existiert bereits ein Benutzer mit dem Benutzernamen: ' + currentAnmelder.benutzername,
+        );
       } else {
-        this.userService.createUser(this.anmelder).subscribe((user) => {
-          console.log('User kreiert ', user.benutzername);
+        this.userService.createUser(currentAnmelder).subscribe((createdUser) => {
+          console.log('User kreiert ', createdUser.benutzername);
           this.dialogRef.close('OK');
           this.router.navigate(['profile']);
         });

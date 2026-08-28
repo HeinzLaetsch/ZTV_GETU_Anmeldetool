@@ -1,21 +1,21 @@
 <ng-container>
   <h1 class="label">Rollen</h1>
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col">
+  <div class="layout-container-fluid">
+    <div class="layout-row">
+      <div class="layout-col">
         <h2>verfügbare Rollen</h2>
       </div>
-      <div class="col">
+      <div class="layout-col">
         <h2>zugewiesene Rollen</h2>
       </div>
     </div>
-    <div class="row">
+    <div class="layout-row">
       <div
         cdkDropList
         #allRolesList="cdkDropList"
         [cdkDropListData]="allRoles"
         [cdkDropListConnectedTo]="[assignedRolesList]"
-        class="drag-drop-list col"
+        class="drag-drop-list layout-col"
         (cdkDropListDropped)="drop($event)"
       >
         <div class="drag-drop-box" *ngFor="let role of allRoles" cdkDrag [cdkDragDisabled]="disableRole(role)">
@@ -27,7 +27,7 @@
         #assignedRolesList="cdkDropList"
         [cdkDropListData]="assignedRoles"
         [cdkDropListConnectedTo]="[allRolesList]"
-        class="drag-drop-list col"
+        class="drag-drop-list layout-col"
         (cdkDropListDropped)="drop($event)"
       >
         <div class="drag-drop-box" *ngFor="let role of assignedRoles" cdkDrag [cdkDragDisabled]="disableRole(role)">

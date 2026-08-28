@@ -8,10 +8,7 @@
   },
   "namedInputs": {
     "sharedGlobals": [],
-    "default": [
-      "{projectRoot}/**/*",
-      "sharedGlobals"
-    ],
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [
       "default",
       "!{projectRoot}/tsconfig.spec.json",
@@ -33,35 +30,24 @@
   },
   "targetDefaults": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "production",
-        "^production"
-      ],
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"],
       "cache": true
     },
     "test": {
-      "inputs": [
-        "defau//lt",
-        "^production",
-        "{workspaceRoot}/karma.conf.js"
-      ],
+      "inputs": ["defau//lt", "^production", "{workspaceRoot}/karma.conf.js"],
       "cache": true
     },
     "e2e": {
-      "inputs": [
-        "default",
-        "^production"
-      ]
+      "inputs": ["default", "^production"]
     },
     "serve": {
       "cache": true
-    }
+    },
+    "useInferencePlugins": false,
+    "defaultBase": "main",
+    "analytics": false,
+    "neverConnectToCloud": true
   },
-  "useInferencePlugins": false,
-  "defaultBase": "main",
-  "analytics": false,
-  "neverConnectToCloud": true
+  "analytics": false
 }

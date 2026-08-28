@@ -23,7 +23,7 @@ export class EventStartListRowComponent implements OnInit {
   }
 
   get administrator(): boolean {
-    return this.authService.isAdministrator();
+    return this.authService.isAdministratorSig();
   }
 
   get showDetail(): boolean {

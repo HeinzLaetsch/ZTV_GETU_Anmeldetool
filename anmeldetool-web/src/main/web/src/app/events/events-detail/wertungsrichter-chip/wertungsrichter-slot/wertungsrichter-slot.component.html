@@ -1,18 +1,19 @@
-<div *ngIf="einsatz; else loading" class="slot">
-  <mat-checkbox
-    [ngClass]="{
-      'label-green': einsatz.eingesetzt,
-      'label-red': !einsatz.eingesetzt,
-    }"
-    [(ngModel)]="einsatz.eingesetzt"
-    [disabled]="!canEdit()"
-    (ngModelChange)="userEingesetztgmodelchange($event)"
-    >{{ getSlotText() }}</mat-checkbox
-  >
-</div>
-
-<ng-template #loading>
+@if (einsatz) {
+  <div class="slot">
+    <mat-checkbox
+      [ngClass]="{
+        'label-green': einsatz().eingesetzt,
+        'label-red': !einsatz().eingesetzt,
+      }"
+      [(ngModel)]="einsatz().eingesetzt"
+      [disabled]="!canEdit()"
+      (ngModelChange)="userEingesetztgmodelchange($event)"
+      >{{ getSlotText() }}</mat-checkbox
+    >
+  </div>
+} @else {
   <div class="center">
     <mat-spinner style="margin: 0 auto"></mat-spinner>
   </div>
-</ng-template>
+}
+

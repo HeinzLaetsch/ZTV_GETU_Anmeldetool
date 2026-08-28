@@ -1,192 +1,230 @@
-<div *ngIf="vereinStarted; else nostart">
-  <div id="printArea" class="container-sm">
-    <div class="row">
-      <div class="col-sm-7">
-        <h1>Startliste</h1>
+@if (vereinStarted) {
+  <div>
+    <div id="printArea" class="layout-container-sm">
+      <div class="layout-row">
+        <div class="layout-col-sm-7">
+          <h1>Startliste</h1>
+        </div>
       </div>
-    </div>
-    <div class="row red">
-      <h2>die Anlage und das Startgerät können bis ca. 15 Minuten vor dem Wettkampfstart noch ändern</h2>
-    </div>
-    <div class="row">
-      <div class="col-sm-10">
-        <h1>{{ titel }}</h1>
+      <div class="layout-row red">
+        <h2>die Anlage und das Startgerät können bis ca. 15 Minuten vor dem Wettkampfstart noch ändern</h2>
       </div>
-      <div class="col-sm">
-        <h1>{{ anlass.tiTu }}</h1>
+      <div class="layout-row">
+        <div class="layout-col-sm-10">
+          <h1>{{ titel }}</h1>
+        </div>
+        <div class="layout-col-sm">
+          <h1>{{ anlass.tiTu }}</h1>
+        </div>
       </div>
-    </div>
-
-    <div class="row">
-      <div class="col-sm-2">
-        <span *ngIf="anlass.startDatum === anlass.endDatum">am</span>
-        <span *ngIf="anlass.startDatum !== anlass.endDatum">von</span>:
+      <div class="layout-row">
+        <div class="layout-col-sm-2">
+          @if (anlass.startDatum === anlass.endDatum) {
+            <span>am</span>
+          }
+          @if (anlass.startDatum !== anlass.endDatum) {
+            <span>von</span>
+          }
+          :
+        </div>
+        <div class="layout-col-sm-2 text-bold">
+          {{ anlass.startDatum | date: 'EEE, d MMMM , y' : 'GMT+1' : 'DE-CH' }}
+        </div>
+        @if (anlass.startDatum !== anlass.endDatum) {
+          <div class="layout-col-sm-2">bis:</div>
+        }
+        @if (anlass.startDatum !== anlass.endDatum) {
+          <div class="layout-col-sm text-bold">
+            {{ anlass.endDatum | date: 'EEE, d MMMM , y' : 'GMT+1' : 'DE-CH' }}
+            >
+          </div>
+        }
       </div>
-      <div class="col-sm-2 text-bold">
-        {{ anlass.startDatum | date: 'EEE, d MMMM , y' : 'GMT+1' : 'DE-CH' }}
+      <div class="layout-row">
+        <div class="layout-col-sm-2">Geschlecht:</div>
+        <div class="layout-col-sm-2 text-bold">
+          {{ anlass.tiTu }}
+        </div>
       </div>
-      <div class="col-sm-2" *ngIf="anlass.startDatum !== anlass.endDatum">bis:</div>
-      <div class="col-sm text-bold" *ngIf="anlass.startDatum !== anlass.endDatum">
-        {{ anlass.endDatum | date: 'EEE, d MMMM , y' : 'GMT+1' : 'DE-CH' }}
-        >
+      <div class="layout-row">
+        <div class="layout-col-sm-2">Startberechtigt:</div>
+        <div class="layout-col-sm-2 text-bold">
+          {{ anlass.tiefsteKategorie }}
+        </div>
+        <div class="layout-col-sm-2">bis</div>
+        <div class="layout-col-sm-2 text-bold">
+          {{ anlass.hoechsteKategorie }}
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-2">Geschlecht:</div>
-      <div class="col-sm-2 text-bold">
-        {{ anlass.tiTu }}
+      <div class="layout-row">
+        <div class="layout-col-sm-2">Ort:</div>
+        <div class="layout-col-sm-2 text-bold">{{ anlass.ort }}</div>
+        <div class="layout-col-sm-2">Halle:</div>
+        <div class="layout-col-sm-2 text-bold">{{ anlass.halle }}</div>
+        <div class="layout-col-sm-2">Organisator:</div>
+        <div class="layout-col-sm-2 text-bold">{{ anlass.organisator }}</div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-2">Startberechtigt:</div>
-      <div class="col-sm-2 text-bold">
-        {{ anlass.tiefsteKategorie }}
+      <div class="layout-row border-bottom divider"></div>
+      <div class="layout-row divider"></div>
+      <div class="layout-row">
+        <div class="layout-col-sm-8"><h2>Teilnehmer</h2></div>
+        <div class="layout-col-sm-2 total">Total Teilnehmer:</div>
+        <div class="layout-col-sm-2 total">
+          {{ anzahlTeilnehmer }}
+        </div>
       </div>
-      <div class="col-sm-2">bis</div>
-      <div class="col-sm-2 text-bold">
-        {{ anlass.hoechsteKategorie }}
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-2">Ort:</div>
-      <div class="col-sm-2 text-bold">{{ anlass.ort }}</div>
-      <div class="col-sm-2">Halle:</div>
-      <div class="col-sm-2 text-bold">{{ anlass.halle }}</div>
-      <div class="col-sm-2">Organisator:</div>
-      <div class="col-sm-2 text-bold">{{ anlass.organisator }}</div>
-    </div>
-
-    <div class="row border-bottom divider"></div>
-    <div class="row divider"></div>
-
-    <div class="row">
-      <div class="col-sm-8"><h2>Teilnehmer</h2></div>
-      <div class="col-sm-2 total">Total Teilnehmer:</div>
-      <div class="col-sm-2 total">
-        {{ anzahlTeilnehmer }}
-      </div>
-    </div>
-    <ng-container *ngIf="brevet1Anlass && getTeilnahmenForKategorieK1().length > 0">
-      <lxt-event-start-list-header [titel]="'Kategorie 1'"></lxt-event-start-list-header>
-      <lxt-event-start-list-row
-        *ngFor="let teilnahme of getTeilnahmenForKategorieK1()"
-        [anlass]="anlass"
-        [teilnahme]="teilnahme"
-      ></lxt-event-start-list-row>
-    </ng-container>
-
-    <ng-container *ngIf="brevet1Anlass && getTeilnahmenForKategorieK2().length > 0">
-      <lxt-event-start-list-header [titel]="'Kategorie 2'"></lxt-event-start-list-header>
-      <lxt-event-start-list-row
-        *ngFor="let teilnahme of getTeilnahmenForKategorieK2()"
-        [anlass]="anlass"
-        [teilnahme]="teilnahme"
-      ></lxt-event-start-list-row>
-    </ng-container>
-
-    <ng-container *ngIf="brevet1Anlass && getTeilnahmenForKategorieK3().length > 0">
-      <lxt-event-start-list-header [titel]="'Kategorie 3'"></lxt-event-start-list-header>
-      <lxt-event-start-list-row
-        *ngFor="let teilnahme of getTeilnahmenForKategorieK3()"
-        [anlass]="anlass"
-        [teilnahme]="teilnahme"
-      ></lxt-event-start-list-row>
-    </ng-container>
-
-    <ng-container *ngIf="brevet1Anlass && getTeilnahmenForKategorieK4().length > 0">
-      <lxt-event-start-list-header [titel]="'Kategorie 4'"></lxt-event-start-list-header>
-      <lxt-event-start-list-row
-        *ngFor="let teilnahme of getTeilnahmenForKategorieK4()"
-        [anlass]="anlass"
-        [teilnahme]="teilnahme"
-      ></lxt-event-start-list-row>
-    </ng-container>
-
-    <ng-container *ngIf="tuAnlass && brevet2Anlass && getTeilnahmenForKategorieK5().length > 0">
-      <lxt-event-start-list-header [titel]="'Kategorie 5'"></lxt-event-start-list-header>
-      <lxt-event-start-list-row
-        *ngFor="let teilnahme of getTeilnahmenForKategorieK5()"
-        [anlass]="anlass"
-        [teilnahme]="teilnahme"
-      ></lxt-event-start-list-row>
-    </ng-container>
-
-    <ng-container *ngIf="tiAnlass && brevet2Anlass && getTeilnahmenForKategorieK5A().length > 0">
-      <lxt-event-start-list-header [titel]="'Kategorie 5A'"></lxt-event-start-list-header>
-      <lxt-event-start-list-row
-        *ngFor="let teilnahme of getTeilnahmenForKategorieK5A()"
-        [anlass]="anlass"
-        [teilnahme]="teilnahme"
-      ></lxt-event-start-list-row>
-    </ng-container>
-
-    <ng-container *ngIf="tiAnlass && brevet2Anlass && getTeilnahmenForKategorieK5B().length > 0">
-      <lxt-event-start-list-header [titel]="'Kategorie 5B'"></lxt-event-start-list-header>
-      <lxt-event-start-list-row
-        *ngFor="let teilnahme of getTeilnahmenForKategorieK5B()"
-        [anlass]="anlass"
-        [teilnahme]="teilnahme"
-      ></lxt-event-start-list-row>
-    </ng-container>
-
-    <ng-container *ngIf="brevet2Anlass && getTeilnahmenForKategorieK6().length > 0">
-      <lxt-event-start-list-header [titel]="'Kategorie 6'"></lxt-event-start-list-header>
-
-      <lxt-event-start-list-row
-        *ngFor="let teilnahme of getTeilnahmenForKategorieK6()"
-        [anlass]="anlass"
-        [teilnahme]="teilnahme"
-      ></lxt-event-start-list-row>
-    </ng-container>
-
-    <ng-container *ngIf="tiAnlass && brevet2Anlass && getTeilnahmenForKategorieKD().length > 0">
-      <lxt-event-start-list-header [titel]="'Kategorie Damen'"></lxt-event-start-list-header>
-      <lxt-event-start-list-row
-        *ngFor="let teilnahme of getTeilnahmenForKategorieKD()"
-        [anlass]="anlass"
-        [teilnahme]="teilnahme"
-      ></lxt-event-start-list-row>
-    </ng-container>
-
-    <ng-container *ngIf="tuAnlass && brevet2Anlass && getTeilnahmenForKategorieKH().length > 0">
-      <lxt-event-start-list-header [titel]="'Kategorie Herren'"></lxt-event-start-list-header>
-      <lxt-event-start-list-row
-        *ngFor="let teilnahme of getTeilnahmenForKategorieKH()"
-        [anlass]="anlass"
-        [teilnahme]="teilnahme"
-      ></lxt-event-start-list-row>
-    </ng-container>
-
-    <ng-container *ngIf="brevet2Anlass && getTeilnahmenForKategorieK7().length > 0">
-      <lxt-event-start-list-header [titel]="'Kategorie 7'"></lxt-event-start-list-header>
-
-      <lxt-event-start-list-row
-        *ngFor="let teilnahme of getTeilnahmenForKategorieK7()"
-        [anlass]="anlass"
-        [teilnahme]="teilnahme"
-      ></lxt-event-start-list-row>
-    </ng-container>
-
-    <div class="row"></div>
-    <div class="container">
-      <div class="row">
-        <div class="col-sm-9"></div>
-        <div class="col-sm-2 well hoverwell button" (click)="print()">Ausdrucken</div>
+      @if (brevet1Anlass && getTeilnahmenForKategorieK1().length > 0) {
+        <lxt-event-start-list-header [titel]="'Kategorie 1'"></lxt-event-start-list-header>
+        @for (
+          teilnahme of getTeilnahmenForKategorieK1();
+          track teilnahme.teilnehmer.id ??
+            teilnahme.teilnehmer.stvNummer ??
+            teilnahme.teilnehmer.name + '-' + teilnahme.teilnehmer.vorname + '-' + teilnahme.teilnehmer.jahrgang ??
+            $index
+        ) {
+          <lxt-event-start-list-row [anlass]="anlass" [teilnahme]="teilnahme"></lxt-event-start-list-row>
+        }
+      }
+      @if (brevet1Anlass && getTeilnahmenForKategorieK2().length > 0) {
+        <lxt-event-start-list-header [titel]="'Kategorie 2'"></lxt-event-start-list-header>
+        @for (
+          teilnahme of getTeilnahmenForKategorieK2();
+          track teilnahme.teilnehmer.id ??
+            teilnahme.teilnehmer.stvNummer ??
+            teilnahme.teilnehmer.name + '-' + teilnahme.teilnehmer.vorname + '-' + teilnahme.teilnehmer.jahrgang ??
+            $index
+        ) {
+          <lxt-event-start-list-row [anlass]="anlass" [teilnahme]="teilnahme"></lxt-event-start-list-row>
+        }
+      }
+      @if (brevet1Anlass && getTeilnahmenForKategorieK3().length > 0) {
+        <lxt-event-start-list-header [titel]="'Kategorie 3'"></lxt-event-start-list-header>
+        @for (
+          teilnahme of getTeilnahmenForKategorieK3();
+          track teilnahme.teilnehmer.id ??
+            teilnahme.teilnehmer.stvNummer ??
+            teilnahme.teilnehmer.name + '-' + teilnahme.teilnehmer.vorname + '-' + teilnahme.teilnehmer.jahrgang ??
+            $index
+        ) {
+          <lxt-event-start-list-row [anlass]="anlass" [teilnahme]="teilnahme"></lxt-event-start-list-row>
+        }
+      }
+      @if (brevet1Anlass && getTeilnahmenForKategorieK4().length > 0) {
+        <lxt-event-start-list-header [titel]="'Kategorie 4'"></lxt-event-start-list-header>
+        @for (
+          teilnahme of getTeilnahmenForKategorieK4();
+          track teilnahme.teilnehmer.id ??
+            teilnahme.teilnehmer.stvNummer ??
+            teilnahme.teilnehmer.name + '-' + teilnahme.teilnehmer.vorname + '-' + teilnahme.teilnehmer.jahrgang ??
+            $index
+        ) {
+          <lxt-event-start-list-row [anlass]="anlass" [teilnahme]="teilnahme"></lxt-event-start-list-row>
+        }
+      }
+      @if (tuAnlass && brevet2Anlass && getTeilnahmenForKategorieK5().length > 0) {
+        <lxt-event-start-list-header [titel]="'Kategorie 5'"></lxt-event-start-list-header>
+        @for (
+          teilnahme of getTeilnahmenForKategorieK5();
+          track teilnahme.teilnehmer.id ??
+            teilnahme.teilnehmer.stvNummer ??
+            teilnahme.teilnehmer.name + '-' + teilnahme.teilnehmer.vorname + '-' + teilnahme.teilnehmer.jahrgang ??
+            $index
+        ) {
+          <lxt-event-start-list-row [anlass]="anlass" [teilnahme]="teilnahme"></lxt-event-start-list-row>
+        }
+      }
+      @if (tiAnlass && brevet2Anlass && getTeilnahmenForKategorieK5A().length > 0) {
+        <lxt-event-start-list-header [titel]="'Kategorie 5A'"></lxt-event-start-list-header>
+        @for (
+          teilnahme of getTeilnahmenForKategorieK5A();
+          track teilnahme.teilnehmer.id ??
+            teilnahme.teilnehmer.stvNummer ??
+            teilnahme.teilnehmer.name + '-' + teilnahme.teilnehmer.vorname + '-' + teilnahme.teilnehmer.jahrgang ??
+            $index
+        ) {
+          <lxt-event-start-list-row [anlass]="anlass" [teilnahme]="teilnahme"></lxt-event-start-list-row>
+        }
+      }
+      @if (tiAnlass && brevet2Anlass && getTeilnahmenForKategorieK5B().length > 0) {
+        <lxt-event-start-list-header [titel]="'Kategorie 5B'"></lxt-event-start-list-header>
+        @for (
+          teilnahme of getTeilnahmenForKategorieK5B();
+          track teilnahme.teilnehmer.id ??
+            teilnahme.teilnehmer.stvNummer ??
+            teilnahme.teilnehmer.name + '-' + teilnahme.teilnehmer.vorname + '-' + teilnahme.teilnehmer.jahrgang ??
+            $index
+        ) {
+          <lxt-event-start-list-row [anlass]="anlass" [teilnahme]="teilnahme"></lxt-event-start-list-row>
+        }
+      }
+      @if (brevet2Anlass && getTeilnahmenForKategorieK6().length > 0) {
+        <lxt-event-start-list-header [titel]="'Kategorie 6'"></lxt-event-start-list-header>
+        @for (
+          teilnahme of getTeilnahmenForKategorieK6();
+          track teilnahme.teilnehmer.id ??
+            teilnahme.teilnehmer.stvNummer ??
+            teilnahme.teilnehmer.name + '-' + teilnahme.teilnehmer.vorname + '-' + teilnahme.teilnehmer.jahrgang ??
+            $index
+        ) {
+          <lxt-event-start-list-row [anlass]="anlass" [teilnahme]="teilnahme"></lxt-event-start-list-row>
+        }
+      }
+      @if (tiAnlass && brevet2Anlass && getTeilnahmenForKategorieKD().length > 0) {
+        <lxt-event-start-list-header [titel]="'Kategorie Damen'"></lxt-event-start-list-header>
+        @for (
+          teilnahme of getTeilnahmenForKategorieKD();
+          track teilnahme.teilnehmer.id ??
+            teilnahme.teilnehmer.stvNummer ??
+            teilnahme.teilnehmer.name + '-' + teilnahme.teilnehmer.vorname + '-' + teilnahme.teilnehmer.jahrgang ??
+            $index
+        ) {
+          <lxt-event-start-list-row [anlass]="anlass" [teilnahme]="teilnahme"></lxt-event-start-list-row>
+        }
+      }
+      @if (tuAnlass && brevet2Anlass && getTeilnahmenForKategorieKH().length > 0) {
+        <lxt-event-start-list-header [titel]="'Kategorie Herren'"></lxt-event-start-list-header>
+        @for (
+          teilnahme of getTeilnahmenForKategorieKH();
+          track teilnahme.teilnehmer.id ??
+            teilnahme.teilnehmer.stvNummer ??
+            teilnahme.teilnehmer.name + '-' + teilnahme.teilnehmer.vorname + '-' + teilnahme.teilnehmer.jahrgang ??
+            $index
+        ) {
+          <lxt-event-start-list-row [anlass]="anlass" [teilnahme]="teilnahme"></lxt-event-start-list-row>
+        }
+      }
+      @if (brevet2Anlass && getTeilnahmenForKategorieK7().length > 0) {
+        <lxt-event-start-list-header [titel]="'Kategorie 7'"></lxt-event-start-list-header>
+        @for (
+          teilnahme of getTeilnahmenForKategorieK7();
+          track teilnahme.teilnehmer.id ??
+            teilnahme.teilnehmer.stvNummer ??
+            teilnahme.teilnehmer.name + '-' + teilnahme.teilnehmer.vorname + '-' + teilnahme.teilnehmer.jahrgang ??
+            $index
+        ) {
+          <lxt-event-start-list-row [anlass]="anlass" [teilnahme]="teilnahme"></lxt-event-start-list-row>
+        }
+      }
+      <div class="layout-row"></div>
+      <div class="layout-container">
+        <div class="layout-row">
+          <div class="layout-col-sm-9"></div>
+          <div class="layout-col-sm-2 well hoverwell button" (click)="print()">Ausdrucken</div>
+        </div>
       </div>
     </div>
   </div>
-</div>
-<ng-template #nostart>
-  <div class="container">
-    <div class="row">
-      <div class="col">
+} @else {
+  <div class="layout-container">
+    <div class="layout-row">
+      <div class="layout-col">
         <h2>{{ titel }}</h2>
       </div>
     </div>
-    <div class="row">
-      <div class="col warnung">
+    <div class="layout-row">
+      <div class="layout-col warnung">
         <h3>Dein Verein ist nicht angemeldet</h3>
       </div>
     </div>
   </div>
-</ng-template>
+}

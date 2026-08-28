@@ -1,6 +1,8 @@
-import { Component, type OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { select, Store } from '@ngrx/store';
-import { combineLatest, forkJoin, type Observable, Subscription } from 'rxjs';
+import { switchMap } from 'rxjs';
 import type { IAnlass } from 'src/app/core/model/IAnlass';
 import type { IAnlassExtended } from 'src/app/core/model/IAnlassExtended';
 import type { IAnlassSummary } from 'src/app/core/model/IAnlassSummary';
@@ -8,78 +10,52 @@ import { selectAnlaesseSortedNew } from 'src/app/core/redux/anlass';
 import { AnlassSummariesActions, selectAnlassSummaries } from 'src/app/core/redux/anlass-summary';
 import type { AppState } from 'src/app/core/redux/core.state';
 import { AuthService } from 'src/app/core/service/auth/auth.service';
-import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
+import { EventThumbnailComponent } from '../event-thumbnail/event-thumbnail.component';
 
 @Component({
   selector: 'lxt-event-list',
   templateUrl: './event-list.component.html',
   styleUrls: ['./event-list.component.css'],
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MatProgressSpinnerModule, EventThumbnailComponent],
 })
-export class EventListComponent extends SubscriptionHelper implements OnInit {
-  // anlaesse: IAnlass[];
-  anlaesse$: Observable<IAnlass[]>;
+export class EventListComponent {
+  private readonly authService = inject(AuthService);
 
-  // anlassSummaries: IAnlassSummary[];
-  anlassSummaries$: Observable<IAnlassSummary[]>;
+  private readonly store = inject<Store<AppState>>(Store);
 
-  anlaesseExtended: IAnlassExtended[];
+  private readonly adminStatus$ = toObservable(this.authService.isAdministratorSig);
 
-  // loaded = false;
-  // subscription: Subscription[] = [];
+  readonly anlaesseSig = toSignal(
+    this.adminStatus$.pipe(
+      switchMap((isAdministrator) => this.store.pipe(select(selectAnlaesseSortedNew(isAdministrator)))),
+    ),
+    {
+      initialValue: null as IAnlass[] | null,
+    },
+  );
 
-  constructor(
-    public authService: AuthService,
-    private store: Store<AppState>, // private anlassService: CachingAnlassService
-  ) {
-    super();
+  readonly anlassSummariesSig = toSignal(this.store.pipe(select(selectAnlassSummaries())), {
+    initialValue: [] as IAnlassSummary[],
+  });
+
+  readonly anlaesseExtended = computed<IAnlassExtended[]>(() => {
+    const anlaesse = this.anlaesseSig() ?? [];
+    const anlassSummaries = this.anlassSummariesSig();
+
+    return anlaesse.map((anlass) => {
+      const summary = anlassSummaries.find((anlassSummary) => anlassSummary.anlassId === anlass.id);
+      return {
+        anlass,
+        summary,
+      };
+    });
+  });
+
+  constructor() {
     this.store.dispatch(AnlassSummariesActions.loadAllAnlasssummariesInvoked());
-    this.anlaesse$ = this.store.pipe(select(selectAnlaesseSortedNew(this.authService.isAdministrator())));
-    this.anlassSummaries$ = this.store.pipe(select(selectAnlassSummaries()));
   }
 
-  ngOnInit() {
-    const anlassExt$ = combineLatest([this.anlaesse$, this.anlassSummaries$]);
-
-    this.registerSubscription(
-      anlassExt$.subscribe(([anlaesse, anlassSummaries]) => {
-        this.anlaesseExtended = anlaesse.map((anlass) => {
-          // ReadOnly ???
-          const summary = anlassSummaries.find((anlassSummary) => {
-            return anlassSummary.anlassId === anlass.id;
-          });
-          const anlaesseExtended: IAnlassExtended = {
-            anlass,
-            summary,
-          };
-          return anlaesseExtended;
-        });
-        console.log('AnlaesseExtended: ', this.anlaesseExtended);
-      }),
-    );
-  }
-
-  get showEvents(): boolean {
-    return (
-      (this.authService.isAuthenticated() && this.authService.isVereinsAnmmelder()) ||
-      this.authService.isAdministrator()
-    );
-    /*
-    return (
-      (this.authService.isAuthenticated() &&
-        this.authService.isVereinsAnmmelder() &&
-        !this.authService.isAdministrator()) ||
-      (this.authService.isAdministrator() &&
-        this.authService.currentVerein.name != "ZTV")
-    );
-    */
-  }
-  handleEventClicked(data) {
-    console.log('received :', data);
-  }
-
-  /*
-  ngOnDestroy(): void {
-    this.subscription.forEach((s) => s.unsubscribe());
-  }*/
+  readonly showEvents = computed(() => this.authService.isVereinsAnmmelderSig());
 }

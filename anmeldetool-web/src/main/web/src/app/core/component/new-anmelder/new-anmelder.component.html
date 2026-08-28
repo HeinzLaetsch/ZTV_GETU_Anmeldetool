@@ -1,4 +1,4 @@
-<div class="container">
+<div class="layout-container">
   <!--form [formGroup]="form" (submit)="save()"-->
   <form [formGroup]="form">
     <h1>Neuen Vereinsanmelder beantragen</h1>
@@ -9,24 +9,31 @@
           <mat-label>Verein</mat-label>
           <mat-select [formControl]="form.controls['vereinFormControl']">
             <mat-option value=""></mat-option>
-            <mat-option *ngFor="let verein of vereine" [value]="verein.id">
-              {{ verein.name }}
-            </mat-option>
+            @for (verein of vereine(); track verein.id) {
+              <mat-option [value]="verein.id">
+                {{ verein.name }}
+              </mat-option>
+            }
           </mat-select>
-          <mat-error *ngIf="form.controls['vereinFormControl'].hasError('required')"> Pflichtfeld </mat-error>
+          @if (form.controls['vereinFormControl'].hasError('required')) {
+            <mat-error> Pflichtfeld </mat-error>
+          }
           <mat-hint>Wähle Deinen Verein aus</mat-hint>
         </mat-form-field>
       </p>
       <lxt-user
-        [(user)]="anmelder"
+        [user]="anmelder()"
+        (userChange)="updateAnmelder($event)"
         (valid)="updateUserValid($event)"
         [showPassword]="true"
         [showBenutzername]="false"
         [mustShowPassword]="true"
       ></lxt-user>
     </mat-dialog-content>
-    <mat-error *ngIf="error" class="error"> {{ errorMessage }}</mat-error>
+    @if (error()) {
+      <mat-error class="error"> {{ errorMessage() }}</mat-error>
+    }
     <button mat-button type="button" (click)="cancel()">Abbrechen</button>
-    <button mat-button type="submit" [disabled]="!form.valid || !userValid">Speichern</button>
+    <button mat-button type="submit" [disabled]="!form.valid || !userValid()" (click)="save()">Speichern</button>
   </form>
 </div>

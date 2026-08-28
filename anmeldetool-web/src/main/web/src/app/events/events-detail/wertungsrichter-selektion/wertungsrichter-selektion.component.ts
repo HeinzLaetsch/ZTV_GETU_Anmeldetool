@@ -1,7 +1,14 @@
 import { type CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { type AfterViewInit, Component, Input, type OnInit, ViewChild } from '@angular/core';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { Component, computed, input, signal, ViewChild } from '@angular/core';
+import type { AfterViewInit, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import type { MatTabGroup } from '@angular/material/tabs';
-import type { Observable } from 'rxjs';
+import { MatTabsModule } from '@angular/material/tabs';
+import { RouterModule } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import type { IAnlass } from 'src/app/core/model/IAnlass';
 import type { IAnlassSummary } from 'src/app/core/model/IAnlassSummary';
 import type { IUser } from 'src/app/core/model/IUser';
@@ -9,166 +16,124 @@ import { WertungsrichterStatusEnum } from 'src/app/core/model/WertungsrichterSta
 import { AnlassService } from 'src/app/core/service/anlass/anlass.service';
 import { AuthService } from 'src/app/core/service/auth/auth.service';
 import { WertungsrichterService } from 'src/app/core/service/wertungsrichter.service';
-import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
+import { WertungsrichterChipComponent } from '../wertungsrichter-chip/wertungsrichter-chip.component';
 
 @Component({
   selector: 'lxt-wertungsrichter-selektion',
   templateUrl: './wertungsrichter-selektion.component.html',
   styleUrls: ['./wertungsrichter-selektion.component.css'],
   standalone: true,
+  imports: [
+    FormsModule,
+    RouterModule,
+    DragDropModule,
+    MatTabsModule,
+    MatCheckboxModule,
+    MatProgressSpinnerModule,
+    WertungsrichterChipComponent,
+  ],
 })
-export class WertungsrichterSelektionComponent extends SubscriptionHelper implements OnInit, AfterViewInit {
+export class WertungsrichterSelektionComponent implements OnInit, AfterViewInit {
   @ViewChild('tabs') tabGroup: MatTabGroup;
 
-  @Input()
-  anlass: IAnlass;
+  readonly anlass = input.required<IAnlass>();
 
-  @Input()
-  changeAllowed: boolean;
+  readonly changeAllowed = input.required<boolean>();
 
-  // @Input()
-  anlassSummary: IAnlassSummary;
-  anlassSummary$: Observable<IAnlassSummary>; // TODO REDUX
+  readonly anlassSummary = input.required<IAnlassSummary>();
+  // anlassSummary$: Observable<IAnlassSummary>; // TODO REDUX
 
-  statusBr1: WertungsrichterStatusEnum;
-  statusBr2: WertungsrichterStatusEnum;
-  useBrevet2 = false;
+  readonly useBrevet2 = signal(false);
 
-  assignedWr1s = [] as IUser[];
-  assignedWr2s = [] as IUser[];
-  wr1s = [] as IUser[];
-  wr2s = [] as IUser[];
+  readonly assignedWr1s = signal<IUser[]>([]);
+  readonly assignedWr2s = signal<IUser[]>([]);
+  readonly wr1s = signal<IUser[]>([]);
+  readonly wr2s = signal<IUser[]>([]);
 
-  wertungsrichterPflichtBrevet1: number;
-  wertungsrichterPflichtBrevet2: number;
+  readonly wertungsrichterPflichtBrevet1 = computed(() =>
+    this.isBrevet1Anlass() ? this.wertungsrichterService.getWertungsrichterPflichtBrevet1(this.anlassSummary()) : 0,
+  );
 
-  availableWertungsrichter1: IUser[] = [] as IUser[];
-  availableWertungsrichter2: IUser[] = [] as IUser[];
+  readonly wertungsrichterPflichtBrevet2 = computed(() =>
+    this.isBrevet2Anlass() ? this.wertungsrichterService.getWertungsrichterPflichtBrevet2(this.anlassSummary()) : 0,
+  );
 
-  isWertungsrichter1Ok: boolean;
-  isWertungsrichter2Ok: boolean;
+  readonly availableWertungsrichter1 = computed(() =>
+    this.useBrevet2() ? [...this.wr1s(), ...this.wr2s()] : this.wr1s(),
+  );
+
+  readonly availableWertungsrichter2 = computed(() => this.wr2s());
+
+  readonly statusBr1 = computed(() =>
+    this.wertungsrichterService.getStatusWertungsrichterBr(this.assignedWr1s(), this.wertungsrichterPflichtBrevet1()),
+  );
+
+  readonly statusBr2 = computed(() =>
+    this.wertungsrichterService.getStatusWertungsrichterBr(this.assignedWr2s(), this.wertungsrichterPflichtBrevet2()),
+  );
+
+  readonly isWertungsrichter1Ok = computed(() => this.statusBr1() !== WertungsrichterStatusEnum.NOTOK);
+
+  readonly isWertungsrichter2Ok = computed(() => this.statusBr2() !== WertungsrichterStatusEnum.NOTOK);
+
+  private readonly initialized = signal(false);
 
   constructor(
     public authService: AuthService,
     private anlassService: AnlassService,
     private wertungsrichterService: WertungsrichterService,
-  ) {
-    super();
-  }
-  ngOnInit() {
-    /* TODO REDUX */
-    this.anlassSummary$ = this.anlassService.getAnlassOrganisationSummary(this.anlass, this.authService.currentVerein);
-    this.registerSubscription(
-      this.anlassSummary$.subscribe((result) => {
-        this.anlassSummary = result;
-        this.wrInit();
-      }),
-    );
-    /* TODO REDUX */
+  ) {}
+
+  ngOnInit(): void {
+    this.wrInit();
   }
 
   ngAfterViewInit(): void {
     if (this.tabGroup) {
-      if (this.isBrevet1Anlass()) {
-        this.tabGroup.selectedIndex = 0;
-      } else {
-        this.tabGroup.selectedIndex = 1;
-      }
+      this.tabGroup.selectedIndex = this.isBrevet1Anlass() ? 0 : 1;
     }
   }
 
-  wrInit() {
-    this.wertungsrichterService.getEingeteilteWertungsrichter(this.anlass, 1).subscribe((assignedWrs) => {
-      // this.assignedWr1s = assignedWrs;
-      this.assignedWr1s = this.assignedWr1s.concat(assignedWrs);
-      console.log('has assigned Wrs 1 : ', assignedWrs);
-      this.updateStatus();
-      // this.availableWertungsrichter1 = this.getAvailableWertungsrichter1();
-    });
-    this.wertungsrichterService.getEingeteilteWertungsrichter(this.anlass, 2).subscribe((assignedWrs) => {
-      this.assignedWr2s = assignedWrs;
-      // console.log("has assigned Wrs 2 : ", assignedWrs);
-      this.updateStatus();
-      if (!this.isBrevet2Anlass() && assignedWrs?.length > 0) {
-        this.assignedWr1s = this.assignedWr1s.concat(assignedWrs);
-        this.useBrevet2 = true;
+  wrInit(): void {
+    forkJoin({
+      brevet1: this.wertungsrichterService.getEingeteilteWertungsrichter(this.anlass(), 1),
+      brevet2: this.wertungsrichterService.getEingeteilteWertungsrichter(this.anlass(), 2),
+      available1: this.anlassService.getVerfuegbareWertungsrichter(this.anlass(), this.authService.currentVerein, 1),
+      available2: this.anlassService.getVerfuegbareWertungsrichter(this.anlass(), this.authService.currentVerein, 2),
+    }).subscribe(({ brevet1, brevet2, available1, available2 }) => {
+      const assignedBrevet1 = [...brevet1];
+      const assignedBrevet2 = [...brevet2];
+
+      this.assignedWr1s.set(
+        assignedBrevet1.concat(!this.isBrevet2Anlass() && assignedBrevet2.length > 0 ? assignedBrevet2 : []),
+      );
+      this.assignedWr2s.set(assignedBrevet2);
+      this.wr1s.set([...available1].sort((a, b) => a.benutzername.localeCompare(b.benutzername)));
+      this.wr2s.set([...available2].sort((a, b) => a.benutzername.localeCompare(b.benutzername)));
+
+      if (!this.isBrevet2Anlass() && assignedBrevet2.length > 0) {
+        this.useBrevet2.set(true);
       }
-      // this.availableWertungsrichter2 = this.getAvailableWertungsrichter2();
     });
-    // ist asynchron
-    this.getVerfuegbareWertungsrichter(this.wr1s, 1);
-    this.getVerfuegbareWertungsrichter(this.wr2s, 2);
-
-    this.wertungsrichterPflichtBrevet1 = this.getWertungsrichterPflichtBrevet1();
-    this.wertungsrichterPflichtBrevet2 = this.getWertungsrichterPflichtBrevet2();
-  }
-
-  updateStatus() {
-    this.statusBr1 = this.getStatusBr1();
-    this.statusBr2 = this.getStatusBr2();
-    this.isWertungsrichter1Ok = this.getIsWertungsrichter1Ok();
-    this.isWertungsrichter2Ok = this.getIsWertungsrichter2Ok();
-  }
-
-  getIsWertungsrichter1Ok(): boolean {
-    return this.statusBr1 !== WertungsrichterStatusEnum.NOTOK;
-  }
-  getIsWertungsrichter2Ok(): boolean {
-    return this.statusBr2 !== WertungsrichterStatusEnum.NOTOK;
   }
 
   isBrevet1Anlass(): boolean {
     // console.log("Brevet 1: ", this.anlass.tiefsteKategorie <= KategorieEnum.K4);
-    return this.anlass.brevet1Anlass;
+    return this.anlass().brevet1Anlass;
   }
   isBrevet2Anlass(): boolean {
     // console.log("Brevet 2: ", this.anlass.hoechsteKategorie > KategorieEnum.K4);
-    return this.anlass.brevet2Anlass;
+    return this.anlass().brevet2Anlass;
   }
-  useBrevet2Clicked(check: boolean) {
-    //console.log("Use Brevet 2: ", this.useBrevet2);
-    this.availableWertungsrichter1 = this.getAvailableWertungsrichter1();
-  }
-
-  wertungsrichterUserChange(wertungsrichterUser: IUser) {
-    this.updateStatus();
+  useBrevet2Clicked(check: boolean): void {
+    this.useBrevet2.set(check);
   }
 
-  getStatusBr1(): WertungsrichterStatusEnum {
-    this.statusBr1 = this.wertungsrichterService.getStatusWertungsrichterBr(
-      this.assignedWr1s,
-      this.wertungsrichterPflichtBrevet1,
-    );
-    return this.statusBr1;
-  }
-  getStatusBr2(): WertungsrichterStatusEnum {
-    this.statusBr2 = this.wertungsrichterService.getStatusWertungsrichterBr(
-      this.assignedWr2s,
-      this.wertungsrichterPflichtBrevet2,
-    );
-    return this.statusBr2;
+  wertungsrichterUserChange(): void {
+    this.assignedWr1s.set([...this.assignedWr1s()]);
   }
 
-  getWertungsrichterPflichtBrevet1(): number {
-    return this.wertungsrichterService.getWertungsrichterPflichtBrevet1(this.anlassSummary);
-  }
-
-  getWertungsrichterPflichtBrevet2(): number {
-    return this.wertungsrichterService.getWertungsrichterPflichtBrevet2(this.anlassSummary);
-  }
-
-  getAvailableWertungsrichter1(): IUser[] {
-    if (this.useBrevet2) {
-      return this.wr1s.concat(this.wr2s);
-    }
-    return this.wr1s;
-  }
-
-  getAvailableWertungsrichter2(): IUser[] {
-    return this.wr2s;
-  }
-
-  drop(event: CdkDragDrop<string[]>, liste: string) {
+  drop(event: CdkDragDrop<string[]>, liste: string): void {
     //console.log("Drop: ", event, ", liste", liste);
     if (event.previousContainer === event.container) {
       console.warn('move Drop: ', event);
@@ -182,54 +147,32 @@ export class WertungsrichterSelektionComponent extends SubscriptionHelper implem
     if (liste === '2') {
       this.anlassService
         .addWertungsrichterToAnlass(
-          this.anlass,
+          this.anlass(),
           this.authService.currentVerein,
           event.container.data[event.currentIndex] as unknown as IUser,
         )
-        .subscribe((result) => {
-          this.statusBr1 = this.getStatusBr1();
-          this.statusBr2 = this.getStatusBr2();
+        .subscribe(() => {
+          this.assignedWr1s.set([...this.assignedWr1s()]);
+          this.assignedWr2s.set([...this.assignedWr2s()]);
 
           this.loadWrLink(event.container.data[event.currentIndex] as unknown as IUser);
         });
     } else {
       this.anlassService
         .deleteWertungsrichterFromAnlass(
-          this.anlass,
+          this.anlass(),
           this.authService.currentVerein,
           event.container.data[event.currentIndex] as unknown as IUser,
         )
-        .subscribe((result) => {
-          this.statusBr1 = this.getStatusBr1();
-          this.statusBr2 = this.getStatusBr2();
+        .subscribe(() => {
+          this.assignedWr1s.set([...this.assignedWr1s()]);
+          this.assignedWr2s.set([...this.assignedWr2s()]);
         });
     }
-    this.updateStatus();
-  }
-
-  private getVerfuegbareWertungsrichter(wrs: IUser[], brevet: number) {
-    this.anlassService
-      .getVerfuegbareWertungsrichter(this.anlass, this.authService.currentVerein, brevet)
-      .subscribe((allUser) => {
-        if (allUser) {
-          allUser.forEach((user) => wrs.push(user));
-          wrs.sort((a, b) => {
-            if (a.benutzername < b.benutzername) {
-              return -1;
-            }
-            if (a.benutzername > b.benutzername) {
-              return 1;
-            }
-            return 0;
-          });
-        }
-      });
-    this.availableWertungsrichter1 = this.getAvailableWertungsrichter1();
-    this.availableWertungsrichter2 = this.getAvailableWertungsrichter2();
   }
   loadWrLink(wertungsrichterUser: IUser): void {
     this.anlassService
-      .getWrEinsatz(this.anlass, this.authService.currentVerein, wertungsrichterUser)
+      .getWrEinsatz(this.anlass(), this.authService.currentVerein, wertungsrichterUser)
       .subscribe((pal) => {
         wertungsrichterUser.pal = pal;
       });

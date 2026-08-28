@@ -1,20 +1,21 @@
 import { Component } from '@angular/core';
-import { AnmeldeToolComponent } from './app.component';
+import { RouterOutlet } from '@angular/router';
 import { LoginComponent } from '../login/login-dialog.component';
 import { AuthService } from '../../service/auth/auth.service';
-import { BusyIndicatorProgressBarComponent } from "../busy-indicator-progress-bar/busy-indicator-progress-bar.component";
-import { NavComponent } from "../nav/nav.component";
+// eslint-disable-next-line max-len
+import { BusyIndicatorProgressBarComponent } from '../busy-indicator-progress-bar/busy-indicator-progress-bar.component';
+import { NavComponent } from '../nav/nav.component';
 
 @Component({
-  selector: 'ztv-app-root',
+  selector: 'lxt-app-root',
   standalone: true,
-  imports: [LoginComponent, AnmeldeToolComponent, BusyIndicatorProgressBarComponent, NavComponent],
+  imports: [LoginComponent, RouterOutlet, BusyIndicatorProgressBarComponent, NavComponent],
   template: `
     <main>
       <ztv-navigation></ztv-navigation>
       <ztv-busy-indicator-progress-bar></ztv-busy-indicator-progress-bar>
       @if (authService.isLoggedIn()) {
-        <ztv-anmelde-tool>loading... App</ztv-anmelde-tool>
+        <router-outlet />
       } @else {
         <ztv-login-dialog />
       }

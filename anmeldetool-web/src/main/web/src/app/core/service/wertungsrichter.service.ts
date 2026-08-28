@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of, switchMap, take } from 'rxjs';
 import { IAnlass } from '../model/IAnlass';
 import { IUser } from '../model/IUser';
 import { WertungsrichterStatusEnum } from '../model/WertungsrichterStatusEnum';
@@ -7,7 +7,7 @@ import { AuthService } from './auth/auth.service';
 import { IAnlassSummary } from '../model/IAnlassSummary';
 import { select, Store } from '@ngrx/store';
 import { AppState } from '../redux/core.state';
-import { selectUserById, UserActions } from '../redux/user';
+import { selectUserById } from '../redux/user';
 import { AnlassService } from './anlass/anlass.service';
 
 @Injectable({
@@ -19,51 +19,50 @@ export class WertungsrichterService {
   constructor(
     public authService: AuthService,
     private store: Store<AppState>,
-    private anlassService: AnlassService, //private userService: CachingUserService //private anlassService: CachingAnlassService,
+    private anlassService: AnlassService,
   ) {
-    this.store.dispatch(UserActions.loadAllUserInvoked());
+    // this.store.dispatch(UserActions.loadAllUserInvoked());
   }
 
   getEingeteilteWertungsrichter(anlass: IAnlass, brevet: number): Observable<IUser[]> {
-    const assignedWrs = new Array<IUser>();
-    const eingteilteWrSubject = new Subject<IUser[]>();
+    return this.anlassService.getEingeteilteWertungsrichter(anlass, this.authService.currentVerein, brevet).pipe(
+      switchMap((links) => {
+        // Wenn keine Links vorhanden sind, leeres Array zurückgeben
+        if (!links || links.length === 0) {
+          return of([]);
+        }
 
-    // get PAL
-    this.anlassService.getEingeteilteWertungsrichter(anlass, this.authService.currentVerein, brevet).subscribe(
-      (result) => {
-        if (result) {
-          let count = 0;
-          result.map((link) => {
-            const obs = this.store.pipe(select(selectUserById(link.personId)));
-            obs.subscribe((user) => {
-              // const user = this.userService.getUserById(link.personId);
+        // Erstellt für jeden Link einen Store-Stream
+        const userObservables = links.map((link) =>
+          this.store.pipe(
+            select(selectUserById(link.personId)),
+            take(1), // Wichtig: Beendet den Stream nach dem ersten Wert
+            map((user) => {
+              if (!user) {
+                console.error(`User not found for id: ${link.personId}`);
+                return null;
+              }
+              // Deep Copy erstellen und Link (pal) anhängen
               const tmpUser = JSON.parse(JSON.stringify(user));
               tmpUser.pal = link;
-              assignedWrs.push(tmpUser);
-              count++;
-              if (count === result.length) {
-                eingteilteWrSubject.next(assignedWrs);
-              }
-            });
-          });
-        } else {
-          eingteilteWrSubject.next([]);
-        }
-      },
-      (error) => {
-        switch (error.status) {
-          case 404: {
-            break;
-          }
-          default: {
-            console.error(error);
-          }
-        }
-        eingteilteWrSubject.next([]);
-      },
-    );
+              return tmpUser;
+            }),
+          ),
+        );
 
-    return eingteilteWrSubject.asObservable();
+        // Wartet, bis ALLE Store-Abfragen einmalig geantwortet haben
+        return forkJoin(userObservables).pipe(
+          // Filtert eventuelle 'null'-Werte heraus, falls ein User nicht gefunden wurde
+          map((users) => users.filter((u): u is IUser => u !== null)),
+        );
+      }),
+      catchError((error) => {
+        if (error.status !== 404) {
+          console.error(error);
+        }
+        return of([]); // Im Fehlerfall leeres Array zurückgeben
+      }),
+    );
   }
 
   // TODO Logik ins Backend verschieben, wenn Redux AnlassSummary
@@ -97,14 +96,18 @@ export class WertungsrichterService {
   getWertungsrichterPflichtBrevet1(anlassSummary: IAnlassSummary): number {
     // const anzahlTeilnehmer = this.anlassService.getTeilnahmen(anlass, 1).length;
     const anzahlTeilnehmer = anlassSummary.startendeBr1;
-    if (anzahlTeilnehmer > 0) {return Math.ceil(anzahlTeilnehmer / 15);}
+    if (anzahlTeilnehmer > 0) {
+      return Math.ceil(anzahlTeilnehmer / 15);
+    }
     return 0;
   }
 
   getWertungsrichterPflichtBrevet2(anlassSummary: IAnlassSummary): number {
     //const anzahlTeilnehmer = this.anlassService.getTeilnahmen(anlass, 2).length;
     const anzahlTeilnehmer = anlassSummary.startendeBr2;
-    if (anzahlTeilnehmer > 0) {return Math.ceil(anzahlTeilnehmer / 15);}
+    if (anzahlTeilnehmer > 0) {
+      return Math.ceil(anzahlTeilnehmer / 15);
+    }
     return 0;
   }
 

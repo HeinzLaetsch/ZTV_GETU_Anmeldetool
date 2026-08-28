@@ -1,21 +1,16 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
+import { form, FormField, required, validate } from '@angular/forms/signals';
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router, RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { type Observable, combineLatest, of } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/service/auth/auth.service';
-import { CachingUserService } from 'src/app/core/service/caching-services/caching.user.service';
 import type { IVerein } from 'src/app/verein/verein';
 import type { AppState } from '../../redux/core.state';
 import { selectAlleVereine } from '../../redux/verein';
@@ -28,155 +23,128 @@ import { NewVereinComponent } from '../new-verein/new-verein.component';
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
+    FormsModule,
+    FormField,
     MatDialogModule,
     MatAutocompleteModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule,
     MatButtonModule,
-    MatCheckboxModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
     RouterModule,
   ],
 })
 export class LoginComponent {
   appearance = 'outline';
-  loginError = false;
-  errorMessage: string | undefined = undefined;
+  loginError = signal(false);
+  errorMessage = signal<string | undefined>(undefined);
 
-  loginForm = new FormGroup({
-    verein: new FormControl<IVerein | string | null>(null, {
-      validators: [Validators.required, this.vereinSelectionValidator],
-    }),
-    userName: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    password: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
+  private authService = inject(AuthService);
+  private store = inject(Store<AppState>);
+  private router = inject(Router);
+  private dialog = inject(MatDialog);
+  private destroyRef = inject(DestroyRef);
+
+  private vereineSignal = toSignal(this.store.select(selectAlleVereine), { initialValue: [] as IVerein[] });
+
+  formModel = signal({
+    vereinText: '',
+    userName: '',
+    password: '',
   });
 
-  readonly vereine$: Observable<IVerein[]>;
-  readonly filteredOptions: Observable<IVerein[]>;
+  chosenVerein = signal<IVerein | null>(null);
 
-  constructor(
-    //public dialogRef: MatDialogRef<LoginDialogComponent>,
-    private authService: AuthService,
-    private store: Store<AppState>,
-    private userService: CachingUserService,
-    private router: Router,
-    private dialog: MatDialog,
-  ) {
-    this.vereine$ = this.store.select(selectAlleVereine);
-    this.filteredOptions = combineLatest([
-      this.vereine$,
-      this.vereinControl.valueChanges.pipe(startWith(this.vereinControl.value)),
-    ]).pipe(
-      map(([vereine, value]) => {
-        const name = typeof value === 'string' ? value : (value?.name ?? '');
+  loginForm = form(this.formModel, (schemaPath) => {
+    required(schemaPath.password);
+    required(schemaPath.vereinText);
+    required(schemaPath.userName);
 
-        return name ? this._filter(vereine, name) : vereine.slice();
-      }),
-    );
-  }
+    validate(schemaPath.userName, () => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const isValid = emailRegex.test(this.formModel().userName);
 
-  get vereinControl(): FormControl<IVerein | string | null> {
-    return this.loginForm.controls.verein;
-  }
+      return isValid
+        ? null
+        : {
+            kind: 'email',
+            message: 'Bitte eine gültige E-Mail-Adresse eingeben.',
+          };
+    });
 
-  get userNameControl(): FormControl<string> {
-    return this.loginForm.controls.userName;
-  }
+    validate(schemaPath.vereinText, () => {
+      const text = this.formModel().vereinText;
+      const ausgewaehlt = this.chosenVerein();
 
-  get passwordControl(): FormControl<string> {
-    return this.loginForm.controls.password;
-  }
-
-  private vereinSelectionValidator(control: AbstractControl<IVerein | string | null>) {
-    const value = control.value;
-    if (!value) {
+      if (!ausgewaehlt || ausgewaehlt.name !== text) {
+        return {
+          kind: 'vereinSelection',
+          message: 'Bitte einen Verein aus der Liste auswählen.',
+        };
+      }
       return null;
+    });
+  });
+
+  filteredOptions = computed(() => {
+    const vereine = this.vereineSignal();
+    const suche = this.formModel().vereinText.toLowerCase().trim();
+
+    if (!suche) {
+      return vereine;
     }
-    return typeof value === 'string' ? { vereinSelection: true } : null;
+    return vereine.filter((v) => v.name.toLowerCase().includes(suche));
+  });
+
+  onVereinSelected(event: MatAutocompleteSelectedEvent): void {
+    const ausgewaehlterVerein = event.option.value as IVerein;
+    this.chosenVerein.set(ausgewaehlterVerein);
+    this.formModel.update((current) => ({
+      ...current,
+      vereinText: ausgewaehlterVerein.name,
+    }));
   }
 
-  private _filter(vereine: IVerein[], name: string): IVerein[] {
-    const filterValue = name.toLowerCase();
-
-    return vereine.filter((option) => option.name.toLowerCase().includes(filterValue));
-  }
-
-  displayFn(verein: IVerein): string {
-    return verein && verein.name ? verein.name : '';
-  }
-
-  login() {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
+  login(): void {
+    if (this.loginForm().invalid()) {
+      this.loginForm.password().markAsTouched();
+      this.loginForm.userName().markAsTouched();
+      this.loginForm.vereinText().markAsTouched();
       return;
     }
 
-    const verein = this.vereinControl.value;
-    if (!verein || typeof verein === 'string') {
-      this.vereinControl.setErrors({ vereinSelection: true });
-      this.vereinControl.markAsTouched();
+    const vereinObjekt = this.chosenVerein();
+    if (!vereinObjekt) {
       return;
     }
 
-    const { userName, password } = this.loginForm.getRawValue();
+    const { userName, password } = this.formModel();
+    this.loginError.set(false);
 
-    this.loginError = false;
-    try {
-      this.authService.login(verein, userName, password).subscribe(
-        (result) => {
-          //this.dialogRef.close('OK');
-          this.loginError = false;
-          this.userService.loadUser().subscribe((result) => {
-            // TODO register Error
-          });
-          // TODO check if preload is realy neccessary
+    this.authService
+      .login(vereinObjekt, userName, password)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.loginError.set(false);
         },
-        (error) => {
-          this.loginError = true;
-          this.errorMessage = 'Fehler beim Login, Verein, Name oder Passwort falsch';
+        error: (error) => {
+          this.loginError.set(true);
+          this.errorMessage.set('Fehler beim Login, Verein, Name oder Passwort falsch. ' + error);
         },
-      );
-    } catch (error) {
-      console.error('Error logging in: ' + error);
-      this.loginError = true;
-    }
+      });
   }
 
-  private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
-      console.error(error);
-      return of(result as T);
-    };
-  }
-  cancel() {
+  cancel(): void {
     this.router.navigate(['anlass']);
   }
 
-  onNoClick(): void {
-    //this.dialogRef.close();
-  }
   newVereinClicked(): void {
-    console.log('New Verein clicked');
     this.dialog.open(NewVereinComponent, {
       width: '600px',
       height: 'auto',
-      maxHeight: '90vh',
+      maxHeight: '95vh',
       disableClose: true,
       panelClass: 'ztv-dialog',
     });
-  }
-
-  newAnmelderClicked(): void {
-    console.log('New Anmelder clicked');
-    //this.dialogRef.close(2);
   }
 }

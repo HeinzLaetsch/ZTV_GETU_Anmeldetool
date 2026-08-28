@@ -1,11 +1,11 @@
-<div class="container-fluid" *ngIf="user$ | async; else loading">
-  <div class="row">
-    <div class="col-12">
+<div class="layout-container-fluid" *ngIf="user$ | async; else loading">
+  <div class="layout-row">
+    <div class="layout-col-12">
       <h1 class="label">Vereinsadministration {{ verein.name }}</h1>
     </div>
   </div>
-  <div class="row">
-    <div class="col-12">
+  <div class="layout-row">
+    <div class="layout-col-12">
       <mat-tab-group mat-align-tabs="start" #tabs>
         <mat-tab *ngFor="let user of vereinsUsers; index as i">
           <ng-template mat-tab-label>

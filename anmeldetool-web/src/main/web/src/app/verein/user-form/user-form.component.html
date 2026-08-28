@@ -1,6 +1,6 @@
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-6">
+<div class="layout-container-fluid">
+  <div class="layout-row">
+    <div class="layout-col-6">
       <lxt-user
         [modify]="true"
         [readOnly]="!(isOwner() || isVereinsAnmelder || isVereinsVerantwortlicher)"
@@ -11,7 +11,7 @@
         (valid)="updateUserValid($event)"
       ></lxt-user>
     </div>
-    <div class="col-6" [hidden]="isUserDirty()">
+    <div class="layout-col-6" [hidden]="isUserDirty()">
       <lxt-role
         [currentUser]="currentUser"
         [isVereinsAnmelder]="isVereinsAnmelder"

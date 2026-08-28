@@ -1,83 +1,111 @@
 <!-- well hoverwell    [routerLink]="['/anlass/', anlass?.id]"
  -->
-<div
-  *ngIf="anlassExtended?.summary"
-  hover
-  [status]="anlassExtended.anlass.anzeigeStatus"
-  class="thumbnail"
-  (click)="isEnabled() ? handleClickMe($event) : $event.stopPropagation()"
->
-  <div class="row">
-    <div class="col-sm-7 double-hight">
-      <h2>{{ anlassExtended.anlass.getCleaned() }}</h2>
+@if (anlassData?.summary) {
+  <div
+    hover
+    [status]="anlassData.anlass.anzeigeStatus"
+    class="thumbnail"
+    (click)="isEnabled() ? handleClickMe() : $event.stopPropagation()"
+  >
+    <div class="layout-row">
+      <div class="layout-col-sm-7 double-hight">
+        <h2>{{ anlassData.anlass.getCleaned() }}</h2>
+      </div>
+      <div class="layout-col-sm-1">
+        <h2>{{ anlassData.anlass.tiTu }}</h2>
+      </div>
+      <div class="layout-col-sm-1">
+        @if (anlassData.summary.startet) {
+          <img class="icon" src="assets/images/skype/beaming-face.png" />
+        } @else {
+          <img class="icon" src="assets/images/skype/slightly-frowning-face.png" />
+        }
+      </div>
+      @if (anlassData.summary.startet) {
+        <div class="layout-col-sm-3 verticalAlign">Dein Verein startet</div>
+      } @else {
+        <div class="layout-col-sm-3 verticalAlign">Dein Verein startet nicht</div>
+      }
     </div>
-    <div class="col-sm-1">
-      <h2>{{ anlassExtended.anlass.tiTu }}</h2>
-    </div>
-    <div class="col-sm-1">
-      <img *ngIf="anlassExtended.summary.startet" class="icon" src="assets/images/skype/beaming-face.png" />
-      <img *ngIf="!anlassExtended.summary.startet" class="icon" src="assets/images/skype/slightly-frowning-face.png" />
-    </div>
-    <div *ngIf="anlassExtended.summary.startet" class="col-sm-3 verticalAlign">Dein Verein startet</div>
-    <div *ngIf="!anlassExtended.summary.startet" class="col-sm-3 verticalAlign">Dein Verein startet nicht</div>
-  </div>
 
-  <div class="row">
-    <div class="col-sm-4">
-      <span *ngIf="anlassExtended.anlass.startDatum === anlassExtended.anlass.endDatum">am</span>
-      <span *ngIf="anlassExtended.anlass.startDatum !== anlassExtended.anlass.endDatum">von</span>:
-      {{ anlassExtended.anlass.startDatum | date: 'EEE, d MMMM , y' : 'GMT+1' : 'DE-CH' }}
+    <div class="layout-row">
+      <div class="layout-col-sm-4">
+        @if (anlassData.anlass.startDatum === anlassData.anlass.endDatum) {
+          <span>am</span>
+        } @else {
+          <span>von</span>
+        }
+        :
+        {{ anlassData.anlass.startDatum | date: 'EEE, d MMMM , y' : 'GMT+1' : 'DE-CH' }}
+      </div>
+      @if (anlassData.anlass.startDatum !== anlassData.anlass.endDatum) {
+        <div class="layout-col-sm-4">
+          bis:
+          {{ anlassData.anlass.endDatum | date: 'EEE, d MMMM , y' : 'GMT+1' : 'DE-CH' }}
+        </div>
+      }
     </div>
-    <div class="col-sm-4" *ngIf="anlassExtended.anlass.startDatum !== anlassExtended.anlass.endDatum">
-      bis:
-      {{ anlassExtended.anlass.endDatum | date: 'EEE, d MMMM , y' : 'GMT+1' : 'DE-CH' }}
+    <div class="layout-row">
+      <div class="layout-col-sm-4">
+        Geschlecht:
+        <span style="font-weight: 550"> {{ anlassData.anlass.tiTu }}</span>
+      </div>
+      <div class="layout-col-sm-4">
+        Startberechtigt: {{ anlassData.anlass.tiefsteKategorie }} bis
+        {{ anlassData.anlass.hoechsteKategorie }}
+      </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-sm-4">
-      Geschlecht:
-      <span style="font-weight: 550"> {{ anlassExtended.anlass.tiTu }}</span>
+    <div class="layout-row">
+      <div class="layout-col-sm-4">Ort: {{ anlassData.anlass.ort }}</div>
+      <div class="layout-col-sm-4">Halle: {{ anlassData.anlass.halle }}</div>
+      <div class="layout-col-sm-4">Organisator: {{ organisator?.name }}</div>
     </div>
-    <div class="col-sm-4">
-      Startberechtigt: {{ anlassExtended.anlass.tiefsteKategorie }} bis
-      {{ anlassExtended.anlass.hoechsteKategorie }}
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-sm-4">Ort: {{ anlassExtended.anlass.ort }}</div>
-    <div class="col-sm-4">Halle: {{ anlassExtended.anlass.halle }}</div>
-    <div class="col-sm-4">Organisator: {{ organisator?.name }}</div>
-  </div>
 
-  <div *ngIf="anlassExtended.summary.startet" class="row">
-    <div class="col-sm-8">
-      <span class="verticalAlign margin-left"
-        >Teilnehmer: {{ anlassExtended.summary.startendeBr1 + anlassExtended.summary.startendeBr2 }}</span
-      >
+    @if (anlassData.summary.startet) {
+      <div class="layout-row">
+        <div class="layout-col-sm-8">
+          <span class="verticalAlign margin-left"
+            >Teilnehmer: {{ anlassData.summary.startendeBr1 + anlassData.summary.startendeBr2 }}</span
+          >
+        </div>
+        <div class="layout-col-sm-1">
+          @if (hasTeilnehmer) {
+            <img class="icon" src="assets/images/skype/beaming-face.png" />
+          } @else {
+            <img class="icon" src="assets/images/skype/slightly-frowning-face.png" />
+          }
+        </div>
+        @if (hasTeilnehmer) {
+          <div class="layout-col-sm-3 verticalAlign">Teilnehmer gemeldet</div>
+        } @else {
+          <div class="layout-col-sm-3 verticalAlign">kein Teilnehmer gemeldet</div>
+        }
+      </div>
+      <div class="layout-row">
+        <div class="layout-col-sm-8">
+          <span class="verticalAlign margin-left">Wertungsrichter: {{ anlassData.summary.gemeldeteBr1 }}</span>
+        </div>
+        <div class="layout-col-sm-1">
+          @if (isWertungsrichterOk) {
+            <img class="icon" src="assets/images/skype/beaming-face.png" />
+          } @else {
+            <img class="icon" src="assets/images/skype/pouting-face.png" />
+          }
+        </div>
+        @if (isWertungsrichterOk) {
+          <div class="layout-col-sm-3 verticalAlign">WR Kontingent erfüllt</div>
+        } @else {
+          <div class="layout-col-sm-3 verticalAlign">WR Kontingent nicht erfüllt</div>
+        }
+      </div>
+    }
+
+    <div class="correct-margin">
+      <lxt-events-dates
+        [anlass]="anlassData.anlass"
+        [anlassSummary]="anlassData.summary"
+        [viewOnly]="true"
+      ></lxt-events-dates>
     </div>
-    <div class="col-sm-1">
-      <img *ngIf="hasTeilnehmer" class="icon" src="assets/images/skype/beaming-face.png" />
-      <img *ngIf="!hasTeilnehmer" class="icon" src="assets/images/skype/slightly-frowning-face.png" />
-    </div>
-    <div *ngIf="hasTeilnehmer" class="col-sm-3 verticalAlign">Teilnehmer gemeldet</div>
-    <div *ngIf="!hasTeilnehmer" class="col-sm-3 verticalAlign">kein Teilnehmer gemeldet</div>
   </div>
-  <div *ngIf="anlassExtended.summary.startet" class="row">
-    <div class="col-sm-8">
-      <span class="verticalAlign margin-left">Wertungsrichter: {{ anlassExtended.summary.gemeldeteBr1 }}</span>
-    </div>
-    <div class="col-sm-1">
-      <img *ngIf="isWertungsrichterOk" class="icon" src="assets/images/skype/beaming-face.png" />
-      <img *ngIf="!isWertungsrichterOk" class="icon" src="assets/images/skype/pouting-face.png" />
-    </div>
-    <div *ngIf="isWertungsrichterOk" class="col-sm-3 verticalAlign">WR Kontingent erfüllt</div>
-    <div *ngIf="!isWertungsrichterOk" class="col-sm-3 verticalAlign">WR Kontingent nicht erfüllt</div>
-  </div>
-  <div class="correct-margin">
-    <lxt-events-dates
-      [anlass]="anlassExtended.anlass"
-      [anlassSummary]="anlassExtended.summary"
-      [viewOnly]="true"
-    ></lxt-events-dates>
-  </div>
-</div>
+}

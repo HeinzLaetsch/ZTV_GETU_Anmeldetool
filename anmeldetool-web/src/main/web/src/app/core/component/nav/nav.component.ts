@@ -52,7 +52,7 @@ export class NavComponent extends SubscriptionHelper implements OnInit {
   }
 
   get eigeneAnlaesse(): IAnlass[] {
-    if (this.authService.isAnlassUser()) {
+    if (this.authService.isAnlassUserSig()) {
       return this.anlaesse.filter((anlass) => {
         if (anlass.organisatorId === this.authService.currentVerein.id) {
           return true;
@@ -60,7 +60,7 @@ export class NavComponent extends SubscriptionHelper implements OnInit {
         return false;
       });
     } else {
-      if (this.authService.isAdministrator()) {
+      if (this.authService.isAdministratorSig()) {
         return this.anlaesse;
       }
       return [];

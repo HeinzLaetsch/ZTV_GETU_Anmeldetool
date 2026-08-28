@@ -23,7 +23,7 @@ import { AuthService } from '../auth/auth.service';
 
 export type IHash = {
   [anlassId: string]: IAnlassLinks;
-}
+};
 
 @Injectable({
   providedIn: 'root',
@@ -233,14 +233,17 @@ export class CachingAnlassService {
     return this.getAnlaesseSM(titu, true);
   }
   getAnlaesseSM(titu: TiTuEnum, sm: boolean): IAnlass[] {
-    const admin = this.authService.isAdministrator();
+    const admin = this.authService.isAdministratorSig();
     if (this.loaded) {
       if (titu === TiTuEnum.Alle) {
         if (sm) {
           return this.anlaesse.filter((anlass) => {
             if (sm && anlass.smQuali && anlass.ausserkantonal) {
-              if (admin) {return true;}
-              else {return false;}
+              if (admin) {
+                return true;
+              } else {
+                return false;
+              }
             }
             return true;
           });
@@ -249,8 +252,11 @@ export class CachingAnlassService {
       }
       return this.anlaesse.filter((anlass) => {
         if (sm && anlass.smQuali && anlass.ausserkantonal) {
-          if (admin) {return true;}
-          else {return false;}
+          if (admin) {
+            return true;
+          } else {
+            return false;
+          }
         }
         const key = TiTuEnum[anlass.tiTu];
         if (key === titu) {

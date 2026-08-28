@@ -27,10 +27,12 @@ h1 {
   color: rgba(168, 37, 37, 0.78);
 }
 
-.container-fluid {
+.container-fluid,
+.layout-container-fluid {
   margin-top: 20px;
 }
-.col {
+.col,
+.layout-col {
   padding-left: 5px;
   padding-right: 5px;
   margin-left: 1em;

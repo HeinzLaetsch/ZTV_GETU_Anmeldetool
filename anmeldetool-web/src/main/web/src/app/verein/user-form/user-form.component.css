@@ -1,7 +1,8 @@
 mat-form-field {
   min-width: 400px;
 }
-.container-fluid {
+.container-fluid,
+.layout-container-fluid {
   margin-top: 20px;
 }
 em {

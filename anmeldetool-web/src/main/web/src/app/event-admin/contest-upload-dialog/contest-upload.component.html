@@ -3,9 +3,11 @@
   <input type="file" class="file-input" (change)="onFileSelected($event)" #fileUpload />
 
   <div class="file-upload">
-    {{ fileName || 'Keine Datei selektiert' }}
+    {{ fileName() || 'Keine Datei selektiert' }}
   </div>
-  <div *ngIf="type === 'error'">Upload fehlgeschlagen {{ upLoadError }}</div>
+  @if (type() === 'error') {
+    <div>Upload fehlgeschlagen {{ upLoadError() }}</div>
+  }
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-mini-fab color="primary" class="upload-btn" (click)="fileUpload.click()">

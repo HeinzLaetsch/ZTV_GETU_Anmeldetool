@@ -9,5 +9,6 @@ export const LoadingActions = createActionGroup({
 		"Loading Event finished": props<{ payload: Update<ILoading> }>(),
 		"Loading Event fehler": props<{ payload: Update<ILoading> }>(),
 		"Loading Event processed": props<{ payload: string }>(),
+		"Loading Event stopped": props<{ payload: string }>(),
 	},
 });

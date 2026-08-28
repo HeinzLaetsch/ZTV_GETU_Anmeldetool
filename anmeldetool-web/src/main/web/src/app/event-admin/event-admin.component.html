@@ -1,13 +1,13 @@
 <div *ngIf="administrator || sekretariat; else elseBlock">
-  <div class="container-lg">
-    <div class="row">
-      <div class="col-7">
+  <div class="layout-container-lg">
+    <div class="layout-row">
+      <div class="layout-col-7">
         <h1>{{ anlass.getCleaned() + ' ' + anlass.ort }}</h1>
       </div>
-      <div class="col-sm-1">
+      <div class="layout-col-sm-1">
         <h1>{{ anlass.tiTu }}</h1>
       </div>
-      <div class="col-sm-4" *ngIf="administrator">
+      <div class="layout-col-sm-4" *ngIf="administrator">
         <mat-checkbox [ngModel]="anlass.toolSperren" (ngModelChange)="toolSperrenClicked($event)"
           >Tool sperren
         </mat-checkbox>
@@ -16,38 +16,38 @@
   </div>
   <mat-tab-group *ngIf="administrator || sekretariat" mat-align-tabs="start">
     <mat-tab label="Exports/Imports" *ngIf="administrator">
-      <div class="container-lg">
-        <div class="row" *ngIf="loaded$ | async as obs; else loading">
-          <div class="col-1">Total Startende</div>
-          <div class="col-1">
+      <div class="layout-container-lg">
+        <div class="layout-row" *ngIf="loaded$ | async as obs; else loading">
+          <div class="layout-col-1">Total Startende</div>
+          <div class="layout-col-1">
             {{ teilnahmeStatistic.totalStartende }}
           </div>
-          <div class="col-1">Total Abgemeldet</div>
-          <div class="col-1">
+          <div class="layout-col-1">Total Abgemeldet</div>
+          <div class="layout-col-1">
             {{ teilnahmeStatistic.totalZurueckgezogen }}
           </div>
-          <div class="col-1">Um / Neugemeldet</div>
-          <div class="col-1">{{ teilnahmeStatistic.ummeldung }}/{{ teilnahmeStatistic.neumeldung }}</div>
-          <div class="col-1">Abgemeldet</div>
-          <div class="col-1">
+          <div class="layout-col-1">Um / Neugemeldet</div>
+          <div class="layout-col-1">{{ teilnahmeStatistic.ummeldung }}/{{ teilnahmeStatistic.neumeldung }}</div>
+          <div class="layout-col-1">Abgemeldet</div>
+          <div class="layout-col-1">
             {{ teilnahmeStatistic.abgemeldet_1 }} / {{ teilnahmeStatistic.abgemeldet_2 }} /
             {{ teilnahmeStatistic.abgemeldet_3 }}
           </div>
-          <div class="col-1">Verletzt</div>
-          <div class="col-1">
+          <div class="layout-col-1">Verletzt</div>
+          <div class="layout-col-1">
             {{ teilnahmeStatistic.verletzt }}
           </div>
-          <div class="col-1">Nicht gestartet</div>
-          <div class="col-1">
+          <div class="layout-col-1">Nicht gestartet</div>
+          <div class="layout-col-1">
             {{ teilnahmeStatistic.nichtGestartet }}
           </div>
         </div>
 
-        <div class="row">
-          <div class="col-3">
+        <div class="layout-row">
+          <div class="layout-col-3">
             <h2>Teilnehmer Import / Export</h2>
           </div>
-          <div class="col-sm-2">
+          <div class="layout-col-sm-2">
             <button
               mat-button
               color="primary"
@@ -65,7 +65,7 @@
               </mat-checkbox>
             </div>
           </div>
-          <div class="col-sm-2">
+          <div class="layout-col-sm-2">
             <button
               mat-button
               color="primary"
@@ -79,12 +79,12 @@
             </button>
           </div>
         </div>
-        <div class="row">
-          <div class="col-3">
+        <div class="layout-row">
+          <div class="layout-col-3">
             <h2>Teilnehmer Import von STV Contest</h2>
           </div>
-          <div class="col-sm-2"></div>
-          <div class="col-sm-2">
+          <div class="layout-col-sm-2"></div>
+          <div class="layout-col-sm-2">
             <button
               mat-button
               color="primary"
@@ -98,11 +98,11 @@
             </button>
           </div>
         </div>
-        <div class="row">
-          <div class="col-3">
+        <div class="layout-row">
+          <div class="layout-col-3">
             <h2>Wertungsrichter Export</h2>
           </div>
-          <div class="col-sm-2">
+          <div class="layout-col-sm-2">
             <button
               mat-button
               color="primary"
@@ -116,11 +116,11 @@
             </button>
           </div>
         </div>
-        <div class="row">
-          <div class="col-3">
+        <div class="layout-row">
+          <div class="layout-col-3">
             <h2>Benutzer Export</h2>
           </div>
-          <div class="col-sm-2">
+          <div class="layout-col-sm-2">
             <button
               mat-button
               color="primary"
@@ -134,11 +134,11 @@
             </button>
           </div>
         </div>
-        <div class="row">
-          <div class="col-3">
+        <div class="layout-row">
+          <div class="layout-col-3">
             <h2>Anmeldekontrolle Export</h2>
           </div>
-          <div class="col-sm-2">
+          <div class="layout-col-sm-2">
             <button
               mat-button
               color="primary"
@@ -152,11 +152,11 @@
             </button>
           </div>
         </div>
-        <div class="row">
-          <div class="col-3">
+        <div class="layout-row">
+          <div class="layout-col-3">
             <h2>Mutationen Export</h2>
           </div>
-          <div class="col-sm-2">
+          <div class="layout-col-sm-2">
             <button
               mat-button
               color="primary"
@@ -171,13 +171,13 @@
           </div>
         </div>
 
-        <div class="row">
-          <div class="col-2">
+        <div class="layout-row">
+          <div class="layout-col-2">
             <h2>Lauflisten</h2>
           </div>
-          <div class="col-10">
-            <div class="row">
-              <div class="col-2">
+          <div class="layout-col-10">
+            <div class="layout-row">
+              <div class="layout-col-2">
                 <mat-form-field appearance="fill">
                   <mat-label>Kategorie</mat-label>
                   <mat-select
@@ -195,7 +195,7 @@
                 </mat-form-field>
               </div>
 
-              <div class="col-3">
+              <div class="layout-col-3">
                 <mat-form-field appearance="fill">
                   <mat-label>Abteilung</mat-label>
                   <mat-select
@@ -212,7 +212,7 @@
                   </mat-select>
                 </mat-form-field>
               </div>
-              <div class="col-2">
+              <div class="layout-col-2">
                 <mat-form-field appearance="fill">
                   <mat-label>Anlage</mat-label>
                   <mat-select
@@ -229,7 +229,7 @@
                   </mat-select>
                 </mat-form-field>
               </div>
-              <div class="col-sm-2">
+              <div class="layout-col-sm-2">
                 <button
                   mat-button
                   color="primary"
@@ -243,12 +243,12 @@
                   Lauflisten löschen
                 </button>
               </div>
-              <div class="col-sm-1 move-checkbox">
+              <div class="layout-col-sm-1 move-checkbox">
                 <mat-checkbox *ngIf="hideOnlyTi" [(ngModel)]="onlyTi" [disabled]="isButtonsDisabled"
                   >nur Ti
                 </mat-checkbox>
               </div>
-              <div class="col-sm-2">
+              <div class="layout-col-sm-2">
                 <button
                   mat-button
                   color="primary"
@@ -265,13 +265,13 @@
             </div>
           </div>
         </div>
-        <div class="row" *ngIf="message">
-          <div class="col" *ngIf="!hasError">
+        <div class="layout-row" *ngIf="message">
+          <div class="layout-col" *ngIf="!hasError">
             <em class="success">
               {{ message }}
             </em>
           </div>
-          <div class="col" *ngIf="hasError">
+          <div class="layout-col" *ngIf="hasError">
             <em class="error">
               {{ message }}
             </em>
@@ -280,16 +280,16 @@
       </div>
     </mat-tab>
     <mat-tab label="Einteilung">
-      <div class="row">
-        <div class="col-sm-3">
+      <div class="layout-row">
+        <div class="layout-col-sm-3">
           <h2>Einteilung</h2>
         </div>
-        <div class="col-sm-9">
+        <div class="layout-col-sm-9">
           <button mat-button color="primary" (click)="refreshEinteilung()">Refresh Einteilung</button>
         </div>
       </div>
-      <div class="row">
-        <div class="col-sm-12">
+      <div class="layout-row">
+        <div class="layout-col-sm-12">
           <lxt-einteilung [anlass]="anlass" [refreshEmitter]="refreshEmitter"> </lxt-einteilung>
         </div>
       </div>

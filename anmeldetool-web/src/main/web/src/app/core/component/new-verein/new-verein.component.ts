@@ -1,12 +1,6 @@
-import { Component, signal, type OnInit } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  UntypedFormBuilder,
-  type UntypedFormGroup,
-  Validators,
-} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -16,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router, RouterModule } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop'; // <-- Wichtig für die Umwandlung
 import { switchMap } from 'rxjs';
 import type { IVerband } from 'src/app/core/model/IVerband';
 import { AuthService } from 'src/app/core/service/auth/auth.service';
@@ -48,9 +43,29 @@ import { UserComponent } from 'src/app/shared/component/user/user.component';
     UserComponent,
   ],
 })
-export class NewVereinComponent implements OnInit {
+export class NewVereinComponent {
+  // Moderne Dependency Injection via inject()
+  private formBuilder = inject(UntypedFormBuilder);
+  public dialogRef = inject(MatDialogRef<NewVereinComponent>);
+  private authService = inject(AuthService);
+  private vereinService = inject(VereinService);
+  private verbandService = inject(VerbandService);
+  private userService = inject(UserService);
+  private router = inject(Router);
+
   appearance = 'outline';
-  form: UntypedFormGroup;
+  form = this.formBuilder.group({
+    vereinsNameControl: ['', Validators.required],
+    verbandFormControl: ['', Validators.required],
+  });
+
+  // Lokaler State als veränderbare Signale
+  userValid = signal(false);
+  mouseoverlogin = signal(false);
+  error = signal(false);
+  errorMessage = signal<string | undefined>(undefined);
+
+  // Das Objekt wird weiterhin im Speicher gehalten für die API-Logik
   verein: IVerein = {
     id: '',
     name: '',
@@ -69,48 +84,13 @@ export class NewVereinComponent implements OnInit {
     aktiv: true,
   });
 
-  userValid = false;
-
-  selectedVerbandValue = '';
-  selectedVerband = '';
-
-  vereinsName = '';
-
-  mouseoverlogin = false;
-
-  vereine: IVerein[] = [];
-  verbaende: IVerband[] = [];
-
-  error = false;
-  errorMessage: string | undefined = undefined;
-
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    public dialogRef: MatDialogRef<NewVereinComponent>,
-    private authService: AuthService,
-    private vereinService: VereinService,
-    private verbandService: VerbandService,
-    private userService: UserService,
-    private router: Router,
-  ) {
-    this.form = this.formBuilder.group({
-      vereinsNameControl: [this.vereinsName, Validators.required],
-      verbandFormControl: ['', Validators.required],
-    });
-  }
-
-  ngOnInit(): void {
-    this.vereinService.getVereine().subscribe((vereine) => {
-      this.vereine = vereine;
-    });
-    this.verbandService.getVerband().subscribe((verbaende) => {
-      this.verbaende = verbaende;
-    });
-  }
+  // 1. Observables direkt in Lese-Signale umwandeln
+  // Initialwert ist ein leeres Array [], damit im Template sofort eine Liste da ist.
+  vereine = toSignal(this.vereinService.getVereine(), { initialValue: [] as IVerein[] });
+  verbaende = toSignal(this.verbandService.getVerband(), { initialValue: [] as IVerband[] });
 
   updateUserValid(valid: boolean): void {
-    this.userValid = valid;
-    // console.log("Valid changed", valid);
+    this.userValid.set(valid);
   }
 
   updateVerantwortlicher(user: IUser): void {
@@ -123,16 +103,18 @@ export class NewVereinComponent implements OnInit {
       { id: '', name: 'VEREINSVERANTWORTLICHER', aktiv: true },
     ];
 
-    this.verein.name = this.form.controls.vereinsNameControl.value;
-    this.verein.verbandId = this.form.controls.verbandFormControl.value;
-    console.log('Verband: ', this.verein.verbandId);
+    // Daten aus dem Formular holen
+    this.verein.name = this.form.controls.vereinsNameControl.value ?? '';
+    this.verein.verbandId = this.form.controls.verbandFormControl.value ?? '';
 
-    const existing = this.vereine.filter((verein) => {
-      return verein.name.toUpperCase() === this.verein.name.toUpperCase();
+    // 2. Existenzprüfung mit dem neuen vereine-Signal()
+    const existing = this.vereine().filter((v) => {
+      return v.name.toUpperCase() === this.verein.name.toUpperCase();
     });
+
     if (existing.length > 0) {
-      this.error = true;
-      this.errorMessage = 'Es existiert bereits ein Verein mit dem Namen: ' + this.verein.name;
+      this.error.set(true);
+      this.errorMessage.set('Es existiert bereits ein Verein mit dem Namen: ' + this.verein.name);
       return;
     }
 
@@ -144,12 +126,14 @@ export class NewVereinComponent implements OnInit {
     };
     const password = verantwortlicher.password ?? '';
 
-    this.userService.getUserByBenutzername(verantwortlicher.benutzername).subscribe(
-      (user) => {
+    // Diese Kette bleibt ein Observable, da es sich um eine einmalige "Aktion" (HTTP Post) handelt.
+    this.userService.getUserByBenutzername(verantwortlicher.benutzername).subscribe({
+      next: (user) => {
         if (user) {
-          this.error = true;
-          this.errorMessage =
-            'Es existiert bereits ein Benutzer mit dem Benutzernamen: ' + verantwortlicher.benutzername;
+          this.error.set(true);
+          this.errorMessage.set(
+            'Es existiert bereits ein Benutzer mit dem Benutzernamen: ' + verantwortlicher.benutzername,
+          );
         } else {
           this.vereinService
             .createVerein(this.verein)
@@ -159,61 +143,41 @@ export class NewVereinComponent implements OnInit {
                   ...verantwortlicher,
                   organisationids: [createdVerein.id],
                 };
-
+                this.authService.currentVerein = createdVerein;
+                this.verein = createdVerein;
                 return this.userService.createUser(userWithOrganisation);
               }),
             )
-            .subscribe(
-              (createdUser) => {
-                console.log('Neuer Verein inklusive User kreiert ', createdUser.benutzername);
-                // Immer erster !!
-                this.verein.id = createdUser.organisationids[0];
+            .subscribe({
+              next: (createdUser) => {
                 this.authService.login(this.verein, createdUser.benutzername, password).subscribe({
                   next: () => {
-                    this.router.navigate(['anlass']);
-
-                    /* ToDo check if preload is realy neccessary
-                           self.userService.reset().subscribe((result) => {
-                             // console.log("Login UserService loaded");
-                           });
-                           */
-                    // TODO check if preload is realy neccessary
-                    /*
-                           self.teilnehmerService
-                             .loadTeilnehmer(self.verein)
-                             .subscribe((result) => {
-                               // console.log("Login teilnehmerService loaded");
-                             });
-                             */
+                    this.router.navigate(['anlaesse']);
                   },
                   error: (msg) => {
-                    console.log('Error: ', msg);
+                    console.error('Error: ', msg);
                   },
                 });
-
                 this.dialogRef.close('OK');
               },
-              (error) => {
-                this.error = true;
-                this.errorMessage = error;
+              error: (err) => {
+                this.error.set(true);
+                this.errorMessage.set(err);
               },
-            );
+            });
         }
       },
-      (error) => {
-        console.error('Error', error);
+      error: (err) => {
+        console.error('Error', err);
       },
-    );
-
-    console.log('Save');
+    });
   }
 
   getError(): string {
-    console.log(this.form.errors);
     return '';
   }
+
   cancel(): void {
     this.dialogRef.close('CANCEL');
-    console.log('Cancel');
   }
 }

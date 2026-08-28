@@ -1,5 +1,8 @@
+import { AsyncPipe } from '@angular/common';
 import { Component, type OnInit } from '@angular/core';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import type { Update } from '@ngrx/entity';
 import { select, Store } from '@ngrx/store';
 import moment from 'moment';
@@ -14,12 +17,27 @@ import { AnlassSummariesActions, selectAnlassSummaryByAnlassId } from 'src/app/c
 import type { AppState } from 'src/app/core/redux/core.state';
 import { AuthService } from 'src/app/core/service/auth/auth.service';
 import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
+import { EventsDatesComponent } from '../dates/events-dates.component';
+import { AnlassDetailComponent } from './anlass-detail/anlass-detail.component';
+import { AnlassStatistikComponent } from './anlass-statistik/anlass-statistik.component';
+import { WertungsrichterSelektionComponent } from './wertungsrichter-selektion/wertungsrichter-selektion.component';
+import { A11yModule } from "@angular/cdk/a11y";
 
 @Component({
   selector: 'lxt-events-detail',
   templateUrl: './events-detail.component.html',
   styleUrls: ['./events-detail.component.css'],
   standalone: true,
+  imports: [
+    AsyncPipe,
+    RouterModule,
+    MatProgressSpinnerModule,
+    AnlassDetailComponent,
+    AnlassStatistikComponent,
+    WertungsrichterSelektionComponent,
+    EventsDatesComponent,
+    A11yModule
+],
 })
 export class EventsDetailComponent extends SubscriptionHelper implements OnInit {
   // @ViewChild("tabs") tabGroup: MatTabGroup;
@@ -54,7 +72,7 @@ export class EventsDetailComponent extends SubscriptionHelper implements OnInit 
     // TODO REDUX store.dispatch(AnlassSummaryActions.loadAllAnlasssummaryInvoked());
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     const anlassId: string = this.route.snapshot.params.id;
 
     this.anlass$ = this.store.pipe(select(selectAnlassById(anlassId)));
@@ -93,11 +111,11 @@ export class EventsDetailComponent extends SubscriptionHelper implements OnInit 
     return false;
   }
 
-  handleClickMe(event: PointerEvent) {
+  handleClickMe(event: PointerEvent): void {
     this.router.navigate(['anlass/anmeldungen/', this.anlass?.id]);
   }
 
-  startetChanged(start: boolean) {
+  startetChanged(start: boolean): void {
     // Hier update des via AnlassSummary
     const anlassSummaryUpdate: Update<IAnlassSummary> = {
       id: this.anlassSummary.anlassId,
@@ -166,7 +184,7 @@ export class EventsDetailComponent extends SubscriptionHelper implements OnInit 
       */
   }
   isViewOnly(): boolean {
-    return !this.authService.isAdministrator();
+    return !this.authService.isAdministratorSig();
   }
   isTuAnlass(): boolean {
     return this.anlass.tuAnlass;

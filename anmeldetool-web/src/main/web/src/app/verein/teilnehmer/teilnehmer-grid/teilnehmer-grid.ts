@@ -349,7 +349,7 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
   }
 
   registerSelects(): void {
-    this.anlaesseAlle$ = this.store.pipe(select(selectAnlaesseSortedNew(this.authService.isAdministrator())));
+    this.anlaesseAlle$ = this.store.pipe(select(selectAnlaesseSortedNew(this.authService.isAdministratorSig())));
     this.anlassSummaries$ = this.store.pipe(select(selectAnlassSummaries())) as Observable<IAnlassSummary[]>;
     this.jahresListeAnlaesse$ = this.store.pipe(select(selectJahre()));
     this.rowData$ = this.store.pipe(select(selectTeilnahmen())) as Observable<ITeilnahmen[]>;
@@ -529,7 +529,7 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
     mode = 4 --> Admin Mode (Alles erlaubt)
   */
   getMode(anlassExt: IAnlassExtended): number {
-    if (this.authService.isAdministrator()) {
+    if (this.authService.isAdministratorSig()) {
       return 4;
     }
     const anzeigeStatus = anlassExt.anlass.anzeigeStatus;
@@ -586,12 +586,10 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
       return false;
     }
 
-    if (
-      !(
-        (anlassExt.anlass.tiAnlass && isTiTuEnumEqual(params.data.teilnehmer.tiTu, TiTuEnum.Ti)) ||
-        (anlassExt.anlass.tuAnlass && isTiTuEnumEqual(params.data.teilnehmer.tiTu, TiTuEnum.Tu))
-      )
-    ) {
+    if (!(
+      (anlassExt.anlass.tiAnlass && isTiTuEnumEqual(params.data.teilnehmer.tiTu, TiTuEnum.Ti)) ||
+      (anlassExt.anlass.tuAnlass && isTiTuEnumEqual(params.data.teilnehmer.tiTu, TiTuEnum.Tu))
+    )) {
       return false;
     }
 

@@ -6,6 +6,7 @@ import jakarta.transaction.NotSupportedException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.NoSuchElementException;
@@ -137,7 +138,7 @@ public class AdminController {
   public ResponseEntity<PersonDTO> createUser(@RequestHeader("vereinsid") UUID vereinsId,
       @RequestBody PersonDTO personDTO) throws URISyntaxException {
     log.info("Creating user {}, {}, {}", personDTO.id(),personDTO.benutzername(), vereinsId);
-    personSrv.create(personDTO, vereinsId);
+    personDTO = personSrv.create(personDTO, vereinsId);
     URI location =  new URI("/admin/user" + personDTO.id().toString());
     return ResponseEntity.created(location).body(personDTO);
   }
@@ -154,11 +155,12 @@ public class AdminController {
     return ResponseEntity.ok(personSrv.findPersonsDtoByOrganisationId(vereinsId));
   }
 
+  //Soll ohne Auth und ohne vereinsid funktionieren
   @GetMapping("/user/benutzernamen/{benutzername}")
   public ResponseEntity<PersonDTO> getPersonByBenutzername(
       @PathVariable("benutzername") String benutzernameEndcoded ) {
     try {
-      String benutzername = java.net.URLDecoder.decode(benutzernameEndcoded, StandardCharsets.UTF_8.name());
+      String benutzername = URLDecoder.decode(benutzernameEndcoded, StandardCharsets.UTF_8.name());
       return ResponseEntity.ok(personSrv.findPersonDtoByBenutzername(benutzername));
     } catch (UnsupportedEncodingException e) {
       // not going to happen - value came from JDK's own StandardCharsets

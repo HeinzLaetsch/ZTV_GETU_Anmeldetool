@@ -10,6 +10,6 @@ export class AuthServiceResolverService implements Resolve<any> {
 
   resolve() {
     console.log('resolve Auth');
-    return this.authService.isAuthenticated();
+    return this.authService.isAuthenticatedSig();
   }
 }

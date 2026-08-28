@@ -11,21 +11,33 @@
   },
   "targets": {
     "build": {
-      "executor": "@angular-devkit/build-angular:browser",
+      "executor": "@angular/build:application",
       "options": {
         "outputPath": "dist/at-app",
         "index": "src/index.html",
-        "main": "src/main.ts",
-        "polyfills": "src/polyfills.ts",
+        "browser": "src/main.ts",
+        "polyfills": [
+          "src/polyfills.ts"
+        ],
         "tsConfig": "tsconfig.app.json",
         "aot": false,
         "inlineStyleLanguage": "scss",
+        "stylePreprocessorOptions": {
+          "includePaths": [
+            ".",
+            "src"
+          ]
+        },
         "assets": [
           "src/favicon.ico",
           "src/assets"
         ],
         "styles": [
           "src/styles.scss"
+        ],
+        "allowedCommonJsDependencies": [
+          "moment",
+          "file-saver"
         ],
         "scripts": [
           "node_modules/jquery/dist/jquery.min.js"
@@ -36,10 +48,11 @@
           "baseHref": "/ztv-anmeldetool/",
           "optimization": false,
           "sourceMap": true,
-          "namedChunks": true,
           "extractLicenses": true,
-          "vendorChunk": true,
-          "buildOptimizer": false,
+          "allowedCommonJsDependencies": [
+            "moment",
+            "file-saver"
+          ],
           "budgets": [
             {
               "type": "initial",
@@ -64,11 +77,12 @@
           "optimization": true,
           "outputHashing": "all",
           "sourceMap": false,
-          "namedChunks": false,
           "aot": true,
           "extractLicenses": true,
-          "vendorChunk": false,
-          "buildOptimizer": true,
+          "allowedCommonJsDependencies": [
+            "moment",
+            "file-saver"
+          ],
           "budgets": [
             {
               "type": "initial",
@@ -93,15 +107,16 @@
           "optimization": true,
           "outputHashing": "all",
           "sourceMap": false,
-          "namedChunks": false,
           "aot": true,
           "extractLicenses": true,
-          "vendorChunk": false,
-          "buildOptimizer": true,
+          "allowedCommonJsDependencies": [
+            "moment",
+            "file-saver"
+          ],
           "budgets": [
             {
               "type": "initial",
-              "maximumWarning": "2mb",
+              "maximumWarning": "3.2mb",
               "maximumError": "5mb"
             },
             {
@@ -118,9 +133,10 @@
       ]
     },
     "serve": {
-      "executor": "@angular-devkit/build-angular:dev-server",
+      "executor": "@angular/build:dev-server",
       "options": {
-        "buildTarget": "at-app:build:development"
+        "buildTarget": "at-app:build:development",
+        "servePath": "/ztv-anmeldetool"
       },
       "configurations": {
         "development": {

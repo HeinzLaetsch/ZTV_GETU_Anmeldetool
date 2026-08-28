@@ -1,19 +1,20 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from 'src/app/shared/material-module';
 
+export type HasChangesDialogResult = 'leave' | 'stay';
+
 @Component({
-  selector: 'lxt-has-changes',
+  selector: 'ztv-has-changes',
   templateUrl: './has-changes.component.html',
   styleUrls: ['./has-changes.component.css'],
   standalone: true,
   imports: [MaterialModule],
 })
 export class HasChangesComponent {
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public data: any,
-    public dialogRef: MatDialogRef<HasChangesComponent>,
-  ) {}
+  readonly data = inject(MAT_DIALOG_DATA);
+  readonly dialogRef = inject(MatDialogRef<HasChangesComponent>);
+
   cancel(): void {
     console.log('Cancel');
     this.dialogRef.close('Cancel');

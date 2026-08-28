@@ -1,0 +1,28 @@
+<form (submit)="onSubmit()" class="form-container">
+  <!-- Passwort Feld -->
+  <mat-form-field appearance="fill">
+    <mat-label>Passwort</mat-label>
+    <input matInput type="password" [formField]="userForm.password" placeholder="Sicheres Passwort eingeben" />
+  </mat-form-field>
+
+  <!-- Person Autocomplete Feld (Filterung nach Name) -->
+  <mat-form-field appearance="fill">
+    <mat-label>Person auswählen (Name)</mat-label>
+    <input type="text" matInput [formField]="userForm.selectedPersonText" [matAutocomplete]="auto" />
+
+    <mat-autocomplete #auto="matAutocomplete">
+      @for (person of gefiltertePersonen(); track person.id) {
+        <mat-option [value]="person.name" (onSelectionChange)="onPersonSelected(person)">
+          {{ person.name }} <span class="email-hint">({{ person.email }})</span>
+        </mat-option>
+      }
+    </mat-autocomplete>
+
+    @if (userForm.selectedPersonText().touched && userForm.selectedPersonText().invalid()) {
+      <mat-error>Bitte wähle eine Person aus der Liste aus.</mat-error>
+    }
+  </mat-form-field>
+
+  <!-- Submit Button -->
+  <button type="submit" [disabled]="userForm().invalid()">Absenden</button>
+</form>

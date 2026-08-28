@@ -61,7 +61,7 @@
 
   //--mat-form-field-container-vertical-padding: 5px;
   --mat-sys-corner-extra-small: 10px;
- 
+
   //--mat-option-label-text-line-height: 1.0em;
   //--mat-option-focus-state-layer-color: rgba(72, 141, 214, 0.5);
   --mat-form-field-outlined-label-text-font: Roboto, 'Helvetica Neue', sans-serif;
@@ -79,7 +79,7 @@
 
   --mdc-list-list-item-hover-state-layer-color: inverse-primary;
 
-  // OK 
+  // OK
   --mat-option-hover-state-layer-color: var(--mat-sys-inverse-primary);
   --mat-option-selected-state-layer-color: var(--ztv-lighter-gray);
 }
@@ -225,4 +225,16 @@ body,
 .zahl {
   text-align: right;
   width: 40px;
+}
+
+.links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.link {
+  color: var(--ztv-blue);
+  cursor: pointer;
+  text-decoration: underline;
 }

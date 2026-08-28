@@ -1,18 +1,22 @@
 // @ts-check
-const eslint = require("@eslint/js");
-const tseslint = require("typescript-eslint");
-const angular = require("@angular-eslint/eslint-plugin");
-const angularTemplate = require("@angular-eslint/eslint-plugin-template");
-const eslintConfigPrettier = require("eslint-config-prettier");
-const { FlatCompat } = require("@eslint/eslintrc");
-const path = require("path");
+import eslint from "@eslint/js";
+import tseslint from "typescript-eslint";
+import angular from "@angular-eslint/eslint-plugin";
+import angularTemplate from "@angular-eslint/eslint-plugin-template";
+import eslintConfigPrettier from "eslint-config-prettier";
+import { FlatCompat } from "@eslint/eslintrc";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const compat = new FlatCompat({
 	baseDirectory: __dirname,
 	recommendedConfig: eslint.configs.recommended,
 });
 
-module.exports = tseslint.config(
+export default tseslint.config(
 	{
 		ignores: [".angular/**", ".nx/**", "coverage/**", "dist/**"],
 	},
@@ -39,7 +43,7 @@ module.exports = tseslint.config(
 				"error",
 				{
 					type: "attribute",
-					prefix: "lxt",
+					prefix: "ztv",
 					style: "camelCase",
 				},
 			],
@@ -47,7 +51,7 @@ module.exports = tseslint.config(
 				"error",
 				{
 					type: ["attribute", "element"],
-					prefix: "lxt",
+					prefix: "ztv",
 					style: "kebab-case",
 				},
 			],

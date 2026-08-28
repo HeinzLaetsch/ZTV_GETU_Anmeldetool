@@ -14,6 +14,7 @@ import { RanglistenComponent } from './rangliste/ranglisten.component';
   selector: 'lxt-rechnungsbuero',
   templateUrl: './rechnungsbuero.component.html',
   styleUrls: ['./rechnungsbuero.component.scss'],
+  standalone: true,
   imports: [CommonModule, MatTabsModule, ErfassenComponent, RanglistenComponent],
 })
 export class RechnungsbueroComponent implements OnInit {

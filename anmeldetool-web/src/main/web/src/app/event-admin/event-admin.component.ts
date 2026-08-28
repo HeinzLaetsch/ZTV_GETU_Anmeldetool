@@ -1,4 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, type OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { select, Store } from '@ngrx/store';
@@ -14,14 +16,18 @@ import { RanglistenService } from 'src/app/core/service/rangliste/ranglisten.ser
 import { selectAnlassById } from '../core/redux/anlass';
 import type { AppState } from '../core/redux/core.state';
 import { AnlassService } from '../core/service/anlass/anlass.service';
+import { MaterialModule } from '../shared/material-module';
 import { SubscriptionHelper } from '../utils/subscription-helper';
 import { ContestUpload } from './contest-upload-dialog/contest-upload.component';
+import { EinteilungComponent } from './einteilung/einteilung.component';
 import { Upload } from './upload-dialog/upload.component';
 
 @Component({
   selector: 'lxt-event-admin',
   templateUrl: './event-admin.component.html',
   styleUrls: ['./event-admin.component.css'],
+  standalone: true,
+  imports: [CommonModule, FormsModule, MaterialModule, EinteilungComponent],
 })
 export class EventAdminComponent extends SubscriptionHelper implements OnInit {
   anlass$!: Observable<IAnlass>;
@@ -87,7 +93,7 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
   }
 
   get administrator(): boolean {
-    return this.authService.isAdministrator();
+    return this.authService.isAdministratorSig();
   }
 
   get sekretariat(): boolean {
@@ -102,12 +108,12 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
     this.anlassService.getTeilnehmerForAnlassCsv(this.anlass, this.rotieren);
   }
   importTeilnehmer(): void {
-    const dialogRef = this.dialog.open(Upload, {
+    this.dialog.open(Upload, {
       data: this.anlass,
     });
   }
   importContestTeilnehmer(): void {
-    const dialogRef = this.dialog.open(ContestUpload, {
+    this.dialog.open(ContestUpload, {
       data: this.anlass,
     });
   }

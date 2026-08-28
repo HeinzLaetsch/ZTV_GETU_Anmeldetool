@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import type { ProgressBarMode } from '@angular/material/progress-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -24,7 +24,8 @@ import { LoadingActions } from '../../redux/busy-indicator-progress-bar/busy-ind
   imports: [CommonModule, MatProgressBarModule, MatSnackBarModule],
 })
 export class BusyIndicatorProgressBarComponent extends SubscriptionHelper {
-  mode: ProgressBarMode = 'determinate';
+  mode = signal<ProgressBarMode>('query');
+
   durationInSeconds = 5;
 
   isLoading$: Observable<ILoading[]>;
@@ -44,7 +45,7 @@ export class BusyIndicatorProgressBarComponent extends SubscriptionHelper {
       this.isLoading$.subscribe((data) => {
         if (data && data.length > 0) {
           console.log('ProgressBarMode: buffer 1');
-          this.mode = 'buffer';
+          this.mode.set('buffer');
         }
       }),
     );
@@ -64,12 +65,31 @@ export class BusyIndicatorProgressBarComponent extends SubscriptionHelper {
                 isAllFinished = false;
               }
             });
+            if (isAllFinished) {
+              console.log('ProgressBarMode: determinate 2');
+              this.mode.set('determinate');
+            }
           }
         }
       }),
     );
-  }
 
+    this.registerSubscription(
+      this.isError$.subscribe((data) => {
+        if (data && data.length > 0) {
+          console.log('ProgressBarMode: determinate 3');
+          this.mode.set('determinate');
+          const error = data.find((x) => x.hasError);
+          this.openSnackBar(error);
+          this.store.dispatch(
+            LoadingActions.loadingEventProcessed({
+              payload: error.id,
+            }),
+          );
+        }
+      }),
+    );
+  }
   openSnackBar(data: ILoading): void {
     this._snackBar.openFromComponent(SnackBarComponent, {
       duration: this.durationInSeconds * 1000,

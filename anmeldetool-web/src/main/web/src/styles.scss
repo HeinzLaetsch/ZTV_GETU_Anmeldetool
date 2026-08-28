@@ -8,6 +8,254 @@ body {
   height: 100%;
 }
 
+/* Lightweight layout utilities replacing Bootstrap grid classes used in templates. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.layout-container,
+.layout-container-sm,
+.layout-container-lg,
+.layout-container-fluid {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 0.75rem;
+  padding-left: 0.75rem;
+}
+
+.layout-container,
+.layout-container-sm,
+.layout-container-lg {
+  max-width: 1200px;
+}
+
+@media (max-width: 575.98px) {
+  .layout-container,
+  .layout-container-sm,
+  .layout-container-lg {
+    max-width: 100%;
+  }
+}
+
+.layout-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -0.75rem;
+  margin-left: -0.75rem;
+}
+
+.layout-row > * {
+  width: 100%;
+  max-width: 100%;
+  padding-right: 0.75rem;
+  padding-left: 0.75rem;
+}
+
+.layout-col {
+  flex: 1 0 0%;
+}
+
+.layout-col-auto {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.layout-col-1 {
+  flex: 0 0 auto;
+  width: 8.333333%;
+}
+
+.layout-col-2 {
+  flex: 0 0 auto;
+  width: 16.666667%;
+}
+
+.layout-col-3 {
+  flex: 0 0 auto;
+  width: 25%;
+}
+
+.layout-col-4 {
+  flex: 0 0 auto;
+  width: 33.333333%;
+}
+
+.layout-col-5 {
+  flex: 0 0 auto;
+  width: 41.666667%;
+}
+
+.layout-col-6 {
+  flex: 0 0 auto;
+  width: 50%;
+}
+
+.layout-col-7 {
+  flex: 0 0 auto;
+  width: 58.333333%;
+}
+
+.layout-col-8 {
+  flex: 0 0 auto;
+  width: 66.666667%;
+}
+
+.layout-col-9 {
+  flex: 0 0 auto;
+  width: 75%;
+}
+
+.layout-col-10 {
+  flex: 0 0 auto;
+  width: 83.333333%;
+}
+
+.layout-col-11 {
+  flex: 0 0 auto;
+  width: 91.666667%;
+}
+
+.layout-col-12 {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+@media (min-width: 576px) {
+  .layout-col-sm {
+    flex: 1 0 0%;
+  }
+
+  .layout-col-sm-1 {
+    flex: 0 0 auto;
+    width: 8.333333%;
+  }
+
+  .layout-col-sm-2 {
+    flex: 0 0 auto;
+    width: 16.666667%;
+  }
+
+  .layout-col-sm-3 {
+    flex: 0 0 auto;
+    width: 25%;
+  }
+
+  .layout-col-sm-4 {
+    flex: 0 0 auto;
+    width: 33.333333%;
+  }
+
+  .layout-col-sm-5 {
+    flex: 0 0 auto;
+    width: 41.666667%;
+  }
+
+  .layout-col-sm-6 {
+    flex: 0 0 auto;
+    width: 50%;
+  }
+
+  .layout-col-sm-7 {
+    flex: 0 0 auto;
+    width: 58.333333%;
+  }
+
+  .layout-col-sm-8 {
+    flex: 0 0 auto;
+    width: 66.666667%;
+  }
+
+  .layout-col-sm-9 {
+    flex: 0 0 auto;
+    width: 75%;
+  }
+
+  .layout-col-sm-10 {
+    flex: 0 0 auto;
+    width: 83.333333%;
+  }
+
+  .layout-col-sm-11 {
+    flex: 0 0 auto;
+    width: 91.666667%;
+  }
+
+  .layout-col-sm-12 {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .layout-col-md-auto {
+    flex: 0 0 auto;
+    width: auto;
+  }
+
+  .layout-col-md-1 {
+    flex: 0 0 auto;
+    width: 8.333333%;
+  }
+
+  .layout-col-md-2 {
+    flex: 0 0 auto;
+    width: 16.666667%;
+  }
+
+  .layout-col-md-3 {
+    flex: 0 0 auto;
+    width: 25%;
+  }
+
+  .layout-col-md-4 {
+    flex: 0 0 auto;
+    width: 33.333333%;
+  }
+
+  .layout-col-md-5 {
+    flex: 0 0 auto;
+    width: 41.666667%;
+  }
+
+  .layout-col-md-6 {
+    flex: 0 0 auto;
+    width: 50%;
+  }
+
+  .layout-col-md-7 {
+    flex: 0 0 auto;
+    width: 58.333333%;
+  }
+
+  .layout-col-md-8 {
+    flex: 0 0 auto;
+    width: 66.666667%;
+  }
+
+  .layout-col-md-9 {
+    flex: 0 0 auto;
+    width: 75%;
+  }
+
+  .layout-col-md-10 {
+    flex: 0 0 auto;
+    width: 83.333333%;
+  }
+
+  .layout-col-md-11 {
+    flex: 0 0 auto;
+    width: 91.666667%;
+  }
+
+  .layout-col-md-12 {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+}
+
 .max-height-dialog {
   .mat-mdc-dialog-container .mdc-dialog__surface {
     max-height: 80vh !important; // Bezieht sich auf 80% des Bildschirms
@@ -24,6 +272,7 @@ body {
   .mat-mdc-dialog-content {
     flex-grow: 1;
     overflow-y: auto;
+    max-height: 95vh; // Bezieht sich auf 80% des Bildschirms
     /* Aktiviert das Scrollen */
   }
 }

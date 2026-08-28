@@ -9,16 +9,16 @@ import type { AppState } from 'src/app/core/redux/core.state';
 import { UserActions } from 'src/app/core/redux/user';
 import { MaterialModule } from '../../material-module';
 import { ConfirmedValidator } from '../../validators/ConfirmedValidator';
-import { MyTel, PhoneInput } from '../phonenumber/phone-input-component';
+import { MyTel } from '../phonenumber/phone-input-component';
 import { UserExists } from './user-exists/user-exists.component';
 
 @Component({
-  selector: 'app-user',
+  selector: 'lxt-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule, PhoneInput],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule],
 })
 export class UserComponent {
   // Inputs

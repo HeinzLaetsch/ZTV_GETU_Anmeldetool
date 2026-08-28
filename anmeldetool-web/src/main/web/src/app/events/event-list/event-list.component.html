@@ -1,15 +1,19 @@
 <h1>ZTV Anlässe</h1>
 <hr />
-<div class="row" *ngIf="anlaesse$ | async; else loading">
-  <div *ngIf="showEvents" class="row">
-    <div *ngFor="let anlass of anlaesseExtended" class="col-md-auto">
-      <lxt-event-thumbnail #thumbnail [anlassExtended]="anlass"></lxt-event-thumbnail>
-    </div>
+@if (anlaesseSig()) {
+  <div class="layout-row">
+    @if (showEvents()) {
+      <div class="layout-row">
+        @for (anlass of anlaesseExtended(); track anlass.anlass.id) {
+          <div class="layout-col-md-auto">
+            <lxt-event-thumbnail #thumbnail [anlassExtended]="anlass"></lxt-event-thumbnail>
+          </div>
+        }
+      </div>
+    }
   </div>
-</div>
-
-<ng-template #loading>
+} @else {
   <div class="center">
     <mat-spinner style="margin: 0 auto"></mat-spinner>
   </div>
-</ng-template>
+}

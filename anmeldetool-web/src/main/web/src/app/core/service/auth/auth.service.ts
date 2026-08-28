@@ -1,28 +1,66 @@
 import { HttpClient } from '@angular/common/http';
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { catchError, mapTo, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { IUser } from 'src/app/core/model/IUser';
 import { IVerein } from 'src/app/verein/verein';
 import { environment } from 'src/environments/environment';
 import { ILoginData } from '../../model/ILoginData';
 import { CachingUserService } from '../caching-services/caching.user.service';
+import { UserActions } from '../../redux/user';
+import { AppState } from '../../redux/core.state';
+import { Store } from '@ngrx/store';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  private store: Store<AppState> = inject(Store<AppState>);
+  
   // Privates Signal für den Login-Status
   private readonly _isLoggedIn = signal(false);
 
+  private readonly _currentUser = signal<IUser | null>(null);
+
   // Read-only Signal für die Komponenten
   readonly isLoggedIn = computed(() => this._isLoggedIn());
+
+  readonly isAuthenticatedSig = computed(() => this.isLoggedIn());
+
+  readonly isAdministratorSig = computed(() => this.isAuthenticatedSig() && this.hasRole('ADMINISTRATOR'));
+
+  readonly isVereinsVerantwortlicherSig = computed(
+    () => this.isAdministratorSig() || (this.isAuthenticatedSig() && this.hasRole('VEREINSVERANTWORTLICHER')),
+  );
+
+  readonly isVereinsAnmmelderSig = computed(
+    () =>
+      this.isAdministratorSig() ||
+      (this.isAuthenticatedSig() && (this.hasRole('ANMELDER') || this.isVereinsVerantwortlicherSig())),
+  );
+
+  readonly isWertungsrichterSig = computed(
+    () => this.isAdministratorSig() || (this.isAuthenticatedSig() && this.hasRole('WERTUNGSRICHTER')),
+  );
+
+  readonly isRechnungsbueroSig = computed(() => this.isAuthenticatedSig() && this.hasRole('RECHNUNGSBUERO'));
+
+  readonly isSekretariatSig = computed(() => this.isAuthenticatedSig() && this.hasRole('SEKRETARIAT'));
+
+  readonly isAnlassUserSig = computed(() => this.isRechnungsbueroSig() || this.isSekretariatSig());
 
   private readonly apiHost = `${environment.apiHost}`;
   private readonly loginUrl = this.apiHost + '/admin/login';
 
   private token = '';
 
-  currentUser!: IUser;
+  get currentUser(): IUser | null {
+    return this._currentUser();
+  }
+
+  set currentUser(user: IUser | null) {
+    this._currentUser.set(user);
+  }
+
   private _currentVerein!: IVerein;
   private _selectedVerein!: IVerein;
 
@@ -34,7 +72,7 @@ export class AuthService {
     this._currentVerein = verein;
   }
   get currentVerein(): IVerein {
-    if (!this.isAdministrator()) {
+    if (!this.isAdministratorSig()) {
       return this._currentVerein;
     } else {
       if (this._selectedVerein) {
@@ -44,7 +82,7 @@ export class AuthService {
     }
   }
 
-  setToken(token: string) {
+  setToken(token: string): void {
     this.token = token;
   }
   getToken(): string {
@@ -52,7 +90,7 @@ export class AuthService {
   }
 
   selectVerein(verein: IVerein): void {
-    if (this.isAdministrator()) {
+    if (this.isAdministratorSig()) {
       this._selectedVerein = verein;
     }
   }
@@ -68,15 +106,9 @@ export class AuthService {
       tap((user) => {
         this.currentUser = user;
         this.currentVerein = verein;
+        this.store.dispatch(UserActions.loadAllUserInvoked());
         this._isLoggedIn.set(true);
       }),
-      switchMap((user) =>
-        this.userService.loadUser().pipe(
-          mapTo(user),
-          // Keep login successful even if user cache refresh fails.
-          catchError(() => of(user)),
-        ),
-      ),
       catchError((error) => {
         this._isLoggedIn.set(false);
         return throwError(() => error);
@@ -86,7 +118,7 @@ export class AuthService {
   /*
    */
   isAuthenticated(): boolean {
-    return this.isLoggedIn();
+    return this.isAuthenticatedSig();
   }
 
   hasRole(roleName: string): boolean {
@@ -99,62 +131,29 @@ export class AuthService {
   }
 
   isVereinsAnmmelder(): boolean {
-    if (this.isAdministrator()) {
-      return true;
-    }
-    if (this.isAuthenticated()) {
-      return this.hasRole('ANMELDER') || this.isVereinsVerantwortlicher();
-    } else {
-      return false;
-    }
+    return this.isVereinsAnmmelderSig();
   }
 
   isVereinsVerantwortlicher(): boolean {
-    if (this.isAdministrator()) {
-      return true;
-    }
-    if (this.isAuthenticated()) {
-      return this.hasRole('VEREINSVERANTWORTLICHER');
-    } else {
-      return false;
-    }
+    return this.isVereinsVerantwortlicherSig();
   }
 
   isWertungsrichter(): boolean {
-    if (this.isAdministrator()) {
-      return true;
-    }
-    if (this.isAuthenticated()) {
-      return this.hasRole('WERTUNGSRICHTER');
-    } else {
-      return false;
-    }
+    return this.isWertungsrichterSig();
   }
 
   isAdministrator(): boolean {
-    if (this.isAuthenticated()) {
-      return this.hasRole('ADMINISTRATOR');
-    } else {
-      return false;
-    }
+    return this.isAdministratorSig();
   }
 
   isRechnungsbuero(): boolean {
-    if (this.isAuthenticated()) {
-      return this.hasRole('RECHNUNGSBUERO');
-    } else {
-      return false;
-    }
+    return this.isRechnungsbueroSig();
   }
   isSekretariat(): boolean {
-    if (this.isAuthenticated()) {
-      return this.hasRole('SEKRETARIAT');
-    } else {
-      return false;
-    }
+    return this.isSekretariatSig();
   }
 
   isAnlassUser(): boolean {
-    return this.isRechnungsbuero() || this.isSekretariat();
+    return this.isAnlassUserSig();
   }
 }

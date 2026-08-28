@@ -1,12 +1,13 @@
-import { AuthRouteActivatorService } from '../core/routing/auth-route-activator.service';
+import { Routes } from '@angular/router';
+import { authCanActivate } from '../core/routing/auth-route-activator.service';
 import { CanDeactivateProfileGuard } from './profile/guards/can-deactivate-profile.guard';
 import { ProfileComponent } from './profile/profile.component';
 
-export const UserRoutes = [
+export const UserRoutes: Routes = [
   {
-    path: 'user',
+    path: '',
     component: ProfileComponent,
-    canActivate: [AuthRouteActivatorService],
+    canActivate: [authCanActivate],
     canDeactivate: [CanDeactivateProfileGuard],
   },
 ];

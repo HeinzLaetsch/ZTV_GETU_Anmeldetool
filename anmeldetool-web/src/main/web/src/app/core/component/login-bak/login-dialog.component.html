@@ -1,0 +1,85 @@
+<div class="layout-container">
+  <h1>Login</h1>
+  <hr />
+  <pre>
+value: {{ vereinControl.value | json }}
+errors: {{ vereinControl.errors | json }}
+valid: {{ vereinControl.valid }}
+</pre>
+  <hr />
+  <form [formGroup]="loginForm" (ngSubmit)="login()">
+    <mat-dialog-content>
+      <!--p-->
+      <mat-form-field [appearance]="appearance">
+        <mat-label>Verein</mat-label>
+        <input matInput type="text" [formControl]="verein" [matAutocomplete]="auto" />
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onVereinSelected($event)">
+          @for (verein of filteredOptions | async; track verein.id) {
+            <mat-option [value]="verein">
+              {{ verein.name }}
+            </mat-option>
+          }
+        </mat-autocomplete>
+        @if (vereinControl.invalid && (vereinControl.dirty || vereinControl.touched)) {
+          <mat-error> Invalid </mat-error>
+        }
+        @if (vereinControl.hasError('required')) {
+          <mat-error> Pflichtfeld </mat-error>
+        }
+        @if (vereinControl.hasError('vereinSelection')) {
+          <mat-error> Bitte einen Verein aus der Liste auswaehlen </mat-error>
+        }
+        <mat-hint>Wähle deinen Verein aus</mat-hint>
+      </mat-form-field>
+      <!--/p-->
+
+      <p>
+        <mat-form-field [appearance]="appearance">
+          <mat-label>Benutzername</mat-label>
+          <input matInput placeholder="Benutzername" formControlName="userName" />
+          @if (userNameControl.hasError('required')) {
+            <mat-error> Pflichtfeld </mat-error>
+          }
+          @if (userNameControl.invalid && (userNameControl.dirty || userNameControl.touched)) {
+            <div class="error-zone">
+              @if (userNameControl.hasError('required')) {
+                <p style="color: red">Dieses Feld ist ein Pflichtfeld!</p>
+              }
+              @if (userNameControl.hasError('email')) {
+                <p style="color: red">Der Name muss mindestens 4 Zeichen lang sein.</p>
+              }
+            </div>
+          }
+
+          <mat-hint>Gib den Benutzernamen(eMail) ein</mat-hint>
+        </mat-form-field>
+      </p>
+
+      <p>
+        <mat-form-field [appearance]="appearance">
+          <mat-label>Passwort</mat-label>
+          <input matInput type="password" placeholder="Passwort" formControlName="password" />
+          @if (passwordControl.hasError('required')) {
+            <mat-error> Pflichtfeld </mat-error>
+          }
+          <mat-hint>Gib das Passwort ein</mat-hint>
+        </mat-form-field>
+      </p>
+    </mat-dialog-content>
+    <div>
+      <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+      <button [disabled]="loginForm.invalid" mat-button type="submit">Login</button>
+      @if (loginError) {
+        <mat-error class="error"> {{ errorMessage }}</mat-error>
+      }
+    </div>
+  </form>
+  <div>
+    <button mat-button (click)="newVereinClicked()">Neues Vereinslogin beantragen</button>
+  </div>
+  <div>
+    <button mat-button [mat-dialog-close]="true" (click)="newAnmelderClicked()">
+      Neuen Vereinsanmelder beantragen
+    </button>
+  </div>
+</div>

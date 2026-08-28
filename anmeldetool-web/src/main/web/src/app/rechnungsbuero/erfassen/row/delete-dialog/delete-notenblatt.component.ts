@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import type { ILauflistenEintrag } from 'src/app/core/model/ILauflistenEintrag';
 
@@ -8,11 +8,12 @@ import type { ILauflistenEintrag } from 'src/app/core/model/ILauflistenEintrag';
   styleUrls: ['./delete-notenblatt.component.css'],
   standalone: true,
   imports: [MatDialogModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotenBlattZurueckZiehen {
-  readonly ABBRECHEN = 'abbrechen';
-  readonly VERLETZT = 'verletzt';
-  readonly NICHT_ANGETRETEN = 'nichtAngetreten';
+  readonly eintrag = inject<ILauflistenEintrag>(MAT_DIALOG_DATA);
 
-  constructor(@Inject(MAT_DIALOG_DATA) public eintrag: ILauflistenEintrag) {}
+  readonly ABBRECHEN = 'abbrechen' as const;
+  readonly VERLETZT = 'verletzt' as const;
+  readonly NICHT_ANGETRETEN = 'nichtAngetreten' as const;
 }

@@ -2,6 +2,7 @@ import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
 import { IOrganisationAnlassLink } from '../../model/IOrganisationAnlassLink';
 
 export const oalAdapter: EntityAdapter<IOrganisationAnlassLink> = createEntityAdapter<IOrganisationAnlassLink>({
+  selectId: (entity) => `${entity.anlassId}_${entity.organisationsId}`,
   sortComparer: sortByAnlassId,
 });
 
@@ -9,7 +10,7 @@ export function sortByAnlassId(a: IOrganisationAnlassLink, b: IOrganisationAnlas
   return a.anlassId.localeCompare(b.anlassId);
 }
 
-export type OalState = {} & EntityState<IOrganisationAnlassLink>
+export type OalState = {} & EntityState<IOrganisationAnlassLink>;
 
 export const initialState: OalState = oalAdapter.getInitialState();
 

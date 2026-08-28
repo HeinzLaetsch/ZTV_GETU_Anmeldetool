@@ -1,47 +1,47 @@
-<div class="row">
-  <div class="col-base col-1 right">
+<div class="layout-row">
+  <div class="col-base layout-col-1 right">
     <span *ngIf="entry.rang === index + 1"> {{ entry.rang }}. </span>
   </div>
-  <div class="col-base col-3">
+  <div class="col-base layout-col-3">
     {{ entry.name }}
   </div>
-  <div class="col-base col-3">
+  <div class="col-base layout-col-3">
     {{ entry.vorname }}
   </div>
-  <div class="col-base col-3">
+  <div class="col-base layout-col-3">
     {{ entry.verein }}
   </div>
-  <div class="col-base col-1">
+  <div class="col-base layout-col-1">
     {{ entry.jahrgang }}
   </div>
-  <div class="col-base col-1">
+  <div class="col-base layout-col-1">
     {{ entry.noteReck | number: '1.2-2' }}
   </div>
-  <div class="col-base col-1">
+  <div class="col-base layout-col-1">
     {{ entry.noteBoden | number: '1.2-2' }}
   </div>
-  <div class="col-base col-1">
+  <div class="col-base layout-col-1">
     {{ entry.noteSchaukelringe | number: '1.2-2' }}
   </div>
-  <div class="col-base col-1">
+  <div class="col-base layout-col-1">
     {{ entry.noteSprung1 | number: '1.2-2' }}
   </div>
-  <div class="col-base col-1">
+  <div class="col-base layout-col-1">
     {{ entry.noteSprung2 | number: '1.2-2' }}
   </div>
-  <div class="col-base col-1">
+  <div class="col-base layout-col-1">
     {{ entry.noteZaehlbar | number: '1.2-2' }}
   </div>
-  <div *ngIf="isTu" class="col-base col-1">
+  <div *ngIf="isTu" class="col-base layout-col-1">
     {{ entry.noteBarren | number: '1.2-2' }}
   </div>
-  <div class="col-base col-1">
+  <div class="col-base layout-col-1">
     {{ entry.gesamtPunktzahl | number: '1.2-2' }}
   </div>
-  <div class="col-base col-1 right">
+  <div class="col-base layout-col-1 right">
     <span *ngIf="entry.rang === index + 1"> {{ entry.rang }}. </span>
   </div>
-  <div class="col-base col-2">
+  <div class="col-base layout-col-2">
     <img *ngIf="entry.auszeichnung && entry.rang > 3" class="mediumNoMarginIcon" src="assets/images/medals/coin.png" />
     <img *ngIf="entry.rang === 1" class="mediumNoMarginIcon" src="assets/images/medals/first-place-medal.png" />
     <img *ngIf="entry.rang === 2" class="mediumNoMarginIcon" src="assets/images/medals/second-place-medal.png" />

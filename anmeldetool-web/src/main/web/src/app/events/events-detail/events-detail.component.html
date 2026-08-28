@@ -1,383 +1,45 @@
-<div class="container" *ngIf="(anlass$ | async) && (anlassSummary$ | async); else loading">
-  <div class="row">
-    <div class="col-7">
-      <h2>{{ anlass.getCleaned() }}</h2>
-    </div>
-    <div class="col-sm-1">
-      <h2>{{ anlass.tiTu }}</h2>
-    </div>
-    <div class="col-sm-2">
-      <div [routerLink]="['anmeldung']" class="well hoverwell button">Anmeldungs Übersicht</div>
-    </div>
-    <div class="col-sm-2">
-      <div [routerLink]="['startliste']" class="well hoverwell button">Startliste</div>
-    </div>
-  </div>
-  <lxt-anlass-detail [anlass]="anlass"></lxt-anlass-detail>
-  <!--  neu app-anlass-detail
-  <div class="row">
-    <div class="col-sm-3">
-      <span *ngIf="anlass.startDatum === anlass.endDatum">am</span>
-      <span *ngIf="anlass.startDatum !== anlass.endDatum">von</span>:
-      {{ anlass.startDatum | date: "EEEE, d MMMM , yyyy":"GMT+1":"DE-CH" }}
-    </div>
-    <div class="col-sm-3" *ngIf="anlass.startDatum !== anlass.endDatum">
-      bis: {{ anlass.endDatum | date: "EEEE, d MMMM , yyyy":"GMT+1":"DE-CH" }}
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-sm-3">
-      Geschlecht: <span style="font-weight: 550"> {{ anlass.tiTu }}</span>
-    </div>
-    <div class="col-sm-3">
-      Startberechtigt: {{ anlass.tiefsteKategorie }} bis
-      {{ anlass.hoechsteKategorie }}
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-sm-3">Ort: {{ anlass.ort }}</div>
-    <div class="col-sm-3">Halle: {{ anlass.halle }}</div>
-    <div class="col-sm-3">Organisator: {{ anlass.organisator }}</div>
-    <div class="col-sm-3">IBAN: {{ anlass.iban }}</div>
-  </div>
-  -->
-
-  <hr />
-  <lxt-anlass-statistik
-    [anlass]="anlass"
-    [anlassSummary]="anlassSummary"
-    (startetChanged)="startetChanged($event)"
-  ></lxt-anlass-statistik>
-  <!-- neu Anlass Statistik
-  <div class="row">
-    <div class="col-12" *ngIf="orgAnlassLink">
-      <mat-checkbox
-        [(ngModel)]="orgAnlassLink.startet"
-        [disabled]="isStartedCheckboxDisabled()"
-        (ngModelChange)="vereinStartedClicked($event)"
-        >Verein startet</mat-checkbox
-      >
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-3">Teilnehmer Total: {{ anzahlTeilnehmer }}</div>
-    <div class="col-3">Teilnehmer K1-K4: {{ anzahlTeilnehmerBrevet1 }}</div>
-    <div class="col-3">Teilnehmer K5-K7: {{ anzahlTeilnehmerBrevet2 }}</div>
-  </div>
-  <div class="row">
-    <div *ngIf="isBrevet1Anlass()" class="col-1">Anzahl</div>
-    <div *ngIf="isBrevet1Anlass()" class="col-1">Anzahl</div>
-    <div *ngIf="isBrevet1Anlass()" class="col-1">Anzahl</div>
-    <div *ngIf="isBrevet1Anlass()" class="col-1">Anzahl</div>
-    <div *ngIf="isBrevet2Anlass() && isTuAnlass()" class="col-1">Anzahl</div>
-    <div *ngIf="isBrevet2Anlass() && isTiAnlass()" class="col-1">Anzahl</div>
-    <div *ngIf="isBrevet2Anlass() && isTiAnlass()" class="col-1">Anzahl</div>
-    <div *ngIf="isBrevet2Anlass()" class="col-1">Anzahl</div>
-    <div *ngIf="isBrevet2Anlass() && isTuAnlass()" class="col-1">Anzahl</div>
-    <div *ngIf="isBrevet2Anlass() && isTiAnlass()" class="col-1">Anzahl</div>
-    <div *ngIf="isBrevet2Anlass()" class="col-1">Anzahl</div>
-  </div>
-  <div class="row">
-    <div
-      *ngIf="isBrevet1Anlass() && getTeilnahmenForKategorieK1() | async; let k1"
-      class="col-1"
-    >
-      K1: {{ k1.length }}
-    </div>
-    <div
-      *ngIf="isBrevet1Anlass() && getTeilnahmenForKategorieK2() | async; let k2"
-      class="col-1"
-    >
-      K2: {{ k2.length }}
-    </div>
-    <div
-      *ngIf="isBrevet1Anlass() && getTeilnahmenForKategorieK3() | async; let k3"
-      class="col-1"
-    >
-      K3: {{ k3.length }}
-    </div>
-    <div
-      *ngIf="isBrevet1Anlass() && getTeilnahmenForKategorieK4() | async; let k4"
-      class="col-1"
-    >
-      K4: {{ k4.length }}
-    </div>
-    <div
-      *ngIf="
-        isBrevet2Anlass() && isTuAnlass() && getTeilnahmenForKategorieK5()
-          | async;
-        let k5
-      "
-      class="col-1"
-    >
-      K5: {{ k5.length }}
-    </div>
-    <div
-      *ngIf="
-        isBrevet2Anlass() && isTiAnlass() && getTeilnahmenForKategorieK5A()
-          | async;
-        let k5A
-      "
-      class="col-1"
-    >
-      K5A: {{ k5A.length }}
-    </div>
-    <div
-      *ngIf="
-        isBrevet2Anlass() && isTiAnlass() && getTeilnahmenForKategorieK5B()
-          | async;
-        let k5B
-      "
-      class="col-1"
-    >
-      K5B: {{ k5B.length }}
-    </div>
-    <div
-      *ngIf="isBrevet2Anlass() && getTeilnahmenForKategorieK6() | async; let k6"
-      class="col-1"
-    >
-      K6: {{ k6.length }}
-    </div>
-    <div
-      *ngIf="
-        isBrevet2Anlass() && isTuAnlass() && getTeilnahmenForKategorieKH()
-          | async;
-        let kH
-      "
-      class="col-1"
-    >
-      KH: {{ kH.length }}
-    </div>
-    <div
-      *ngIf="
-        isBrevet2Anlass() && isTiAnlass() && getTeilnahmenForKategorieKD()
-          | async;
-        let kD
-      "
-      class="col-1"
-    >
-      KD: {{ kD.length }}
-    </div>
-    <div
-      *ngIf="isBrevet2Anlass() && getTeilnahmenForKategorieK7() | async; let k7"
-      class="col-1"
-    >
-      K7: {{ k7.length }}
-    </div>
-  </div>
--->
-
-  <lxt-wertungsrichter-selektion
-    *ngIf="anlassSummary.startet"
-    [anlass]="anlass"
-    [changeAllowed]="isChangeAllowed()"
-  ></lxt-wertungsrichter-selektion>
-
-  <!-- neu Wertungsrichter Selektion
-  <div class="row">
-    <h3 class="padding">Wertungsrichter</h3>
-  </div>
-  <div class="row">
-    <div class="col-12">
-      <mat-tab-group #tabs mat-align-tabs="start">
-        <mat-tab [disabled]="!isBrevet1Anlass()">
-          <ng-template matTabContent>
-            <ng-template mat-tab-label
-              >Brevet 1
-              <img
-                *ngIf="isWertungsrichter1Ok"
-                class="icon"
-                src="assets/images/skype/beaming-face.png"
-              />
-              <img
-                *ngIf="!isWertungsrichter1Ok"
-                class="icon"
-                src="assets/images/skype/pouting-face.png"
-              />
-            </ng-template>
-            <div class="row doubleRow">
-              <div class="col">Status Brevet 1: {{ statusBr1 }}</div>
-            </div>
-            <div class="row doubleRow">
-              <div
-                class="col-4 label-red"
-                *ngIf="isBrevet1Anlass() && !isBrevet2Anlass()"
-              >
-                <mat-checkbox
-                  [(ngModel)]="useBrevet2"
-                  (ngModelChange)="useBrevet2Clicked($event)"
-                  >Brevet 2 als Brevet 1 einsetzen</mat-checkbox
-                >
-              </div>
-
-              <div class="col">
-                Benötigte Wertungsrichter Brevet 1:
-                {{ wertungsrichterPflichtBrevet1 }}
-              </div>
-            </div>
-            <div class="row doubleRow">
-              <div class="col">
-                <h3>Verfügbare Wertungsrichter Brevet 1</h3>
-              </div>
-              <div class="col">
-                <h3>Ausgewählte Wertungsrichter Brevet 1</h3>
-              </div>
-            </div>
-            <div class="row doubleRow">
-              <div class="col">
-                <div
-                  aria-label="Wertungsrichter"
-                  class="drag-drop-list col"
-                  cdkDropList
-                  [cdkDropListDisabled]="
-                    isStartedCheckboxDisabled() || !isBrevet1Anlass()
-                  "
-                  #allWr1sList="cdkDropList"
-                  [cdkDropListData]="availableWertungsrichter1"
-                  [cdkDropListConnectedTo]="[assignedWr1List]"
-                  cdkDropListOrientation="vertical"
-                  (cdkDropListDropped)="drop($event, '1')"
-                >
-                  <lxt-wertungsrichter-chip
-                    *ngFor="let wr of availableWertungsrichter1"
-                    [isAllWertungsrichterList]="true"
-                    [wertungsrichterUser]="wr"
-                    [anlass]="anlass"
-                    [useBrevet2]="false"
-                  ></lxt-wertungsrichter-chip>
-                </div>
-              </div>
-              <div class="col">
-                <div
-                  cdkDropList
-                  [cdkDropListDisabled]="
-                    isStartedCheckboxDisabled() || !isBrevet1Anlass()
-                  "
-                  #assignedWr1List="cdkDropList"
-                  [cdkDropListData]="assignedWr1s"
-                  [cdkDropListConnectedTo]="[allWr1sList]"
-                  class="drag-drop-list col"
-                  (cdkDropListDropped)="drop($event, '2')"
-                >
-                  <lxt-wertungsrichter-chip
-                    *ngFor="let wr of assignedWr1s"
-                    [isAllWertungsrichterList]="false"
-                    [wertungsrichterUser]="wr"
-                    [anlass]="anlass"
-                    [useBrevet2]="useBrevet2"
-                    (wertungsrichterUserChange)="
-                      wertungsrichterUserChange($event)
-                    "
-                  ></lxt-wertungsrichter-chip>
-                </div>
-              </div>
-            </div>
-          </ng-template>
-        </mat-tab>
-        <mat-tab [disabled]="!isBrevet2Anlass()">
-          <ng-template mat-tab-label
-            >Brevet 2
-            <img
-              *ngIf="isWertungsrichter2Ok"
-              class="icon"
-              src="assets/images/skype/beaming-face.png"
-            />
-            <img
-              *ngIf="!isWertungsrichter2Ok"
-              class="icon"
-              src="assets/images/skype/pouting-face.png"
-            />
-          </ng-template>
-          <div class="row doubleRow">
-            <div class="col">Status Brevet 2: {{ statusBr2 }}</div>
-          </div>
-          <div class="row doubleRow">
-            <div class="col">
-              Benötigte Wertungsrichter Brevet 2:
-              {{ wertungsrichterPflichtBrevet2 }}
-            </div>
-          </div>
-          <div class="row doubleRow">
-            <div class="col">
-              <h3>Verfügbare Wertungsrichter Brevet 2</h3>
-            </div>
-            <div class="col">
-              <h3>Ausgewählte Wertungsrichter Brevet 2</h3>
-            </div>
-          </div>
-          <div class="row doubleRow scrollable">
-            <div class="col">
-              <div
-                aria-label="Wertungsrichter"
-                class="drag-drop-list col"
-                cdkDropList
-                #allWr2sList="cdkDropList"
-                [cdkDropListData]="availableWertungsrichter2"
-                [cdkDropListConnectedTo]="[assignedWr2List]"
-                cdkDropListOrientation="vertical"
-                (cdkDropListDropped)="drop($event, '1')"
-                [cdkDropListDisabled]="
-                  isStartedCheckboxDisabled() || !isBrevet2Anlass()
-                "
-              >
-                <lxt-wertungsrichter-chip
-                  *ngFor="let wr of availableWertungsrichter2"
-                  [isAllWertungsrichterList]="true"
-                  [wertungsrichterUser]="wr"
-                  [anlass]="anlass"
-                >
-                </lxt-wertungsrichter-chip>
-              </div>
-            </div>
-            <div class="col">
-              <div
-                cdkDropList
-                #assignedWr2List="cdkDropList"
-                [cdkDropListData]="assignedWr2s"
-                [cdkDropListConnectedTo]="[allWr2sList]"
-                class="drag-drop-list col"
-                (cdkDropListDropped)="drop($event, '2')"
-                [cdkDropListDisabled]="
-                  isStartedCheckboxDisabled() || !isBrevet2Anlass()
-                "
-              >
-                <lxt-wertungsrichter-chip
-                  *ngFor="let wr of assignedWr2s"
-                  [isAllWertungsrichterList]="false"
-                  [wertungsrichterUser]="wr"
-                  [anlass]="anlass"
-                  (wertungsrichterUserChange)="
-                    wertungsrichterUserChange($event)
-                  "
-                >
-                </lxt-wertungsrichter-chip>
-              </div>
-            </div>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <div [routerLink]="['/user/user']" class="well hoverwell">
-        Wertungsrichter bearbeiten
+@if ((anlass$ | async) && (anlassSummary$ | async)) {
+  <div class="layout-container">
+    <div class="layout-row">
+      <div class="layout-col-7">
+        <h2>{{ anlass.getCleaned() }}</h2>
+      </div>
+      <div class="layout-col-sm-1">
+        <h2>{{ anlass.tiTu }}</h2>
+      </div>
+      <div class="layout-col-sm-2">
+        <div [routerLink]="['anmeldung']" class="well hoverwell button">Anmeldungs Übersicht</div>
+      </div>
+      <div class="layout-col-sm-2">
+        <div [routerLink]="['startliste']" class="well hoverwell button">Startliste</div>
       </div>
     </div>
-  </div>
--->
-  <lxt-events-dates
-    [anlass]="anlass"
-    [anlassSummary]="anlassSummary"
-    [viewOnly]="isViewOnly()"
-    (verlaengertChanged)="verlaengertChanged($event)"
-  ></lxt-events-dates>
-</div>
+    <lxt-anlass-detail [anlass]="anlass"></lxt-anlass-detail>
 
-<ng-template #loading>
+    <hr />
+    <lxt-anlass-statistik
+      [anlass]="anlass"
+      [anlassSummary]="anlassSummary"
+      (startetChanged)="startetChanged($event)"
+    ></lxt-anlass-statistik>
+
+    @if (anlassSummary.startet) {
+      <lxt-wertungsrichter-selektion
+        [anlass]="anlass"
+        [anlassSummary]="anlassSummary"
+        [changeAllowed]="isChangeAllowed()"
+      ></lxt-wertungsrichter-selektion>
+    }
+
+    <lxt-events-dates
+      [anlass]="anlass"
+      [anlassSummary]="anlassSummary"
+      [viewOnly]="isViewOnly()"
+      (verlaengertChanged)="verlaengertChanged($event)"
+    ></lxt-events-dates>
+  </div>
+} @else {
   <div class="center">
     <mat-spinner style="margin: 0 auto"></mat-spinner>
   </div>
-</ng-template>
+}

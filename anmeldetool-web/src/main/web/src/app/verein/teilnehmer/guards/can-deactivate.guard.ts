@@ -1,9 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { CanDeactivate } from '@angular/router';
-import { Observable, of, Subject } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { HasChangesComponent } from './has-changes.component';
+import { Observable, map, of } from 'rxjs';
+import { HasChangesComponent, type HasChangesDialogResult } from './has-changes.component';
 
 type HasUnsavedTeilnehmerChanges = {
   disAllowTab: () => boolean;
@@ -13,36 +12,21 @@ type HasUnsavedTeilnehmerChanges = {
   providedIn: 'root',
 })
 export class CanDeactivateGuard implements CanDeactivate<HasUnsavedTeilnehmerChanges> {
-  dialogResult: Subject<string>;
-  constructor(public dialog: MatDialog) {
-    this.dialogResult = new Subject();
-  }
+  private readonly dialog = inject(MatDialog);
+
   canDeactivate(component: HasUnsavedTeilnehmerChanges): Observable<boolean> {
-    if (component.disAllowTab()) {
-      // this.openDialog().subscribe((result) => {
-      return this.openDialog().pipe(
-        map((result) => {
-          console.log(result);
-          if (result === 'Cancel') {
-            return true;
-          } else {
-            return false;
-          }
-        }),
-      );
+    if (!component.disAllowTab()) {
+      return of(true);
     }
-    return of(true);
+
+    return this.openDialog();
   }
 
-  private openDialog(): Observable<string> {
+  private openDialog(): Observable<boolean> {
     const dialogRef = this.dialog.open(HasChangesComponent, {
-      data: undefined,
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      console.log(`Dialog result: ${result}`);
-      this.dialogResult.next(result);
-    });
-    return this.dialogResult.asObservable();
+    return dialogRef.afterClosed().pipe(map((result: HasChangesDialogResult | undefined) => result === 'leave'));
   }
 }

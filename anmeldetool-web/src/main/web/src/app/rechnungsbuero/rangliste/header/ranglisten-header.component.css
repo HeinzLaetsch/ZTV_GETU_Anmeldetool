@@ -12,15 +12,18 @@
   width: 100%;
   font-weight: 600;
 }
-.col-1 {
+.col-1,
+.layout-col-1 {
   flex-basis: 0;
   flex-grow: 1;
 }
-.col-2 {
+.col-2,
+.layout-col-2 {
   flex-basis: 0;
   flex-grow: 2;
 }
-.col-3 {
+.col-3,
+.layout-col-3 {
   flex-basis: 0;
   flex-grow: 2;
 }

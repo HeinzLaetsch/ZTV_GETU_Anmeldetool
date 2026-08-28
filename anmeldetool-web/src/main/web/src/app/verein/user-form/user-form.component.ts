@@ -121,7 +121,7 @@ export class UserFormComponent implements OnInit {
   }
 
   isOwner() {
-    if (this.authService.isAdministrator()) {
+    if (this.authService.isAdministratorSig()) {
       return true;
     }
     if (this.currentUser.benutzername === this.authService.currentUser.benutzername) {
@@ -162,17 +162,17 @@ export class UserFormComponent implements OnInit {
     this.checkWrChanged();
   }
   get isVereinsAnmelder() {
-    if (this.authService.isAdministrator()) {
+    if (this.authService.isAdministratorSig()) {
       return true;
     }
-    return this.authService.isVereinsAnmmelder();
+    return this.authService.isVereinsAnmmelderSig();
   }
 
   get isVereinsVerantwortlicher() {
-    if (this.authService.isAdministrator()) {
+    if (this.authService.isAdministratorSig()) {
       return true;
     }
-    return this.authService.isVereinsVerantwortlicher();
+    return this.authService.isVereinsVerantwortlicherSig();
   }
   get assignedRoles(): IRolle[] {
     // console.log('Get user: ', this.currentUser);

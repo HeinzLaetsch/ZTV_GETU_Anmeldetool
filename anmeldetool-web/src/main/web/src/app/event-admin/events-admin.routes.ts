@@ -1,6 +1,5 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { EventRouteActivatorService } from '../events';
+import { Routes } from '@angular/router';
+import { eventCanActivate } from '../events/events-detail/event-route-activator.service';
 import { EventAdminComponent } from './index';
 
 export const EventAdminRoutes: Routes = [
@@ -15,13 +14,13 @@ export const EventAdminRoutes: Routes = [
   {
     path: 'admin',
     component: EventAdminComponent,
-    canActivate: [EventRouteActivatorService],
+    canActivate: [eventCanActivate],
     data: { roles: ['SEKRETARIAT'] },
   },
   {
     path: ':id/admin',
     component: EventAdminComponent,
-    canActivate: [EventRouteActivatorService],
+    canActivate: [eventCanActivate],
     data: { roles: ['SEKRETARIAT'] },
   },
 ];

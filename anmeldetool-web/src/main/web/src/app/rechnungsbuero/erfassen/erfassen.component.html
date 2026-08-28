@@ -1,6 +1,6 @@
-<div class="container-fluid toppadding">
-  <div class="row">
-    <div class="col-2">
+<div class="layout-container-fluid toppadding">
+  <div class="layout-row">
+    <div class="layout-col-2">
       <lxt-anlass-status
         [anlass]="anlass"
         (lauflisteSelectedEvent)="lauflisteSelected($event)"
@@ -8,8 +8,8 @@
         [checkedChangedEmitter]="checkedChangedEmitter"
       ></lxt-anlass-status>
     </div>
-    <div class="col-10">
-      <div class="row">
+    <div class="layout-col-10">
+      <div class="layout-row">
         <!--             (keyup.enter)="searchLaufliste()" -->
         <mat-form-field appearance="fill">
           <mat-label>Lauflisten Schlüssel</mat-label>
@@ -29,23 +29,23 @@
           <mat-icon>search</mat-icon>
         </button>
       </div>
-      <div class="row">
-        <div class="col-2 side">
+      <div class="layout-row">
+        <div class="layout-col-2 side">
           <lxt-erfassen-header [laufliste]="laufliste"></lxt-erfassen-header>
         </div>
-        <div *ngIf="laufliste" class="col-10">
-          <div class="row blue">
-            <div class="col-1">Nr.</div>
-            <div class="col-2">Verein</div>
-            <div class="col-2">Name</div>
-            <div class="col-2">Vorname</div>
-            <div *ngIf="!sprung && !modeErfassen" class="col-2 centered">Note</div>
-            <div *ngIf="!sprung && modeErfassen" class="col-1 centered">Note</div>
+        <div *ngIf="laufliste" class="layout-col-10">
+          <div class="layout-row blue">
+            <div class="layout-col-1">Nr.</div>
+            <div class="layout-col-2">Verein</div>
+            <div class="layout-col-2">Name</div>
+            <div class="layout-col-2">Vorname</div>
+            <div *ngIf="!sprung && !modeErfassen" class="layout-col-2 centered">Note</div>
+            <div *ngIf="!sprung && modeErfassen" class="layout-col-1 centered">Note</div>
 
-            <div *ngIf="sprung" class="col-1 centered">Note 1</div>
-            <div *ngIf="sprung" class="col-1 centered">Note 2</div>
-            <div class="col-1 centered">gespeichert</div>
-            <div class="col-1 centered">geprüft</div>
+            <div *ngIf="sprung" class="layout-col-1 centered">Note 1</div>
+            <div *ngIf="sprung" class="layout-col-1 centered">Note 2</div>
+            <div class="layout-col-1 centered">gespeichert</div>
+            <div class="layout-col-1 centered">geprüft</div>
           </div>
           <lxt-erfassen-row
             *ngFor="let eintrag of sortedEintraege"

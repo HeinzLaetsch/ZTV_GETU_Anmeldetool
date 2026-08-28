@@ -139,6 +139,9 @@ public class PersonService {
     Organisation organisation = organisationSrv.findById(orgId);
 
     Person person = personMapper.toEntity(personDTO);
+    if(person.getId() == null) {
+      person.setId(UUID.randomUUID());
+    }
 
     handlePassword(personDTO, person);
 

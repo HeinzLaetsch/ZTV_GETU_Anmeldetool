@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { AppRoutingModule } from './app-routing.module';
 
 // import { NavBarComponent } from "./nav/nav-bar/nav-bar.component";
 import { CoreModule } from './core/core.module';
@@ -7,6 +6,6 @@ import { CoreModule } from './core/core.module';
 
 @NgModule({
   declarations: [],
-  imports: [AppRoutingModule, CoreModule],
+  imports: [CoreModule],
 })
 export class AppModule {}

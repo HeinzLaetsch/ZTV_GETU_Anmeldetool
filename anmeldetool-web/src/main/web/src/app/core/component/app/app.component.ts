@@ -1,13 +1,11 @@
 import { Component, type OnInit } from '@angular/core';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { select, Store } from '@ngrx/store';
 import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
 import type { IAnlass } from '../../model/IAnlass';
 import { selectSperrenAnlaesse } from '../../redux/anlass';
 import type { AppState } from '../../redux/core.state';
 import { AuthService } from '../../service/auth/auth.service';
-import { BusyIndicatorProgressBarComponent } from '../busy-indicator-progress-bar/busy-indicator-progress-bar.component';
-import { NavComponent } from '../nav/nav.component';
 import { NewAnmelderComponent } from '../new-anmelder/new-anmelder.component';
 import { NewVereinComponent } from '../new-verein/new-verein.component';
 
@@ -17,7 +15,7 @@ import { NewVereinComponent } from '../new-verein/new-verein.component';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   standalone: true,
-  imports: [BusyIndicatorProgressBarComponent, NavComponent],
+  imports: [],
 })
 export class AnmeldeToolComponent extends SubscriptionHelper implements OnInit {
   localeTextDE = {
@@ -39,6 +37,7 @@ export class AnmeldeToolComponent extends SubscriptionHelper implements OnInit {
     public dialog: MatDialog,
   ) {
     super();
+    console.log('AnmeldeToolComponent constructor');
   }
 
   ngOnInit(): void {
@@ -65,7 +64,7 @@ export class AnmeldeToolComponent extends SubscriptionHelper implements OnInit {
   }
 
   get administrator(): boolean {
-    return this.authService.isAdministrator();
+    return this.authService.isAdministratorSig();
   }
 
   /*
@@ -75,7 +74,7 @@ export class AnmeldeToolComponent extends SubscriptionHelper implements OnInit {
   */
 
   private openLoginDialogIfNeeded(): void {
-    if (this.appBlocked || this.authService.isAuthenticated() || !this._authenticated || this.loginDialogScheduled) {
+    if (this.appBlocked || this.authService.isAuthenticatedSig() || !this._authenticated || this.loginDialogScheduled) {
       return;
     }
 
@@ -83,7 +82,7 @@ export class AnmeldeToolComponent extends SubscriptionHelper implements OnInit {
     queueMicrotask(() => {
       this.loginDialogScheduled = false;
 
-      if (!this.appBlocked && !this.authService.isAuthenticated() && this._authenticated) {
+      if (!this.appBlocked && !this.authService.isAuthenticatedSig() && this._authenticated) {
         this._authenticated = false;
         this.dialogOpen = true;
         //this.openLoginDialog();
@@ -153,7 +152,7 @@ export class AnmeldeToolComponent extends SubscriptionHelper implements OnInit {
   }
 
   get authenticated(): boolean {
-    return this.authService.isAuthenticated();
+    return this.authService.isAuthenticatedSig();
   }
   onShowPage(showPage: number): void {
     console.log('On ShowPage', showPage);

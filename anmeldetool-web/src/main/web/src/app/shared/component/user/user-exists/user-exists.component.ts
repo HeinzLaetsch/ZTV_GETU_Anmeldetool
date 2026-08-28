@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import type { IUser } from 'src/app/core/model/IUser';
 
@@ -9,7 +9,8 @@ import type { IUser } from 'src/app/core/model/IUser';
   styleUrls: ['./user-exists.component.css'],
   standalone: true,
   imports: [CommonModule, MatDialogModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserExists {
-  data = inject(MAT_DIALOG_DATA) as IUser;
+  readonly data = inject<IUser>(MAT_DIALOG_DATA);
 }

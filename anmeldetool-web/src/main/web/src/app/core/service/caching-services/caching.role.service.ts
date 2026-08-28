@@ -53,7 +53,7 @@ export class CachingRoleService {
 
   getRoles(): IRolle[] {
     if (this.loaded) {
-      if (this.authService.isAdministrator()) {
+      if (this.authService.isAdministratorSig()) {
         return this.roles.filter((role) => {
           // console.log('Rolle: ', role);
           return role.aktiv;

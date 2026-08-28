@@ -1,6 +1,33 @@
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, Router } from '@angular/router';
+import { inject, Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../service/auth/auth.service';
+
+export const authCanActivate: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (authService.isAdministratorSig()) {
+    return true;
+  }
+
+  const isAuthenticated = authService.isAuthenticatedSig();
+  let accessAllowed = true;
+  const roles = route.data.roles as string[] | undefined;
+
+  if (roles) {
+    roles.forEach((roleName: string) => {
+      const hasRole = authService.hasRole(roleName);
+      accessAllowed = accessAllowed && hasRole;
+    });
+  }
+
+  if (!isAuthenticated || !accessAllowed) {
+    router.navigate(['/']);
+    return false;
+  }
+
+  return true;
+};
 
 @Injectable({
   providedIn: 'root',
@@ -11,22 +38,27 @@ export class AuthRouteActivatorService {
     private router: Router,
   ) {}
 
-  canActivate(route: ActivatedRouteSnapshot) {
-    if (this.authService.isAdministrator()) {
+  canActivate(route: ActivatedRouteSnapshot): boolean {
+    if (this.authService.isAdministratorSig()) {
       return true;
     }
-    const isAuthenticated = this.authService.isAuthenticated();
+
+    const isAuthenticated = this.authService.isAuthenticatedSig();
     let accessAllowed = true;
-    if (route.data.roles) {
-      route.data.roles.forEach((roleName) => {
+    const roles = route.data.roles as string[] | undefined;
+
+    if (roles) {
+      roles.forEach((roleName: string) => {
         const hasRole = this.authService.hasRole(roleName);
         accessAllowed = accessAllowed && hasRole;
       });
     }
-    // console.log("canActivate ", isAuthenticated);
+
     if (!isAuthenticated || !accessAllowed) {
       this.router.navigate(['/']);
+      return false;
     }
-    return isAuthenticated;
+
+    return true;
   }
 }

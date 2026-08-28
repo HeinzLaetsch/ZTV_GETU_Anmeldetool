@@ -1,11 +1,11 @@
 import { HttpEventType } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { Subject, type Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import type { IAnlass } from 'src/app/core/model/IAnlass';
 import { CachingAnlassService } from 'src/app/core/service/caching-services/caching.anlass.service';
 
 @Component({
@@ -16,56 +16,54 @@ import { CachingAnlassService } from 'src/app/core/service/caching-services/cach
   imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
 })
 export class ContestUpload {
-  private _destroy$ = new Subject<void>();
-  fileName = '';
-  uploading: false;
-  type: string;
-  upLoadError: string;
+  private readonly dialogRef = inject(MatDialogRef<ContestUpload>);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly anlassService = inject(CachingAnlassService);
 
-  uploadProgress: number;
-  uploadSub: Subscription;
+  readonly data = inject<IAnlass>(MAT_DIALOG_DATA);
+  readonly fileName = signal('');
+  readonly uploading = signal(false);
+  readonly type = signal<'success' | 'error' | null>(null);
+  readonly upLoadError = signal('');
+  readonly uploadProgress = signal(0);
 
-  constructor(
-    private dialogRef: MatDialogRef<ContestUpload>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-    private anlassService: CachingAnlassService,
-  ) {}
-
-  onFileSelected(event) {
-    const file: File = event.target.files[0];
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
 
     if (file) {
-      this.fileName = file.name;
+      this.fileName.set(file.name);
+      this.uploading.set(true);
+      this.uploadProgress.set(0);
+      this.type.set(null);
 
       const formData = new FormData();
 
       formData.append('teilnehmer', file);
-      // const alle = this.anlassService.getAnlaesse(TiTuEnum.Alle);
       this.anlassService
         .importContestTeilnehmerForAnlassCsv(this.data, formData)
-        .pipe(takeUntil(this._destroy$))
-        .subscribe(
-          (event) => {
-            console.log('Resultat: ', event);
-            if (event?.type === HttpEventType.UploadProgress) {
-              this.uploadProgress = Math.round(100 * (event.loaded / event.total));
-            } else {
-              this.uploading = false;
-              this.type = 'success';
-              this.dialogRef.close();
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (uploadEvent) => {
+            console.log('Resultat: ', uploadEvent);
+            if (uploadEvent?.type === HttpEventType.UploadProgress) {
+              const total = uploadEvent.total ?? uploadEvent.loaded;
+              this.uploadProgress.set(Math.round((100 * uploadEvent.loaded) / total));
+              return;
             }
-            // this.updateActiveBkpLoad();
+
+            this.uploading.set(false);
+            this.type.set('success');
+            this.dialogRef.close();
           },
-          (error: any) => {
+          error: (error: unknown) => {
+            const uploadError = error as { error?: string };
             console.error('error during file upload: ', error);
-            this.uploading = false;
-            this.upLoadError = error.error;
-            this.type = 'error';
+            this.uploading.set(false);
+            this.upLoadError.set(uploadError.error ?? 'Unbekannter Fehler');
+            this.type.set('error');
           },
-        );
+        });
     }
-  }
-  ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }

@@ -2,7 +2,7 @@
   <div class="main-nav-container">
     @if (authService.isLoggedIn()) {
       <mat-nav-list class="list-horizontal">
-        @if (!authService.isAnlassUser()) {
+        @if (!authService.isAnlassUserSig()) {
           <mat-list-item
             routerLink="/anlaesse"
             routerLinkActive="active"
@@ -13,7 +13,7 @@
           </mat-list-item>
         }
 
-        @if (authService.isAdministrator() || authService.isSekretariat()) {
+        @if (authService.isAdministratorSig() || authService.isSekretariatSig()) {
           <mat-list-item class="task-add-btn" data-cy="admin-funcs-nav-btn">
             <button mat-button class="mainNav" disableRipple [matMenuTriggerFor]="menu">
               Anlässe Verwalten
@@ -39,13 +39,13 @@
             </mat-menu>
           </mat-list-item>
         }
-        @if (!authService.isAnlassUser()) {
+        @if (!authService.isAnlassUserSig()) {
           <mat-list-item routerLink="/teilnehmer" routerLinkActive="active">
             <button mat-button class="mainNav" disableRipple>Teilnehmer</button>
           </mat-list-item>
         }
 
-        @if ((authService.isAdministrator() || authService.isRechnungsbuero()) && authService.currentVerein) {
+        @if ((authService.isAdministratorSig() || authService.isRechnungsbueroSig()) && authService.currentVerein) {
           <mat-list-item class="task-add-btn" data-cy="admin-funcs-nav-btn">
             <button mat-button class="mainNav" disableRipple [matMenuTriggerFor]="RBmenu">
               Rechnungsbüro
@@ -69,7 +69,7 @@
             </mat-menu>
           </mat-list-item>
         }
-        @if (authService.isAdministrator()) {
+        @if (authService.isAdministratorSig()) {
           <mat-list-item class="task-add-btn" data-cy="admin-funcs-nav-btn">
             <button mat-button class="mainNav" disableRipple [matMenuTriggerFor]="menu">
               Verein auswählen ({{ authService.currentVerein.name }})
