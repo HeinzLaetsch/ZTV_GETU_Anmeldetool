@@ -1,0 +1,21 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "bundler",
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "esnext",
+    "lib": ["ES2022", "dom"],
+    "strict": false,
+    "paths": {
+      "src/*": ["src/*"],
+      "@angular/forms": ["./node_modules/@angular/forms"],
+      "@angular/forms/*": ["./node_modules/@angular/forms/*"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

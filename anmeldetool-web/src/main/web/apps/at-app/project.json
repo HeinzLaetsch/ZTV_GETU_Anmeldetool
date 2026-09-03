@@ -1,0 +1,220 @@
+{
+  "name": "at-app",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/at-app/src",
+  "prefix": "app",
+  "generators": {
+    "@schematics/angular:component": {
+      "style": "scss"
+    }
+  },
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "defaultConfiguration": "production",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/at-app",
+        "index": "apps/at-app/src/index.html",
+        "browser": "apps/at-app/src/main.ts",
+        "sourceMap": true,
+        "polyfills": [
+          "apps/at-app/src/polyfills.ts"
+        ],
+        "tsConfig": "apps/at-app/tsconfig.app.json",
+        "aot": false,
+        "inlineStyleLanguage": "scss",
+        "stylePreprocessorOptions": {
+          "includePaths": [
+            ".",
+            "apps/at-app/src"
+          ]
+        },
+        "assets": [
+          "apps/at-app/src/favicon.ico",
+          "apps/at-app/src/assets"
+        ],
+        "styles": [
+          "apps/at-app/src/styles.scss"
+        ],
+        "allowedCommonJsDependencies": [
+          "moment",
+          "file-saver"
+        ],
+        "scripts": [
+          "node_modules/jquery/dist/jquery.min.js"
+        ]
+      },
+      "configurations": {
+        "development": {
+          "baseHref": "/ztv-anmeldetool/",
+          "optimization": false,
+          "sourceMap": {
+            "scripts": true,
+            "styles": true,
+            "vendor": true
+          },
+          "extractLicenses": true,
+          "allowedCommonJsDependencies": [
+            "moment",
+            "file-saver"
+          ],
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "10mb",
+              "maximumError": "15mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "6kb",
+              "maximumError": "250kb"
+            }
+          ]
+        },
+        "production": {
+          "fileReplacements": [
+            {
+              "replace": "apps/at-app/src/environments/environment.ts",
+              "with": "apps/at-app/src/environments/environment.prod.ts"
+            }
+          ],
+          "baseHref": "/ztv-anmeldetool/",
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "aot": true,
+          "extractLicenses": true,
+          "allowedCommonJsDependencies": [
+            "moment",
+            "file-saver"
+          ],
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "10mb",
+              "maximumError": "15mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "6kb",
+              "maximumError": "250kb"
+            }
+          ]
+        },
+        "halle": {
+          "fileReplacements": [
+            {
+              "replace": "apps/at-app/src/environments/environment.ts",
+              "with": "apps/at-app/src/environments/environment.halle.ts"
+            }
+          ],
+          "baseHref": "/",
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "aot": true,
+          "extractLicenses": true,
+          "allowedCommonJsDependencies": [
+            "moment",
+            "file-saver"
+          ],
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "3.2mb",
+              "maximumError": "5mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "6kb",
+              "maximumError": "10kb"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "@angular/build:dev-server",
+      "continuous": true,
+      "cache": false,
+      "options": {
+        "buildTarget": "at-app:build:development",
+        "servePath": "/ztv-anmeldetool"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "at-app:build:development"
+        },
+        "production": {
+          "buildTarget": "at-app:build:production"
+        },
+        "halle": {
+          "buildTarget": "at-app:build:halle"
+        }
+      }
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "browserTarget": "at-app:build"
+      }
+    },
+    "test": {
+      "executor": "@angular-devkit/build-angular:karma",
+      "options": {
+        "main": "apps/at-app/src/test.ts",
+        "polyfills": "apps/at-app/src/polyfills.ts",
+        "tsConfig": "apps/at-app/tsconfig.spec.json",
+        "karmaConfig": "karma.conf.js",
+        "assets": [
+          "apps/at-app/src/favicon.ico",
+          "apps/at-app/src/assets"
+        ],
+        "styles": [
+          "apps/at-app/src/styles.scss"
+        ],
+        "scripts": []
+      }
+    },
+    "e2e": {
+      "executor": "@cypress/schematic:cypress",
+      "options": {
+        "devServerTarget": "at-app:serve",
+        "watch": true,
+        "headless": false
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "at-app:serve:development"
+        }
+      }
+    },
+    "cypress-run": {
+      "executor": "@cypress/schematic:cypress",
+      "options": {
+        "devServerTarget": "at-app:serve"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "at-app:serve:development"
+        }
+      }
+    },
+    "e2eProtractor": {
+      "executor": "@angular-devkit/build-angular:protractor",
+      "options": {
+        "protractorConfig": "e2e/protractor.conf.js",
+        "devServerTarget": "at-app:serve"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "at-app:serve:development"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../../dist/out-tsc",
+    "downlevelIteration": true,
+    "esModuleInterop": true,
+    "ignoreDeprecations": "6.0",
+    "strictNullChecks": false,
+    "strictPropertyInitialization": false,
+    "noImplicitAny": false,
+    "isolatedModules": true,
+    "typeRoots": ["node_modules/@types"]
+  },
+  "angularCompilerOptions": {
+    "strictInjectionParameters": true,
+    "strictTemplates": false
+  },
+  "extends": "../../tsconfig.base.json"
+}

@@ -1,5 +1,5 @@
 {
-  "name": "at-app",
+  "name": "anmeldetool-web-workspace",
   "version": "0.0.0",
   "type": "module",
   "overrides": {
@@ -7,16 +7,17 @@
   },
   "scripts": {
     "ng": "ng",
-    "start": "nx run at-app:serve:development --live-reload --configuration=development --skip-nx-cache",
+    "start-nx": "nx serve at-app --live-reload --configuration=development --skip-nx-cache",
     "start-dev": "npm run start",
     "start-halle": "nx run at-app:serve:halle --live-reload",
     "startHalle": "npm run start-halle",
-    "start-nx": "npm run start",
+    "start": "npm run start",
+    "build-dev-nx": "nx run at-app:build:development --skip-nx-cache",
     "build": "nx build",
     "build-halle": "nx run at-app:build:halle --skip-nx-cache",
     "build-halle-nx": "npm run build-halle",
     "test": "nx test",
-    "lint": "eslint \"src/**/*.{ts,html}\" \"cypress/**/*.ts\"",
+    "lint": "eslint --config apps/at-app/eslint.config.js \"apps/at-app/src/**/*.{ts,html}\" \"cypress/**/*.ts\"",
     "e2e": "nx e2e",
     "e2e:headless": "nx run at-app:cypress-run",
     "cy:open": "cypress open",
