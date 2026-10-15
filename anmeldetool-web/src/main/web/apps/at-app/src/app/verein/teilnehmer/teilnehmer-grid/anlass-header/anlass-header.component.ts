@@ -1,34 +1,34 @@
-import { AgPromise, IHeaderComp, IHeaderParams } from 'ag-grid-community';
+import { IHeaderComp, IHeaderParams } from 'ag-grid-community';
 // https://plnkr.co/edit/?open=main.js&preview
 export class AnlassHeaderComponent implements IHeaderComp {
-  agParams;
-  eGui;
-  eMenuButton;
-  eSortDownButton;
-  eSortUpButton;
-  eSortRemoveButton;
-  onMenuClickListener;
-  onSortAscRequestedListener;
-  onSortDescRequestedListener;
-  onRemoveSortListener;
-  onSortChangedListener;
+  agParams!: IHeaderParams<unknown, unknown>;
+  eGui!: HTMLDivElement;
+  eMenuButton!: Element | null;
+  eSortDownButton!: Element | null;
+  eSortUpButton!: Element | null;
+  eSortRemoveButton!: Element | null;
+  onMenuClickListener?: EventListener;
+  onSortAscRequestedListener?: EventListener;
+  onSortDescRequestedListener?: EventListener;
+  onRemoveSortListener?: EventListener;
+  onSortChangedListener?: EventListener;
 
-  refresh(params: IHeaderParams<any>): boolean {
+  refresh(_params: IHeaderParams<unknown, unknown>): boolean {
     throw new Error('Method not implemented.');
   }
   getGui(): HTMLElement {
     return this.eGui;
   }
 
-  onSortRequested(order, event) {
+  onSortRequested(order: 'asc' | 'desc' | null, event: MouseEvent): void {
     this.agParams.setSort(order, event.shiftKey);
   }
 
-  onMenuClick() {
+  onMenuClick(): void {
     this.agParams.showColumnMenu(this.eMenuButton);
   }
 
-  destroy() {
+  destroy(): void {
     if (this.onMenuClickListener) {
       this.eMenuButton.removeEventListener('click', this.onMenuClickListener);
     }
@@ -38,7 +38,7 @@ export class AnlassHeaderComponent implements IHeaderComp {
     this.agParams.column.removeEventListener('sortChanged', this.onSortChangedListener);
   }
 
-  init(agParams) {
+  init(agParams: IHeaderParams<unknown, unknown>): void {
     this.agParams = agParams;
     this.eGui = document.createElement('div');
     this.eGui.innerHTML = `

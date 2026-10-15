@@ -2,7 +2,7 @@
  -->
 @if (anlassData?.summary) {
   <div
-    hover
+    ztvHover
     [status]="anlassData.anlass.anzeigeStatus"
     class="thumbnail"
     (click)="isEnabled() ? handleClickMe() : $event.stopPropagation()"
@@ -101,11 +101,11 @@
     }
 
     <div class="correct-margin">
-      <lxt-events-dates
+      <ztv-events-dates
         [anlass]="anlassData.anlass"
         [anlassSummary]="anlassData.summary"
         [viewOnly]="true"
-      ></lxt-events-dates>
+      ></ztv-events-dates>
     </div>
   </div>
 }

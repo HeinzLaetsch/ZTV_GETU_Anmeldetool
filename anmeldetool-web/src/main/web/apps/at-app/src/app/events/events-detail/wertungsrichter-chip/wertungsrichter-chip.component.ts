@@ -1,30 +1,25 @@
-import {
-  Component,
-  computed,
-  EventEmitter,
-  input,
-  type OnChanges,
-  type OnInit,
-  Output,
-  signal,
-  type SimpleChanges,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MaterialModule } from 'src/app/shared/material-module';
+import { distinctUntilChanged, filter, map, switchMap } from 'rxjs';
 import type { IAnlass } from 'src/app/core/model/IAnlass';
 import type { IUser } from 'src/app/core/model/IUser';
-import type { IWertungsrichter } from 'src/app/core/model/IWertungsrichter';
 import type { IWertungsrichterEinsatz } from 'src/app/core/model/IWertungsrichterEinsatz';
 import type { IWertungsrichterSlot } from 'src/app/core/model/IWertungsrichterSlot';
 import { AuthService } from 'src/app/core/service/auth/auth.service';
 import { CachingAnlassService } from 'src/app/core/service/caching-services/caching.anlass.service';
 import { CachingUserService } from 'src/app/core/service/caching-services/caching.user.service';
+import { WertungsrichterSlotComponent } from './wertungsrichter-slot';
 
 @Component({
-  selector: 'lxt-wertungsrichter-chip',
+  selector: 'ztv-wertungsrichter-chip',
   templateUrl: './wertungsrichter-chip.component.html',
-  styleUrls: ['./wertungsrichter-chip.component.css'],
-  standalone: true,
+  styleUrl: './wertungsrichter-chip.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MaterialModule, MatProgressSpinnerModule, WertungsrichterSlotComponent],
 })
-export class WertungsrichterChipComponent implements OnInit, OnChanges {
+export class WertungsrichterChipComponent {
   readonly isVereinsAnmelder = input<boolean>(false);
   readonly isVereinsVerantwortlicher = input<boolean>(false);
   readonly isAllWertungsrichterList = input<boolean>(false);
@@ -33,78 +28,66 @@ export class WertungsrichterChipComponent implements OnInit, OnChanges {
   readonly useBrevet2 = input<boolean>(false);
   readonly changeAllowed = input<boolean>(false);
 
-  @Output()
-  wertungsrichterUserChange = new EventEmitter<IUser>();
+  readonly wertungsrichterUserChange = output<IUser>();
 
-  readonly wertungsrichterSig = signal<IWertungsrichter | undefined>(undefined);
+  private readonly authservice = inject(AuthService);
+  private readonly userService = inject(CachingUserService);
+  private readonly anlassService = inject(CachingAnlassService);
+  private readonly wertungsrichterId = toObservable(this.wertungsrichterUser).pipe(
+    map((user) => user.id),
+    distinctUntilChanged(),
+  );
 
-  readonly hasWertungsrichter = computed(() => this.wertungsrichterSig() !== undefined);
+  readonly wertungsrichter = toSignal(
+    this.wertungsrichterId.pipe(
+      filter((id): id is string => !!id),
+      switchMap((id) => this.userService.getWertungsrichter(id)),
+    ),
+    { initialValue: undefined },
+  );
 
-  constructor(
-    private authservice: AuthService,
-    private userService: CachingUserService,
-    private anlassService: CachingAnlassService,
-  ) {}
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.isAllWertungsrichterList && !changes.isAllWertungsrichterList.currentValue) {
-      // console.error("Load Einsaetze: ", changes);
+  readonly slotsForBrevet = computed(() => {
+    const wertungsrichter = this.wertungsrichter();
+    if (!wertungsrichter) {
+      return [];
     }
-  }
 
-  ngOnInit(): void {
-    this.userService.getWertungsrichter(this.wertungsrichterUser().id).subscribe((value) => {
-      if (value) {
-        this.wertungsrichterSig.set(value);
-      }
-    });
-  }
-  wrEinsatzChange(wrEinsatz: IWertungsrichterEinsatz) {
+    const brevet = this.useBrevet2() ? 1 : wertungsrichter.brevet;
+    return this.anlass().wertungsrichterSlots.filter((slot) => slot.brevet === brevet);
+  });
+
+  readonly wertungsrichterName = computed(
+    () => `${this.wertungsrichterUser().vorname} ${this.wertungsrichterUser().name}`,
+  );
+  readonly wrAnlassLink = computed(() => this.wertungsrichterUser().pal);
+  readonly commentDraft = signal<string | undefined>(undefined);
+  readonly kommentar = computed(() => this.commentDraft() ?? this.wertungsrichterUser().pal?.kommentar ?? '');
+  readonly hasKommentar = computed(() => this.kommentar().length > 0);
+  readonly egalSlot = computed(() => this.slotsForBrevet().find((slot) => slot.egalSlot));
+
+  onWertungsrichterEinsatzChange(): void {
     this.wertungsrichterUserChange.emit(this.wertungsrichterUser());
   }
 
-  kommentarChange(value): void {
-    console.log('Value changed: ', value);
-    this.wertungsrichterUser().pal.kommentar = value.target.value;
-    this.anlassService
-      .updateAnlassLink(this.wertungsrichterUser().pal, this.authservice.currentVerein)
-      .subscribe((pal) => {
-        console.log('Pal saved: ', pal.kommentar);
-      });
-  }
-  getSlotsForBrevet(): IWertungsrichterSlot[] {
-    const slots = this.anlass().wertungsrichterSlots.filter((slot) => {
-      if (this.useBrevet2()) {
-        return slot.brevet === 1;
-      } else {
-        return slot.brevet === this.wertungsrichterSig()?.brevet;
-      }
-    });
-    return slots;
+  onKommentarInput(event: Event): void {
+    this.commentDraft.set((event.target as HTMLInputElement).value);
   }
 
-  getEinsatzForSlot(slot: IWertungsrichterSlot): IWertungsrichterEinsatz {
-    // console.log("getEinsatzForSlot: ", slot, this.wertungsrichterUser);
-    const einsatz = this.wertungsrichterUser()?.pal?.einsaetze?.filter((einsatz) => {
-      return einsatz.wertungsrichterSlotId === slot.id;
-    })?.[0];
-    return einsatz;
-  }
-
-  egalIsAktiv(slot: IWertungsrichterSlot): boolean {
-    const egalSlot = this.getEgalSlot();
-    if (egalSlot === undefined || egalSlot.id === slot.id) {
-      return false;
+  saveKommentar(): void {
+    const user = this.wertungsrichterUser();
+    const pal = user.pal;
+    if (!pal) {
+      return;
     }
-    return egalSlot.egalSlot;
-  }
-  get wrAnlassLink() {
-    return this.wertungsrichterUser().pal;
+
+    const updatedPal = { ...pal, kommentar: this.kommentar() };
+    this.anlassService.updateAnlassLink(updatedPal, this.authservice.currentVerein).subscribe((savedPal) => {
+      this.commentDraft.set(undefined);
+      this.wertungsrichterUserChange.emit({ ...user, pal: savedPal });
+    });
   }
 
-  private getEgalSlot(): IWertungsrichterSlot {
-    const egalSlots = this.getSlotsForBrevet().filter((slot) => {
-      return slot.egalSlot;
-    });
-    return egalSlots.length > 0 ? egalSlots[0] : undefined;
+  getEinsatzForSlot(slot: IWertungsrichterSlot): IWertungsrichterEinsatz | undefined {
+    return this.wertungsrichterUser().pal?.einsaetze?.find((einsatz) => einsatz.wertungsrichterSlotId === slot.id);
   }
 }

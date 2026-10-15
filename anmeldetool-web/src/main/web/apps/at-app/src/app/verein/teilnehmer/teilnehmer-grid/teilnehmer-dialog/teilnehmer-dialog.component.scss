@@ -15,26 +15,28 @@ mat-form-field {
 
 .close-icon {
   transition: 1s ease-in-out;
-
-  &:hover {
-    transform: rotate(180deg);
-  }
 }
 
-::ng-deep {
-  .icon-outside {
-    .close-button {
-      float: right;
-      top: -52px;
-      right: -52px;
-    }
-
-    .mat-dialog-container {
-      overflow: unset;
-    }
-  }
+.close-icon:hover {
+  transform: rotate(180deg);
 }
 
+::ng-deep .icon-outside .close-button {
+  float: right;
+  top: -52px;
+  right: -52px;
+}
+
+::ng-deep .icon-outside .mat-dialog-container {
+  overflow: unset;
+}
+/*
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+*/
 .minimal {
   min-width: 25em;
 }

@@ -1,4 +1,4 @@
-@if (wertungsrichterSig()) {
+@if (wertungsrichter(); as currentWertungsrichter) {
   <div
     class="layout-container chip drag-drop-box"
     cdkDrag
@@ -9,15 +9,11 @@
   >
     <div class="layout-row">
       <div class="layout-col-10">
-        <span
-          [ngClass]="{
-            'h2-green': wertungsrichterSig()?.gueltig,
-            'h2-red': !wertungsrichterSig()?.gueltig,
-          }"
-          >{{ wertungsrichterUser().vorname + ' ' + wertungsrichterUser().name }}</span
-        >
+        <span [class.h2-green]="currentWertungsrichter.gueltig" [class.h2-red]="!currentWertungsrichter.gueltig">{{
+          wertungsrichterName()
+        }}</span>
       </div>
-      <div class="layout-col-2">Brevet {{ wertungsrichterSig()?.brevet }}</div>
+      <div class="layout-col-2">Brevet {{ currentWertungsrichter.brevet }}</div>
     </div>
     @if (!isAllWertungsrichterList() && wertungsrichterUser().pal) {
       <div class="layout-row">
@@ -27,17 +23,17 @@
     @if (!isAllWertungsrichterList()) {
       <div class="layout-row">
         <div class="layout-col doubleRow">
-          @for (slot of getSlotsForBrevet(); track slot.id) {
-            <lxt-wertungsrichter-slot
+          @for (slot of slotsForBrevet(); track slot.id) {
+            <ztv-wertungsrichter-slot
               [slot]="slot"
-              [wrAnlassLink]="wrAnlassLink"
+              [wrAnlassLink]="wrAnlassLink()"
               [wertungsrichter]="wertungsrichterUser()"
               [einsatz]="getEinsatzForSlot(slot)"
               [anlass]="anlass()"
-              (wrEinsatzChange)="wrEinsatzChange($event)"
-              [egalIsAktiv]="egalIsAktiv(slot)"
+              (wrEinsatzChange)="onWertungsrichterEinsatzChange()"
+              [egalIsAktiv]="egalSlot()?.id !== slot.id && !!egalSlot()?.egalSlot"
             >
-            </lxt-wertungsrichter-slot>
+            </ztv-wertungsrichter-slot>
           }
           @if (wertungsrichterUser().pal) {
             <mat-form-field class="full-width" appearance="fill">
@@ -45,17 +41,18 @@
               <input
                 matInput
                 placeholder="Kommentar"
-                [(ngModel)]="wertungsrichterUser().pal.kommentar"
-                (change)="kommentarChange($event)"
+                [value]="kommentar()"
+                (input)="onKommentarInput($event)"
+                (change)="saveKommentar()"
                 [disabled]="!changeAllowed()"
               />
-              @if (wertungsrichterUser().pal.kommentar) {
+              @if (hasKommentar()) {
                 <button
                   [disabled]="!changeAllowed()"
                   matSuffix
                   mat-icon-button
                   aria-label="leeren"
-                  (click)="wertungsrichterUser().pal.kommentar = ''"
+                  (click)="commentDraft.set(''); saveKommentar()"
                 >
                   <mat-icon>close</mat-icon>
                 </button>

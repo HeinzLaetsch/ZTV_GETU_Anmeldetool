@@ -1,19 +1,25 @@
-<div class="layout-col-12">
-  <mat-tab-group #tabs mat-align-tabs="start">
-    <mat-tab>
-      <ng-template mat-tab-label>Erfassen </ng-template>
-      <lxt-erfassen [anlass]="anlass" [modeErfassen]="true"></lxt-erfassen>
-    </mat-tab>
-    <mat-tab>
-      <ng-template mat-tab-label>Überprüfen </ng-template>
-      <lxt-erfassen [anlass]="anlass" [modeErfassen]="false"></lxt-erfassen>
-    </mat-tab>
-    <mat-tab *ngIf="authService.isAdministrator()">
-      <ng-template mat-tab-label>Ranglisten </ng-template>
-      <lxt-ranglisten></lxt-ranglisten>
-    </mat-tab>
-  </mat-tab-group>
-  <div class="anlass-title">
-    <h2>{{ anlass.getWithDatum() }}</h2>
+@if (anlass; as currentAnlass) {
+  <div class="layout-col-12">
+    <mat-tab-group #tabs mat-align-tabs="start">
+      <mat-tab>
+        <ng-template mat-tab-label>Erfassen</ng-template>
+        <ztv-erfassen [anlass]="currentAnlass" [modeErfassen]="true"></ztv-erfassen>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>Überprüfen</ng-template>
+        <ztv-erfassen [anlass]="currentAnlass" [modeErfassen]="false"></ztv-erfassen>
+      </mat-tab>
+      @if (authService.isAdministrator()) {
+        <mat-tab>
+          <ng-template mat-tab-label>Ranglisten</ng-template>
+          <ztv-ranglisten></ztv-ranglisten>
+        </mat-tab>
+      }
+    </mat-tab-group>
+    <div class="anlass-title">
+      <h2>{{ currentAnlass.getWithDatum() }}</h2>
+    </div>
   </div>
-</div>
+} @else {
+  <p class="loading-message">Anlass wird geladen...</p>
+}

@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import type { ILauflistenEintrag } from 'src/app/core/model/ILauflistenEintrag';
 
 @Component({
-  selector: 'lxt-delete-notenblatt',
+  selector: 'ztv-delete-notenblatt',
   templateUrl: './delete-notenblatt.component.html',
-  styleUrls: ['./delete-notenblatt.component.css'],
+  styleUrls: ['./delete-notenblatt.component.scss'],
   standalone: true,
   imports: [MatDialogModule],
   changeDetection: ChangeDetectionStrategy.OnPush,

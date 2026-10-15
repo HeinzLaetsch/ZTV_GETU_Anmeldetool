@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, type OnInit, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import type { Subscription } from 'rxjs';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DestroyRef } from '@angular/core';
 import type { IRolle } from 'src/app/core/model/IRolle';
 import type { IUser } from 'src/app/core/model/IUser';
 import type { IWertungsrichter } from 'src/app/core/model/IWertungsrichter';
@@ -13,42 +13,123 @@ import { RoleFormComponent } from '../profile/role-form/role-form.component';
 import { WertungsrichterFormComponent } from '../profile/wertungsrichter-form/wertungsrichter-form.component';
 
 @Component({
-  selector: 'lxt-user-form',
+  selector: 'ztv-user-form',
   templateUrl: './user-form.component.html',
-  styleUrls: ['./user-form.component.scss'],
-  standalone: true,
-  imports: [CommonModule, UserComponent, RoleFormComponent, WertungsrichterFormComponent],
+  styleUrl: './user-form.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [UserComponent, RoleFormComponent, WertungsrichterFormComponent],
 })
-export class UserFormComponent implements OnInit {
-  @Input()
-  //user: IUser;
-  currentUser: IUser;
-  @Input()
-  tabIndex: number;
-  @Input()
-  userDirty: boolean;
+export class UserFormComponent {
+  protected readonly currentUser = input.required<IUser>();
+  protected readonly tabIndex = input.required<number>();
+  protected readonly userDirty = input(false);
+  protected readonly userChange = output<IChangeEvent>();
 
-  @Output()
-  userChange: EventEmitter<IChangeEvent>;
+  private readonly authService = inject(AuthService);
+  private readonly userService = inject(CachingUserService);
+  private readonly roleService = inject(CachingRoleService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  changeEvent: IChangeEvent;
-  appearance = 'outline';
+  protected readonly assignedRoles = signal<IRolle[]>([]);
+  protected readonly wertungsrichter = signal<IWertungsrichter>(this.getEmptyWertungsrichter());
+  private readonly changeEvent = signal<IChangeEvent>(this.getNewChangeEvent(-1));
 
-  _assignedRoles: IRolle[];
+  protected readonly isVereinsAnmelder = computed(
+    () => this.authService.isAdministratorSig() || this.authService.isVereinsAnmmelderSig(),
+  );
+  protected readonly isVereinsVerantwortlicher = computed(
+    () => this.authService.isAdministratorSig() || this.authService.isVereinsVerantwortlicherSig(),
+  );
+  protected readonly isWertungsrichter = computed(() =>
+    this.assignedRoles().some((role) => role.name === 'WERTUNGSRICHTER' && role.aktiv),
+  );
+  protected readonly isOwner = computed(
+    () =>
+      this.authService.isAdministratorSig() ||
+      this.currentUser().benutzername === this.authService.currentUser?.benutzername,
+  );
 
-  _wertungsrichter: IWertungsrichter;
+  constructor() {
+    effect((onCleanup) => {
+      const user = this.currentUser();
+      if (!user.id) {
+        this.assignedRoles.set([]);
+        this.updateChangeEvent({ userValid: false });
+        return;
+      }
 
-  _localPassword = '';
+      const rolesSubscription = this.roleService.getRolesForUser(user).subscribe((roles) => {
+        this.assignedRoles.set(roles);
+        this.updateChangeEvent({ hasWr: this.isWertungsrichter() });
+      });
+      const wertungsrichterSubscription = this.userService.getWertungsrichter(user.id).subscribe((value) => {
+        if (value) {
+          this.wertungsrichter.set(value);
+        }
+      });
 
-  constructor(
-    private authService: AuthService,
-    private userService: CachingUserService,
-    private roleService: CachingRoleService,
-  ) {
-    this.userChange = new EventEmitter<IChangeEvent>();
-    this._wertungsrichter = this.getEmptyWertungsrichter();
-    this.changeEvent = {
-      tabIndex: -1,
+      onCleanup(() => {
+        rolesSubscription.unsubscribe();
+        wertungsrichterSubscription.unsubscribe();
+      });
+    });
+  }
+
+  protected readonly isReadOnly = computed(
+    () => !(this.isOwner() || this.isVereinsAnmelder() || this.isVereinsVerantwortlicher()),
+  );
+
+  private getEmptyWertungsrichter(): IWertungsrichter {
+    return {
+      id: '',
+      brevet: 1,
+      gueltig: false,
+      letzterFK: new Date(),
+      aktiv: false,
+    };
+  }
+  protected isUserDirty(): boolean {
+    return this.userDirty();
+  }
+
+  protected readonly userHasChanged = computed(() => this.changeEvent().userHasChanged);
+
+  protected onUserChange(user: IUser): void {
+    Object.assign(this.currentUser(), user);
+    this.updateChangeEvent({ userHasChanged: true });
+  }
+
+  protected onAssignedRolesChange(roles: IRolle[]): void {
+    const hasWr = roles.some((role) => role.name === 'WERTUNGSRICHTER' && role.aktiv);
+    this.assignedRoles.set(roles);
+    this.updateChangeEvent({
+      rolesChanged: true,
+      wrChanged: this.changeEvent().hasWr !== hasWr,
+      hasWr,
+    });
+    this.saveRolesChanged(roles);
+    this.checkWrChanged();
+  }
+
+  protected onWertungsrichterChange(value: IWertungsrichter): void {
+    this.wertungsrichter.set(value);
+    this.updateChangeEvent({ wrChanged: true });
+    this.checkWrChanged();
+  }
+
+  protected updateUserValid(valid: boolean): void {
+    this.updateChangeEvent({ userValid: valid });
+  }
+
+  private updateChangeEvent(changes: Partial<IChangeEvent>): void {
+    const nextChangeEvent = { ...this.changeEvent(), ...changes, tabIndex: this.tabIndex() };
+    this.changeEvent.set(nextChangeEvent);
+    this.userChange.emit(nextChangeEvent);
+  }
+
+  private getNewChangeEvent(index: number): IChangeEvent {
+    return {
+      tabIndex: index,
       hasWr: false,
       rolesChanged: false,
       userHasChanged: false,
@@ -59,172 +140,43 @@ export class UserFormComponent implements OnInit {
     };
   }
 
-  getEmptyWertungsrichter(): IWertungsrichter {
-    return {
-      id: '',
-      brevet: 1,
-      gueltig: false,
-      letzterFK: new Date(),
-      aktiv: false,
-    };
-  }
-  ngOnInit(): void {
-    // console.log("Current User: ", this.currentUser);
-    this.changeEvent.tabIndex = this.tabIndex;
-    if (this.currentUser.id && this.currentUser.id.length > 0) {
-      this.reloadRoles(this.currentUser);
-      this.userService.getWertungsrichter(this.currentUser.id).subscribe((value) => {
-        if (value) {
-          this._wertungsrichter = value;
-        }
-      });
-    } else {
-      this.changeEvent.userValid = false;
-      this._assignedRoles = [] as IRolle[];
-    }
-  }
-
-  isSaveDisabled() {
-    if (!this.changeEvent.userValid) {
-      return true;
-    }
-    if (!this.changeEvent.rolesChanged && !this.changeEvent.userHasChanged && !this.changeEvent.wrChanged) {
-      return true;
-    }
-    return false;
-  }
-  private reloadRoles(user: IUser) {
-    let localSubscription2: Subscription;
-    if (user && user.id && user.id.length > 0) {
-      // console.log("user.id is valid");
-      localSubscription2 = this.roleService.getRolesForUser(user).subscribe((result) => {
-        this._assignedRoles = result;
-        this.changeEvent.hasWr = this.isWertungsrichter();
-        // console.log("RoleFormComponent:: ngOnInit: ", this._assignedRoles);
-        if (localSubscription2) {
-          localSubscription2.unsubscribe();
-        }
-      });
-    } else {
-      console.log('user.id not valid');
-      this._assignedRoles = [] as IRolle[];
-      this.changeEvent.hasWr = false;
-    }
-  }
-
-  isUserDirty(): boolean {
-    return this.userDirty;
-  }
-
-  isWertungsrichter() {
-    return this.hasRole('WERTUNGSRICHTER');
-  }
-
-  isOwner() {
-    if (this.authService.isAdministratorSig()) {
-      return true;
-    }
-    if (this.currentUser.benutzername === this.authService.currentUser.benutzername) {
-      return true;
-    }
-    return false;
-  }
-
-  private hasRole(roleName: string): boolean {
-    if (this._assignedRoles) {
-      const rollen = this._assignedRoles.filter((role) => role.name === roleName);
-      // console.log('Rollen: ' , rollen, ' , Name: ', roleName);
-      if (rollen && rollen.length > 0) {
-        return rollen[0].aktiv;
-      }
-    }
-    return false;
-  }
-  private updateChangeEvent(saved: boolean, canceled: boolean) {
-    this.changeEvent.canceled = canceled;
-    this.changeEvent.saved = saved;
-    this.userChange.next(this.changeEvent);
-  }
-  get userHasChanged(): boolean {
-    return this.changeEvent.userHasChanged;
-  }
-  set userHasChanged(value: boolean) {
-    this.changeEvent.userHasChanged = value;
-  }
-  get wertungsrichter() {
-    return this._wertungsrichter;
-  }
-
-  set wertungsrichter(value: IWertungsrichter) {
-    this.changeEvent.wrChanged = true;
-    this._wertungsrichter = value;
-    // this.updateChangeEvent(false, false);
-    this.checkWrChanged();
-  }
-  get isVereinsAnmelder() {
-    if (this.authService.isAdministratorSig()) {
-      return true;
-    }
-    return this.authService.isVereinsAnmmelderSig();
-  }
-
-  get isVereinsVerantwortlicher() {
-    if (this.authService.isAdministratorSig()) {
-      return true;
-    }
-    return this.authService.isVereinsVerantwortlicherSig();
-  }
-  get assignedRoles(): IRolle[] {
-    // console.log('Get user: ', this.currentUser);
-    return this._assignedRoles;
-  }
-  set assignedRoles(value: IRolle[]) {
-    // console.log("Set assignedRoles: ", value);
-    this.changeEvent.rolesChanged = true;
-    this._assignedRoles = value;
-    if (this.changeEvent.hasWr !== this.isWertungsrichter()) {
-      this.changeEvent.wrChanged = true;
-    }
-    this.changeEvent.hasWr = this.isWertungsrichter();
-    this.updateChangeEvent(false, false);
-    this.saveRolesChanged();
-    this.checkWrChanged();
-  }
-
-  saveRolesChanged() {
+  private saveRolesChanged(roles: IRolle[]): void {
     this.userService
-      .updateRoles(this.currentUser, this.authService.currentVerein, this.assignedRoles)
+      .updateRoles(this.currentUser(), this.authService.currentVerein, roles)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((user) => {
-        this.currentUser = user;
-        this.reloadRoles(this.currentUser);
-        this.updateChangeEvent(true, false);
-        this.changeEvent.rolesChanged = false;
+        Object.assign(this.currentUser(), user);
+        this.updateChangeEvent({ saved: true, rolesChanged: false });
       });
   }
-  updateUserValid(valid: boolean) {
-    this.changeEvent.userValid = valid;
-    this.userChange.next(this.changeEvent);
-    // console.log("Valid changed: ", this.currentUser , ', ', valid);
-  }
 
-  checkWrChanged(): void {
-    if (this.changeEvent.wrChanged) {
-      if (this.changeEvent.hasWr) {
-        const newWR = JSON.parse(JSON.stringify(this._wertungsrichter));
-        newWR.personId = this.currentUser.id;
-        this.userService.updateWertungsrichter(this.currentUser.id, newWR).subscribe((value) => {
-          // created returns no Object just URL this._wertungsrichter = value;
-          this.changeEvent.wrChanged = false;
-          if (this._wertungsrichter.id === '' || value?.brevet !== this._wertungsrichter.brevet) {
-            this._wertungsrichter = value;
-          }
-        });
-      } else {
-        this.userService.deleteWertungsrichterForUserId(this.currentUser.id).subscribe((value) => {
-          this._wertungsrichter = this.getEmptyWertungsrichter();
-          this.changeEvent.wrChanged = false;
-        });
-      }
+  private checkWrChanged(): void {
+    const changeEvent = this.changeEvent();
+    const userId = this.currentUser().id;
+    if (!changeEvent.wrChanged || !userId) {
+      return;
     }
+
+    if (changeEvent.hasWr) {
+      const newWertungsrichter = { ...structuredClone(this.wertungsrichter()), personId: userId };
+      this.userService
+        .updateWertungsrichter(userId, newWertungsrichter)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((value) => {
+          if (value) {
+            this.wertungsrichter.set(value);
+          }
+          this.updateChangeEvent({ wrChanged: false });
+        });
+      return;
+    }
+
+    this.userService
+      .deleteWertungsrichterForUserId(userId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.wertungsrichter.set(this.getEmptyWertungsrichter());
+        this.updateChangeEvent({ wrChanged: false });
+      });
   }
 }

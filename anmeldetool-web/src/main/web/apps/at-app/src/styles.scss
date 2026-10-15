@@ -3,6 +3,99 @@
 
 @use 'assets/theme/ztv-gen-theme';
 
+.mat-mdc-button-base,
+.mat-mdc-button-base.mat-primary,
+.mat-mdc-button-base.mat-accent,
+.mat-mdc-button-base.mat-warn {
+  --mat-button-filled-container-color: var(--ztv-lighter-gray);
+  --mat-button-filled-label-text-color: var(--ztv-dark-gray);
+  --mat-button-filled-state-layer-color: var(--ztv-dark-blue);
+  --mat-button-filled-ripple-color: var(--ztv-dark-blue);
+  --mat-button-outlined-label-text-color: var(--ztv-dark-gray);
+  --mat-button-outlined-outline-color: var(--ztv-dark-gray);
+  --mat-button-outlined-state-layer-color: var(--ztv-dark-blue);
+  --mat-button-outlined-ripple-color: var(--ztv-dark-blue);
+  --mat-button-protected-container-color: var(--ztv-lighter-gray);
+  --mat-button-protected-label-text-color: var(--ztv-dark-gray);
+  --mat-button-protected-state-layer-color: var(--ztv-dark-blue);
+  --mat-button-protected-ripple-color: var(--ztv-dark-blue);
+  --mat-button-text-label-text-color: var(--ztv-dark-gray);
+  --mat-button-text-state-layer-color: var(--ztv-dark-blue);
+  --mat-button-text-ripple-color: var(--ztv-dark-blue);
+  --mat-button-tonal-container-color: var(--ztv-lighter-gray);
+  --mat-button-tonal-label-text-color: var(--ztv-dark-gray);
+  --mat-button-tonal-state-layer-color: var(--ztv-dark-blue);
+  --mat-button-tonal-ripple-color: var(--ztv-dark-blue);
+
+  background-color: var(--ztv-lighter-gray);
+  border-radius: 0.6rem;
+  color: var(--ztv-dark-gray);
+}
+
+.mat-mdc-button-base:hover:not(:disabled),
+.mat-mdc-button-base:focus-visible:not(:disabled) {
+  --mat-button-filled-label-text-color: var(--ztv-light-gray);
+  --mat-button-outlined-label-text-color: var(--ztv-light-gray);
+  --mat-button-protected-label-text-color: var(--ztv-light-gray);
+  --mat-button-text-label-text-color: var(--ztv-light-gray);
+  --mat-button-tonal-label-text-color: var(--ztv-light-gray);
+
+  background-color: var(--ztv-dark-blue);
+  color: var(--ztv-light-gray);
+}
+
+.nav-menu .mat-mdc-menu-item {
+  --mat-menu-item-label-text-color: var(--ztv-dark-gray);
+  --mat-menu-item-icon-color: var(--ztv-dark-gray);
+  --mat-menu-item-hover-state-layer-color: var(--ztv-dark-blue);
+  --mat-menu-item-focus-state-layer-color: var(--ztv-dark-blue);
+
+  color: var(--ztv-dark-gray);
+  background-color: var(--ztv-lighter-gray);
+}
+
+.nav-menu .mat-mdc-menu-item:hover,
+.nav-menu .mat-mdc-menu-item.cdk-program-focused,
+.nav-menu .mat-mdc-menu-item.cdk-keyboard-focused {
+  --mat-menu-item-label-text-color: var(--ztv-light-gray);
+  --mat-menu-item-icon-color: var(--ztv-light-gray);
+
+  color: var(--ztv-light-gray);
+  background-color: var(--ztv-dark-blue);
+}
+
+.nav-menu .mat-mdc-menu-item.active,
+.nav-menu .mat-mdc-menu-item.active:hover,
+.nav-menu .mat-mdc-menu-item.active.cdk-program-focused,
+.nav-menu .mat-mdc-menu-item.active.cdk-keyboard-focused {
+  --mat-menu-item-label-text-color: var(--ztv-white);
+  --mat-menu-item-icon-color: var(--ztv-white);
+  --mat-menu-item-hover-state-layer-color: transparent;
+  --mat-menu-item-focus-state-layer-color: transparent;
+
+  color: var(--ztv-white);
+  background-color: var(--ztv-blue);
+}
+
+.nav-menu .mat-mdc-menu-item:disabled {
+  --mat-menu-item-label-text-color: var(--ztv-gray);
+  --mat-menu-item-icon-color: var(--ztv-gray);
+
+  color: var(--ztv-gray);
+  background-color: var(--ztv-lighter-blue);
+}
+
+.mat-mdc-option:not(.mdc-list-item--disabled) {
+  --mat-option-label-text-color: var(--ztv-dark-gray);
+  background-color: var(--ztv-lighter-gray);
+}
+
+.mat-mdc-option:hover:not(.mdc-list-item--disabled),
+.mat-mdc-option:focus:not(.mdc-list-item--disabled),
+.mat-mdc-option.mat-mdc-option-active:not(.mdc-list-item--disabled) {
+  --mat-option-label-text-color: var(--ztv-light-gray);
+}
+
 html,
 body {
   height: 100%;

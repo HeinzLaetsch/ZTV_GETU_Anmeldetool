@@ -1,111 +1,40 @@
-import { Component, EventEmitter, Input, type OnInit, Output } from '@angular/core';
-import moment from 'moment';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { type MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { AnzeigeStatusEnum } from 'src/app/core/model/AnzeigeStatusEnum';
 import type { IAnlass } from 'src/app/core/model/IAnlass';
 import type { IAnlassSummary } from 'src/app/core/model/IAnlassSummary';
-import type { IOrganisationAnlassLink } from 'src/app/core/model/IOrganisationAnlassLink';
-import { AuthService } from 'src/app/core/service/auth/auth.service';
-import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
 
 @Component({
-  selector: 'lxt-anlass-statistik',
+  selector: 'ztv-anlass-statistik',
   templateUrl: './anlass-statistik.component.html',
-  styleUrls: ['./anlass-statistik.component.css'],
-  standalone: true,
+  styleUrl: './anlass-statistik.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MatCheckboxModule],
 })
-export class AnlassStatistikComponent extends SubscriptionHelper implements OnInit {
-  @Input()
-  anlass: IAnlass;
-  @Input()
-  anlassSummary: IAnlassSummary;
+export class AnlassStatistikComponent {
+  readonly anlass = input.required<IAnlass>();
+  readonly anlassSummary = input.required<IAnlassSummary>();
+  readonly startetChanged = output<boolean>();
 
-  @Output()
-  startetChanged = new EventEmitter();
+  readonly isTuAnlass = computed(() => this.anlass().tuAnlass);
+  readonly isTiAnlass = computed(() => this.anlass().tiAnlass);
+  readonly isBrevet1Anlass = computed(() => this.anlass().brevet1Anlass);
+  readonly isBrevet2Anlass = computed(() => this.anlass().brevet2Anlass);
+  readonly isStartedCheckboxDisabled = computed(() => {
+    const anlass = this.anlass();
+    const summary = this.anlassSummary();
+    const status = anlass.anzeigeStatus;
 
-  // anlassSummary$: Observable<IAnlassSummary>;
-
-  orgAnlassLink: IOrganisationAnlassLink;
-  //starts$: Observable<ReadonlyArray<IOrganisationAnlassLink>>;
-
-  startet: boolean;
-
-  constructor(
-    public authService: AuthService, //private store: Store<AppState>,
-  ) {
-    //private anlassService: AnlassService
-    super();
-  }
-  ngOnInit() {
-    this.startet = this.anlassSummary.startet;
-    /*
-    this.anlassSummary$ = this.anlassService.getAnlassOrganisationSummary(
-      this.anlass,
-      this.authService.currentVerein
-    );
-    */
-    /*
-    this.starts$ = this.store.pipe(
-      select(
-        selectOalForKeys(this.authService.currentVerein.id, this.anlass.id)
-      )
-    );
-    */
-    /*
-    this.registerSubscription(
-      this.anlassSummary$.subscribe((result) => {
-        this.anlassSummary = result;
-        this.anlassSummary.startendeK2 = result.startendeK2;
-        this.startetClicked.emit(this.anlassSummary.startet);
-      })
-    );
-    */
-    /*
-    this.registerSubscription(
-      this.starts$.subscribe((oalLinks) => {
-        if (oalLinks !== undefined && oalLinks.length > 0) {
-          this.orgAnlassLink = oalLinks[0];
-        }
-      })
-    );
-    */
-  }
-  isStartedCheckboxDisabled(): boolean {
-    if (!this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)) {
-      const asMoment = moment(this.anlassSummary.verlaengerungsDate);
-      if (
-        !this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED) ||
-        asMoment.isSameOrAfter(moment.now())
-      ) {
-        return false;
-      }
+    if (!status || status.hasStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN)) {
+      return true;
     }
-    return true;
-  }
 
-  vereinStartedClicked(check: boolean) {
-    console.log('VereinStartedClicked: ', check);
-    /*
-    const newOAL = JSON.parse(JSON.stringify(this.orgAnlassLink));
-    newOAL.startet = check;
-    this.store.dispatch(
-      OalActions.updateVereinsStartInvoked({ payload: newOAL })
+    return (
+      status.hasStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED) && new Date(summary.verlaengerungsDate).getTime() < Date.now()
     );
-    */
-    this.startetChanged.emit(check);
-  }
+  });
 
-  isTuAnlass(): boolean {
-    return this.anlass.tuAnlass;
-  }
-  isTiAnlass(): boolean {
-    return this.anlass.tiAnlass;
-  }
-  isBrevet1Anlass(): boolean {
-    // console.log("Brevet 1: ", this.anlass.tiefsteKategorie <= KategorieEnum.K4);
-    return this.anlass.brevet1Anlass;
-  }
-  isBrevet2Anlass(): boolean {
-    // console.log("Brevet 2: ", this.anlass.hoechsteKategorie > KategorieEnum.K4);
-    return this.anlass.brevet2Anlass;
+  onStartetChange(change: MatCheckboxChange): void {
+    this.startetChanged.emit(change.checked);
   }
 }

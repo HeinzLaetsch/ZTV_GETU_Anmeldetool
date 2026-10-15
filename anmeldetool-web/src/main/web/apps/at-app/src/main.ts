@@ -14,6 +14,9 @@ import { VereinActions } from './app/core/redux/verein';
 import { appEffects } from './app/core/redux/app.effects';
 import { appReducers } from './app/core/redux/app.reducer';
 import { AnmeldeToolRootComponent } from './app/core/component/app/app-root.component';
+import { AllCommunityModule, ModuleRegistry, ValidationModule } from 'ag-grid-community';
+
+ModuleRegistry.registerModules([AllCommunityModule, ValidationModule]);
 
 registerLocaleData(localeDeCH, 'de-CH');
 registerLocaleData(localeDeCH, 'DE-CH');
@@ -30,6 +33,10 @@ bootstrapApplication(AnmeldeToolRootComponent, {
     {
       provide: LOCALE_ID,
       useValue: 'de-CH',
+    },
+    {
+      provide: Window,
+      useValue: window,
     },
     provideStore(appReducers),
     provideEffects(...appEffects),

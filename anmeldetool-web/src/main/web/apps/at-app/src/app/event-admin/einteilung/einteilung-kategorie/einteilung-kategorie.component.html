@@ -1,31 +1,31 @@
 <ng-container *ngIf="loaded$ | async as obs; else loading">
   <mat-expansion-panel *ngIf="teilnahmeStatistic.totalStartende > 0">
     <mat-expansion-panel-header>
-      <mat-panel-title> {{ kategorie }} </mat-panel-title>
+      <mat-panel-title> {{ kategorie() }} </mat-panel-title>
       <mat-panel-description>
         Startende
         <span class="zahl">{{ teilnahmeStatistic.totalStartende }}</span>
       </mat-panel-description>
     </mat-expansion-panel-header>
     <ng-template matExpansionPanelContent>
-      <lxt-einteilung-abteilung
+      <ztv-einteilung-abteilung
         *ngFor="let abteilung of abteilungen"
-        [anlass]="anlass"
-        [kategorie]="kategorie"
+        [anlass]="anlass()"
+        [kategorie]="kategorie()"
         [abteilung]="abteilung"
-        [refreshEmitter]="refreshEmitter"
-        [search]="search"
+        [refreshEmitter]="refreshEmitter()"
+        [search]="search()"
         [expanded]="abteilungen?.length === 1"
-      ></lxt-einteilung-abteilung>
-      <lxt-einteilung-startgeraet
-        [anlass]="anlass"
-        [kategorie]="kategorie"
+      ></ztv-einteilung-abteilung>
+      <ztv-einteilung-startgeraet
+        [anlass]="anlass()"
+        [kategorie]="kategorie()"
         [abteilung]="UNDEFINED"
         [anlage]=""
         [startgeraet]=""
-        [refreshEmitter]="refreshEmitter"
-        [search]="search"
-      ></lxt-einteilung-startgeraet>
+        [refreshEmitter]="refreshEmitter()"
+        [search]="search()"
+      ></ztv-einteilung-startgeraet>
     </ng-template>
   </mat-expansion-panel>
 </ng-container>

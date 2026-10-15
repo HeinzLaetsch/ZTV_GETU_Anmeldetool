@@ -19,7 +19,7 @@ export class HttpSecurityInterceptorService implements HttpInterceptor {
     private authService: AuthService,
   ) {}
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     console.log('HttpSecurityInterceptorService intercept called for URL: ', req.url);
 
     const isLoginRequest = req.url.includes('/admin/login');
@@ -55,7 +55,7 @@ export class HttpSecurityInterceptorService implements HttpInterceptor {
             }
           }
         },
-        error: (err: any) => {
+        error: (err: HttpErrorResponse) => {
           if (err instanceof HttpErrorResponse) {
             if (err.status !== 401 && err.status !== 403) {
               return;

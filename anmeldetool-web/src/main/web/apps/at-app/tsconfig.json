@@ -9,11 +9,11 @@
     "strictPropertyInitialization": false,
     "noImplicitAny": false,
     "isolatedModules": true,
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": ["../../node_modules/@types"]
   },
   "angularCompilerOptions": {
     "strictInjectionParameters": true,
-    "strictTemplates": false
+    "strictTemplates": true
   },
   "extends": "../../tsconfig.base.json"
 }

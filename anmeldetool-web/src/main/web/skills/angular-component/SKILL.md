@@ -170,11 +170,11 @@ export class Button {
 export class Card {}
 
 // Usage:
-// <lxt-card>
+// <ztv-card>
 //   <h2 card-header>Title</h2>
 //   <p>Main content</p>
 //   <button card-footer>Action</button>
-// </lxt-card>
+// </ztv-card>
 ```
 
 ## Lifecycle Hooks
@@ -245,16 +245,16 @@ Use native control flow—do NOT use `*ngIf`, `*ngFor`, `*ngSwitch`.
 ```html
 <!-- Conditionals -->
 @if (isLoading()) {
-<lxt-spinner />
+<ztv-spinner />
 } @else if (error()) {
-<lxt-error [message]="error()" />
+<ztv-error [message]="error()" />
 } @else {
-<lxt-content [data]="data()" />
+<ztv-content [data]="data()" />
 }
 
 <!-- Loops -->
 @for (item of items(); track item.id) {
-<lxt-item [item]="item" />
+<ztv-item [item]="item" />
 } @empty {
 <p>No items found</p>
 }

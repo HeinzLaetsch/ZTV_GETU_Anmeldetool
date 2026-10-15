@@ -3,6 +3,7 @@ import { NgIf } from '@angular/common';
 import { ICellRendererParams } from 'ag-grid-community';
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { KategorieEnum, KategorieEnumFunction } from 'src/app/core/model/KategorieEnum';
+import type { IAnlassLink } from 'src/app/core/model/IAnlassLink';
 import { MeldeStatusEnum } from 'src/app/core/model/MeldeStatusEnum';
 
 @Component({
@@ -53,7 +54,7 @@ export class TeilnahmeStatusRenderer implements ICellRendererAngularComp {
     return true;
   }
 
-  showKategorie(value: any) {
+  showKategorie(value: IAnlassLink | undefined): boolean {
     if (value) {
       const keinStart = KategorieEnum.KEIN_START;
       if (!KategorieEnumFunction.equals(KategorieEnum.KEIN_START, value.kategorie) && keinStart !== value.kategorie) {
@@ -63,7 +64,7 @@ export class TeilnahmeStatusRenderer implements ICellRendererAngularComp {
     return false;
   }
 
-  showStatus(value: any): boolean {
+  showStatus(value: IAnlassLink | undefined): boolean {
     if (value && value.meldeStatus) {
       if (value.meldeStatus.toUpperCase() === MeldeStatusEnum.ABGEMELDET) {
         return true;
@@ -75,7 +76,7 @@ export class TeilnahmeStatusRenderer implements ICellRendererAngularComp {
     return false;
   }
 
-  getClass() {
+  getClass(): "teilnahme-status" | "teilnahme-status-disabled" {
     if (this.params.column.isCellEditable(this.params.node)) {
       return 'teilnahme-status';
     } else {

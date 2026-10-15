@@ -15,7 +15,7 @@ export class TeilnehmerEffects {
   loadAllTeilnehmer$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(TeilnehmerActions.loadAllTeilnehmerInvoked),
-      mergeMap((action) => {
+      mergeMap(() => {
         return this.teilnehmerService.getTeilnehmer(this.authService.currentVerein).pipe(
           switchMap((teilnehmer) => [
             TeilnehmerActions.loadAllTeilnehmerSuccess({

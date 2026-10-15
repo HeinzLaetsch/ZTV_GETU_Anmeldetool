@@ -24,7 +24,7 @@ import { EventStartListRowComponent } from './event-start-list-row/event-start-l
 @Component({
   selector: 'ztv-event-start-list',
   templateUrl: './event-start-list.component.html',
-  styleUrls: ['./event-start-list.component.css'],
+  styleUrls: ['./event-start-list.component.scss'],
   standalone: true,
   imports: [DatePipe, EventStartListHeaderComponent, EventStartListRowComponent],
 })
@@ -49,7 +49,7 @@ export class EventStartListComponent extends SubscriptionHelper implements OnIni
     super();
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     const anlassId: string = this.route.snapshot.params.id;
     //console.log("url param: ", anlassId);
     this.anlass$ = this.store.pipe(select(selectAnlassById(anlassId)));
@@ -84,11 +84,11 @@ export class EventStartListComponent extends SubscriptionHelper implements OnIni
     );
   }
 
-  print() {
+  print(): void {
     // this.angWindow.print();
     this.anlassService
       .getVereinAnmeldeKontrollePdf(this.anlass, this.authService.currentVerein)
-      .subscribe((result) => {});
+      .subscribe();
   }
 
   get titel(): string {
@@ -160,35 +160,35 @@ export class EventStartListComponent extends SubscriptionHelper implements OnIni
     return this.alleTeilnahmen
       ?.filter((teilnahme) => {
         console.log('filter: ', teilnahme.talDTOList[0].kategorie);
-        return teilnahme.talDTOList[0].kategorie == KategorieEnum.K1;
+        return teilnahme.talDTOList[0].kategorie === KategorieEnum.K1;
       })
       .sort((a, b) => this.sortBy(a, b));
   }
   getTeilnahmenForKategorieK2(): ITeilnahmen[] {
     return this.alleTeilnahmen
       ?.filter((teilnahme) => {
-        return teilnahme.talDTOList[0].kategorie == KategorieEnum.K2;
+        return teilnahme.talDTOList[0].kategorie === KategorieEnum.K2;
       })
       .sort((a, b) => this.sortBy(a, b));
   }
   getTeilnahmenForKategorieK3(): ITeilnahmen[] {
     return this.alleTeilnahmen
       ?.filter((teilnahme) => {
-        return teilnahme.talDTOList[0].kategorie == KategorieEnum.K3;
+        return teilnahme.talDTOList[0].kategorie === KategorieEnum.K3;
       })
       .sort((a, b) => this.sortBy(a, b));
   }
   getTeilnahmenForKategorieK4(): ITeilnahmen[] {
     return this.alleTeilnahmen
       ?.filter((teilnahme) => {
-        return teilnahme.talDTOList[0].kategorie == KategorieEnum.K4;
+        return teilnahme.talDTOList[0].kategorie === KategorieEnum.K4;
       })
       .sort((a, b) => this.sortBy(a, b));
   }
   getTeilnahmenForKategorieK5(): ITeilnahmen[] {
     return this.alleTeilnahmen
       ?.filter((teilnahme) => {
-        return teilnahme.talDTOList[0].kategorie == KategorieEnum.K5;
+        return teilnahme.talDTOList[0].kategorie === KategorieEnum.K5;
       })
       .sort((a, b) => this.sortBy(a, b));
   }
@@ -196,42 +196,42 @@ export class EventStartListComponent extends SubscriptionHelper implements OnIni
     console.log('getTeilnahmenForKategorieK5A: ', this.alleTeilnahmen);
     return this.alleTeilnahmen
       ?.filter((teilnahme) => {
-        return teilnahme.talDTOList[0].kategorie == KategorieEnum.K5A;
+        return teilnahme.talDTOList[0].kategorie === KategorieEnum.K5A;
       })
       .sort((a, b) => this.sortBy(a, b));
   }
   getTeilnahmenForKategorieK5B(): ITeilnahmen[] {
     return this.alleTeilnahmen
       ?.filter((teilnahme) => {
-        return teilnahme.talDTOList[0].kategorie == KategorieEnum.K5B;
+        return teilnahme.talDTOList[0].kategorie === KategorieEnum.K5B;
       })
       .sort((a, b) => this.sortBy(a, b));
   }
   getTeilnahmenForKategorieK6(): ITeilnahmen[] {
     return this.alleTeilnahmen
       ?.filter((teilnahme) => {
-        return teilnahme.talDTOList[0].kategorie == KategorieEnum.K6;
+        return teilnahme.talDTOList[0].kategorie === KategorieEnum.K6;
       })
       .sort((a, b) => this.sortBy(a, b));
   }
   getTeilnahmenForKategorieKD(): ITeilnahmen[] {
     return this.alleTeilnahmen
       ?.filter((teilnahme) => {
-        return teilnahme.talDTOList[0].kategorie == KategorieEnum.KD;
+        return teilnahme.talDTOList[0].kategorie === KategorieEnum.KD;
       })
       .sort((a, b) => this.sortBy(a, b));
   }
   getTeilnahmenForKategorieKH(): ITeilnahmen[] {
     return this.alleTeilnahmen
       ?.filter((teilnahme) => {
-        return teilnahme.talDTOList[0].kategorie == KategorieEnum.KH;
+        return teilnahme.talDTOList[0].kategorie === KategorieEnum.KH;
       })
       .sort((a, b) => this.sortBy(a, b));
   }
   getTeilnahmenForKategorieK7(): ITeilnahmen[] {
     return this.alleTeilnahmen
       ?.filter((teilnahme) => {
-        return teilnahme.talDTOList[0].kategorie == KategorieEnum.K7;
+        return teilnahme.talDTOList[0].kategorie === KategorieEnum.K7;
       })
       .sort((a, b) => this.sortBy(a, b));
   }

@@ -1,4 +1,3 @@
-import { MeldeStatusEnum } from './MeldeStatusEnum';
 import { TiTuEnum } from './TiTuEnum';
 
 export type ITeilnehmerStart = {

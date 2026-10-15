@@ -1,16 +1,15 @@
 import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
+export type HasChangesDialogResult = 'leave' | 'stay';
+
 @Component({
-  selector: 'lxt-has-changes',
+  selector: 'ztv-has-changes',
   templateUrl: './has-changes.component.html',
-  styleUrls: ['./has-changes.component.css'],
+  styleUrls: ['./has-changes.component.scss'],
   standalone: true,
   imports: [MatDialogModule],
 })
-
-export type HasChangesDialogResult = 'leave' | 'stay';
-
 export class HasChangesComponent {
   readonly data = inject(MAT_DIALOG_DATA);
   readonly dialogRef = inject(MatDialogRef<HasChangesComponent>);

@@ -31,11 +31,11 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     private verein: IVerein,
   ) {}
 
-  connect(collectionViewer: CollectionViewer): Observable<ITeilnehmer[]> {
+  connect(_collectionViewer: CollectionViewer): Observable<ITeilnehmer[]> {
     return this.teilnehmerSubject.asObservable();
   }
 
-  disconnect(collectionViewer: CollectionViewer): void {
+  disconnect(_collectionViewer: CollectionViewer): void {
     this.teilnehmerSubject.complete();
     // this.loadingSubject.complete();
   }
@@ -81,7 +81,14 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
   }
 
   // pageEvent: PageEvent,
-  update(filter: string, tiTu: TiTuEnum, previousIndex: number, row: number, col: number, value: any) {
+  update(
+    filter: string,
+    tiTu: TiTuEnum,
+    previousIndex: number,
+    row: number,
+    col: number,
+    value: string | number,
+  ): void {
     // const effRow = pageEvent.previousPageIndex * this.paginator.pageSize + row;
     if (!this.teilnehmerService.getTeilnehmer(filter, this.sortValue, tiTu, this.paginator, previousIndex)) {
       console.log('Empty');
@@ -113,7 +120,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     this.teilnehmerService.getTeilnehmer(filter, this.sortValue, tiTu, this.paginator, previousIndex)[row].dirty = true;
   }
 
-  updateMutationen(filter: string, tiTu: TiTuEnum, row: number, value: MeldeStatusEnum, anlass: IAnlass) {
+  updateMutationen(filter: string, tiTu: TiTuEnum, row: number, value: MeldeStatusEnum, anlass: IAnlass): void {
     if (!this.teilnehmerService.getTeilnehmer(filter, this.sortValue, tiTu, this.paginator, undefined)) {
       console.log('Empty');
       return;
@@ -152,7 +159,14 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     }
   }
 
-  updateTeilnahme(filter: string, tiTu: TiTuEnum, row: number, value: any, anlass: IAnlass, erfassenDisabled: boolean) {
+  updateTeilnahme(
+    filter: string,
+    tiTu: TiTuEnum,
+    row: number,
+    value: string,
+    anlass: IAnlass,
+    erfassenDisabled: boolean,
+  ): void {
     // const effRow = pageEvent.previousPageIndex * this.paginator.pageSize + row;
     if (!this.teilnehmerService.getTeilnehmer(filter, this.sortValue, tiTu, this.paginator, undefined)) {
       console.log('Empty');
@@ -198,7 +212,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
     }
   }
 
-  reset(verein: IVerein): Observable<any> {
+  reset(verein: IVerein): Observable<string[]> {
     // console.log("Reset");
     return this.teilnehmerService.reset(verein, true);
   }
@@ -224,7 +238,7 @@ export class TeilnehmerDataSource implements DataSource<ITeilnehmer> {
   saveAll(verein: IVerein): Observable<ITeilnehmer[]> {
     return this.teilnehmerService.saveAll(verein);
   }
-  sort(sort: Sort) {
+  sort(sort: Sort): void {
     this.sortValue = sort;
   }
 }

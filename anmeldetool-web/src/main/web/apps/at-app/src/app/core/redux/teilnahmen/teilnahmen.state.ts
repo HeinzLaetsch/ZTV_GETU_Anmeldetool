@@ -6,7 +6,7 @@ export const teilnahmenAdapter: EntityAdapter<ITeilnahmen> = createEntityAdapter
   sortComparer: sortByTeilnehmer,
 });
 
-export function sortByTeilnehmer(a: ITeilnahmen, b: ITeilnahmen): any {
+export function sortByTeilnehmer(a: ITeilnahmen, b: ITeilnahmen): number {
   if (a.teilnehmer.name) {
     return a.teilnehmer.name.localeCompare(b.teilnehmer.name);
   }

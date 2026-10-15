@@ -1,4 +1,12 @@
-import { Component, type EventEmitter, Input, type OnInit, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  type EventEmitter,
+  inject,
+  input,
+  type OnInit,
+  ViewEncapsulation,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -12,19 +20,16 @@ import { MaterialModule } from 'src/app/shared/material-module';
 import { EinteilungKategorieComponent } from './einteilung-kategorie/einteilung-kategorie.component';
 
 @Component({
-  selector: 'lxt-einteilung',
+  selector: 'ztv-einteilung',
   templateUrl: './einteilung.component.html',
-  styleUrls: ['./einteilung.component.css'],
+  styleUrls: ['./einteilung.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule, MaterialModule, EinteilungKategorieComponent],
 })
 export class EinteilungComponent implements OnInit {
-  @Input()
-  anlass: IAnlass;
-
-  @Input()
-  refreshEmitter: EventEmitter<string>;
+  readonly anlass = input.required<IAnlass>();
+  readonly refreshEmitter = input.required<EventEmitter<string>>();
 
   currentUser: IUser;
   panelOpenState = false;
@@ -33,20 +38,15 @@ export class EinteilungComponent implements OnInit {
 
   teilnahmeStatistic: ITeilnahmeStatistic;
 
-  loaded$: Subject<boolean>;
-
   search_: string;
 
-  constructor(
-    private authService: AuthService,
-    private anlassService: CachingAnlassService,
-  ) {
-    this.loaded$ = new Subject();
-  }
+  private readonly authService = inject(AuthService);
+  private readonly anlassService = inject(CachingAnlassService);
+  readonly loaded$ = new Subject<boolean>();
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.currentUser = this.authService.currentUser;
-    this.kategorien = this.anlass.getKategorienRaw().slice(1);
+    this.kategorien = this.anlass().getKategorienRaw().slice(1);
     this.loadData();
   }
 
@@ -57,17 +57,17 @@ export class EinteilungComponent implements OnInit {
     this.search_ = search;
   }
 
-  private loadData() {
+  private loadData(): void {
     this.anlassService
-      .getTeilnahmeStatistic(this.anlass, undefined, undefined, undefined, undefined, this.search_)
+      .getTeilnahmeStatistic(this.anlass(), undefined, undefined, undefined, undefined, this.search_)
       .subscribe((statistic) => {
         this.teilnahmeStatistic = statistic;
         this.loaded$.next(true);
       });
-    this.refreshEmitter.subscribe((search) => {
+    this.refreshEmitter().subscribe((search) => {
       console.log('EinteilungComponent, Refresh Kategorie: ', search);
       this.anlassService
-        .getTeilnahmeStatistic(this.anlass, undefined, undefined, undefined, undefined, this.search_)
+        .getTeilnahmeStatistic(this.anlass(), undefined, undefined, undefined, undefined, search)
         .subscribe((statistic) => {
           this.teilnahmeStatistic = statistic;
         });
@@ -78,10 +78,10 @@ export class EinteilungComponent implements OnInit {
   }
   executeSearch(value: string): void {
     console.log('Suche ', value, this.search);
-    this.refreshEmitter.emit(value);
+    this.refreshEmitter().emit(value);
   }
-  clear() {
+  clear(): void {
     this.search = undefined;
-    this.refreshEmitter.emit(undefined);
+    this.refreshEmitter().emit(undefined);
   }
 }

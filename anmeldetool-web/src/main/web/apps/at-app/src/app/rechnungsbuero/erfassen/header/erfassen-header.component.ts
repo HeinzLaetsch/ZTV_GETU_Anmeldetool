@@ -1,27 +1,24 @@
-import { Component, Input, type OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, type OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GeraeteEnum } from 'src/app/core/model/GeraeteEnum';
 import type { ILaufliste } from 'src/app/core/model/ILaufliste';
 import type { IUser } from 'src/app/core/model/IUser';
 import { AuthService } from 'src/app/core/service/auth/auth.service';
-import { CachingUserService } from 'src/app/core/service/caching-services/caching.user.service';
 
 @Component({
-  selector: 'lxt-erfassen-header',
+  selector: 'ztv-erfassen-header',
   templateUrl: './erfassen-header.component.html',
-  styleUrls: ['./erfassen-header.component.css'],
-  standalone: true,
+  styleUrls: ['./erfassen-header.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
 })
 export class ErfassenHeaderComponent implements OnInit {
-  @Input()
-  laufliste: ILaufliste;
+  readonly laufliste = input.required<ILaufliste>();
 
   currentUser: IUser;
 
-  constructor(private authService: AuthService) {}
+  private readonly authService = inject(AuthService);
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.currentUser = this.authService.currentUser;
   }
 }

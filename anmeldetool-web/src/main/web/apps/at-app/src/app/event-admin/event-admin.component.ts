@@ -23,9 +23,9 @@ import { EinteilungComponent } from './einteilung/einteilung.component';
 import { Upload } from './upload-dialog/upload.component';
 
 @Component({
-  selector: 'lxt-event-admin',
+  selector: 'ztv-event-admin',
   templateUrl: './event-admin.component.html',
-  styleUrls: ['./event-admin.component.css'],
+  styleUrls: ['./event-admin.component.scss'],
   standalone: true,
   imports: [CommonModule, FormsModule, MaterialModule, EinteilungComponent],
 })

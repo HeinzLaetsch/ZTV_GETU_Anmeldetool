@@ -67,11 +67,10 @@
       </mat-form-field>
     </p>
   }
-  <!--
   <p>
     <mat-form-field appearance="fill">
       <mat-label>Mobiltelefon</mat-label>
-      <lxt-phone-input formControlName="mobilNummerControl" required></lxt-phone-input>
+      <ztv-phone-input formControlName="mobilNummerControl" required></ztv-phone-input>
       <mat-icon matSuffix>phone</mat-icon>
       <mat-hint>Gib die Mobilnummer ein Beispiel: 076 111 11 11</mat-hint>
       @if (form.controls.mobilNummerControl.hasError('required')) {
@@ -81,7 +80,7 @@
         <mat-error> ungültige Mobile Nummer Beispiel: 076 111 11 11 </mat-error>
       }
     </mat-form-field>
-  </p-->
+  </p>
   <p>
     <mat-form-field [appearance]="appearance">
       <mat-label>Kontakt eMail Adresse</mat-label>

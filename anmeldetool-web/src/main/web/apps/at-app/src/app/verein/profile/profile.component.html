@@ -1,27 +1,33 @@
-<div class="layout-container-fluid" *ngIf="user$ | async; else loading">
-  <div class="layout-row">
-    <div class="layout-col-12">
-      <h1 class="label">Vereinsadministration {{ verein.name }}</h1>
+@if (users().length > 0) {
+  <div class="layout-container-fluid">
+    <div class="layout-row">
+      <div class="layout-col-12">
+        <h1 class="label">Vereinsadministration {{ verein().name }}</h1>
+      </div>
+    </div>
+    <div class="layout-row">
+      <div class="layout-col-12">
+        <mat-tab-group mat-align-tabs="start" #tabs>
+          @for (user of vereinsUsers(); track user.id; let i = $index) {
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <span [class.unsafed]="hasUnsavedWork(i)">{{ getTabName(user.benutzername, i) }}</span>
+              </ng-template>
+              <ztv-user-form
+                [currentUser]="user"
+                [userDirty]="hasUnsavedWork(i)"
+                [tabIndex]="i"
+                (userChange)="userChange($event)"
+              ></ztv-user-form>
+            </mat-tab>
+          }
+        </mat-tab-group>
+      </div>
     </div>
   </div>
-  <div class="layout-row">
-    <div class="layout-col-12">
-      <mat-tab-group mat-align-tabs="start" #tabs>
-        <mat-tab *ngFor="let user of vereinsUsers; index as i">
-          <ng-template mat-tab-label>
-            <span [ngClass]="{ unsafed: hasUnsafedWork(i) }">{{ getTabName(user.benutzername, i) }}</span>
-          </ng-template>
-          <lxt-user-form
-            [currentUser]="user"
-            [userDirty]="hasUnsafedWork(i)"
-            [tabIndex]="i"
-            (userChange)="userChange($event)"
-          ></lxt-user-form>
-        </mat-tab>
-      </mat-tab-group>
-    </div>
-  </div>
-</div>
+} @else {
+  <p>Loading...</p>
+}
 <button
   mat-fab
   class="mat-fab-pos1"
@@ -30,7 +36,7 @@
   matTooltip="Neuen Benutzer anlegen"
   matTooltipPosition="below"
   matTooltipHideDelay="500"
-  (click)="addUser($event)"
+  (click)="addUser()"
 >
   Neu
 </button>
@@ -43,7 +49,7 @@
   matTooltip="Änderungen verwerfen"
   matTooltipPosition="below"
   matTooltipHideDelay="500"
-  (click)="cancelUser($event)"
+  (click)="cancelUser()"
 >
   Verwerfen</button
 ><button
@@ -55,8 +61,7 @@
   matTooltip="Änderungen speichern"
   matTooltipPosition="below"
   matTooltipHideDelay="500"
-  (click)="saveUser($event)"
+  (click)="saveUser()"
 >
   Speichern
 </button>
-<ng-template #loading>Loading...</ng-template>

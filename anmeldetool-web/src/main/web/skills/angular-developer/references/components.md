@@ -43,7 +43,7 @@ To use a component, add it to the `imports` array of the consuming component and
 @Component({
   selector: 'app-root',
   imports: [Profile],
-  template: `<lxt-profile />`,
+  template: `<ztv-profile />`,
 })
 export class App {}
 ```
@@ -95,8 +95,8 @@ The `@for` block iterates over collections. The `track` expression is **required
 The `@switch` block renders content based on a value. It uses strict equality (`===`) and has **no fallthrough**.
 
 ```html
-@switch (status()) { @case ('loading') { <lxt-spinner /> } @case ('error') { <lxt-error-msg /> } @case ('success') {
-<lxt-data-grid /> } @default {
+@switch (status()) { @case ('loading') { <ztv-spinner /> } @case ('error') { <ztv-error-msg /> } @case ('success') {
+<ztv-data-grid /> } @default {
 <p>Unknown status</p>
 } }
 ```

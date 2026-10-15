@@ -1,7 +1,7 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { CanDeactivate } from '@angular/router';
-import { Observable, map, of } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { HasChangesComponent, type HasChangesDialogResult } from './has-changes.component';
 
 type HasUnsavedTeilnehmerChanges = {

@@ -7,9 +7,9 @@ The `RouterOutlet` directive is a placeholder where Angular renders the componen
 Include `<router-outlet />` in your template. Angular inserts the routed component as a sibling immediately following the outlet.
 
 ```html
-<lxt-header /> <router-outlet />
+<ztv-header /> <router-outlet />
 <!-- Route content appears here -->
-<lxt-footer />
+<ztv-footer />
 ```
 
 ## Nested Outlets

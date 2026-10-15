@@ -13,9 +13,9 @@ import { AuthService } from 'src/app/core/service/auth/auth.service';
 import { EventThumbnailComponent } from '../event-thumbnail/event-thumbnail.component';
 
 @Component({
-  selector: 'lxt-event-list',
+  selector: 'ztv-event-list',
   templateUrl: './event-list.component.html',
-  styleUrls: ['./event-list.component.css'],
+  styleUrls: ['./event-list.component.scss'],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatProgressSpinnerModule, EventThumbnailComponent],

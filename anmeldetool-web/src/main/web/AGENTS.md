@@ -65,6 +65,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
   - Markdown documentation: `style-guide/style-guide.md.md`
   - Git commits: `style-guide/style-guide.git.md`
 
+
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->
 

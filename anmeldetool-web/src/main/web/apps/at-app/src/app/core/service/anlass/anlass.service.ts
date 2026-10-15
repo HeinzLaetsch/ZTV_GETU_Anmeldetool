@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as FileSaver from 'file-saver';
 import { Observable, of, Subject } from 'rxjs';
@@ -495,15 +495,21 @@ export class AnlassService extends ServiceHelper {
       });
   }
 
-  importTeilnehmerForAnlassCsv(anlass: IAnlass, formData: FormData): Observable<unknown> {
+  importTeilnehmerForAnlassCsv(anlass: IAnlass, formData: FormData): Observable<HttpEvent<unknown>> {
     const combinedUrl = this.url + '/' + anlass.id + '/teilnehmer/';
-    return this.http.post<unknown>(combinedUrl, formData);
+    return this.http.post<unknown>(combinedUrl, formData, {
+      observe: 'events',
+      reportProgress: true,
+    });
   }
 
-  importContestTeilnehmerForAnlassCsv(anlass: IAnlass, formData: FormData): Observable<unknown> {
+  importContestTeilnehmerForAnlassCsv(anlass: IAnlass, formData: FormData): Observable<HttpEvent<unknown>> {
     const combinedUrl = this.url + '/' + anlass.id + '/teilnehmer/contest';
     console.log('importContestTeilnehmerForAnlassCsv called: ', combinedUrl);
-    return this.http.post<unknown>(combinedUrl, formData);
+    return this.http.post<unknown>(combinedUrl, formData, {
+      observe: 'events',
+      reportProgress: true,
+    });
   }
 
   getAnmeldeKontrolleCsv(anlass: IAnlass): void {

@@ -1,4 +1,4 @@
-import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { createFeatureSelector, createSelector, type MemoizedSelector } from '@ngrx/store';
 import type { AnlassState } from './anlass.state';
 import { anlassFeature } from './anlass.reducer';
 import * as fromAnlass from './anlass.reducer';
@@ -11,7 +11,7 @@ export const selectAnlaesseState = createFeatureSelector<AnlassState>(anlassFeat
 
 export const selectAllAnlaesse = createSelector(selectAnlaesseState, fromAnlass.selectAll);
 
-export const selectAnlaesseAdmin = (aktiv: boolean, admin: boolean, anlaesse: IAnlass[]) => {
+export const selectAnlaesseAdmin = (aktiv: boolean, admin: boolean, anlaesse: IAnlass[]): IAnlass[] => {
   return anlaesse.filter((anlass) => {
     if (admin) {
       if (aktiv) {
@@ -23,39 +23,33 @@ export const selectAnlaesseAdmin = (aktiv: boolean, admin: boolean, anlaesse: IA
     }
   });
 };
-export const selectAktiveAnlaesse = (admin: boolean) =>
+export const selectAktiveAnlaesse = (admin: boolean): MemoizedSelector<object, IAnlass[]> =>
   createSelector(selectAllAnlaesse, (anlaesse) => {
-    const filtered = selectAnlaesseAdmin(true, admin, anlaesse);
-    return filtered;
+    return selectAnlaesseAdmin(true, admin, anlaesse);
   });
 
-export const selectSperrenAnlaesse = () =>
+export const selectSperrenAnlaesse = (): MemoizedSelector<object, IAnlass[] | undefined> =>
   createSelector(selectAllAnlaesse, (anlaesse) => {
     if (anlaesse.length === 0) {
       return undefined;
     }
-    const filtered = anlaesse.filter((anlass) => {
-      return anlass.toolSperren;
-    });
-    return filtered;
+    return anlaesse.filter((anlass) => anlass.toolSperren);
   });
 
-export const selectAnlassById = (id: string) =>
+export const selectAnlassById = (id: string): MemoizedSelector<object, IAnlass | undefined> =>
   createSelector(selectAnlaesseState, (anlaesseState) => {
-    const ret = anlaesseState.ids.length ? anlaesseState.entities[id] : undefined;
-    return ret;
+    return anlaesseState.ids.length ? anlaesseState.entities[id] : undefined;
   });
 
-export const selectAnlassByName = (anlassBezeichnung: string) =>
+export const selectAnlassByName = (anlassBezeichnung: string): MemoizedSelector<object, IAnlass[]> =>
   createSelector(selectAllAnlaesse, (anlaesse) =>
     anlaesse.filter((anlass) => anlass.anlassBezeichnung === anlassBezeichnung),
   );
-export const selectAnlaesse = (admin: boolean) =>
+export const selectAnlaesse = (admin: boolean): MemoizedSelector<object, IAnlass[]> =>
   createSelector(selectAllAnlaesse, (anlaesse) => {
-    const filtered = selectAnlaesseAdmin(true, admin, anlaesse);
-    return filtered;
+    return selectAnlaesseAdmin(true, admin, anlaesse);
   });
-export const selectAnlaesseSortedNew = (admin: boolean) =>
+export const selectAnlaesseSortedNew = (admin: boolean): MemoizedSelector<object, IAnlass[]> =>
   createSelector(selectAllAnlaesse, (anlaesse) => {
     const filtered = selectAnlaesseAdmin(true, admin, anlaesse);
     return [...filtered.values()].sort(
@@ -63,7 +57,10 @@ export const selectAnlaesseSortedNew = (admin: boolean) =>
       (a1, a2) => moment(a1.endDatum).diff(moment(a2.endDatum)),
     );
   });
-export const selectAllAnlaesseTiTu = (admin: boolean, tiTu: TiTuEnum) =>
+export const selectAllAnlaesseTiTu = (
+  admin: boolean,
+  tiTu: TiTuEnum,
+): MemoizedSelector<object, IAnlass[]> =>
   createSelector(selectAllAnlaesse, (anlaesse) => {
     const filtered = selectAnlaesseAdmin(true, admin, anlaesse);
     return filtered.filter((anlass) => {
@@ -74,7 +71,7 @@ export const selectAllAnlaesseTiTu = (admin: boolean, tiTu: TiTuEnum) =>
       }
     });
   });
-export const selectJahre = () =>
+export const selectJahre = (): MemoizedSelector<object, IAnlass[]> =>
   createSelector(selectAllAnlaesse, (anlaesse) => {
     const hashMap = new Map<number, IAnlass>();
     anlaesse.forEach((anlass) => {

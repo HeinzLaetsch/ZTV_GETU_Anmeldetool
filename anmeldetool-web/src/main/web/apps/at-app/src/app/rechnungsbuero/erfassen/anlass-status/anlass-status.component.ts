@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, type OnInit, Output, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  type EventEmitter,
+  inject,
+  input,
+  type OnInit,
+  output,
+  ViewEncapsulation,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import type { AbteilungEnum } from 'src/app/core/model/AbteilungEnum';
 import type { AnlageEnum } from 'src/app/core/model/AnlageEnum';
@@ -11,23 +20,18 @@ import { MaterialModule } from 'src/app/shared/material-module';
 import { KategorieStatusComponent } from './kategorie-status/kategorie-status.component';
 
 @Component({
-  selector: 'lxt-anlass-status',
+  selector: 'ztv-anlass-status',
   templateUrl: './anlass-status.component.html',
-  styleUrls: ['./anlass-status.component.css'],
+  styleUrls: ['./anlass-status.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, MaterialModule, KategorieStatusComponent],
 })
 export class AnlassStatusComponent implements OnInit {
-  @Input()
-  anlass: IAnlass;
-  @Input()
-  erfasstChangedEmitter: EventEmitter<ILaufliste>;
-  @Input()
-  checkedChangedEmitter: EventEmitter<ILaufliste>;
-
-  @Output()
-  lauflisteSelectedEvent = new EventEmitter<ILaufliste>();
+  readonly anlass = input.required<IAnlass>();
+  readonly erfasstChangedEmitter = input.required<EventEmitter<ILaufliste>>();
+  readonly checkedChangedEmitter = input.required<EventEmitter<ILaufliste>>();
+  readonly lauflisteSelectedEvent = output<ILaufliste>();
 
   currentUser: IUser;
   panelOpenState = false;
@@ -36,14 +40,16 @@ export class AnlassStatusComponent implements OnInit {
   abteilungen: AbteilungEnum[][];
   anlagen: AnlageEnum;
 
-  constructor(private authService: AuthService) {
+  private readonly authService = inject(AuthService);
+
+  constructor() {
     this.abteilungen = [];
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.currentUser = this.authService.currentUser;
-    this.kategorien = this.anlass.getKategorienRaw().slice(1);
-    this.erfasstChangedEmitter.subscribe((laufliste) => {
+    this.kategorien = this.anlass().getKategorienRaw().slice(1);
+    this.erfasstChangedEmitter().subscribe((_laufliste) => {
       // console.log("AnlassStatusComponent : Laufliste changed: ", laufliste);
     });
   }

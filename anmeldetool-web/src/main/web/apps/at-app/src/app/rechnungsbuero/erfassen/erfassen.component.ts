@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, type OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GeraeteEnum } from 'src/app/core/model/GeraeteEnum';
@@ -13,10 +13,10 @@ import { ErfassenHeaderComponent } from './header/erfassen-header.component';
 import { ErfassenRowComponent } from './row/erfassen-row.component';
 
 @Component({
-  selector: 'lxt-erfassen',
+  selector: 'ztv-erfassen',
   templateUrl: './erfassen.component.html',
-  styleUrls: ['./erfassen.component.css'],
-  standalone: true,
+  styleUrls: ['./erfassen.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     FormsModule,
@@ -26,11 +26,9 @@ import { ErfassenRowComponent } from './row/erfassen-row.component';
     ErfassenRowComponent,
   ],
 })
-export class ErfassenComponent implements OnInit {
-  @Input()
-  anlass: IAnlass;
-  @Input()
-  modeErfassen;
+export class ErfassenComponent {
+  readonly anlass = input.required<IAnlass>();
+  readonly modeErfassen = input.required<boolean>();
 
   checkedChangedEmitter = new EventEmitter<ILaufliste>();
 
@@ -42,31 +40,11 @@ export class ErfassenComponent implements OnInit {
 
   search: string;
 
-  constructor(
-    private authService: AuthService,
-    private ranglistenService: RanglistenService,
-  ) {
-    this.sortedEintraege = [];
-  }
+  private readonly authService = inject(AuthService);
+  private readonly ranglistenService = inject(RanglistenService);
 
-  ngOnInit() {
-    // const organisatorId: string = this.route.snapshot.params.id;
-    // this.anlass = this.anlassService.getAnlassByOrganisatorId(organisatorId);
-    /*
-    this.routeSubject = this.route.params.subscribe((param) => {
-      if (param.function === "erfassen") {
-        if (!this.modeErfassen) {
-          this.searchLaufliste();
-        }
-        this.modeErfassen = true;
-      } else {
-        if (this.modeErfassen) {
-          this.searchLaufliste();
-        }
-        this.modeErfassen = false;
-      }
-    });
-    */
+  constructor() {
+    this.sortedEintraege = [];
   }
 
   get sprung(): boolean {
@@ -76,15 +54,15 @@ export class ErfassenComponent implements OnInit {
     return false;
   }
   get title(): string {
-    if (this.modeErfassen) {
+    if (this.modeErfassen()) {
       return 'Noten erfassen';
     }
     return 'Note überprüfen';
   }
 
-  searchLaufliste() {
+  searchLaufliste(): void {
     console.log('Suche: ', this.search);
-    this.ranglistenService.searchLauflisteByKey(this.anlass, this.search).subscribe((laufliste) => {
+    this.ranglistenService.searchLauflisteByKey(this.anlass(), this.search).subscribe((laufliste) => {
       if (laufliste) {
         this.sortedEintraege = this.getSortedEintraege(laufliste);
         this.laufliste = laufliste;
@@ -109,11 +87,11 @@ export class ErfassenComponent implements OnInit {
   }
 
   private updateLaufliste(): void {
-    this.ranglistenService.updateLaufliste(this.anlass, this.laufliste).subscribe((laufliste) => {
+    this.ranglistenService.updateLaufliste(this.anlass(), this.laufliste).subscribe((laufliste) => {
       this.laufliste.erfasst = laufliste.erfasst;
       this.laufliste.checked = laufliste.checked;
 
-      if (this.modeErfassen) {
+      if (this.modeErfassen()) {
         this.erfasstChangedEmitter.emit(laufliste);
       } else {
         if (!laufliste.checked && !laufliste.erfasst) {
@@ -155,11 +133,11 @@ export class ErfassenComponent implements OnInit {
       }
     }
   }
-  entryChanged(entry: ILauflistenEintrag) {
+  entryChanged(entry: ILauflistenEintrag): void {
     const toBeUpdated = this.laufliste.eintraege.filter((eintrag) => {
       return eintrag.tal_id === entry.tal_id;
     })[0];
-    if (this.modeErfassen) {
+    if (this.modeErfassen()) {
       toBeUpdated.erfasst = entry.erfasst;
       toBeUpdated.deleted = entry.deleted;
       this.checkErfassen();

@@ -1,12 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
 
-@use 'ag-grid-community/styles/ag-grid.css';
-@use 'ag-grid-community/styles/ag-theme-alpine.css';
-
-.ag-theme-alpine .ag-header-cell {
-  padding: 5px;
-}
-
 @font-face {
   font-family: 'Material Icons';
   font-style: normal;
@@ -41,6 +34,7 @@
 }
 
 :root {
+  --ztv-dark-blue: #0061a6;
   --ztv-blue: #488dd6;
   --ztv-light-blue: rgba(72, 141, 214, 0.5);
   --ztv-lighter-blue: rgba(72, 141, 214, 0.25);
@@ -49,6 +43,7 @@
   --ztv-lighter-gray: rgba(220, 220, 220, 0.98);
   --ztv-light-gray: rgb(184, 184, 184);
   --ztv-gray: rgb(131, 128, 128);
+  --ztv-dark-gray: rgb(67, 64, 64);
   --ztv-light-red: rgba(253, 177, 177, 0.78);
   --ztv-error: rgba(235, 25, 25, 0.78);
   --ztv-warning: #f89406;
@@ -59,29 +54,279 @@
   --ztv-in-kategorie-geschlossen: rgba(240, 100, 100, 0.78);
   --ztv-mutationen-geschlossen: rgba(220, 220, 220, 0.21);
 
-  //--mat-form-field-container-vertical-padding: 5px;
   --mat-sys-corner-extra-small: 10px;
 
-  //--mat-option-label-text-line-height: 1.0em;
-  //--mat-option-focus-state-layer-color: rgba(72, 141, 214, 0.5);
+  --mat-form-field-container-height: 56px;
+  --mat-form-field-container-vertical-padding: 16px;
+  --mat-form-field-container-text-font: Roboto, 'Helvetica Neue', sans-serif;
+  --mat-form-field-container-text-line-height: 24px;
+  --mat-form-field-container-text-size: 0.8rem;
+  --mat-form-field-container-text-tracking: 0.03125em;
+  --mat-form-field-container-text-weight: 300;
+  --mat-form-field-filled-label-display: block;
+  --mat-form-field-filled-with-label-container-padding-top: 24px;
+  --mat-form-field-filled-with-label-container-padding-bottom: 8px;
+  --mat-form-field-filled-container-shape: var(--mat-sys-corner-extra-small);
+  --mat-form-field-filled-active-indicator-height: 1px;
+  --mat-form-field-filled-focus-active-indicator-height: 2px;
+  --mat-form-field-outlined-container-shape: var(--mat-sys-corner-extra-small);
+  --mat-form-field-outlined-outline-width: 1px;
+  --mat-form-field-outlined-focus-outline-width: 2px;
   --mat-form-field-outlined-label-text-font: Roboto, 'Helvetica Neue', sans-serif;
   --mat-form-field-outlined-label-text-size: 0.8rem;
+  --mat-form-field-outlined-label-text-tracking: 0.03125em;
   --mat-form-field-outlined-label-text-weight: 300;
+  --mat-form-field-outlined-label-text-populated-size: 0.8rem;
+  --mat-form-field-filled-label-text-font: Roboto, 'Helvetica Neue', sans-serif;
+  --mat-form-field-filled-label-text-size: 0.8rem;
+  --mat-form-field-filled-label-text-tracking: 0.03125em;
+  --mat-form-field-filled-label-text-weight: 300;
+  --mat-form-field-subscript-text-font: Roboto, 'Helvetica Neue', sans-serif;
+  --mat-form-field-subscript-text-line-height: 20px;
+  --mat-form-field-subscript-text-size: 12px;
+  --mat-form-field-subscript-text-tracking: 0.0333333333em;
+  --mat-form-field-subscript-text-weight: 400;
+  --mat-form-field-focus-select-arrow-color: var(--ztv-dark-blue);
+  --mat-form-field-filled-caret-color: var(--ztv-dark-blue);
+  --mat-form-field-filled-focus-active-indicator-color: var(--ztv-dark-blue);
+  --mat-form-field-filled-focus-label-text-color: var(--ztv-light-gray);
+  --mat-form-field-outlined-caret-color: var(--ztv-dark-blue);
+  --mat-form-field-outlined-focus-outline-color: var(--ztv-dark-blue);
+  --mat-form-field-outlined-focus-label-text-color: var(--ztv-light-gray);
+  --mat-form-field-disabled-input-text-placeholder-color: var(--ztv-gray);
+  --mat-form-field-state-layer-color: var(--ztv-dark-blue);
+  --mat-form-field-error-text-color: var(--ztv-error);
+  --mat-form-field-select-option-text-color: var(--ztv-dark-gray);
+  --mat-form-field-select-disabled-option-text-color: var(--ztv-gray);
+  --mat-form-field-leading-icon-color: var(--ztv-dark-gray);
+  --mat-form-field-disabled-leading-icon-color: var(--ztv-gray);
+  --mat-form-field-trailing-icon-color: var(--ztv-dark-gray);
+  --mat-form-field-disabled-trailing-icon-color: var(--ztv-gray);
+  --mat-form-field-error-focus-trailing-icon-color: var(--ztv-error);
+  --mat-form-field-error-hover-trailing-icon-color: var(--ztv-error);
+  --mat-form-field-error-trailing-icon-color: var(--ztv-error);
+  --mat-form-field-enabled-select-arrow-color: var(--ztv-dark-gray);
+  --mat-form-field-disabled-select-arrow-color: var(--ztv-gray);
+  --mat-form-field-hover-state-layer-opacity: 1;
+  --mat-form-field-focus-state-layer-opacity: 1;
+  --mat-form-field-filled-container-color: var(--ztv-lighter-gray);
+  --mat-form-field-filled-disabled-container-color: var(--ztv-lighter-blue);
+  --mat-form-field-filled-label-text-color: var(--ztv-dark-gray);
+  --mat-form-field-filled-hover-label-text-color: var(--ztv-light-gray);
+  --mat-form-field-filled-disabled-label-text-color: var(--ztv-gray);
+  --mat-form-field-filled-input-text-color: var(--ztv-dark-gray);
+  --mat-form-field-filled-disabled-input-text-color: var(--ztv-gray);
+  --mat-form-field-filled-input-text-placeholder-color: var(--ztv-dark-gray);
+  --mat-form-field-filled-error-hover-label-text-color: var(--ztv-error);
+  --mat-form-field-filled-error-focus-label-text-color: var(--ztv-error);
+  --mat-form-field-filled-error-label-text-color: var(--ztv-error);
+  --mat-form-field-filled-error-caret-color: var(--ztv-error);
+  --mat-form-field-filled-active-indicator-color: var(--ztv-dark-gray);
+  --mat-form-field-filled-disabled-active-indicator-color: var(--ztv-gray);
+  --mat-form-field-filled-hover-active-indicator-color: var(--ztv-dark-blue);
+  --mat-form-field-filled-error-active-indicator-color: var(--ztv-error);
+  --mat-form-field-filled-error-focus-active-indicator-color: var(--ztv-error);
+  --mat-form-field-filled-error-hover-active-indicator-color: var(--ztv-error);
+  --mat-form-field-outlined-label-text-color: var(--ztv-dark-gray);
+  --mat-form-field-outlined-hover-label-text-color: var(--ztv-light-gray);
+  --mat-form-field-outlined-disabled-label-text-color: var(--ztv-gray);
+  --mat-form-field-outlined-input-text-color: var(--ztv-dark-gray);
+  --mat-form-field-outlined-disabled-input-text-color: var(--ztv-gray);
+  --mat-form-field-outlined-input-text-placeholder-color: var(--ztv-dark-gray);
+  --mat-form-field-outlined-error-caret-color: var(--ztv-error);
+  --mat-form-field-outlined-error-focus-label-text-color: var(--ztv-error);
+  --mat-form-field-outlined-error-label-text-color: var(--ztv-error);
+  --mat-form-field-outlined-error-hover-label-text-color: var(--ztv-error);
+  --mat-form-field-outlined-outline-color: var(--ztv-dark-gray);
+  --mat-form-field-outlined-disabled-outline-color: var(--ztv-gray);
+  --mat-form-field-outlined-hover-outline-color: var(--ztv-dark-blue);
+  --mat-form-field-outlined-error-focus-outline-color: var(--ztv-error);
+  --mat-form-field-outlined-error-hover-outline-color: var(--ztv-error);
+  --mat-form-field-outlined-error-outline-color: var(--ztv-error);
 
-  --mat-button-text-label-text-color: var(--ztv-black);
-  --mat-button-text-label-text-color-hover: var(--ztv-black);
-  --mat-button-text-label-text-color-focus: var(--ztv-black);
-  --mat-button-text-label-text-color-disabled: var(--ztv-gray);
-
+  --mat-button-filled-container-shape: 0.6rem;
+  --mat-button-filled-horizontal-padding: 16px;
+  --mat-button-filled-icon-offset: -4px;
+  --mat-button-filled-icon-spacing: 8px;
+  --mat-button-filled-touch-target-size: 48px;
+  --mat-button-outlined-container-shape: 0.6rem;
+  --mat-button-outlined-horizontal-padding: 15px;
+  --mat-button-outlined-icon-offset: -4px;
+  --mat-button-outlined-icon-spacing: 8px;
+  --mat-button-outlined-keep-touch-target: false;
+  --mat-button-outlined-outline-width: 1px;
+  --mat-button-outlined-touch-target-size: 48px;
+  --mat-button-protected-container-elevation-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+  --mat-button-protected-container-shape: 0.6rem;
+  --mat-button-protected-disabled-container-elevation-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 0px 0px rgba(0, 0, 0, 0.12);
+  --mat-button-protected-focus-container-elevation-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+  --mat-button-protected-horizontal-padding: 16px;
+  --mat-button-protected-hover-container-elevation-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+  --mat-button-protected-icon-offset: -4px;
+  --mat-button-protected-icon-spacing: 8px;
+  --mat-button-protected-pressed-container-elevation-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+  --mat-button-protected-touch-target-size: 48px;
+  --mat-button-text-container-shape: 0.6rem;
+  --mat-button-text-horizontal-padding: 8px;
+  --mat-button-text-icon-offset: 0;
+  --mat-button-text-icon-spacing: 8px;
+  --mat-button-text-with-icon-horizontal-padding: 8px;
+  --mat-button-text-touch-target-size: 48px;
+  --mat-button-tonal-container-shape: 0.6rem;
+  --mat-button-tonal-horizontal-padding: 16px;
+  --mat-button-tonal-icon-offset: -4px;
+  --mat-button-tonal-icon-spacing: 8px;
+  --mat-button-tonal-touch-target-size: 48px;
+  --mat-button-filled-container-color: var(--ztv-lighter-gray);
+  --mat-button-filled-disabled-container-color: var(--ztv-lighter-blue);
+  --mat-button-filled-disabled-label-text-color: var(--ztv-gray);
+  --mat-button-filled-disabled-state-layer-color: var(--ztv-lighter-blue);
+  --mat-button-filled-focus-state-layer-opacity: 1;
+  --mat-button-filled-hover-state-layer-opacity: 1;
+  --mat-button-filled-label-text-color: var(--ztv-dark-gray);
+  --mat-button-filled-pressed-state-layer-opacity: 1;
+  --mat-button-filled-ripple-color: var(--ztv-dark-blue);
+  --mat-button-filled-state-layer-color: var(--ztv-dark-blue);
+  --mat-button-outlined-disabled-label-text-color: var(--ztv-gray);
+  --mat-button-outlined-disabled-outline-color: var(--ztv-gray);
+  --mat-button-outlined-disabled-state-layer-color: var(--ztv-lighter-blue);
+  --mat-button-outlined-focus-state-layer-opacity: 1;
+  --mat-button-outlined-hover-state-layer-opacity: 1;
+  --mat-button-outlined-label-text-color: var(--ztv-dark-gray);
+  --mat-button-outlined-outline-color: var(--ztv-dark-gray);
+  --mat-button-outlined-pressed-state-layer-opacity: 1;
+  --mat-button-outlined-ripple-color: var(--ztv-dark-blue);
+  --mat-button-outlined-state-layer-color: var(--ztv-dark-blue);
+  --mat-button-protected-container-color: var(--ztv-lighter-gray);
+  --mat-button-protected-disabled-container-color: var(--ztv-lighter-blue);
+  --mat-button-protected-disabled-label-text-color: var(--ztv-gray);
+  --mat-button-protected-disabled-state-layer-color: var(--ztv-lighter-blue);
+  --mat-button-protected-focus-state-layer-opacity: 1;
+  --mat-button-protected-hover-state-layer-opacity: 1;
+  --mat-button-protected-label-text-color: var(--ztv-dark-gray);
+  --mat-button-protected-pressed-state-layer-opacity: 1;
+  --mat-button-protected-ripple-color: var(--ztv-dark-blue);
+  --mat-button-protected-state-layer-color: var(--ztv-dark-blue);
+  --mat-button-text-disabled-label-text-color: var(--ztv-gray);
+  --mat-button-text-disabled-state-layer-color: var(--ztv-lighter-blue);
+  --mat-button-text-focus-state-layer-opacity: 1;
+  --mat-button-text-hover-state-layer-opacity: 1;
+  --mat-button-text-label-text-color: var(--ztv-dark-gray);
+  --mat-button-text-pressed-state-layer-opacity: 1;
+  --mat-button-text-ripple-color: var(--ztv-dark-blue);
+  --mat-button-text-state-layer-color: var(--ztv-dark-blue);
+  --mat-button-tonal-container-color: var(--ztv-lighter-gray);
+  --mat-button-tonal-disabled-container-color: var(--ztv-lighter-blue);
+  --mat-button-tonal-disabled-label-text-color: var(--ztv-gray);
+  --mat-button-tonal-disabled-state-layer-color: var(--ztv-lighter-blue);
+  --mat-button-tonal-focus-state-layer-opacity: 1;
+  --mat-button-tonal-hover-state-layer-opacity: 1;
+  --mat-button-tonal-label-text-color: var(--ztv-dark-gray);
+  --mat-button-tonal-pressed-state-layer-opacity: 1;
+  --mat-button-tonal-ripple-color: var(--ztv-dark-blue);
+  --mat-button-tonal-state-layer-color: var(--ztv-dark-blue);
+  --mat-button-filled-container-height: 36px;
+  --mat-button-filled-touch-target-display: block;
+  --mat-button-outlined-container-height: 36px;
+  --mat-button-outlined-touch-target-display: block;
+  --mat-button-protected-container-height: 36px;
+  --mat-button-protected-touch-target-display: block;
+  --mat-button-text-container-height: 36px;
+  --mat-button-text-touch-target-display: block;
+  --mat-button-tonal-container-height: 36px;
+  --mat-button-tonal-touch-target-display: block;
+  --mat-button-filled-label-text-font: Roboto, 'Helvetica Neue', sans-serif;
+  --mat-button-filled-label-text-size: 0.8rem;
+  --mat-button-filled-label-text-tracking: 0.0892857143em;
+  --mat-button-filled-label-text-transform: none;
+  --mat-button-filled-label-text-weight: 300;
+  --mat-button-outlined-label-text-font: Roboto, 'Helvetica Neue', sans-serif;
+  --mat-button-outlined-label-text-size: 0.8rem;
+  --mat-button-outlined-label-text-tracking: 0.0892857143em;
+  --mat-button-outlined-label-text-transform: none;
+  --mat-button-outlined-label-text-weight: 300;
+  --mat-button-protected-label-text-font: Roboto, 'Helvetica Neue', sans-serif;
+  --mat-button-protected-label-text-size: 0.8rem;
+  --mat-button-protected-label-text-tracking: 0.0892857143em;
+  --mat-button-protected-label-text-transform: none;
+  --mat-button-protected-label-text-weight: 300;
   --mat-button-text-label-text-font: Roboto, 'Helvetica Neue', sans-serif;
   --mat-button-text-label-text-size: 0.8rem;
+  --mat-button-text-label-text-tracking: 0.0892857143em;
+  --mat-button-text-label-text-transform: none;
   --mat-button-text-label-text-weight: 300;
+  --mat-button-tonal-label-text-font: Roboto, 'Helvetica Neue', sans-serif;
+  --mat-button-tonal-label-text-size: 0.8rem;
+  --mat-button-tonal-label-text-tracking: 0.0892857143em;
+  --mat-button-tonal-label-text-transform: none;
+  --mat-button-tonal-label-text-weight: 300;
+
+  --mat-list-active-indicator-shape: 4px;
+  --mat-list-active-indicator-color: var(--ztv-blue);
+  --mat-list-list-item-container-shape: 0;
+  --mat-list-list-item-container-color: var(--ztv-lighter-gray);
+  --mat-list-list-item-selected-container-color: var(--ztv-blue);
+  --mat-list-list-item-leading-avatar-shape: 50%;
+  --mat-list-list-item-leading-avatar-size: 40px;
+  --mat-list-list-item-leading-avatar-color: transparent;
+  --mat-list-list-item-leading-icon-size: 24px;
+  --mat-list-list-item-leading-icon-start-space: 16px;
+  --mat-list-list-item-leading-icon-end-space: 32px;
+  --mat-list-list-item-trailing-icon-size: 24px;
+  --mat-list-list-item-one-line-container-height: 48px;
+  --mat-list-list-item-two-line-container-height: 64px;
+  --mat-list-list-item-three-line-container-height: 88px;
+  --mat-list-list-item-label-text-color: var(--ztv-dark-gray);
+  --mat-list-list-item-label-text-font: Roboto, sans-serif;
+  --mat-list-list-item-label-text-line-height: 24px;
+  --mat-list-list-item-label-text-size: 16px;
+  --mat-list-list-item-label-text-tracking: 0.03125em;
+  --mat-list-list-item-label-text-weight: 400;
+  --mat-list-list-item-supporting-text-color: var(--ztv-dark-gray);
+  --mat-list-list-item-supporting-text-font: Roboto, sans-serif;
+  --mat-list-list-item-supporting-text-line-height: 20px;
+  --mat-list-list-item-supporting-text-size: 14px;
+  --mat-list-list-item-supporting-text-tracking: 0.0178571429em;
+  --mat-list-list-item-supporting-text-weight: 400;
+  --mat-list-list-item-trailing-supporting-text-color: var(--ztv-dark-gray);
+  --mat-list-list-item-trailing-supporting-text-font: Roboto, sans-serif;
+  --mat-list-list-item-trailing-supporting-text-line-height: 20px;
+  --mat-list-list-item-trailing-supporting-text-size: 12px;
+  --mat-list-list-item-trailing-supporting-text-tracking: 0.0333333333em;
+  --mat-list-list-item-trailing-supporting-text-weight: 400;
+  --mat-list-list-item-leading-icon-color: var(--ztv-dark-gray);
+  --mat-list-list-item-trailing-icon-color: var(--ztv-dark-gray);
+  --mat-list-list-item-selected-trailing-icon-color: var(--ztv-white);
+  --mat-list-list-item-disabled-state-layer-color: var(--ztv-lighter-blue);
+  --mat-list-list-item-disabled-state-layer-opacity: 1;
+  --mat-list-list-item-disabled-label-text-color: var(--ztv-gray);
+  --mat-list-list-item-disabled-label-text-opacity: 1;
+  --mat-list-list-item-disabled-leading-icon-color: var(--ztv-gray);
+  --mat-list-list-item-disabled-leading-icon-opacity: 1;
+  --mat-list-list-item-disabled-trailing-icon-color: var(--ztv-gray);
+  --mat-list-list-item-disabled-trailing-icon-opacity: 1;
+  --mat-list-list-item-hover-label-text-color: var(--ztv-light-gray);
+  --mat-list-list-item-hover-leading-icon-color: var(--ztv-light-gray);
+  --mat-list-list-item-hover-trailing-icon-color: var(--ztv-light-gray);
+  --mat-list-list-item-hover-state-layer-color: var(--ztv-dark-blue);
+  --mat-list-list-item-hover-state-layer-opacity: 1;
+  --mat-list-list-item-focus-label-text-color: var(--ztv-light-gray);
+  --mat-list-list-item-focus-state-layer-color: var(--ztv-dark-blue);
+  --mat-list-list-item-focus-state-layer-opacity: 1;
+  --mat-option-label-text-color: var(--ztv-dark-gray);
+  --mat-option-label-text-font: Roboto, 'Helvetica Neue', sans-serif;
+  --mat-option-label-text-line-height: 24px;
+  --mat-option-label-text-size: 0.8rem;
+  --mat-option-label-text-tracking: 0.03125em;
+  --mat-option-label-text-weight: 400;
 
   --mdc-list-list-item-hover-state-layer-color: inverse-primary;
 
   // OK
-  --mat-option-hover-state-layer-color: var(--mat-sys-inverse-primary);
-  --mat-option-selected-state-layer-color: var(--ztv-lighter-gray);
+  --mat-option-hover-state-layer-color: var(--ztv-dark-blue);
+  --mat-option-focus-state-layer-color: var(--ztv-dark-blue);
+  --mat-option-selected-state-layer-color: var(--ztv-blue);
+  --mat-option-selected-state-label-text-color: var(--ztv-white);
 }
 
 .well {
@@ -181,7 +426,23 @@
 }
 
 button {
-  color: #555;
+  background-color: var(--ztv-lighter-gray);
+  border-radius: 0.6rem;
+  color: var(--ztv-dark-gray);
+}
+
+button:disabled,
+button.mat-mdc-button-base:disabled {
+  --mat-button-filled-disabled-container-color: var(--ztv-lighter-blue);
+  --mat-button-filled-disabled-label-text-color: var(--ztv-gray);
+  --mat-button-outlined-disabled-label-text-color: var(--ztv-gray);
+  --mat-button-protected-disabled-container-color: var(--ztv-lighter-blue);
+  --mat-button-protected-disabled-label-text-color: var(--ztv-gray);
+  --mat-button-text-disabled-label-text-color: var(--ztv-gray);
+  --mat-button-tonal-disabled-container-color: var(--ztv-lighter-blue);
+  --mat-button-tonal-disabled-label-text-color: var(--ztv-gray);
+  background-color: var(--ztv-lighter-blue);
+  color: var(--ztv-gray);
 }
 
 [hidden] {

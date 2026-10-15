@@ -24,7 +24,7 @@ export class CachingVereinService {
     return this.loadVereine();
   }
 
-  private strip(org: string, pattern: string) {
+  private strip(org: string, pattern: string): string {
     const hasGetuA = org.indexOf(pattern);
     if (hasGetuA >= 0) {
       return org.substring(hasGetuA + pattern.length);
@@ -115,7 +115,7 @@ export class CachingVereinService {
     }
     return undefined;
   }
-  getVereinById(id: string) {
+  getVereinById(id: string): IVerein {
     if (this.loaded) {
       return this.vereine.find((verein) => verein.id === id);
     }

@@ -1,5 +1,5 @@
 import type { Update } from '@ngrx/entity';
-import { Action, createActionGroup, emptyProps, props } from '@ngrx/store';
+import { createActionGroup, props } from '@ngrx/store';
 import type { ITeilnahmen } from '../../model/ITeilnahmen';
 import type { ITeilnehmer } from '../../model/ITeilnehmer';
 

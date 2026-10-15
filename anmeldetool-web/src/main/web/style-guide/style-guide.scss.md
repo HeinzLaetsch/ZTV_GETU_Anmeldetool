@@ -36,6 +36,10 @@ This document contains guidelines for _Angular_ styling (SCSS) files.
 - use `@use` and `@forward` instead of deprecated `@import`
 - use `rem` for typography instead of `px`
 
+- Use the shared `--ztv-*` color tokens for navigation colors instead of defining component-local color values.
+- Keep navigation hover and selected states consistent: blue backgrounds with white text; selected buttons should inherit colors from their active list item.
+- Prefer using global styles over styles defined within components.
+
 ### Should do
 
 - write less & simple SCSS
@@ -43,9 +47,9 @@ This document contains guidelines for _Angular_ styling (SCSS) files.
   - separate rules by new lines
   - order properties alphabetically if configured
 - use BEM syntax (Block, Element, Modifier)
-  - `.lxt-person {}`
-  - `.lxt-person__head {}`
-  - `.lxt-person--tall {}`
+  - `.ztv-person {}`
+  - `.ztv-person__head {}`
+  - `.ztv-person--tall {}`
   - there are no nested BEM selectors
 - organise global styles by using imports
   - 1.) Variables (breakpoints, colors, sizes)
@@ -64,9 +68,9 @@ This document contains guidelines for _Angular_ styling (SCSS) files.
   - (e.g. don't use `.heading`, `.label` or `.form-control`)
   - only use those classes to override the lib's own CSS
 - avoid nesting with more than 2 levels (in rare cases 3)
-  - okay: `.lxt-is-home .lxt-person`
-  - hell no: `body.lxt-is-home .lxt-person.lxt-is-disabled > .lxt-avatar`
-  - use modifier instead: `.lxt-avatar--disabled`
+  - okay: `.ztv-is-home .ztv-person`
+  - hell no: `body.ztv-is-home .ztv-person.ztv-is-disabled > .ztv-avatar`
+  - use modifier instead: `.ztv-avatar--disabled`
 - avoid defining raw colors in components (use design tokens or component-private custom properties)
 - avoid `float` use CSS grid or flexbox instead
   - howto [choose between grid and flexbox](https://medium.com/youstart-labs/beginners-guide-to-choose-between-css-grid-and-flexbox-783005dd2412)

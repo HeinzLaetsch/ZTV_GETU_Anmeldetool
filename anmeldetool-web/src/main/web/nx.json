@@ -54,7 +54,7 @@
     },
     "test": {
       "inputs": [
-        "defau//lt",
+        "default",
         "^production",
         "{workspaceRoot}/karma.conf.js"
       ],

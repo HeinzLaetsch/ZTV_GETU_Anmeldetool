@@ -47,7 +47,7 @@ When creating a new Angular application for a user, always follow the following 
 
 2. **Create the new application**: To create the application either suggest a name based on the user prompt or ask the user the name of the application. Create the application with the following command:
 
-   `npx ng new <lxt-name> [list of flags based on the description of the app] --interactive=false --ai-config=[agents, claude, copilot, cursor, gemini, jetbrains, none, windsurf]`
+   `npx ng new <ztv-name> [list of flags based on the description of the app] --interactive=false --ai-config=[agents, claude, copilot, cursor, gemini, jetbrains, none, windsurf]`
 
    _Important_: Prefer agent for `--ai-config`, or use the option that best suits the environment, for example if the user is using Gemini, use `--ai-config=gemini`.
 

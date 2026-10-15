@@ -1,4 +1,4 @@
-import { Component, type OnInit } from '@angular/core';
+import { Component, computed, type OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
@@ -24,7 +24,8 @@ export class NavComponent extends SubscriptionHelper implements OnInit {
   anlaesse: IAnlass[] = [];
   anlaesse$!: Observable<IAnlass[]>;
 
-  vereine: IVerein[] = [];
+  readonly vereine = signal<IVerein[]>([]);
+  readonly vereinSearch = signal('');
   vereine$!: Observable<IVerein[]>;
 
   constructor(
@@ -35,10 +36,10 @@ export class NavComponent extends SubscriptionHelper implements OnInit {
     super();
     this.anlaesse$ = this.store.pipe(select(selectAnlaesseSortedNew(true)));
     this.vereine$ = this.store.pipe(select(selectVereineSorted()));
-    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+    this.router.routeReuseStrategy.shouldReuseRoute = (): false => false;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.registerSubscription(
       this.anlaesse$.subscribe((data) => {
         this.anlaesse = data;
@@ -46,7 +47,7 @@ export class NavComponent extends SubscriptionHelper implements OnInit {
     );
     this.registerSubscription(
       this.vereine$.subscribe((data) => {
-        this.vereine = data;
+        this.vereine.set(data);
       }),
     );
   }
@@ -71,8 +72,24 @@ export class NavComponent extends SubscriptionHelper implements OnInit {
     return this.store.pipe(select(selectVereinById(anlass.organisatorId)));
   }
 
-  setVerein(verein: IVerein) {
-    const oldSelectedVerein = this.authService.currentVerein;
+  readonly filteredVereine = computed(() => {
+    const searchTerm = this.vereinSearch().trim().toLocaleLowerCase();
+    if (!searchTerm) {
+      return this.vereine();
+    }
+
+    return this.vereine().filter((verein) => verein.name.toLocaleLowerCase().includes(searchTerm));
+  });
+
+  onVereinSearchInput(event: Event): void {
+    this.vereinSearch.set((event.target as HTMLInputElement).value);
+  }
+
+  resetVereinSearch(): void {
+    this.vereinSearch.set('');
+  }
+
+  setVerein(verein: IVerein): void {
     this.authService.selectVerein(verein);
     // this.userService.reset();
     // this.anlassService.reset();

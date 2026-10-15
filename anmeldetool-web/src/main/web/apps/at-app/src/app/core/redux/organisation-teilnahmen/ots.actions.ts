@@ -1,4 +1,4 @@
-import { createActionGroup, emptyProps, props } from '@ngrx/store';
+import { createActionGroup, props } from '@ngrx/store';
 import type { IOrganisationTeilnahmenStatistik } from '../../model/IOrganisationTeilnahmenStatistik';
 
 export const OtsActions = createActionGroup({

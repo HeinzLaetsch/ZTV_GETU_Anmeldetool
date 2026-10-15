@@ -11,7 +11,7 @@ import { ErfassenComponent } from './erfassen/erfassen.component';
 import { RanglistenComponent } from './rangliste/ranglisten.component';
 
 @Component({
-  selector: 'lxt-rechnungsbuero',
+  selector: 'ztv-rechnungsbuero',
   templateUrl: './rechnungsbuero.component.html',
   styleUrls: ['./rechnungsbuero.component.scss'],
   standalone: true,

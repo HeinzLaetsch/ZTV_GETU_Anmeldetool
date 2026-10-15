@@ -1,7 +1,11 @@
 <mat-toolbar class="ztv-toolbar-theme" id="main-menu">
   <div class="main-nav-container">
+    <a class="brand" routerLink="/anlaesse" aria-label="ZTV Anmeldetool Startseite">
+      <span class="brand-mark"><mat-icon aria-hidden="true">event_available</mat-icon></span>
+      <span class="brand-name">ZTV Anmeldetool</span>
+    </a>
     @if (authService.isLoggedIn()) {
-      <mat-nav-list class="list-horizontal">
+      <mat-nav-list class="list-horizontal primary-nav" aria-label="Hauptnavigation">
         @if (!authService.isAnlassUserSig()) {
           <mat-list-item
             routerLink="/anlaesse"
@@ -9,90 +13,119 @@
             [routerLinkActiveOptions]="{ exact: true }"
             matRipple
           >
-            <button mat-button class="mainNav" disableRipple>Alle Anlässe</button>
+            <button mat-button class="mainNav nav-action" disableRipple>
+              <mat-icon aria-hidden="true">event</mat-icon>
+              <span>Alle Anlässe</span>
+            </button>
           </mat-list-item>
         }
 
         @if (authService.isAdministratorSig() || authService.isSekretariatSig()) {
           <mat-list-item class="task-add-btn" data-cy="admin-funcs-nav-btn">
-            <button mat-button class="mainNav" disableRipple [matMenuTriggerFor]="menu">
+            <button mat-button class="mainNav nav-action" disableRipple [matMenuTriggerFor]="adminMenu">
+              <mat-icon aria-hidden="true">tune</mat-icon>
               Anlässe Verwalten
               <mat-icon class="material-icons-outlined arrow-icon"> arrow_drop_down </mat-icon>
             </button>
-            <mat-menu #menu="matMenu">
+            <mat-menu #adminMenu="matMenu" class="nav-menu">
               @for (anlass of eigeneAnlaesse; track anlass.id) {
-                <div class="dropdown-item" data-cy="data-import-nav-btn">
-                  <button
-                    mat-button
-                    class="mainNav small-text"
-                    [routerLink]="['/admin', anlass.id, 'admin']"
-                    routerLinkActive="active"
-                    [routerLinkActiveOptions]="{ exact: true }"
-                    disableRipple
-                  >
-                    @if (getOrganisator(anlass) | async; as org) {
-                      <div>{{ anlass.getCleaned() }} - {{ org.name }}</div>
-                    }
-                  </button>
-                </div>
+                <button
+                  mat-menu-item
+                  type="button"
+                  data-cy="data-import-nav-btn"
+                  [routerLink]="['/admin', anlass.id, 'admin']"
+                  routerLinkActive="active"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                >
+                  <mat-icon aria-hidden="true">tune</mat-icon>
+                  @if (getOrganisator(anlass) | async; as org) {
+                    <span>{{ anlass.getCleaned() }} - {{ org.name }}</span>
+                  }
+                </button>
               }
             </mat-menu>
           </mat-list-item>
         }
         @if (!authService.isAnlassUserSig()) {
-          <mat-list-item routerLink="/teilnehmer" routerLinkActive="active">
-            <button mat-button class="mainNav" disableRipple>Teilnehmer</button>
+          <mat-list-item routerLink="/verein/teilnehmer" routerLinkActive="active">
+            <button mat-button class="mainNav nav-action" disableRipple>
+              <mat-icon aria-hidden="true">groups</mat-icon>
+              <span>Teilnehmer</span>
+            </button>
           </mat-list-item>
         }
 
         @if ((authService.isAdministratorSig() || authService.isRechnungsbueroSig()) && authService.currentVerein) {
           <mat-list-item class="task-add-btn" data-cy="admin-funcs-nav-btn">
-            <button mat-button class="mainNav" disableRipple [matMenuTriggerFor]="RBmenu">
+            <button mat-button class="mainNav nav-action" disableRipple [matMenuTriggerFor]="RBmenu">
+              <mat-icon aria-hidden="true">receipt_long</mat-icon>
               Rechnungsbüro
               <mat-icon class="material-icons-outlined arrow-icon"> arrow_drop_down </mat-icon>
             </button>
-            <mat-menu #RBmenu="matMenu">
+            <mat-menu #RBmenu="matMenu" class="nav-menu">
               @for (anlass of eigeneAnlaesse; track anlass.id) {
-                <div class="dropdown-item" data-cy="data-import-nav-btn">
-                  <button
-                    mat-button
-                    class="mainNav small-text"
-                    [routerLink]="['/rechnungsbuero', anlass.id]"
-                    routerLinkActive="active"
-                    [routerLinkActiveOptions]="{ exact: true }"
-                    disableRipple
-                  >
-                    {{ anlass.getWithDatum() }}
-                  </button>
-                </div>
+                <button
+                  mat-menu-item
+                  type="button"
+                  data-cy="data-import-nav-btn"
+                  [routerLink]="['/rechnungsbuero', anlass.id]"
+                  routerLinkActive="active"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                >
+                  <mat-icon aria-hidden="true">receipt_long</mat-icon>
+                  <span>{{ anlass.getWithDatum() }}</span>
+                </button>
               }
             </mat-menu>
           </mat-list-item>
         }
         @if (authService.isAdministratorSig()) {
           <mat-list-item class="task-add-btn" data-cy="admin-funcs-nav-btn">
-            <button mat-button class="mainNav" disableRipple [matMenuTriggerFor]="menu">
+            <button
+              mat-button
+              class="mainNav nav-action"
+              disableRipple
+              [matMenuTriggerFor]="vereinMenu"
+              (menuOpened)="resetVereinSearch()"
+            >
+              <mat-icon aria-hidden="true">business</mat-icon>
               Verein auswählen ({{ authService.currentVerein.name }})
               <mat-icon class="material-icons-outlined arrow-icon"> arrow_drop_down </mat-icon>
             </button>
-            <mat-menu #menu="matMenu">
-              @for (verein of vereine; track verein.id) {
-                <div class="dropdown-item" data-cy="data-import-nav-btn" (click)="setVerein(verein)">
-                  {{ verein.name }}
-                </div>
+            <mat-menu #vereinMenu="matMenu" class="nav-menu verein-menu">
+              <div class="menu-search" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+                <mat-icon aria-hidden="true">search</mat-icon>
+                <input
+                  type="search"
+                  placeholder="Verein suchen"
+                  aria-label="Verein suchen"
+                  [value]="vereinSearch()"
+                  (input)="onVereinSearchInput($event)"
+                />
+              </div>
+              @for (verein of filteredVereine(); track verein.id) {
+                <button mat-menu-item type="button" data-cy="data-import-nav-btn" (click)="setVerein(verein)">
+                  <mat-icon aria-hidden="true">business</mat-icon>
+                  <span>{{ verein.name }}</span>
+                </button>
+              } @empty {
+                <div class="menu-empty">Kein Verein gefunden</div>
               }
             </mat-menu>
           </mat-list-item>
         }
       </mat-nav-list>
-      <mat-nav-list class="list-horizontal">
+      <mat-nav-list class="list-horizontal account-nav" aria-label="Benutzerkonto">
         <mat-list-item
-          routerLink="/user/user"
+          routerLink="/user"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
           matRipple
         >
-          <button mat-button class="mainNav" disableRipple>Benutzerdaten</button>
+          <button mat-button class="mainNav nav-action" disableRipple>
+            <mat-icon aria-hidden="true">account_circle</mat-icon>
+            <span>Benutzerdaten</span>
+          </button>
         </mat-list-item>
       </mat-nav-list>
     }

@@ -14,29 +14,29 @@
         <div [routerLink]="['startliste']" class="well hoverwell button">Startliste</div>
       </div>
     </div>
-    <lxt-anlass-detail [anlass]="anlass"></lxt-anlass-detail>
+    <ztv-anlass-detail [anlass]="anlass"></ztv-anlass-detail>
 
     <hr />
-    <lxt-anlass-statistik
+    <ztv-anlass-statistik
       [anlass]="anlass"
       [anlassSummary]="anlassSummary"
       (startetChanged)="startetChanged($event)"
-    ></lxt-anlass-statistik>
+    ></ztv-anlass-statistik>
 
     @if (anlassSummary.startet) {
-      <lxt-wertungsrichter-selektion
+      <ztv-wertungsrichter-selektion
         [anlass]="anlass"
         [anlassSummary]="anlassSummary"
         [changeAllowed]="isChangeAllowed()"
-      ></lxt-wertungsrichter-selektion>
+      ></ztv-wertungsrichter-selektion>
     }
 
-    <lxt-events-dates
+    <ztv-events-dates
       [anlass]="anlass"
       [anlassSummary]="anlassSummary"
       [viewOnly]="isViewOnly()"
       (verlaengertChanged)="verlaengertChanged($event)"
-    ></lxt-events-dates>
+    ></ztv-events-dates>
   </div>
 } @else {
   <div class="center">

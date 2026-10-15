@@ -1,32 +1,35 @@
 <div class="layout-container-fluid">
   <div class="layout-row">
     <div class="layout-col-6">
-      <lxt-user
+      <ztv-user
         [modify]="true"
-        [readOnly]="!(isOwner() || isVereinsAnmelder || isVereinsVerantwortlicher)"
-        [(user)]="currentUser"
+        [readOnly]="isReadOnly()"
+        [user]="currentUser()"
         [showPassword]="isOwner()"
         [showBenutzername]="true"
         [mustShowPassword]="false"
+        (userChange)="onUserChange($event)"
         (valid)="updateUserValid($event)"
-      ></lxt-user>
+      ></ztv-user>
     </div>
     <div class="layout-col-6" [hidden]="isUserDirty()">
-      <lxt-role
-        [currentUser]="currentUser"
-        [isVereinsAnmelder]="isVereinsAnmelder"
-        [isVereinsVerantwortlicher]="isVereinsVerantwortlicher"
-        [(assignedRoles)]="assignedRoles"
+      <ztv-role
+        [currentUser]="currentUser()"
+        [isVereinsAnmelder]="isVereinsAnmelder()"
+        [isVereinsVerantwortlicher]="isVereinsVerantwortlicher()"
+        [assignedRoles]="assignedRoles()"
+        (assignedRolesChange)="onAssignedRolesChange($event)"
       >
-      </lxt-role>
-      <lxt-wertungsrichter
-        *ngIf="isWertungsrichter()"
-        [currentUser]="currentUser"
-        [(wertungsrichter)]="wertungsrichter"
-        [isVereinsAnmelder]="isVereinsAnmelder"
-        [isVereinsVerantwortlicher]="isVereinsVerantwortlicher"
-      >
-      </lxt-wertungsrichter>
+      </ztv-role>
+      @if (isWertungsrichter()) {
+        <ztv-wertungsrichter
+          [currentUser]="currentUser()"
+          [wertungsrichter]="wertungsrichter()"
+          [isVereinsAnmelder]="isVereinsAnmelder()"
+          [isVereinsVerantwortlicher]="isVereinsVerantwortlicher()"
+          (wertungsrichterChange)="onWertungsrichterChange($event)"
+        ></ztv-wertungsrichter>
+      }
     </div>
   </div>
 </div>

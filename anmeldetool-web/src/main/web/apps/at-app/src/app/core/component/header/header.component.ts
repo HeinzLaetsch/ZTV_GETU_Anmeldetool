@@ -1,17 +1,13 @@
-import { Component, type OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'lxt-header',
+  selector: 'ztv-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   standalone: true,
   imports: [CommonModule],
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
   headerClass = 'test';
-
-  constructor() {}
-
-  ngOnInit(): void {}
 }

@@ -1,7 +1,6 @@
-import { Component, EventEmitter, Input, type OnInit, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { UntypedFormControl, type UntypedFormGroup } from '@angular/forms';
-import { ReactiveFormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import type { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import moment from 'moment';
 import { AnzeigeStatusEnum } from 'src/app/core/model/AnzeigeStatusEnum';
@@ -10,85 +9,52 @@ import type { IAnlassSummary } from 'src/app/core/model/IAnlassSummary';
 import { MaterialModule } from 'src/app/shared/material-module';
 
 @Component({
-  selector: 'lxt-events-dates',
+  selector: 'ztv-events-dates',
   templateUrl: './events-dates.component.html',
-  styleUrls: ['./events-dates.component.css'],
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MaterialModule],
+  styleUrls: ['./events-dates.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [DatePipe, ReactiveFormsModule, MaterialModule],
 })
-export class EventsDatesComponent implements OnInit {
-  @Input() anlass: IAnlass;
-  @Input() anlassSummary: IAnlassSummary;
-  @Input() viewOnly: boolean;
+export class EventsDatesComponent {
+  readonly anlass = input.required<IAnlass>();
+  readonly anlassSummary = input.required<IAnlassSummary>();
+  readonly viewOnly = input.required<boolean>();
 
-  @Output()
-  verlaengertChanged: EventEmitter<Date>;
+  readonly verlaengertChanged = output<Date>();
 
-  verlaengerungGroup: UntypedFormGroup;
-  verlaengerungControl: UntypedFormControl;
+  protected readonly verlaengerungControl = new FormControl<Date | null>(null);
 
-  constructor() {
-    // this.verlaengerungGroup = new FormGroup({
-    this.verlaengerungControl = new UntypedFormControl();
-    // });
-    this.verlaengertChanged = new EventEmitter<Date>();
-  }
+  protected readonly nochNichtOffenClass = computed(() => this.getStatusClass(AnzeigeStatusEnum.NOCH_NICHT_OFFEN));
+  protected readonly erfassenGeschlossenClass = computed(() => this.getStatusClass(AnzeigeStatusEnum.ERFASSEN_CLOSED));
+  protected readonly crossKategorieGeschlossenClass = computed(() =>
+    this.getStatusClass(AnzeigeStatusEnum.CROSS_KATEGORIE_CLOSED),
+  );
+  protected readonly inKategorieGeschlossenClass = computed(() =>
+    this.getStatusClass(AnzeigeStatusEnum.IN_KATEGORIE_CLOSED),
+  );
+  protected readonly alleMutationenGeschlossenClass = computed(() =>
+    this.getStatusClass(AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED),
+  );
+  protected readonly geschlossenClass = computed(() => this.getStatusClass(AnzeigeStatusEnum.CLOSED));
+  protected readonly hasStatusVerlaengert = computed(() =>
+    moment(this.anlassSummary().verlaengerungsDate).isSameOrAfter(moment.now()),
+  );
 
-  ngOnInit() {
-    console.log('Anlass verlaengert: ', this.anlass.erfassenVerlaengert);
-    //this.verlaengerungControl.setValue(this.anlass.erfassenVerlaengert);
-    this.verlaengerungControl.setValue(this.anlassSummary.verlaengerungsDate);
-  }
-  /*
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.anlass) {
-      console.error("anlass: ", this.anlass);
-      this.verlaengerungGroup.controls.verlaengerungControl.setValue(
-        this.anlass.erfassenVerlaengert
-      );
-    }
-  }*/
+  private readonly syncExtensionDate = effect(() => {
+    this.verlaengerungControl.setValue(this.anlassSummary().verlaengerungsDate, { emitEvent: false });
+  });
 
-  getClassForAnzeigeStatus(anzeigeStatus: AnzeigeStatusEnum): string {
-    if (this.anlass.anzeigeStatus.hasStatus(anzeigeStatus)) {
+  private getStatusClass(anzeigeStatus: AnzeigeStatusEnum): string {
+    if (this.anlass().anzeigeStatus.hasStatus(anzeigeStatus)) {
       return 'div-red';
     }
+
     return 'div-green';
   }
 
-  getClassForAnzeigeStatusNochNichtOffen(): string {
-    return this.getClassForAnzeigeStatus(AnzeigeStatusEnum.NOCH_NICHT_OFFEN);
-  }
-  getClassForAnzeigeStatusErfassenGeschlossen(): string {
-    return this.getClassForAnzeigeStatus(AnzeigeStatusEnum.ERFASSEN_CLOSED);
-  }
-
-  getClassForAnzeigeStatusCrossKategorieGeschlossen(): string {
-    return this.getClassForAnzeigeStatus(AnzeigeStatusEnum.CROSS_KATEGORIE_CLOSED);
-  }
-
-  getClassForAnzeigeStatusInKategorieGeschlossen(): string {
-    return this.getClassForAnzeigeStatus(AnzeigeStatusEnum.IN_KATEGORIE_CLOSED);
-  }
-
-  getClassForAnzeigeStatusAlleMutationenGeschlossen(): string {
-    return this.getClassForAnzeigeStatus(AnzeigeStatusEnum.ALLE_MUTATIONEN_CLOSED);
-  }
-
-  getClassForAnzeigeStatusGeschlossen(): string {
-    return this.getClassForAnzeigeStatus(AnzeigeStatusEnum.CLOSED);
-  }
-
-  getClassForAnzeigeStatusVerlaengert(): string {
-    return this.getClassForAnzeigeStatus(AnzeigeStatusEnum.VERLAENGERT);
-  }
-  hasStatusVerlaengert(): boolean {
-    const asMoment = moment(this.anlassSummary.verlaengerungsDate);
-    return asMoment.isSameOrAfter(moment.now());
-    //return this.anlass.anzeigeStatus.hasStatus(AnzeigeStatusEnum.VERLAENGERT);
-  }
-
-  addVerlaengerung(type: string, event: MatDatepickerInputEvent<Date>): void {
-    this.verlaengertChanged.next(event.value);
+  protected onExtensionDateChanged(event: MatDatepickerInputEvent<Date>): void {
+    if (event.value) {
+      this.verlaengertChanged.emit(event.value);
+    }
   }
 }

@@ -6,12 +6,10 @@
 /* Make sure to import fonts in `<head>` of html */
 /*
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Roboto&family=Roboto&display=swap');
 </style>
 
 OR
 
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto&family=Roboto&display=swap">
 */
 
 @use '@angular/material' as mat;

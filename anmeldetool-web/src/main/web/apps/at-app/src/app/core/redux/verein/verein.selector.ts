@@ -1,4 +1,5 @@
-import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { createFeatureSelector, createSelector, type MemoizedSelector } from '@ngrx/store';
+import type { IVerein } from '../../../verein/verein';
 
 import * as fromVerein from './verein.reducer';
 import { VereinState } from './verein.state';
@@ -7,21 +8,20 @@ export const selectVereinState = createFeatureSelector<VereinState>(fromVerein.v
 
 export const selectAlleVereine = createSelector(selectVereinState, fromVerein.selectAll);
 
-export const selectVereineSorted = () =>
+export const selectVereineSorted = (): MemoizedSelector<object, IVerein[]> =>
   createSelector(selectAlleVereine, (vereine) => {
     return [...vereine.values()].sort((v1, v2) => sortVereinsname(v1.name, v2.name));
   });
 
-export const selectVereinById = (id: string) =>
+export const selectVereinById = (id: string): MemoizedSelector<object, IVerein | undefined> =>
   createSelector(selectVereinState, (vereinState) => {
-    const ret = vereinState.ids.length ? vereinState.entities[id] : undefined;
-    return ret;
+    return vereinState.ids.length ? vereinState.entities[id] : undefined;
   });
 
-export const selectVereinByName = (name: string) =>
-  createSelector(selectAlleVereine, (vereine) => vereine.filter((verein) => verein.name === name));
+export const selectVereinByName = (name: string): MemoizedSelector<object, IVerein[]> =>
+  createSelector(selectAlleVereine, (vereine: IVerein[]) => vereine.filter((verein) => verein.name === name));
 
-const strip = (org: string, pattern: string) => {
+const strip = (org: string, pattern: string): string => {
   const hasGetuA = org.indexOf(pattern);
   if (hasGetuA >= 0) {
     return org.substring(hasGetuA + pattern.length);
@@ -29,7 +29,7 @@ const strip = (org: string, pattern: string) => {
   return org;
 };
 
-const sortVereinsname = (aName: string, bName: string) => {
+const sortVereinsname = (aName: string, bName: string): 1 | -1 | 0 => {
   let strippedA = aName.toUpperCase();
   let strippedB = bName.toUpperCase();
   if (strippedA === 'ZTV') {

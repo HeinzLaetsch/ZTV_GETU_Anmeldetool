@@ -7,7 +7,7 @@ import { BusyIndicatorProgressBarComponent } from '../busy-indicator-progress-ba
 import { NavComponent } from '../nav/nav.component';
 
 @Component({
-  selector: 'lxt-app-root',
+  selector: 'ztv-app-root',
   standalone: true,
   imports: [LoginComponent, RouterOutlet, BusyIndicatorProgressBarComponent, NavComponent],
   template: `

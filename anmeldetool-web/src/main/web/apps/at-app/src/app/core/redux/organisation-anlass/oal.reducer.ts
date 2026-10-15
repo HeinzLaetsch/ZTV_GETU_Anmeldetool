@@ -1,6 +1,6 @@
-import { Action, createFeature, createReducer, on } from '@ngrx/store';
+import { createFeature, createReducer, on } from '@ngrx/store';
 import { OalActions } from './oal.actions';
-import { initialState, oalAdapter, OalState } from './oal.state';
+import { initialState, oalAdapter } from './oal.state';
 
 export const oalFeature = createFeature({
   name: 'oal',

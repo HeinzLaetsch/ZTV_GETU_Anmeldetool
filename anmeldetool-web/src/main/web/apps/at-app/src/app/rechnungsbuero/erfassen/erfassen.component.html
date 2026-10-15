@@ -1,12 +1,12 @@
 <div class="layout-container-fluid toppadding">
   <div class="layout-row">
     <div class="layout-col-2">
-      <lxt-anlass-status
-        [anlass]="anlass"
+      <ztv-anlass-status
+        [anlass]="anlass()"
         (lauflisteSelectedEvent)="lauflisteSelected($event)"
         [erfasstChangedEmitter]="erfasstChangedEmitter"
         [checkedChangedEmitter]="checkedChangedEmitter"
-      ></lxt-anlass-status>
+      ></ztv-anlass-status>
     </div>
     <div class="layout-col-10">
       <div class="layout-row">
@@ -31,7 +31,7 @@
       </div>
       <div class="layout-row">
         <div class="layout-col-2 side">
-          <lxt-erfassen-header [laufliste]="laufliste"></lxt-erfassen-header>
+          <ztv-erfassen-header [laufliste]="laufliste"></ztv-erfassen-header>
         </div>
         <div *ngIf="laufliste" class="layout-col-10">
           <div class="layout-row blue">
@@ -39,22 +39,22 @@
             <div class="layout-col-2">Verein</div>
             <div class="layout-col-2">Name</div>
             <div class="layout-col-2">Vorname</div>
-            <div *ngIf="!sprung && !modeErfassen" class="layout-col-2 centered">Note</div>
-            <div *ngIf="!sprung && modeErfassen" class="layout-col-1 centered">Note</div>
+            <div *ngIf="!sprung && !modeErfassen()" class="layout-col-2 centered">Note</div>
+            <div *ngIf="!sprung && modeErfassen()" class="layout-col-1 centered">Note</div>
 
             <div *ngIf="sprung" class="layout-col-1 centered">Note 1</div>
             <div *ngIf="sprung" class="layout-col-1 centered">Note 2</div>
             <div class="layout-col-1 centered">gespeichert</div>
             <div class="layout-col-1 centered">geprüft</div>
           </div>
-          <lxt-erfassen-row
+          <ztv-erfassen-row
             *ngFor="let eintrag of sortedEintraege"
-            [anlass]="anlass"
+            [anlass]="anlass()"
             [eintrag]="eintrag"
             [sprung]="sprung"
-            [modeErfassen]="modeErfassen"
+            [modeErfassen]="modeErfassen()"
             (entryChangedEvent)="entryChanged($event)"
-          ></lxt-erfassen-row>
+          ></ztv-erfassen-row>
         </div>
       </div>
     </div>

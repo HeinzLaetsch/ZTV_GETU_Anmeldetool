@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, type OnChanges, type OnInit, Output, type SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, type OnInit, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import type { IRolle } from 'src/app/core/model/IRolle';
@@ -8,23 +8,18 @@ import { MaterialModule } from 'src/app/shared/material-module';
 import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'lxt-wertungsrichter',
+  selector: 'ztv-wertungsrichter',
   templateUrl: './wertungsrichter-form.component.html',
   styleUrls: ['./wertungsrichter-form.component.scss'],
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ReactiveFormsModule, MaterialModule],
 })
-export class WertungsrichterFormComponent implements OnInit, OnChanges {
-  @Input()
-  currentUser: IUser;
-  @Input()
-  wertungsrichter: IWertungsrichter;
-  @Input()
-  isVereinsAnmelder: boolean;
-  @Input()
-  isVereinsVerantwortlicher: boolean;
-  @Output()
-  wertungsrichterChange = new EventEmitter<IWertungsrichter>();
+export class WertungsrichterFormComponent implements OnInit {
+  readonly currentUser = input.required<IUser>();
+  readonly wertungsrichter = input.required<IWertungsrichter>();
+  readonly isVereinsAnmelder = input.required<boolean>();
+  readonly isVereinsVerantwortlicher = input.required<boolean>();
+  readonly wertungsrichterChange = output<IWertungsrichter>();
 
   appearance = 'outline';
 
@@ -40,40 +35,28 @@ export class WertungsrichterFormComponent implements OnInit, OnChanges {
     gueltigControl: this.gueltigControl,
     bestaetigtControl: this.bestaetigtControl,
   });
-
-  constructor() {}
+  private readonly valuesEffect = effect(() => {
+    this.setValues(this.wertungsrichter());
+  });
 
   ngOnInit(): void {
-    this.setValues();
-
-    this.form.valueChanges.subscribe((value: any) => {
+    this.form.valueChanges.subscribe(() => {
       if (this.form.dirty && this.brevetControl.dirty) {
-        this.wertungsrichter.brevet = this.brevetControl.value as unknown as number;
-        this.wertungsrichterChange.emit(this.wertungsrichter);
+        this.wertungsrichter().brevet = this.brevetControl.value as unknown as number;
+        this.wertungsrichterChange.emit(this.wertungsrichter());
       }
     });
   }
 
-  private setValues(): void {
-    this.brevetControl.setValue(this.wertungsrichter.brevet);
-    this.letzterFkControl.setValue(this.wertungsrichter.letzterFK);
-    this.gueltigControl.setValue(this.wertungsrichter.gueltig);
-    this.bestaetigtControl.setValue(this.wertungsrichter.aktiv);
+  private setValues(wertungsrichter: IWertungsrichter): void {
+    this.brevetControl.setValue(wertungsrichter.brevet);
+    this.letzterFkControl.setValue(wertungsrichter.letzterFK);
+    this.gueltigControl.setValue(wertungsrichter.gueltig);
+    this.bestaetigtControl.setValue(wertungsrichter.aktiv);
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    for (const propName in changes) {
-      if (changes.wertungsrichter) {
-        this.wertungsrichter = changes.wertungsrichter.currentValue;
-        if (this.wertungsrichter) {
-          this.setValues();
-        }
-      }
-    }
-  }
-
-  disableRole(role: IRolle) {
-    if (role.name === 'VEREINSVERANTWORTLICHER' && !this.isVereinsVerantwortlicher) {
+  disableRole(role: IRolle): boolean {
+    if (role.name === 'VEREINSVERANTWORTLICHER' && !this.isVereinsVerantwortlicher()) {
       return true;
     }
     return false;

@@ -1,17 +1,19 @@
-import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { TiTuEnum } from 'src/app/core/model/TiTuEnum';
 
 @Component({
-  selector: 'lxt-ranglisten-header',
+  selector: 'ztv-ranglisten-header',
   templateUrl: './ranglisten-header.component.html',
-  styleUrls: ['./ranglisten-header.component.css'],
+  styleUrls: ['./ranglisten-header.component.scss'],
+  imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RanglistenHeaderComponent {
-  @Input()
-  tiTu: TiTuEnum;
+  readonly tiTu = input.required<TiTuEnum>();
 
   get isTu(): boolean {
-    const res = TiTuEnum.Tu === this.tiTu;
+    const res = TiTuEnum.Tu === this.tiTu();
     return res;
   }
 }

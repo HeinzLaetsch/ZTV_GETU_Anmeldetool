@@ -1,21 +1,20 @@
-import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { createFeatureSelector, createSelector, type MemoizedSelector } from '@ngrx/store';
+import type { IOrganisationTeilnahmenStatistik } from '../../model/IOrganisationTeilnahmenStatistik';
 import { OtsState } from './ots.state';
 import { otsFeature } from './ots.reducer';
 import * as fromOts from './ots.reducer';
-import { KategorieEnum } from '../../model/KategorieEnum';
 
 export const selectOtsState = createFeatureSelector<OtsState>(otsFeature.name);
 
 export const selectAllOts = createSelector(selectOtsState, fromOts.selectAll);
 
-export const selectOts = () =>
-  createSelector(selectAllOts, (ots) => {
-    return ots;
-  });
-export const selectOtsByAnlassId = (anlassId: string) =>
+export const selectOts = (): MemoizedSelector<object, IOrganisationTeilnahmenStatistik[]> =>
+  createSelector(selectAllOts, (ots: IOrganisationTeilnahmenStatistik[]) => ots);
+export const selectOtsByAnlassId = (
+  anlassId: string,
+): MemoizedSelector<object, IOrganisationTeilnahmenStatistik | undefined> =>
   createSelector(selectOtsState, (otsState) => {
-    const ret = otsState.ids.length ? otsState.entities[anlassId] : undefined;
-    return ret;
+    return otsState.ids.length ? otsState.entities[anlassId] : undefined;
   });
 /*
 export const selectOtsForAnlassId = (anlassId: string) =>

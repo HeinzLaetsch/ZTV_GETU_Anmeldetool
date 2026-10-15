@@ -4,7 +4,7 @@ export const loadingAdapter: EntityAdapter<ILoading> = createEntityAdapter<ILoad
   sortComparer: sortByCreationDate,
 });
 
-export function sortByCreationDate(a: ILoading, b: ILoading): any {
+export function sortByCreationDate(a: ILoading, b: ILoading): number {
   return a.creationDate.getTime() - b.creationDate.getTime();
 }
 
@@ -19,5 +19,5 @@ export type ILoading = {
   isLoading: boolean;
   isFinished: boolean;
   hasError: boolean;
-  message: string;
+  message?: string;
 };

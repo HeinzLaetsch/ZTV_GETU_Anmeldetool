@@ -1,5 +1,16 @@
-import { Component, type EventEmitter, Input, type OnInit, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  type EventEmitter,
+  inject,
+  input,
+  type OnInit,
+  ViewEncapsulation,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { UntypedFormControl } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MaterialModule } from 'src/app/shared/material-module';
 import { Subject } from 'rxjs';
 import { AbteilungEnum } from 'src/app/core/model/AbteilungEnum';
 import { AnlageEnum } from 'src/app/core/model/AnlageEnum';
@@ -13,30 +24,22 @@ import { CachingAnlassService } from 'src/app/core/service/caching-services/cach
 import { RanglistenService } from 'src/app/core/service/rangliste/ranglisten.service';
 
 @Component({
-  selector: 'lxt-einteilung-startgeraet',
+  selector: 'ztv-einteilung-startgeraet',
   templateUrl: './einteilung-startgeraet.component.html',
-  styleUrls: ['./einteilung-startgeraet.component.css'],
+  styleUrls: ['./einteilung-startgeraet.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, ReactiveFormsModule, MaterialModule],
 })
 export class EinteilungStartgeraetComponent implements OnInit {
-  @Input()
-  anlass: IAnlass;
-  @Input()
-  kategorie: KategorieEnum;
-  @Input()
-  abteilung: AbteilungEnum;
-  @Input()
-  anlage: AnlageEnum;
-  @Input()
-  startgeraet: GeraeteEnum;
-  @Input()
-  refreshEmitter: EventEmitter<string>;
-  @Input()
-  search: string;
-  @Input()
-  expanded: boolean;
-
-  loaded$: Subject<boolean>;
+  readonly anlass = input.required<IAnlass>();
+  readonly kategorie = input.required<KategorieEnum>();
+  readonly abteilung = input.required<AbteilungEnum>();
+  readonly anlage = input.required<AnlageEnum>();
+  readonly startgeraet = input.required<GeraeteEnum>();
+  readonly refreshEmitter = input.required<EventEmitter<string>>();
+  readonly search = input<string | undefined>();
+  readonly expanded = input(false);
 
   private statisticLoaded = false;
   private startsLoaded = false;
@@ -61,26 +64,28 @@ export class EinteilungStartgeraetComponent implements OnInit {
   anlageControls_ = [] as UntypedFormControl[];
   abteilungenControls_ = [] as UntypedFormControl[];
 
-  constructor(
-    private anlassService: CachingAnlassService,
-    private ranglistenService: RanglistenService,
-  ) {
-    this.loaded$ = new Subject();
-    this.startgeraeteControls_ = [];
-  }
+  private readonly anlassService = inject(CachingAnlassService);
+  private readonly ranglistenService = inject(RanglistenService);
+  readonly loaded$ = new Subject<boolean>();
 
   ngOnInit(): void {
-    this.loadData(this.search);
-    this.refreshEmitter.subscribe((search) => {
+    this.loadData(this.search());
+    this.refreshEmitter().subscribe((search) => {
       console.log('EinteilungStartgeraetComponent, Refresh Kategorie: ', search);
-      this.search = search;
       this.loadData(search);
     });
   }
 
-  private loadData(search: string): void {
+  private loadData(search: string | undefined): void {
     this.anlassService
-      .getTeilnahmeStatistic(this.anlass, this.kategorie, this.abteilung, this.anlage, this.startgeraet, search)
+      .getTeilnahmeStatistic(
+        this.anlass(),
+        this.kategorie(),
+        this.abteilung(),
+        this.anlage(),
+        this.startgeraet(),
+        search,
+      )
       .subscribe((statistic) => {
         this.teilnahmeStatistic = statistic;
         this.statisticLoaded = true;
@@ -90,7 +95,7 @@ export class EinteilungStartgeraetComponent implements OnInit {
       });
 
     this.anlassService
-      .getByStartgeraet(this.anlass, this.kategorie, this.abteilung, this.anlage, this.startgeraet, search)
+      .getByStartgeraet(this.anlass(), this.kategorie(), this.abteilung(), this.anlage(), this.startgeraet(), search)
       .subscribe((startende) => {
         this.startende = startende;
         this.startgeraeteControls_.slice(0, 0);
@@ -121,7 +126,7 @@ export class EinteilungStartgeraetComponent implements OnInit {
   get startgeraeteControls(): UntypedFormControl[] {
     return this.startgeraeteControls_;
   }
-  change(rowIndex: any, colIndex: any) {
+  change(rowIndex: number, colIndex: number): void {
     console.log('Change ', rowIndex, ' ', colIndex);
     switch (colIndex) {
       case 0:
@@ -137,11 +142,11 @@ export class EinteilungStartgeraetComponent implements OnInit {
         this.startende[rowIndex].startgeraet = this.startgeraeteControls_[rowIndex].value.toUpperCase();
         break;
     }
-    this.anlassService.updateStartgeraet(this.anlass, this.startende[rowIndex]).subscribe(() => {});
+    this.anlassService.updateStartgeraet(this.anlass(), this.startende[rowIndex]).subscribe();
   }
 
   get alleStartgeraete(): GeraeteEnum[] {
-    const startgeraete = this.anlass.getStartgeraete();
+    const startgeraete = this.anlass().getStartgeraete();
     return startgeraete;
   }
   get anlageControls(): UntypedFormControl[] {
@@ -172,30 +177,26 @@ export class EinteilungStartgeraetComponent implements OnInit {
     abteilungen.push(AbteilungEnum.ABTEILUNG_8);
     return abteilungen;
   }
-  compareWith(value1, value2) {
-    if (value1 && value2 && value1.toUpperCase() === value2.toUpperCase()) {
-      return value1;
-    } else {
-      return '';
-    }
+  compareWith(value1: string, value2: string): boolean {
+    return !!(value1 && value2 && value1.toUpperCase() === value2.toUpperCase());
   }
   abmelden(rowIndex: number): void {
     console.log('Abmelden von ', this.startende[rowIndex].name);
     //TODO Check
     this.startende[rowIndex].meldeStatus = MeldeStatusEnum.ABGEMELDET.toString().toUpperCase();
-    if (!this.anlass.aenderungenNichtMehrErlaubt) {
+    if (!this.anlass().aenderungenNichtMehrErlaubt) {
       this.startende[rowIndex].meldeStatus = MeldeStatusEnum.ABGEMELDET.toString().toUpperCase();
     }
-    this.anlassService.updateStartgeraet(this.anlass, this.startende[rowIndex]).subscribe(() => {});
+    this.anlassService.updateStartgeraet(this.anlass(), this.startende[rowIndex]).subscribe();
   }
 
   addToStartgeraet(rowIndex: number): void {
     console.log('Nachtraeglich zum Startgeraet hinzufügen von ', this.startende[rowIndex].name);
     //TODO Check
     this.startende[rowIndex].meldeStatus = MeldeStatusEnum.ABGEMELDET.toString().toUpperCase();
-    if (!this.anlass.aenderungenNichtMehrErlaubt) {
+    if (!this.anlass().aenderungenNichtMehrErlaubt) {
       this.startende[rowIndex].meldeStatus = MeldeStatusEnum.ABGEMELDET.toString().toUpperCase();
     }
-    this.ranglistenService.addToStartgeraet(this.anlass, this.startende[rowIndex]).subscribe(() => {});
+    this.ranglistenService.addToStartgeraet(this.anlass(), this.startende[rowIndex]).subscribe();
   }
 }

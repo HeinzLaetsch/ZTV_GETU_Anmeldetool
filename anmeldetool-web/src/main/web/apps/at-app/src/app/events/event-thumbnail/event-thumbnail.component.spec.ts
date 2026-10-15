@@ -1,4 +1,7 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideStore } from '@ngrx/store';
+import { appReducers } from 'src/app/core/redux/app.reducer';
 
 import { EventThumbnailComponent } from './event-thumbnail.component';
 
@@ -6,11 +9,12 @@ describe('EventThumbnailComponent', () => {
   let component: EventThumbnailComponent;
   let fixture: ComponentFixture<EventThumbnailComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [EventThumbnailComponent],
+      imports: [EventThumbnailComponent],
+      providers: [provideHttpClient(), provideStore(appReducers)],
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(EventThumbnailComponent);

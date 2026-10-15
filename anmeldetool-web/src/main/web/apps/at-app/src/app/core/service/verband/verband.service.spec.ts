@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { EventService } from './event.service';
+import { VerbandService } from './verband.service';
 
-describe('EventService', () => {
+describe('VerbandService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: EventService = TestBed.get(EventService);
+    const service: VerbandService = TestBed.inject(VerbandService);
     expect(service).toBeTruthy();
   });
 });

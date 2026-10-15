@@ -1,7 +1,7 @@
 import { type CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, type OnChanges, type OnInit, Output, type SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, type OnInit, output } from '@angular/core';
 import type { Subscription } from 'rxjs';
 import type { IRolle } from 'src/app/core/model/IRolle';
 import type { IUser } from 'src/app/core/model/IUser';
@@ -9,23 +9,18 @@ import { CachingRoleService } from 'src/app/core/service/caching-services/cachin
 import { RoleChipComponent } from './role-chip/role-chip.component';
 
 @Component({
-  selector: 'lxt-role',
+  selector: 'ztv-role',
   templateUrl: './role-form.component.html',
   styleUrls: ['./role-form.component.scss'],
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, DragDropModule, RoleChipComponent],
 })
-export class RoleFormComponent implements OnInit, OnChanges {
-  @Input()
-  currentUser: IUser;
-  @Input()
-  isVereinsAnmelder: boolean;
-  @Input()
-  isVereinsVerantwortlicher: boolean;
-  @Input()
-  assignedRoles: IRolle[];
-  @Output()
-  assignedRolesChange = new EventEmitter<IRolle[]>();
+export class RoleFormComponent implements OnInit {
+  readonly currentUser = input.required<IUser>();
+  readonly isVereinsAnmelder = input.required<boolean>();
+  readonly isVereinsVerantwortlicher = input.required<boolean>();
+  readonly assignedRoles = input.required<IRolle[]>();
+  readonly assignedRolesChange = output<IRolle[]>();
 
   appearance = 'outline';
   userValid: boolean;
@@ -35,11 +30,10 @@ export class RoleFormComponent implements OnInit, OnChanges {
   assignedRolesDirty = false;
   assignedRolesChanged = false;
 
-  constructor(private roleService: CachingRoleService) {}
+  private readonly roleService = inject(CachingRoleService);
 
   ngOnInit(): void {
-    let localSubscription: Subscription;
-    localSubscription = this.roleService.loadRoles().subscribe((result) => {
+    const localSubscription: Subscription = this.roleService.loadRoles().subscribe(() => {
       this._allRoles = this.roleService.getRoles();
       // console.log('RoleFormComponent:: ngOnInit: ' , this._allRoles);
       if (localSubscription) {
@@ -50,29 +44,20 @@ export class RoleFormComponent implements OnInit, OnChanges {
     // console.log('RoleFormComponent:: ngOnInit: ' , this.assignedRoles);
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    for (const propName in changes) {
-      if (changes.currentUser) {
-        // console.log('ngOnChanges: ' , changes.user.previousValue, ', ' , changes.user.currentValue);
-        // this.reloadRoles(changes.currentUser.currentValue);
-      }
-    }
-  }
-
-  aktivChange(role: IRolle) {
+  aktivChange(_role: IRolle): void {
     // console.log('Role: ', role);
     this.assignedRolesChanged = true;
-    this.assignedRolesChange.emit(this.assignedRoles);
+    this.assignedRolesChange.emit(this.assignedRoles());
   }
 
   get allRoles(): IRolle[] {
-    if (this.assignedRoles && this._allRoles) {
+    if (this.assignedRoles() && this._allRoles) {
       return this._allRoles.filter((value) => {
-        if (!this.isVereinsVerantwortlicher && value.name === 'VEREINSVERANTWORTLICHER') {
+        if (!this.isVereinsVerantwortlicher() && value.name === 'VEREINSVERANTWORTLICHER') {
           // console.log('this.isVereinsVerantwortlicher: ' , this.isVereinsVerantwortlicher , value, ' , ');
           return false;
         }
-        const notFound = this.assignedRoles.find((search) => search.name === value.name) === undefined;
+        const notFound = this.assignedRoles().find((search) => search.name === value.name) === undefined;
         // console.log('this.isVereinsVerantwortlicher: ' , this.isVereinsVerantwortlicher ,'  notFound: ' , notFound , value, ' , ');
         return notFound;
       });
@@ -83,11 +68,11 @@ export class RoleFormComponent implements OnInit, OnChanges {
     this._allRoles = value;
   }
 
-  disableRole(role: IRolle) {
-    if (!this.isVereinsAnmelder) {
+  disableRole(role: IRolle): boolean {
+    if (!this.isVereinsAnmelder()) {
       return true;
     }
-    if (role.name === 'VEREINSVERANTWORTLICHER' && !this.isVereinsVerantwortlicher) {
+    if (role.name === 'VEREINSVERANTWORTLICHER' && !this.isVereinsVerantwortlicher()) {
       return true;
     }
     return false;
@@ -101,7 +86,7 @@ export class RoleFormComponent implements OnInit, OnChanges {
     this._assignedRoles = value;
   }
 */
-  drop(event: CdkDragDrop<string[]>) {
+  drop(event: CdkDragDrop<IRolle[]>): void {
     console.log('Drop: ', event);
     if (event.previousContainer === event.container) {
       console.log('move Drop: ', event);
@@ -110,11 +95,11 @@ export class RoleFormComponent implements OnInit, OnChanges {
       console.log('Transfer Drop: ', event);
       this.assignedRolesDirty = true;
       transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
-      if (this.assignedRoles[event.currentIndex]) {
-        this.assignedRoles[event.currentIndex].aktiv = true;
+      if (this.assignedRoles()[event.currentIndex]) {
+        this.assignedRoles()[event.currentIndex].aktiv = true;
       }
       console.log('Current Index: ', event.currentIndex, ' , Data: ', event.container.data[event.currentIndex]);
-      this.assignedRolesChange.emit(this.assignedRoles);
+      this.assignedRolesChange.emit(this.assignedRoles());
     }
   }
 }

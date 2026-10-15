@@ -20,6 +20,12 @@ body {
   padding-top: 6px;
   height: 64px;
 }
+.teilnehmer-grid {
+  display: block;
+  width: 100%;
+  height: calc(100vh - 150px);
+  min-height: 400px;
+}
 .ztvAnlassHeaderLabel {
   width: 30px;
   transform: rotate(90deg);

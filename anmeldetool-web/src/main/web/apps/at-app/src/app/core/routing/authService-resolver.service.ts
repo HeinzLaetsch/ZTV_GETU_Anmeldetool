@@ -5,10 +5,10 @@ import { AuthService } from '../service/auth/auth.service';
 @Injectable({
   providedIn: 'root',
 })
-export class AuthServiceResolverService implements Resolve<any> {
+export class AuthServiceResolverService implements Resolve<boolean> {
   constructor(public authService: AuthService) {}
 
-  resolve() {
+  resolve(): boolean {
     console.log('resolve Auth');
     return this.authService.isAuthenticatedSig();
   }

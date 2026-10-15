@@ -4,9 +4,9 @@ import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import type { IUser } from 'src/app/core/model/IUser';
 
 @Component({
-  selector: 'lxt-user-exists',
+  selector: 'ztv-user-exists',
   templateUrl: './user-exists.component.html',
-  styleUrls: ['./user-exists.component.css'],
+  styleUrls: ['./user-exists.component.scss'],
   standalone: true,
   imports: [CommonModule, MatDialogModule],
   changeDetection: ChangeDetectionStrategy.OnPush,

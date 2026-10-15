@@ -59,64 +59,73 @@ const parseKategorieValue = (value?: string | KategorieEnum): KategorieEnum | un
   return undefined;
 };
 
-export namespace KategorieEnumFunction {
-  export function toString(kategorie: KategorieEnum): string {
-    return kategorie;
+function toString(kategorie: KategorieEnum): string {
+  return kategorie;
+}
+
+function values(): string[] {
+  return [...KATEGORIE_VALUES];
+}
+
+function keys(): (keyof typeof KategorieEnum)[] {
+  return Object.keys(KategorieEnum) as (keyof typeof KategorieEnum)[];
+}
+
+function parse(kategorie: string): KategorieEnum {
+  return parseKategorieValue(kategorie) ?? (kategorie as KategorieEnum);
+}
+
+function equals(kategorie1?: string | KategorieEnum, kategorie2?: string | KategorieEnum): boolean {
+  const left = parseKategorieValue(kategorie1);
+  const right = parseKategorieValue(kategorie2);
+
+  if (left !== undefined && right !== undefined) {
+    return left === right;
   }
 
-  export function values(): string[] {
-    return [...KATEGORIE_VALUES];
-  }
+  return kategorie1 === kategorie2;
+}
 
-  export function keys(): (keyof typeof KategorieEnum)[] {
-    return Object.keys(KategorieEnum) as (keyof typeof KategorieEnum)[];
-  }
+function valuesAndGreater(start?: string | KategorieEnum, titu?: TiTuEnum, anlass?: IAnlass): KategorieEnum[] {
+  const startKategorie = parseKategorieValue(start) ?? KategorieEnum.K1;
+  const startIndex = KATEGORIE_VALUES.indexOf(startKategorie);
+  const sliced = startIndex >= 0 ? KATEGORIE_VALUES.slice(startIndex) : [...KATEGORIE_VALUES];
 
-  export function parse(kategorie: string): KategorieEnum {
-    return parseKategorieValue(kategorie) ?? (kategorie as KategorieEnum);
-  }
+  return sliced.filter((kategorie) => {
+    if (anlass) {
+      const startBr1 = isBrevet1(anlass.tiefsteKategorie) && (isBrevet1(kategorie) || isBrevet2(kategorie));
+      const startBr2 = isBrevet2(anlass.tiefsteKategorie) && isBrevet2(kategorie);
+      const endBr1 = isBrevet1(anlass.hoechsteKategorie) && isBrevet1(kategorie);
+      const endBr2 = isBrevet2(anlass.hoechsteKategorie) && (isBrevet1(kategorie) || isBrevet2(kategorie));
 
-  export function equals(kategorie1?: string | KategorieEnum, kategorie2?: string | KategorieEnum): boolean {
-    const left = parseKategorieValue(kategorie1);
-    const right = parseKategorieValue(kategorie2);
-
-    if (left !== undefined && right !== undefined) {
-      return left === right;
+      if (!((startBr1 && (endBr1 || endBr2)) || (startBr2 && endBr2))) {
+        return false;
+      }
     }
 
-    return kategorie1 === kategorie2;
-  }
+    if (isTiTuEnumEqual(TiTuEnum.Ti, titu)) {
+      return !TI_EXCLUDED_KATEGORIEN.has(kategorie);
+    }
 
-  export function valuesAndGreater(start?: string | KategorieEnum, titu?: TiTuEnum, anlass?: IAnlass): KategorieEnum[] {
-    const startKategorie = parseKategorieValue(start) ?? KategorieEnum.K1;
-    const startIndex = KATEGORIE_VALUES.indexOf(startKategorie);
-    const sliced = startIndex >= 0 ? KATEGORIE_VALUES.slice(startIndex) : [...KATEGORIE_VALUES];
-
-    return sliced.filter((kategorie) => {
-      if (anlass) {
-        const startBr1 = isBrevet1(anlass.tiefsteKategorie) && (isBrevet1(kategorie) || isBrevet2(kategorie));
-        const startBr2 = isBrevet2(anlass.tiefsteKategorie) && isBrevet2(kategorie);
-        const endBr1 = isBrevet1(anlass.hoechsteKategorie) && isBrevet1(kategorie);
-        const endBr2 = isBrevet2(anlass.hoechsteKategorie) && (isBrevet1(kategorie) || isBrevet2(kategorie));
-
-        if (!((startBr1 && (endBr1 || endBr2)) || (startBr2 && endBr2))) {
-          return false;
-        }
-      }
-
-      if (isTiTuEnumEqual(TiTuEnum.Ti, titu)) {
-        return !TI_EXCLUDED_KATEGORIEN.has(kategorie);
-      }
-
-      return !TU_EXCLUDED_KATEGORIEN.has(kategorie);
-    });
-  }
-
-  export function isBrevet1(kategorie: KategorieEnum): boolean {
-    return BREVET1_KATEGORIEN.has(kategorie);
-  }
-
-  export function isBrevet2(kategorie: KategorieEnum): boolean {
-    return !isBrevet1(kategorie) && !equals(KategorieEnum.KEIN_START, kategorie);
-  }
+    return !TU_EXCLUDED_KATEGORIEN.has(kategorie);
+  });
 }
+
+function isBrevet1(kategorie: KategorieEnum): boolean {
+  return BREVET1_KATEGORIEN.has(kategorie);
+}
+
+function isBrevet2(kategorie: KategorieEnum): boolean {
+  return !isBrevet1(kategorie) && !equals(KategorieEnum.KEIN_START, kategorie);
+}
+
+export const KategorieEnumFunction = {
+  toString,
+  values,
+  keys,
+  parse,
+  equals,
+  valuesAndGreater,
+  isBrevet1,
+  isBrevet2,
+};

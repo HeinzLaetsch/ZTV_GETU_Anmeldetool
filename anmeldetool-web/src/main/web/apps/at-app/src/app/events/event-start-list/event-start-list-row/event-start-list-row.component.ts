@@ -7,7 +7,7 @@ import { AuthService } from 'src/app/core/service/auth/auth.service';
 @Component({
   selector: 'ztv-event-start-list-row',
   templateUrl: './event-start-list-row.component.html',
-  styleUrls: ['./event-start-list-row.component.css'],
+  styleUrls: ['./event-start-list-row.component.scss'],
   standalone: true,
 })
 export class EventStartListRowComponent {

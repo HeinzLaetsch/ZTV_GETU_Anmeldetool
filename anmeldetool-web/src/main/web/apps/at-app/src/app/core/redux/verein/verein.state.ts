@@ -5,7 +5,7 @@ export const vereinAdapter: EntityAdapter<IVerein> = createEntityAdapter<IVerein
   sortComparer: sortByName,
 });
 
-export function sortByName(a: IVerein, b: IVerein): any {
+export function sortByName(a: IVerein, b: IVerein): number {
   return a.name.localeCompare(b.name);
 }
 

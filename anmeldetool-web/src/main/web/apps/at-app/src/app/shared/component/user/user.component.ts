@@ -9,16 +9,17 @@ import type { AppState } from 'src/app/core/redux/core.state';
 import { UserActions } from 'src/app/core/redux/user';
 import { MaterialModule } from '../../material-module';
 import { ConfirmedValidator } from '../../validators/ConfirmedValidator';
-import { MyTel } from '../phonenumber/phone-input-component';
+import { MyTel } from '../phonenumber/my-tel';
+import { PhoneInput } from '../phonenumber/phone-input-component';
 import { UserExists } from './user-exists/user-exists.component';
 
 @Component({
-  selector: 'lxt-user',
+  selector: 'ztv-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule, PhoneInput],
 })
 export class UserComponent {
   // Inputs
@@ -157,7 +158,7 @@ export class UserComponent {
     });
   }
 
-  private openDialog(existingUser: IUser) {
+  private openDialog(existingUser: IUser): void {
     const dialogRef = this.dialog.open(UserExists, {
       data: existingUser,
     });
@@ -176,7 +177,7 @@ export class UserComponent {
     return myTel;
   }
 
-  private updateUser(user: IUser) {
+  private updateUser(user: IUser): void {
     if (this.form.controls.benutzernameControl.value !== user.benutzername) {
       this.form.controls.benutzernameControl.setValue(user.benutzername, { emitEvent: false });
     }
@@ -242,7 +243,7 @@ export class UserComponent {
     return valid;
   }
 
-  private emitChange(userUpdate: Update<IUser>) {
+  private emitChange(userUpdate: Update<IUser>): void {
     const user = this.user();
     if (!user) {
       return;

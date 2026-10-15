@@ -22,7 +22,8 @@
         "browser": "apps/at-app/src/main.ts",
         "sourceMap": true,
         "polyfills": [
-          "apps/at-app/src/polyfills.ts"
+          "zone.js",
+          "@angular/localize/init"
         ],
         "tsConfig": "apps/at-app/tsconfig.app.json",
         "aot": false,
@@ -158,26 +159,17 @@
       }
     },
     "extract-i18n": {
-      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "executor": "@angular/build:extract-i18n",
       "options": {
-        "browserTarget": "at-app:build"
+        "buildTarget": "at-app:build"
       }
     },
     "test": {
-      "executor": "@angular-devkit/build-angular:karma",
+      "executor": "@angular/build:unit-test",
       "options": {
-        "main": "apps/at-app/src/test.ts",
-        "polyfills": "apps/at-app/src/polyfills.ts",
+        "buildTarget": "at-app:build:development",
         "tsConfig": "apps/at-app/tsconfig.spec.json",
-        "karmaConfig": "karma.conf.js",
-        "assets": [
-          "apps/at-app/src/favicon.ico",
-          "apps/at-app/src/assets"
-        ],
-        "styles": [
-          "apps/at-app/src/styles.scss"
-        ],
-        "scripts": []
+        "runner": "vitest"
       }
     },
     "e2e": {
@@ -196,18 +188,6 @@
     "cypress-run": {
       "executor": "@cypress/schematic:cypress",
       "options": {
-        "devServerTarget": "at-app:serve"
-      },
-      "configurations": {
-        "production": {
-          "devServerTarget": "at-app:serve:development"
-        }
-      }
-    },
-    "e2eProtractor": {
-      "executor": "@angular-devkit/build-angular:protractor",
-      "options": {
-        "protractorConfig": "e2e/protractor.conf.js",
         "devServerTarget": "at-app:serve"
       },
       "configurations": {

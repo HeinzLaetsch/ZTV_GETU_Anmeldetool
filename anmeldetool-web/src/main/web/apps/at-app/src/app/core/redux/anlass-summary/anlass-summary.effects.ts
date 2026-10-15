@@ -15,7 +15,7 @@ export class AnlassSummaryEffects {
   loadAnlassSummaries$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(AnlassSummariesActions.loadAllAnlasssummariesInvoked),
-      mergeMap((action) => {
+      mergeMap(() => {
         return this.anlassService.getAnlassOrganisationSummaries(this.authService.currentVerein).pipe(
           switchMap((anlassSummaries) => [
             AnlassSummariesActions.loadAllAnlasssummariesSuccess({
@@ -69,8 +69,8 @@ export class AnlassSummaryEffects {
             }),
           ]),
           catchError((error) => {
-            // 401 handlen
             if (error.status === 401) {
+              // handled globally by the security interceptor
             }
             return of(
               AnlassSummariesActions.refreshAnlasssummaryError({

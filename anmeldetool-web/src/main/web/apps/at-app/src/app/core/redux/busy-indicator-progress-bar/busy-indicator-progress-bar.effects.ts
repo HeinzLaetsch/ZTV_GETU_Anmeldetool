@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect } from '@ngrx/effects';
+import type { Action } from '@ngrx/store';
 import type { Update } from '@ngrx/entity';
 import { filter, map } from 'rxjs/operators';
 import { LoadingActions } from './busy-indicator-progress-bar.actions';
@@ -8,6 +9,9 @@ import type { ILoading } from './busy-indicator-progress-bar.state';
 @Injectable({ providedIn: 'root' })
 export class BusyIndicatorProgressBarEffects {
   private actions$ = inject(Actions);
+  private getErrorMessage(action: Action & { error?: { message?: string } }): string | undefined {
+    return action.error?.message;
+  }
 
   loadingProcessRunning$ = createEffect(() => {
     return this.actions$.pipe(
@@ -59,7 +63,7 @@ export class BusyIndicatorProgressBarEffects {
       filter((action) => {
         return action.type.includes('error');
       }),
-      map((action: any) => {
+      map((action: Action & { error?: { message?: string } }) => {
         console.log('Action ', action);
         const updatedLoadingState: Update<ILoading> = {
           id: action.type.substring(0, action.type.indexOf('error')).toLowerCase(),
@@ -68,7 +72,7 @@ export class BusyIndicatorProgressBarEffects {
             isLoading: false,
             isFinished: false,
             hasError: true,
-            message: action.error?.message,
+            message: this.getErrorMessage(action),
           },
         };
         return LoadingActions.loadingEventFinished({

@@ -13,7 +13,7 @@ export class AnlassEffects {
     console.log('loadAnlaesse$ effect created');
     return this.actions$.pipe(
       ofType(AnlassActions.loadAllAnlaesseInvoked),
-      mergeMap((action) => {
+      mergeMap(() => {
         return this.anlassService.getAnlaesse(false).pipe(
           switchMap((anlaesse) => [AnlassActions.loadAllAnlaesseSuccess({ payload: anlaesse })]),
           catchError((error) => {

@@ -6,7 +6,7 @@ describe('EventListResolverService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: EventListResolverService = TestBed.get(EventListResolverService);
+    const service: EventListResolverService = TestBed.inject(EventListResolverService);
     expect(service).toBeTruthy();
   });
 });

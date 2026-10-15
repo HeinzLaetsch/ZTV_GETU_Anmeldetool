@@ -5,14 +5,12 @@ import { MaterialModule } from 'src/app/shared/material-module';
 @Component({
   standalone: true,
   imports: [MaterialModule],
-  selector: 'lxt-teilnehmer-grid-help',
+  selector: 'ztv-teilnehmer-grid-help',
   templateUrl: 'teilnehmer-grid-help.component.html',
-  styleUrls: ['teilnehmer-grid-help.component.css'],
+  styleUrls: ['teilnehmer-grid-help.component.scss'],
 })
 export class TeilnehmerGridHelpComponent {
   readonly dialogRef = inject(MatDialogRef<TeilnehmerGridHelpComponent>);
-
-  constructor() {}
 
   onCloseClick(): void {
     this.dialogRef.close();

@@ -9,12 +9,12 @@
   <mat-icon class="material-icons color_gray" aria-hidden="false" aria-label="Suchen">search</mat-icon>
 </button>
 <mat-accordion *ngIf="loaded$ | async as obs; else loading">
-  <lxt-einteilung-kategorie
+  <ztv-einteilung-kategorie
     *ngFor="let kategorie of getKategorien()"
-    [anlass]="anlass"
+    [anlass]="anlass()"
     [kategorie]="kategorie"
-    [refreshEmitter]="refreshEmitter"
+    [refreshEmitter]="refreshEmitter()"
     [search]="search"
-  ></lxt-einteilung-kategorie>
+  ></ztv-einteilung-kategorie>
 </mat-accordion>
 <ng-template #loading>Loading...</ng-template>

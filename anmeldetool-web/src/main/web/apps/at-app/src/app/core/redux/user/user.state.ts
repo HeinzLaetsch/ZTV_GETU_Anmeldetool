@@ -6,7 +6,7 @@ export const userAdapter: EntityAdapter<IUser> = createEntityAdapter<IUser>({
   sortComparer: sortByName,
 });
 
-export function sortByName(a: IUser, b: IUser): any {
+export function sortByName(a: IUser, b: IUser): number {
   return a.benutzername.localeCompare(b.benutzername);
 }
 

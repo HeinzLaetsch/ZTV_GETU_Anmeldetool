@@ -7,7 +7,6 @@ import { ITeilnehmer } from 'src/app/core/model/ITeilnehmer';
 import { AppState } from 'src/app/core/redux/core.state';
 import { Store } from '@ngrx/store';
 import { TeilnahmenActions } from 'src/app/core/redux/teilnahmen';
-import { TeilnehmerActions } from 'src/app/core/redux/teilnehmer';
 import { TeilnehmerDialog } from '../teilnehmer-dialog/teilnehmer-dialog.component';
 
 @Component({
@@ -40,16 +39,16 @@ export class ButtonCellRenderer implements ICellRendererAngularComp {
     this.params = params;
   }
 
-  refresh() {
+  refresh(): boolean {
     return false;
   }
 
-  delete() {
+  delete(): void {
     const teilnehmer = this.params.data.teilnehmer;
     this.openDialog(teilnehmer);
   }
 
-  private openDialog(teilnehmer: ITeilnehmer) {
+  private openDialog(teilnehmer: ITeilnehmer): void {
     const dialogRef = this.dialog.open(TeilnehmerDialog, {
       data: {
         title: 'Teilnehmer löschen',

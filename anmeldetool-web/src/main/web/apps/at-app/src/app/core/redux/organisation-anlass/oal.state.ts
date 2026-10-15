@@ -6,7 +6,7 @@ export const oalAdapter: EntityAdapter<IOrganisationAnlassLink> = createEntityAd
   sortComparer: sortByAnlassId,
 });
 
-export function sortByAnlassId(a: IOrganisationAnlassLink, b: IOrganisationAnlassLink): any {
+export function sortByAnlassId(a: IOrganisationAnlassLink, b: IOrganisationAnlassLink): number {
   return a.anlassId.localeCompare(b.anlassId);
 }
 

@@ -1,14 +1,12 @@
-@if (einsatz) {
+@if (einsatz(); as currentEinsatz) {
   <div class="slot">
     <mat-checkbox
-      [ngClass]="{
-        'label-green': einsatz().eingesetzt,
-        'label-red': !einsatz().eingesetzt,
-      }"
-      [(ngModel)]="einsatz().eingesetzt"
+      [class.label-green]="currentEinsatz.eingesetzt"
+      [class.label-red]="!currentEinsatz.eingesetzt"
+      [checked]="currentEinsatz.eingesetzt"
       [disabled]="!canEdit()"
-      (ngModelChange)="userEingesetztgmodelchange($event)"
-      >{{ getSlotText() }}</mat-checkbox
+      (change)="userEingesetztChange($event)"
+      >{{ slotText() }}</mat-checkbox
     >
   </div>
 } @else {

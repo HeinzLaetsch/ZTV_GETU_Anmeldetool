@@ -1,40 +1,23 @@
-import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { createFeatureSelector, createSelector, type MemoizedSelector } from '@ngrx/store';
 import { loadingFeature } from './busy-indicator-progress-bar.reducers';
-import { LoadingState } from './busy-indicator-progress-bar.state';
+import { type ILoading, LoadingState } from './busy-indicator-progress-bar.state';
 import * as fromLoading from './busy-indicator-progress-bar.reducers';
 
 export const selectLoadingState = createFeatureSelector<LoadingState>(loadingFeature.name);
 
 export const selectAllLoading = createSelector(selectLoadingState, fromLoading.selectAll);
-export const selectAllLoadings = () =>
-  createSelector(selectAllLoading, (loadingState) => {
-    return loadingState;
-  });
+export const selectAllLoadings = (): MemoizedSelector<object, ILoading[]> =>
+  createSelector(selectAllLoading, (loadingState: ILoading[]) => loadingState);
 
-export const selectLoading = () =>
-  createSelector(selectAllLoading, (loadingState) => {
-    const ret = loadingState.filter((x) => x.isLoading && !x.isFinished);
-    return ret;
-  });
-export const selectFinished = () =>
-  createSelector(selectAllLoading, (loadingState) => {
-    const ret = loadingState.filter((x) => x.isFinished);
-    return ret;
-  });
+export const selectLoading = (): MemoizedSelector<object, ILoading[]> =>
+  createSelector(selectAllLoading, (loadingState) => loadingState.filter((item) => item.isLoading && !item.isFinished));
+export const selectFinished = (): MemoizedSelector<object, ILoading[]> =>
+  createSelector(selectAllLoading, (loadingState) => loadingState.filter((item) => item.isFinished));
 // Muss noch definiert werden falls Log Funktion
-export const selectProcessed = () =>
-  createSelector(selectAllLoading, (loadingState) => {
-    const ret = loadingState.filter((x) => x.isFinished);
-    return ret;
-  });
+export const selectProcessed = (): MemoizedSelector<object, ILoading[]> =>
+  createSelector(selectAllLoading, (loadingState) => loadingState.filter((item) => item.isFinished));
 // Muss noch definiert werden falls Log Funktion
-export const selectTransactions = () =>
-  createSelector(selectAllLoading, (loadingState) => {
-    const ret = loadingState.filter((x) => x.isLoading || x.isFinished);
-    return ret;
-  });
-export const selectErrors = () =>
-  createSelector(selectAllLoading, (loadingState) => {
-    const ret = loadingState.filter((x) => x.hasError);
-    return ret;
-  });
+export const selectTransactions = (): MemoizedSelector<object, ILoading[]> =>
+  createSelector(selectAllLoading, (loadingState) => loadingState.filter((item) => item.isLoading || item.isFinished));
+export const selectErrors = (): MemoizedSelector<object, ILoading[]> =>
+  createSelector(selectAllLoading, (loadingState) => loadingState.filter((item) => item.hasError));

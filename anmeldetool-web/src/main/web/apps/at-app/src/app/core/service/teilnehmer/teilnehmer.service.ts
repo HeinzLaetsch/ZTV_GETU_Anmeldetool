@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { IVerein } from 'src/app/verein/verein';
 import { environment } from 'src/environments/environment';
@@ -16,7 +16,12 @@ export class TeilnehmerService extends ServiceHelper {
   private url: string = this.apiHost + '/admin/organisationen/';
   private _anzahlTeilnehmer = 0;
   teilnehmer: ITeilnehmer[] = [];
-  // teilnahmen: IAnlassLink[] = [  {id: '1', anlassId: '1', kategorie: 'k1'}, {id: '2', anlassId: '2', kategorie: ''}, {id: '3', anlassId: '3', kategorie: ''}, {id: '4', anlassId: '4', kategorie: ''}];
+  // teilnahmen: IAnlassLink[] = [
+  //   {id: '1', anlassId: '1', kategorie: 'k1'},
+  //   {id: '2', anlassId: '2', kategorie: ''},
+  //   {id: '3', anlassId: '3', kategorie: ''},
+  //   {id: '4', anlassId: '4', kategorie: ''},
+  // ];
 
   constructor(private http: HttpClient) {
     super();
@@ -33,13 +38,13 @@ export class TeilnehmerService extends ServiceHelper {
     );
   }
 
-  reset() {
+  reset(): void {
     // this.loadTeilnehmer();
   }
-  get anzahlTeilnehmer() {
+  get anzahlTeilnehmer(): number {
     return this._anzahlTeilnehmer;
   }
-  updateCount(verein: IVerein) {
+  updateCount(verein: IVerein): void {
     const combinedUrl = this.url + verein.id + '/teilnehmer/count';
     this.http
       .get<number>(combinedUrl)
@@ -54,8 +59,7 @@ export class TeilnehmerService extends ServiceHelper {
   add(verein: IVerein, titu: TiTuEnum): Observable<ITeilnehmer> {
     console.log('add Verein called');
     this._anzahlTeilnehmer++;
-    const combinedUrl = this.url + verein.id + '/teilnehmer';
-    const tiTuKey = (Object.keys(TiTuEnum) as Array<keyof typeof TiTuEnum>).find((key) => TiTuEnum[key] === titu);
+    const tiTuKey = (Object.keys(TiTuEnum) as (keyof typeof TiTuEnum)[]).find((key) => TiTuEnum[key] === titu);
     const teilnehmer: ITeilnehmer = {
       // Persist enum key shape expected by ITeilnehmer.
       tiTu: tiTuKey,

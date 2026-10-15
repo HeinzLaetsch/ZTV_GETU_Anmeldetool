@@ -53,8 +53,8 @@ export class SmQualiService {
         responseType: 'blob',
         headers,
       })
-      .pipe(catchError(this.handleError<any>('getSmAuswertungCsv', [])))
-      .subscribe((result: HttpResponse<string>) => {
+      .pipe(catchError(this.handleError<HttpResponse<Blob>>('getSmAuswertungCsv')))
+      .subscribe((result: HttpResponse<Blob>) => {
         const header = result.headers.get('Content-Disposition');
         const parts = header.split('filename=');
         this.saveAsFile(result.body, parts[1], 'text/csv');
@@ -62,14 +62,14 @@ export class SmQualiService {
       });
     return statusResponse.asObservable();
   }
-  private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
+  private handleError<T>(_operation = 'operation', result?: T) {
+    return (error: unknown): Observable<T> => {
       console.error(error);
       return of(result as T);
     };
   }
 
-  private saveAsFile(buffer: any, fileName: string, fileType: string): void {
+  private saveAsFile(buffer: BlobPart, fileName: string, fileType: string): void {
     const asArray = [buffer];
     const data: Blob = new Blob(asArray, { type: fileType });
     FileSaver.saveAs(data, fileName);

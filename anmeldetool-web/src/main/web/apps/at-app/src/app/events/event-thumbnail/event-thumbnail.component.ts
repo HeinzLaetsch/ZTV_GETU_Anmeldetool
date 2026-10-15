@@ -15,9 +15,9 @@ import type { IVerein } from 'src/app/verein/verein';
 import { EventsDatesComponent } from '../dates/events-dates.component';
 
 @Component({
-  selector: 'lxt-event-thumbnail',
+  selector: 'ztv-event-thumbnail',
   templateUrl: './event-thumbnail.component.html',
-  styleUrls: ['./event-thumbnail.component.css'],
+  styleUrls: ['./event-thumbnail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [DatePipe, HoverOverDirective, EventsDatesComponent],

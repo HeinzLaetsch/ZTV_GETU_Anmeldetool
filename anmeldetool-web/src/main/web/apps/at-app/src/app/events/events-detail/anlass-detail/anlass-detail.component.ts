@@ -1,33 +1,29 @@
-import { Component, Input, type OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { select, Store } from '@ngrx/store';
+import { DatePipe } from '@angular/common';
+import { Component, inject, input } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { Store } from '@ngrx/store';
+import { distinctUntilChanged, switchMap } from 'rxjs';
 import type { IAnlass } from 'src/app/core/model/IAnlass';
 import type { AppState } from 'src/app/core/redux/core.state';
 import { selectVereinById } from 'src/app/core/redux/verein';
-import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
 import type { IVerein } from 'src/app/verein/verein';
 
 @Component({
-  selector: 'lxt-anlass-detail',
+  selector: 'ztv-anlass-detail',
   templateUrl: './anlass-detail.component.html',
-  styleUrls: ['./anlass-detail.component.css'],
-  standalone: true,
-  imports: [CommonModule],
+  styleUrl: './anlass-detail.component.scss',
+  imports: [DatePipe],
 })
-export class AnlassDetailComponent extends SubscriptionHelper implements OnInit {
-  @Input()
-  anlass: IAnlass;
+export class AnlassDetailComponent {
+  readonly anlass = input.required<IAnlass>();
 
-  organisator: IVerein;
+  private readonly store = inject(Store<AppState>);
 
-  constructor(private store: Store<AppState>) {
-    super();
-  }
-  ngOnInit() {
-    this.registerSubscription(
-      this.store.pipe(select(selectVereinById(this.anlass.organisatorId))).subscribe((result) => {
-        this.organisator = result;
-      }),
-    );
-  }
+  readonly organisator = toSignal(
+    toObservable(this.anlass).pipe(
+      distinctUntilChanged(),
+      switchMap((anlass) => this.store.select(selectVereinById(anlass.organisatorId))),
+    ),
+    { initialValue: undefined as IVerein | undefined },
+  );
 }

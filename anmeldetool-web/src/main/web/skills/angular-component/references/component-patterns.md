@@ -38,7 +38,7 @@ export class Slider {
   }
 }
 
-// Usage: <lxt-slider [(value)]="sliderValue" />
+// Usage: <ztv-slider [(value)]="sliderValue" />
 ```
 
 Required model:
@@ -59,7 +59,7 @@ import { Component, viewChild, viewChildren, ElementRef } from '@angular/core';
   template: `
     <div #container class="gallery">
       @for (image of images(); track image.id) {
-        <lxt-image-card [image]="image" />
+        <ztv-image-card [image]="image" />
       }
     </div>
   `,
@@ -174,7 +174,7 @@ export class Dashboard {
 ```typescript
 // Parent
 @Component({
-  template: `<lxt-child [data]="parentData()" [config]="config" />`,
+  template: `<ztv-child [data]="parentData()" [config]="config" />`,
 })
 export class Parent {
   parentData = signal({ name: 'Test' });
@@ -207,7 +207,7 @@ export class Child {
 
 // Parent
 @Component({
-  template: `<lxt-child (saved)="onSaved($event)" />`,
+  template: `<ztv-child (saved)="onSaved($event)" />`,
 })
 export class Parent {
   onSaved(data: Data) {
@@ -262,11 +262,11 @@ Using `@defer` for lazy loading:
 @Component({
   template: `
     @defer (on viewport) {
-      <lxt-heavy-chart [data]="chartData()" />
+      <ztv-heavy-chart [data]="chartData()" />
     } @placeholder {
       <div class="chart-placeholder">Loading chart...</div>
     } @loading (minimum 500ms) {
-      <lxt-spinner />
+      <ztv-spinner />
     } @error {
       <p>Failed to load chart</p>
     }
@@ -291,7 +291,7 @@ Defer triggers:
 @Component({
   template: `
     @defer (on interaction; prefetch on idle) {
-      <lxt-comments [postId]="postId()" />
+      <ztv-comments [postId]="postId()" />
     } @placeholder {
       <button>Load Comments</button>
     }
@@ -318,7 +318,7 @@ export class Highlight {
 // Usage on component
 @Component({
   imports: [Highlight],
-  template: `<lxt-card appHighlight="lightblue" />`,
+  template: `<ztv-card appHighlight="lightblue" />`,
 })
 export class Page {}
 ```

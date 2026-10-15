@@ -28,7 +28,7 @@ export class User {
 ### Usage in Template
 
 ```html
-<lxt-user [name]="userName" [age]="25" />
+<ztv-user [name]="userName" [age]="25" />
 ```
 
 ## Configuration Options

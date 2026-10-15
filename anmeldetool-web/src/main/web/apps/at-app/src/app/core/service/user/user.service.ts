@@ -54,7 +54,7 @@ export class UserService extends ServiceHelper {
     );
   }
   updateRoles(user: IUser, verein: IVerein, roles: IRolle[]): Observable<IUser> {
-    const url = this.url + '/' + user.id + '/' + 'organisationen' + '/' + verein.id + '/rollen';
+    const url = this.url + '/' + user.id + '/organisationen/' + verein.id + '/rollen';
     // console.log("updateRoles called: ", url, " , data: ", roles);
     return this.http.put<IUser>(url, roles).pipe(
       catchError((err, caught) => {
@@ -71,7 +71,7 @@ export class UserService extends ServiceHelper {
     );
   }
 
-  updateWertungsrichter(id: string, wertungsrichter: IWertungsrichter): Observable<any> {
+  updateWertungsrichter(id: string, wertungsrichter: IWertungsrichter): Observable<IWertungsrichter> {
     return this.http.put<IWertungsrichter>(this.url + '/' + id + '/wertungsrichter', wertungsrichter).pipe(
       catchError((err, caught) => {
         return this.handleError('updateWertungsrichter', err, caught);

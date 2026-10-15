@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { ReactiveFormsModule, NonNullableFormBuilder } from '@angular/forms';
+import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from 'src/app/shared/material-module';
 import type { ITeilnehmer } from 'src/app/core/model/ITeilnehmer';
 
-interface TeilnehmerDialogData {
+type TeilnehmerDialogData = {
   title: string;
   actionButton: string;
   disabled: boolean;
@@ -13,7 +13,7 @@ interface TeilnehmerDialogData {
 }
 
 @Component({
-  selector: 'lxt-teilnehmer-dialog',
+  selector: 'ztv-teilnehmer-dialog',
   templateUrl: './teilnehmer-dialog.component.html',
   styleUrls: ['./teilnehmer-dialog.component.scss'],
   standalone: true,

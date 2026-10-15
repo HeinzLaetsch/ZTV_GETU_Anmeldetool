@@ -8,9 +8,9 @@ import { SmQualiService } from 'src/app/core/service/smquali/smquali.service';
 import { MaterialModule } from 'src/app/shared/material-module';
 
 @Component({
-  selector: 'lxt-smquali-viewer',
+  selector: 'ztv-smquali-viewer',
   templateUrl: './smquali-viewer.component.html',
-  styleUrls: ['./smquali-viewer.component.css'],
+  styleUrls: ['./smquali-viewer.component.scss'],
   standalone: true,
   imports: [CommonModule, MaterialModule],
 })
@@ -23,21 +23,21 @@ export class SmQualiViewerComponent implements OnInit {
   smQualiList: ISmQuali[];
   constructor(private smQualiService: SmQualiService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadAuswertung();
   }
 
-  private loadAuswertung() {
+  private loadAuswertung(): void {
     this.smQualiService
       .getSmAuswertungJson(this.jahr, this.getFilter(this.tiTu), this.kategorie, this.nurQuali)
       .subscribe((result) => (this.smQualiList = result));
   }
-  downloadAuswertungCSV() {
+  downloadAuswertungCSV(): void {
     this.smQualiService.getSmAuswertungCsv(this.jahr, this.getFilter(this.tiTu), this.kategorie, this.nurQuali);
   }
 
   private getFilter(titu: TiTuEnum): string {
-    let filter = 'Tu';
+    let filter: string;
     if (TiTuEnum.Tu === titu) {
       filter = 'Tu';
     } else {
@@ -45,21 +45,21 @@ export class SmQualiViewerComponent implements OnInit {
     }
     return filter;
   }
-  getJahre() {
+  getJahre(): number[] {
     return [2023];
   }
   jahrSelected(jahr: MatSelectChange): void {
     this.jahr = jahr.value;
     this.loadAuswertung();
   }
-  getKategorien() {
+  getKategorien(): KategorieEnum[] {
     if (this.tiTu === TiTuEnum.Ti) {
       return [KategorieEnum.K5A, KategorieEnum.K6, KategorieEnum.KD, KategorieEnum.K7];
     } else {
       return [KategorieEnum.K5, KategorieEnum.K6, KategorieEnum.KH, KategorieEnum.K7];
     }
   }
-  getTiTu() {
+  getTiTu(): TiTuEnum[] {
     return [TiTuEnum.Ti, TiTuEnum.Tu];
   }
   kategorieSelected(kategorie: MatSelectChange): void {
@@ -72,7 +72,7 @@ export class SmQualiViewerComponent implements OnInit {
     // this.tiTu = TiTuEnum[tiTu.value];
     this.loadAuswertung();
   }
-  setNurQuali(nurQuali) {
+  setNurQuali(nurQuali): void {
     this.nurQuali = nurQuali;
     this.loadAuswertung();
   }

@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, type OnInit, Output, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  type EventEmitter,
+  inject,
+  input,
+  type OnInit,
+  output,
+  ViewEncapsulation,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbteilungEnum } from 'src/app/core/model/AbteilungEnum';
 import type { IAnlass } from 'src/app/core/model/IAnlass';
@@ -10,24 +19,19 @@ import { MaterialModule } from 'src/app/shared/material-module';
 import { AbteilungStatusComponent } from '../abteilung-status/abteilung-status.component';
 
 @Component({
-  selector: 'lxt-kategorie-status',
+  selector: 'ztv-kategorie-status',
   templateUrl: './kategorie-status.component.html',
-  styleUrls: ['./kategorie-status.component.css'],
+  styleUrls: ['./kategorie-status.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, MaterialModule, AbteilungStatusComponent],
 })
 export class KategorieStatusComponent implements OnInit {
-  @Input()
-  anlass: IAnlass;
-  @Input()
-  kategorie: KategorieEnum;
-  @Input()
-  erfasstChangedEmitter: EventEmitter<ILaufliste>;
-  @Input()
-  checkedChangedEmitter: EventEmitter<ILaufliste>;
-  @Output()
-  lauflisteSelectedEvent = new EventEmitter<ILaufliste>();
+  readonly anlass = input.required<IAnlass>();
+  readonly kategorie = input.required<KategorieEnum>();
+  readonly erfasstChangedEmitter = input.required<EventEmitter<ILaufliste>>();
+  readonly checkedChangedEmitter = input.required<EventEmitter<ILaufliste>>();
+  readonly lauflisteSelectedEvent = output<ILaufliste>();
 
   abteilungen: AbteilungEnum[];
 
@@ -36,21 +40,23 @@ export class KategorieStatusComponent implements OnInit {
   checked = false;
   checkedAbteilungen: boolean[];
 
-  constructor(private ranglistenService: RanglistenService) {
+  private readonly ranglistenService = inject(RanglistenService);
+
+  constructor() {
     this.erfasstAbteilungen = new Array(Object.keys(AbteilungEnum).length);
     this.checkedAbteilungen = new Array(Object.keys(AbteilungEnum).length);
   }
 
-  ngOnInit() {
-    this.ranglistenService.getAbteilungenForAnlass(this.anlass, this.kategorie).subscribe((abteilungen) => {
+  ngOnInit(): void {
+    this.ranglistenService.getAbteilungenForAnlass(this.anlass(), this.kategorie()).subscribe((abteilungen) => {
       this.abteilungen = abteilungen;
     });
-    this.erfasstChangedEmitter.subscribe((laufliste) => {
+    this.erfasstChangedEmitter().subscribe((_laufliste) => {
       // console.log("KategorieStatusComponent: Laufliste changed: ", laufliste);
     });
   }
 
-  erfasstChanged(changeEvent: ChangeEvent) {
+  erfasstChanged(changeEvent: ChangeEvent<AbteilungEnum>): void {
     this.erfasstAbteilungen[this.getIndex(changeEvent.topic)] = changeEvent.status;
     const nichtAlle = this.erfasstAbteilungen.filter((erfasst) => {
       if (erfasst === false) {
@@ -60,7 +66,7 @@ export class KategorieStatusComponent implements OnInit {
     });
     this.erfasst = nichtAlle.length === 0;
   }
-  checkedChanged(changeEvent: ChangeEvent) {
+  checkedChanged(changeEvent: ChangeEvent<AbteilungEnum>): void {
     this.checkedAbteilungen[this.getIndex(changeEvent.topic)] = changeEvent.status;
     const nichtAlle = this.checkedAbteilungen.filter((checked) => {
       if (checked === false) {
@@ -75,7 +81,7 @@ export class KategorieStatusComponent implements OnInit {
     this.lauflisteSelectedEvent.emit(laufliste);
   }
 
-  private getIndex(abteilung: AbteilungEnum) {
+  private getIndex(abteilung: AbteilungEnum): number {
     const index = Object.keys(AbteilungEnum).indexOf(abteilung);
     return index;
   }

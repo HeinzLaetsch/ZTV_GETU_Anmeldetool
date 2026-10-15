@@ -1,12 +1,6 @@
-import { Component, inject, signal, type OnInit } from '@angular/core';
+import { Component, inject, type OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  UntypedFormBuilder,
-  type UntypedFormGroup,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -26,9 +20,9 @@ import { UserComponent } from 'src/app/shared/component/user/user.component';
 import type { IVerein } from 'src/app/verein/verein';
 
 @Component({
-  selector: 'lxt-new-anmelder',
+  selector: 'ztv-new-anmelder',
   templateUrl: './new-anmelder.component.html',
-  styleUrls: ['./new-anmelder.component.css'],
+  styleUrls: ['./new-anmelder.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
@@ -49,14 +43,14 @@ import type { IVerein } from 'src/app/verein/verein';
 export class NewAnmelderComponent implements OnInit {
   //floatLabel = 'Always';
   appearance = 'outline';
-  private readonly formBuilder = inject(UntypedFormBuilder);
+  private readonly formBuilder = inject(FormBuilder).nonNullable;
   readonly dialogRef = inject(MatDialogRef<NewAnmelderComponent>);
   private readonly vereinService = inject(VereinService);
   private readonly cachingUserService = inject(CachingUserService);
   private readonly userService = inject(UserService);
   private readonly router = inject(Router);
 
-  readonly form: UntypedFormGroup = this.formBuilder.group({
+  readonly form = this.formBuilder.group({
     vereinFormControl: ['', Validators.required],
   });
 
@@ -69,7 +63,6 @@ export class NewAnmelderComponent implements OnInit {
   readonly anmelder = signal<IUser>({
     id: '-1',
     name: '',
-    verbandId: '',
     organisationids: ['-1'],
     vorname: '',
     password: '',
@@ -79,9 +72,7 @@ export class NewAnmelderComponent implements OnInit {
     aktiv: true,
   });
 
-  constructor() {}
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.anmelder.update((current) => ({
       ...current,
       organisationids: ['-1'],

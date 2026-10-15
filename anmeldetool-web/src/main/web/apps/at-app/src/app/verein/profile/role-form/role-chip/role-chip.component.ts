@@ -1,37 +1,23 @@
-import { Component, EventEmitter, Input, type OnInit, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { IRolle } from 'src/app/core/model/IRolle';
 import { MaterialModule } from 'src/app/shared/material-module';
 
 @Component({
-  selector: 'lxt-role-chip',
+  selector: 'ztv-role-chip',
   templateUrl: './role-chip.component.html',
-  styleUrls: ['./role-chip.component.css'],
-  standalone: true,
-  imports: [CommonModule, FormsModule, MaterialModule],
+  styleUrl: './role-chip.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [FormsModule, MaterialModule],
 })
-export class RoleChipComponent implements OnInit {
-  @Input()
-  isVereinsAnmelder: boolean;
-  @Input()
-  isVereinsVerantwortlicher: boolean;
-  @Input()
-  role: IRolle;
-  @Output()
-  roleChange: EventEmitter<IRolle>;
+export class RoleChipComponent {
+  protected readonly isVereinsAnmelder = input(false);
+  protected readonly isVereinsVerantwortlicher = input(false);
+  protected readonly role = input.required<IRolle>();
+  protected readonly isAllRolesList = input(false);
+  protected readonly roleChange = output<IRolle>();
 
-  constructor() {
-    this.roleChange = new EventEmitter();
-  }
-
-  @Input()
-  isAllRolesList: boolean;
-
-  ngOnInit(): void {
-    // console.log("Oninit: ", this.role?.name);
-  }
-  aktivChange(role: IRolle) {
-    this.roleChange.emit(role);
+  protected onAktivChange(): void {
+    this.roleChange.emit(this.role());
   }
 }

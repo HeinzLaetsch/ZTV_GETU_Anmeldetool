@@ -1,19 +1,84 @@
-.login-dialog-panel .mat-mdc-dialog-surface {
-  min-width: 450px;
-  min-height: 500px;
-}
-
 .layout-container {
   width: min(100%, 48rem);
-  height: min(100%, 90vh);
+  max-height: 90vh;
   margin: 0 auto;
   padding: clamp(0.75rem, 2vw, 1.5rem);
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
-mat-form-field,
-.mat-form-field {
+.login-form {
+  min-width: 0;
+}
+
+.login-dialog h1 {
+  margin: 0;
+  padding: 1rem 1.5rem 0;
+  color: var(--ztv-black);
+  font-size: 1.5rem;
+}
+
+.login-dialog-content {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.login-dialog-content mat-form-field {
   width: 100%;
-  min-width: 350px;
-  box-sizing: border-box;
+  min-width: 0;
+}
+
+.error-banner {
+  margin: 0 1.5rem 0.75rem;
+  padding: 0.75rem 1rem;
+  color: var(--ztv-black);
+  background-color: var(--ztv-light-red);
+  border-inline-start: 0.25rem solid var(--ztv-error);
+  border-radius: 0.25rem;
+}
+
+.actions,
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1.5rem 0.75rem;
+}
+
+.actions {
+  justify-content: flex-end;
+}
+
+.links {
+  justify-content: flex-start;
+}
+
+.login-dialog button {
+  border-radius: 0.6rem;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.login-dialog button:hover:not(:disabled) {
+  color: var(--ztv-light-gray);
+  background-color: var(--ztv-dark-blue);
+}
+
+.login-dialog button:focus-visible {
+  outline: 2px solid var(--ztv-dark-blue);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .actions,
+  .links {
+    padding-inline: 1rem;
+  }
+
+  .actions button,
+  .links button {
+    width: 100%;
+  }
 }

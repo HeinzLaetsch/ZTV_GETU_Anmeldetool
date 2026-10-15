@@ -55,13 +55,13 @@
                   (cdkDropListDropped)="drop($event, '1')"
                 >
                   @for (wr of availableWertungsrichter1(); track wr.id ?? wr.benutzername) {
-                    <lxt-wertungsrichter-chip
+                    <ztv-wertungsrichter-chip
                       [isAllWertungsrichterList]="true"
                       [wertungsrichterUser]="wr"
                       [anlass]="anlass()"
                       [useBrevet2]="false"
                       [changeAllowed]="changeAllowed()"
-                    ></lxt-wertungsrichter-chip>
+                    ></ztv-wertungsrichter-chip>
                   }
                 </div>
               </div>
@@ -76,14 +76,14 @@
                   (cdkDropListDropped)="drop($event, '2')"
                 >
                   @for (wr of assignedWr1s(); track wr.id ?? wr.benutzername) {
-                    <lxt-wertungsrichter-chip
+                    <ztv-wertungsrichter-chip
                       [isAllWertungsrichterList]="false"
                       [wertungsrichterUser]="wr"
                       [anlass]="anlass()"
                       [useBrevet2]="useBrevet2()"
                       [changeAllowed]="changeAllowed()"
                       (wertungsrichterUserChange)="wertungsrichterUserChange()"
-                    ></lxt-wertungsrichter-chip>
+                    ></ztv-wertungsrichter-chip>
                   }
                 </div>
               </div>
@@ -130,13 +130,13 @@
                   [cdkDropListDisabled]="!anlassSummary()?.startet || !isBrevet2Anlass()"
                 >
                   @for (wr of availableWertungsrichter2(); track wr.id ?? wr.benutzername) {
-                    <lxt-wertungsrichter-chip
+                    <ztv-wertungsrichter-chip
                       [isAllWertungsrichterList]="true"
                       [wertungsrichterUser]="wr"
                       [anlass]="anlass()"
                       [changeAllowed]="changeAllowed()"
                     >
-                    </lxt-wertungsrichter-chip>
+                    </ztv-wertungsrichter-chip>
                   }
                 </div>
               </div>
@@ -151,14 +151,14 @@
                   [cdkDropListDisabled]="!anlassSummary()?.startet || !isBrevet2Anlass()"
                 >
                   @for (wr of assignedWr2s(); track wr.id ?? wr.benutzername) {
-                    <lxt-wertungsrichter-chip
+                    <ztv-wertungsrichter-chip
                       [isAllWertungsrichterList]="false"
                       [wertungsrichterUser]="wr"
                       [anlass]="anlass()"
                       [changeAllowed]="changeAllowed()"
                       (wertungsrichterUserChange)="wertungsrichterUserChange()"
                     >
-                    </lxt-wertungsrichter-chip>
+                    </ztv-wertungsrichter-chip>
                   }
                 </div>
               </div>
@@ -169,7 +169,7 @@
     </div>
     <div class="layout-row">
       <div class="layout-col">
-        <div [routerLink]="['/user/user']" class="well hoverwell">Wertungsrichter bearbeiten</div>
+        <div [routerLink]="['/user']" class="well hoverwell">Wertungsrichter bearbeiten</div>
       </div>
     </div>
   </div>

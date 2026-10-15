@@ -24,9 +24,9 @@ import { WertungsrichterSelektionComponent } from './wertungsrichter-selektion/w
 import { A11yModule } from '@angular/cdk/a11y';
 
 @Component({
-  selector: 'lxt-events-detail',
+  selector: 'ztv-events-detail',
   templateUrl: './events-detail.component.html',
-  styleUrls: ['./events-detail.component.css'],
+  styleUrls: ['./events-detail.component.scss'],
   standalone: true,
   imports: [
     AsyncPipe,
@@ -111,7 +111,7 @@ export class EventsDetailComponent extends SubscriptionHelper implements OnInit 
     return false;
   }
 
-  handleClickMe(event: PointerEvent): void {
+  handleClickMe(_event: PointerEvent): void {
     this.router.navigate(['anlass/anmeldungen/', this.anlass?.id]);
   }
 

@@ -79,7 +79,7 @@ import { FormField } from '@angular/forms/signals';
   template: `
     <form autocomplete="off" (submit)="submit($event)">
       <div class="form-field">
-        <lxt-rating [formField]="ratingForm.rating"> </lxt-rating>
+        <ztv-rating [formField]="ratingForm.rating"> </ztv-rating>
         <!-- print to show the value updation -->
         {{ ratingForm.rating().value() }}
       </div>

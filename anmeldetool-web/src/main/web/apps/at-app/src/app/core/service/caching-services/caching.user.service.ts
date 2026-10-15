@@ -120,7 +120,7 @@ export class CachingUserService {
   getUserByBenutzername(benutzername: string): Observable<IUser> {
     return this.userService.getUserByBenutzername(benutzername);
   }
-  getAllWertungsrichter(brevet: number): Observable<IWertungsrichter[]> {
+  getAllWertungsrichter(_brevet: number): Observable<IWertungsrichter[]> {
     const observables = new Array<Observable<IWertungsrichter>>();
     if (this.loaded) {
       // console.log('Vereins User: ' , this.users);
@@ -138,7 +138,7 @@ export class CachingUserService {
     return this.userService.updateRoles(user, verein, roles);
   }
 
-  getUserById(id: string) {
+  getUserById(id: string): IUser {
     if (this.loaded) {
       const newUser = this.orgUsers.find((user) => user.id === id);
       // console.log('Org: ' , newUser, ' , alle: ' , this.orgUsers);
@@ -152,10 +152,10 @@ export class CachingUserService {
   getWertungsrichter(id: string): Observable<IWertungsrichter> {
     return this.userService.getWertungsrichter(id);
   }
-  updateWertungsrichter(id: string, wertungsrichter: IWertungsrichter) {
+  updateWertungsrichter(id: string, wertungsrichter: IWertungsrichter): Observable<IWertungsrichter> {
     return this.userService.updateWertungsrichter(id, wertungsrichter);
   }
-  deleteWertungsrichterForUserId(id: string) {
+  deleteWertungsrichterForUserId(id: string): Observable<IWertungsrichter> {
     return this.userService.deleteWertungsrichterForUserId(id);
   }
 }

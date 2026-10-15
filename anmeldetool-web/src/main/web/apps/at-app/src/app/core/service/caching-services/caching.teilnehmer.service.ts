@@ -152,10 +152,10 @@ export class CachingTeilnehmerService {
     return this.teilnehmerService.delete(verein, teilnehmer);
   }
 
-  removeTeilnehmer(searchTeilnehmer: ITeilnehmer) {
+  removeTeilnehmer(searchTeilnehmer: ITeilnehmer): void {
     const index = this.teilnehmer.indexOf(searchTeilnehmer);
-    const removed = this.teilnehmer.splice(index, 1);
-    // console.log("Finished: ", index, " , ", removed);
+    this.teilnehmer.splice(index, 1);
+    // console.log("Finished: ", index);
   }
   getTeilnehmer(
     filter: string,
@@ -225,7 +225,7 @@ export class CachingTeilnehmerService {
           return this.compare(a.jahrgang ?? 0, b.jahrgang ?? 0, isAsc);
         case 'stvnummer':
           return this.compare(a.stvNummer ?? '', b.stvNummer ?? '', isAsc);
-        default:
+        default: {
           if (!anlass) {
             return 0;
           }
@@ -244,31 +244,32 @@ export class CachingTeilnehmerService {
             return 0;
           }
           return this.compare(kategories.indexOf(aLink.kategorie), kategories.indexOf(bLink.kategorie), isAsc);
+        }
       }
     });
     return this.sortedTeilnehmer;
   }
 
-  private compare(a: number | string, b: number | string, isAsc: boolean) {
+  private compare(a: number | string, b: number | string, isAsc: boolean): number {
     if (a === b) {
       return 0;
     }
     return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
   }
-  getTeilnehmerForAnlass(anlass: IAnlass) {
+  getTeilnehmerForAnlass(anlass: IAnlass): ITeilnehmer[] {
     // console.log("getTeilnehmerForAnlass: " + anlass.anlassBezeichnung);
     const aLinks = this.anlassService.getTeilnahmenForAnlassSorted(anlass);
     // console.log("aLinks: " + aLinks.length);
     const teilnehmer = aLinks.map((alink) => {
       // console.log("alink.kategorie: " + alink.kategorie);
-      if (alink.kategorie != KategorieEnum.KEINE_TEILNAHME) {
+      if (alink.kategorie !== KategorieEnum.KEINE_TEILNAHME) {
         // console.log("create copy: " + alink.teilnehmerId);
-        const teilnehmer = this.getTeilnehmerById(alink.teilnehmerId);
-        if (!teilnehmer) {
+        const matchingTeilnehmer = this.getTeilnehmerById(alink.teilnehmerId);
+        if (!matchingTeilnehmer) {
           return undefined;
         }
         const copy: ITeilnehmer = {
-          ...teilnehmer,
+          ...matchingTeilnehmer,
           teilnahmen: {
             dirty: false,
             anlass,
@@ -292,11 +293,11 @@ export class CachingTeilnehmerService {
       return this.filteredTeilnehmer;
     }
     this.oldFilter = filter;
-    this.filteredTeilnehmer = teilnehmer.filter((teilnehmer) => {
-      if ((teilnehmer.name ?? '').toLowerCase().indexOf(filter) > -1) {
+    this.filteredTeilnehmer = teilnehmer.filter((teilnehmerEntry) => {
+      if ((teilnehmerEntry.name ?? '').toLowerCase().indexOf(filter) > -1) {
         return true;
       }
-      if ((teilnehmer.vorname ?? '').toLowerCase().indexOf(filter) > -1) {
+      if ((teilnehmerEntry.vorname ?? '').toLowerCase().indexOf(filter) > -1) {
         return true;
       }
       return false;
@@ -307,7 +308,7 @@ export class CachingTeilnehmerService {
   getTeilnehmerById(id: string): ITeilnehmer | undefined {
     // console.log("getTeilnehmerById id: " + id + ", loaded:" + this.loaded);
     if (this.loaded) {
-      const newTeilnehmer = this.teilnehmer.find((newTeilnehmer) => newTeilnehmer.id === id);
+      const newTeilnehmer = this.teilnehmer.find((teilnehmerEntry) => teilnehmerEntry.id === id);
       // console.log("Org: ", newTeilnehmer);
       const copy = this.deepCopy(newTeilnehmer);
       // console.log("Copy: ", copy);
@@ -327,8 +328,8 @@ export class CachingTeilnehmerService {
     );
   }
 
-  saveAll(verein: IVerein): Observable<any[]> {
-    const observables = new Array<Observable<any>>();
+  saveAll(verein: IVerein): Observable<unknown[]> {
+    const observables = new Array<Observable<unknown>>();
     this.teilnehmer.forEach((teilnehmer) => {
       if (teilnehmer.dirty) {
         teilnehmer.dirty = false;

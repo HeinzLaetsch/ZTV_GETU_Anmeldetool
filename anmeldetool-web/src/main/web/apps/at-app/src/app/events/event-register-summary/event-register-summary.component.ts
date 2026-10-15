@@ -59,9 +59,9 @@ const EMPTY_VEREIN: IVerein = {
 } as unknown as IVerein;
 
 @Component({
-  selector: 'lxt-event-register-summary',
+  selector: 'ztv-event-register-summary',
   templateUrl: './event-register-summary.component.html',
-  styleUrls: ['./event-register-summary.component.css'],
+  styleUrls: ['./event-register-summary.component.scss'],
   standalone: true,
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,

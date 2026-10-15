@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { catchError, mapTo, Observable, of, switchMap, tap, throwError } from 'rxjs';
+import { catchError, Observable, tap, throwError } from 'rxjs';
 import { IUser } from 'src/app/core/model/IUser';
 import { IVerein } from 'src/app/verein/verein';
 import { environment } from 'src/environments/environment';
@@ -66,7 +66,7 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private userService: CachingUserService,
+    private _userService: CachingUserService,
   ) {}
   set currentVerein(verein: IVerein) {
     this._currentVerein = verein;
@@ -92,6 +92,7 @@ export class AuthService {
   selectVerein(verein: IVerein): void {
     if (this.isAdministratorSig()) {
       this._selectedVerein = verein;
+      this.store.dispatch(UserActions.loadAllUserInvoked());
     }
   }
 

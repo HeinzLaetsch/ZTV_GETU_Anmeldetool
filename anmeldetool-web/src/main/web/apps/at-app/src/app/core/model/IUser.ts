@@ -1,4 +1,3 @@
-import { IOrganisationAnlassLink } from './IOrganisationAnlassLink';
 import { IOrganisationPersonLink } from './IOrganisationPersonLink';
 import { IPersonAnlassLink } from './IPersonAnlassLink';
 import { IRolle } from './IRolle';

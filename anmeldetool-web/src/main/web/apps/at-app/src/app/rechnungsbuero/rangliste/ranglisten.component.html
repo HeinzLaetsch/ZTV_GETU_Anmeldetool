@@ -101,15 +101,15 @@
       </button>
     </div>
   </div>
-  <lxt-ranglisten-header [tiTu]="tiTu"></lxt-ranglisten-header>
-  <lxt-ranglisten-entry
+  <ztv-ranglisten-header [tiTu]="tiTu"></ztv-ranglisten-header>
+  <ztv-ranglisten-entry
     [anlass]="anlass"
     [entry]="entry"
     [highlighted]="highlighted"
     [index]="i"
     [tiTu]="tiTu"
     *ngFor="let entry of ranglistenEntries; index as i"
-  ></lxt-ranglisten-entry>
+  ></ztv-ranglisten-entry>
 </div>
 
 <ng-template #loading>Loading...</ng-template>

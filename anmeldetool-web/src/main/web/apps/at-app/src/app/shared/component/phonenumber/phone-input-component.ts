@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { FocusMonitor } from '@angular/cdk/a11y';
-import { type BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
+  ChangeDetectionStrategy,
   Component,
+  effect,
   ElementRef,
   forwardRef,
-  Inject,
-  Input,
+  inject,
+  input,
   type OnDestroy,
-  Optional,
-  Self,
   ViewChild,
 } from '@angular/core';
 import {
@@ -23,25 +23,16 @@ import {
 } from '@angular/forms';
 import { MAT_FORM_FIELD, type MatFormField, MatFormFieldControl } from '@angular/material/form-field';
 import { Subject } from 'rxjs';
+import { MyTel } from './my-tel';
 
 /** @title Form field with custom telephone number input control. */
 
-/** Data structure for holding telephone number. */
-export class MyTel {
-  constructor(
-    public part1: string,
-    public part2: string,
-    public part3: string,
-    public part4: string,
-  ) {}
-}
-
 /** Custom `MatFormFieldControl` for telephone number input. */
 @Component({
-  selector: 'lxt-phone-input',
+  selector: 'ztv-phone-input',
   templateUrl: './phone-input.html',
   styleUrls: ['./phone-input.scss'],
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ReactiveFormsModule],
   providers: [
     {
@@ -63,10 +54,14 @@ export class PhoneInput implements ControlValueAccessor, MatFormFieldControl<MyT
   touched = false;
   controlType = 'phone-input';
   id = `phone-input-${PhoneInput.nextId++}`;
-  onChange = (_: any) => {};
-  onTouched = () => {};
+  onChange = (_: unknown): void => {
+    // intentionally empty: registered via ControlValueAccessor
+  };
+  onTouched = (): void => {
+    // intentionally empty: registered via ControlValueAccessor
+  };
 
-  get empty() {
+  get empty(): boolean {
     const {
       value: { part1, part2, part3, part4 },
     } = this.parts;
@@ -74,42 +69,38 @@ export class PhoneInput implements ControlValueAccessor, MatFormFieldControl<MyT
     return !part1 && !part2 && !part3 && !part4;
   }
 
-  get shouldLabelFloat() {
+  get shouldLabelFloat(): boolean {
     return this.focused || !this.empty;
   }
 
-  @Input('aria-describedby') userAriaDescribedBy = '';
+  protected readonly _userAriaDescribedBy = input('', { alias: 'aria-describedby' });
+
+  get userAriaDescribedBy(): string {
+    return this._userAriaDescribedBy();
+  }
 
   get placeholder(): string {
-    return this._placeholder;
+    return this._placeholderInput();
   }
-  @Input()
-  set placeholder(value: string) {
-    this._placeholder = value;
-    this.stateChanges.next();
-  }
-  private _placeholder = '';
+  protected readonly _placeholderInput = input('', { alias: 'placeholder' });
 
   get required(): boolean {
-    return this._required;
+    return this._requiredInput();
   }
-  @Input()
-  set required(value: BooleanInput) {
-    this._required = coerceBooleanProperty(value);
-    this.stateChanges.next();
-  }
-  private _required = false;
+  protected readonly _requiredInput = input(false, {
+    alias: 'required',
+    transform: coerceBooleanProperty,
+  });
 
   get disabled(): boolean {
-    return this._disabled;
+    return this._disabledInput();
   }
-  @Input()
-  set disabled(value: BooleanInput) {
-    this._disabled = coerceBooleanProperty(value);
-    this._disabled ? this.parts.disable() : this.parts.enable();
-    this.stateChanges.next();
-  }
-  private _disabled = false;
+  protected readonly _disabledInput = input(false, {
+    alias: 'disabled',
+    transform: coerceBooleanProperty,
+  });
+
+  protected readonly _valueInput = input<MyTel | null>(null, { alias: 'value' });
 
   get value(): MyTel | null {
     if (this.parts.valid) {
@@ -120,13 +111,6 @@ export class PhoneInput implements ControlValueAccessor, MatFormFieldControl<MyT
     }
     return null;
   }
-  @Input()
-  set value(tel: MyTel | null) {
-    const { part1, part2, part3, part4 } = tel || new MyTel('', '', '', '');
-    this.parts.setValue({ part1, part2, part3, part4 });
-    this.stateChanges.next();
-  }
-
   get valid(): boolean {
     return this.parts.valid;
   }
@@ -138,17 +122,13 @@ export class PhoneInput implements ControlValueAccessor, MatFormFieldControl<MyT
     return this.parts.invalid;
   }
 
-  constructor(
-    private _formBuilder: FormBuilder,
-    private _focusMonitor: FocusMonitor,
-    private _elementRef: ElementRef<HTMLElement>,
-    @Optional()
-    @Inject(MAT_FORM_FIELD)
-    public _formField: MatFormField,
-    @Optional()
-    @Self()
-    public ngControl: NgControl | null,
-  ) {
+  private readonly _formBuilder = inject(FormBuilder);
+  private readonly _focusMonitor = inject(FocusMonitor);
+  private readonly _elementRef = inject(ElementRef<HTMLElement>);
+  readonly _formField = inject<MatFormField | null>(MAT_FORM_FIELD, { optional: true });
+  readonly ngControl = inject(NgControl, { optional: true, self: true });
+
+  constructor() {
     this.parts = this._formBuilder.group({
       part1: [
         null,
@@ -171,21 +151,42 @@ export class PhoneInput implements ControlValueAccessor, MatFormFieldControl<MyT
     if (this.ngControl != null) {
       this.ngControl.valueAccessor = this;
     }
+
+    effect(() => {
+      this._placeholderInput();
+      this._requiredInput();
+      this.stateChanges.next();
+    });
+    effect(() => {
+      const isDisabled = this._disabledInput();
+      if (isDisabled) {
+        this.parts.disable();
+      } else {
+        this.parts.enable();
+      }
+      this.stateChanges.next();
+    });
+    effect(() => {
+      const tel = this._valueInput();
+      if (tel) {
+        this.setValue(tel);
+      }
+    });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.stateChanges.complete();
     this._focusMonitor.stopMonitoring(this._elementRef);
   }
 
-  onFocusIn(event: FocusEvent) {
+  onFocusIn(_event: FocusEvent): void {
     if (!this.focused) {
       this.focused = true;
       this.stateChanges.next();
     }
   }
 
-  onFocusOut(event: FocusEvent) {
+  onFocusOut(event: FocusEvent): void {
     if (!this._elementRef.nativeElement.contains(event.relatedTarget as Element)) {
       this.touched = true;
       this.focused = false;
@@ -206,12 +207,12 @@ export class PhoneInput implements ControlValueAccessor, MatFormFieldControl<MyT
     }
   }
 
-  setDescribedByIds(ids: string[]) {
+  setDescribedByIds(ids: string[]): void {
     const controlElement = this._elementRef.nativeElement.querySelector('.phone-input-container')!;
     controlElement.setAttribute('aria-describedby', ids.join(' '));
   }
 
-  onContainerClick() {
+  onContainerClick(): void {
     if (this.parts.controls.part4.valid) {
       this._focusMonitor.focusVia(this.part4Input.nativeElement, 'program');
     } else if (this.parts.controls.part3.valid) {
@@ -226,23 +227,34 @@ export class PhoneInput implements ControlValueAccessor, MatFormFieldControl<MyT
   }
 
   writeValue(tel: MyTel | null): void {
-    this.value = tel;
+    this.setValue(tel);
   }
 
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: (value: MyTel | null) => void): void {
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    if (isDisabled) {
+      this.parts.disable();
+    } else {
+      this.parts.enable();
+    }
+    this.stateChanges.next();
   }
 
   _handleInput(control: AbstractControl, nextElement?: HTMLInputElement): void {
     this.autoFocusNext(control, nextElement);
     this.onChange(this.value);
+  }
+
+  private setValue(tel: MyTel | null): void {
+    const { part1, part2, part3, part4 } = tel || new MyTel('', '', '', '');
+    this.parts.setValue({ part1, part2, part3, part4 });
+    this.stateChanges.next();
   }
 }

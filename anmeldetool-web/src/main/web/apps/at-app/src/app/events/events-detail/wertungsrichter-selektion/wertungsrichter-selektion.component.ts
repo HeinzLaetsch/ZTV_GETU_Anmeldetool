@@ -19,9 +19,9 @@ import { WertungsrichterService } from 'src/app/core/service/wertungsrichter.ser
 import { WertungsrichterChipComponent } from '../wertungsrichter-chip/wertungsrichter-chip.component';
 
 @Component({
-  selector: 'lxt-wertungsrichter-selektion',
+  selector: 'ztv-wertungsrichter-selektion',
   templateUrl: './wertungsrichter-selektion.component.html',
-  styleUrls: ['./wertungsrichter-selektion.component.css'],
+  styleUrls: ['./wertungsrichter-selektion.component.scss'],
   standalone: true,
   imports: [
     FormsModule,
@@ -133,7 +133,7 @@ export class WertungsrichterSelektionComponent implements OnInit, AfterViewInit 
     this.assignedWr1s.set([...this.assignedWr1s()]);
   }
 
-  drop(event: CdkDragDrop<string[]>, liste: string): void {
+  drop(event: CdkDragDrop<IUser[]>, liste: string): void {
     //console.log("Drop: ", event, ", liste", liste);
     if (event.previousContainer === event.container) {
       console.warn('move Drop: ', event);

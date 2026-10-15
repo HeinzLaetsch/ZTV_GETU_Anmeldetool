@@ -6,11 +6,11 @@ export const otsAdapter: EntityAdapter<IOrganisationTeilnahmenStatistik> =
     sortComparer: sortByAnlassId,
     selectId: selectAnlassId,
   });
-export function selectAnlassId(ots: IOrganisationTeilnahmenStatistik) {
+export function selectAnlassId(ots: IOrganisationTeilnahmenStatistik): string {
   return ots.anlassId;
 }
 
-export function sortByAnlassId(a: IOrganisationTeilnahmenStatistik, b: IOrganisationTeilnahmenStatistik): any {
+export function sortByAnlassId(a: IOrganisationTeilnahmenStatistik, b: IOrganisationTeilnahmenStatistik): number {
   return a.anlassId.localeCompare(b.anlassId);
 }
 

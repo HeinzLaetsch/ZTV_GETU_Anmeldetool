@@ -9,21 +9,21 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
-import { Store, StoreModule } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { tap } from 'rxjs';
+import { type Observable, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { SharedComponentsModule } from '../shared/component/shared.components.module';
 import { MaterialModule } from '../shared/material-module';
 import { HttpSecurityInterceptorService } from './interceptor/http.security.interceptor.service';
-import { AnlassActions, AnlassEffects } from './redux/anlass';
-import { type AppState, metaReducers, reducers } from './redux/core.state';
+import { AnlassActions } from './redux/anlass';
+import { type AppState } from './redux/core.state';
 import { CustomSerializer } from './redux/router/custom-serializer';
-import { VereinActions, VereinEffects } from './redux/verein';
+import { VereinActions } from './redux/verein';
 import type { CachingVereinService } from './service/caching-services/caching.verein.service';
 import { ServiceModule } from './service/service.module';
 
-export function initVereinservice(vereinService: CachingVereinService): Function {
+export function initVereinservice(vereinService: CachingVereinService): () => Observable<boolean> {
   return () =>
     vereinService.loadVereine().pipe(
       tap((value) => {

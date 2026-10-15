@@ -21,14 +21,14 @@
           <mat-hint>Wähle Deinen Verein aus</mat-hint>
         </mat-form-field>
       </p>
-      <lxt-user
+      <ztv-user
         [user]="anmelder()"
         (userChange)="updateAnmelder($event)"
         (valid)="updateUserValid($event)"
         [showPassword]="true"
         [showBenutzername]="false"
         [mustShowPassword]="true"
-      ></lxt-user>
+      ></ztv-user>
     </mat-dialog-content>
     @if (error()) {
       <mat-error class="error"> {{ errorMessage() }}</mat-error>

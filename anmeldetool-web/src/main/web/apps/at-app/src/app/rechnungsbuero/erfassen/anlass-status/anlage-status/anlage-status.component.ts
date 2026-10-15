@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, type OnInit, Output, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  type EventEmitter,
+  inject,
+  input,
+  type OnInit,
+  output,
+  ViewEncapsulation,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import type { AbteilungEnum } from 'src/app/core/model/AbteilungEnum';
 import type { AnlageEnum } from 'src/app/core/model/AnlageEnum';
@@ -11,32 +20,23 @@ import { MaterialModule } from 'src/app/shared/material-module';
 import { LauflisteStatusComponent } from '../laufliste-status/laufliste-status.component';
 
 @Component({
-  selector: 'lxt-anlage-status',
+  selector: 'ztv-anlage-status',
   templateUrl: './anlage-status.component.html',
-  styleUrls: ['./anlage-status.component.css'],
+  styleUrls: ['./anlage-status.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, MaterialModule, LauflisteStatusComponent],
 })
 export class AnlageStatusComponent implements OnInit {
-  @Input()
-  anlass: IAnlass;
-  @Input()
-  kategorie: KategorieEnum;
-  @Input()
-  abteilung: AbteilungEnum;
-  @Input()
-  anlage: AnlageEnum;
-  @Input()
-  erfasstChangedEmitter: EventEmitter<ILaufliste>;
-  @Input()
-  checkedChangedEmitter: EventEmitter<ILaufliste>;
-  @Output()
-  erfasstEvent = new EventEmitter<ChangeEvent>();
-  @Output()
-  checkedEvent = new EventEmitter<ChangeEvent>();
-  @Output()
-  lauflisteSelectedEvent = new EventEmitter<ILaufliste>();
+  readonly anlass = input.required<IAnlass>();
+  readonly kategorie = input.required<KategorieEnum>();
+  readonly abteilung = input.required<AbteilungEnum>();
+  readonly anlage = input.required<AnlageEnum>();
+  readonly erfasstChangedEmitter = input.required<EventEmitter<ILaufliste>>();
+  readonly checkedChangedEmitter = input.required<EventEmitter<ILaufliste>>();
+  readonly erfasstEvent = output<ChangeEvent<AnlageEnum>>();
+  readonly checkedEvent = output<ChangeEvent<AnlageEnum>>();
+  readonly lauflisteSelectedEvent = output<ILaufliste>();
 
   lauflisten: ILaufliste[];
 
@@ -44,11 +44,11 @@ export class AnlageStatusComponent implements OnInit {
 
   checked = true;
 
-  constructor(private ranglistenService: RanglistenService) {}
+  private readonly ranglistenService = inject(RanglistenService);
 
   ngOnInit(): void {
     this.ranglistenService
-      .getLauflisten(this.anlass, this.kategorie, this.abteilung, this.anlage)
+      .getLauflisten(this.anlass(), this.kategorie(), this.abteilung(), this.anlage())
       .subscribe((lauflisten) => {
         this.lauflisten = lauflisten.sort((a, b) => {
           if (a.abloesung < b.abloesung) {
@@ -62,12 +62,12 @@ export class AnlageStatusComponent implements OnInit {
         this.erfasstChanged();
         this.checkedChanged();
       });
-    this.erfasstChangedEmitter.subscribe((laufliste) => {
+    this.erfasstChangedEmitter().subscribe((_laufliste) => {
       // console.log("AnlageStatusComponent: Laufliste changed: ", laufliste);
     });
   }
 
-  lauflisteErfasstChanged(erfasstLaufliste: ILaufliste) {
+  lauflisteErfasstChanged(erfasstLaufliste: ILaufliste): void {
     this.lauflisten.forEach((laufliste) => {
       if (laufliste.id === erfasstLaufliste.id) {
         laufliste.erfasst = erfasstLaufliste.erfasst;
@@ -76,7 +76,7 @@ export class AnlageStatusComponent implements OnInit {
     this.erfasstChanged();
   }
 
-  lauflisteCheckedChanged(changedLaufliste: ILaufliste) {
+  lauflisteCheckedChanged(changedLaufliste: ILaufliste): void {
     this.lauflisten.forEach((laufliste) => {
       if (laufliste.id === changedLaufliste.id) {
         laufliste.checked = changedLaufliste.checked;
@@ -85,7 +85,7 @@ export class AnlageStatusComponent implements OnInit {
     this.checkedChanged();
   }
 
-  erfasstChanged() {
+  erfasstChanged(): void {
     /*
     const nichtAlle = this.erfasstLauflisten.filter((erfasst) => {
       if (erfasst === false) {
@@ -97,14 +97,14 @@ export class AnlageStatusComponent implements OnInit {
       return !laufliste.erfasst;
     });
     this.erfasst = nichtAlle.length === 0;
-    const eventData: ChangeEvent = {
+    const eventData: ChangeEvent<AnlageEnum> = {
       status: this.erfasst,
-      topic: this.anlage,
+      topic: this.anlage(),
     };
     this.erfasstEvent.emit(eventData);
   }
 
-  checkedChanged() {
+  checkedChanged(): void {
     /*const nichtAlle = this.checkedLauflisten.filter((checked) => {
       if (checked === false) {
         return true;
@@ -116,9 +116,9 @@ export class AnlageStatusComponent implements OnInit {
     });
 
     this.checked = nichtAlle.length === 0;
-    const eventData: ChangeEvent = {
+    const eventData: ChangeEvent<AnlageEnum> = {
       status: this.checked,
-      topic: this.anlage,
+      topic: this.anlage(),
     };
     this.checkedEvent.emit(eventData);
   }

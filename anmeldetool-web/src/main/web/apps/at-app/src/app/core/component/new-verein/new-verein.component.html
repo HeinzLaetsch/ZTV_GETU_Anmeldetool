@@ -33,16 +33,16 @@
       <p>
         <span class="label">Vereinsverantwortliche/r</span>
       </p>
-      <lxt-user
+      <ztv-user
         [user]="verantwortlicher()"
         (userChange)="updateVerantwortlicher($event)"
         (valid)="updateUserValid($event)"
         [showPassword]="true"
         [showBenutzername]="false"
         [mustShowPassword]="true"
-      ></lxt-user>
+      ></ztv-user>
       @if (error()) {
-        <mat-error class="error"> {{ errorMessage }}</mat-error>
+        <mat-error class="error"> {{ errorMessage() }}</mat-error>
       }
       <button mat-button type="button" (click)="cancel()">Abbrechen</button>
       <button mat-button type="submit" [disabled]="!form.valid || !userValid" (click)="save()">Speichern</button>

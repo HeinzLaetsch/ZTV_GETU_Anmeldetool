@@ -1,12 +1,12 @@
-<ng-container *ngIf="eintrag">
+<ng-container *ngIf="eintrag()">
   <div class="layout-row" [ngClass]="getBackground()">
-    <div class="layout-col-1 label number">{{ eintrag.startnummer }}</div>
-    <div class="layout-col-2 label">{{ eintrag.verein }}</div>
-    <div class="layout-col-2 label">{{ eintrag.name }}</div>
-    <div class="layout-col-2 label">{{ eintrag.vorname }}</div>
+    <div class="layout-col-1 label number">{{ eintrag().startnummer }}</div>
+    <div class="layout-col-2 label">{{ eintrag().verein }}</div>
+    <div class="layout-col-2 label">{{ eintrag().name }}</div>
+    <div class="layout-col-2 label">{{ eintrag().vorname }}</div>
     <!-- Mode Erfassen -->
-    <ng-container *ngIf="modeErfassen">
-      <ng-container *ngIf="sprung">
+    <ng-container *ngIf="modeErfassen()">
+      <ng-container *ngIf="sprung()">
         <div class="layout-col-1 data centered">
           <input matInput [formControl]="note_1_Cntr" type="text" class="note" />
         </div>
@@ -14,27 +14,27 @@
           <input matInput [formControl]="note_2_Cntr" type="text" class="note" />
         </div>
       </ng-container>
-      <ng-container *ngIf="!sprung">
+      <ng-container *ngIf="!sprung()">
         <div class="layout-col-1 data centered">
           <input matInput [formControl]="note_1_Cntr" type="text" class="note" />
         </div>
       </ng-container>
     </ng-container>
     <!-- Mode Check -->
-    <ng-container *ngIf="!modeErfassen">
-      <ng-container *ngIf="sprung">
+    <ng-container *ngIf="!modeErfassen()">
+      <ng-container *ngIf="sprung()">
         <div class="layout-col-1 data centered">
-          <span [ngClass]="getNotenStyle()">{{ eintrag.note_1 | number: '1.2-2' }}</span>
+          <span [ngClass]="getNotenStyle()">{{ eintrag().note_1 | number: '1.2-2' }}</span>
           <input #control1 matInput [formControl]="note_1_Cntr" type="text" class="note" />
         </div>
         <div class="layout-col-1 data centered">
-          <span [ngClass]="getNotenStyle()">{{ eintrag.note_2 | number: '1.2-2' }}</span>
+          <span [ngClass]="getNotenStyle()">{{ eintrag().note_2 | number: '1.2-2' }}</span>
           <input matInput [formControl]="note_2_Cntr" type="text" class="note" />
         </div>
       </ng-container>
-      <ng-container *ngIf="!sprung">
+      <ng-container *ngIf="!sprung()">
         <div class="layout-col-1 data centered">
-          <span [ngClass]="getNotenStyle()">{{ eintrag.note_1 | number: '1.2-2' }}</span>
+          <span [ngClass]="getNotenStyle()">{{ eintrag().note_1 | number: '1.2-2' }}</span>
         </div>
         <div class="layout-col-1 data centered">
           <input #control1 matInput [formControl]="note_1_Cntr" type="text" class="note" />
@@ -43,14 +43,14 @@
     </ng-container>
 
     <div class="layout-col-1 data centered">
-      <img *ngIf="!eintrag.erfasst" class="icon" src="assets/images/skype/white-question-mark.png" />
-      <img *ngIf="eintrag.erfasst" class="icon" src="assets/images/skype/check-mark.png" />
+      <img *ngIf="!eintrag().erfasst" class="icon" src="assets/images/skype/white-question-mark.png" />
+      <img *ngIf="eintrag().erfasst" class="icon" src="assets/images/skype/check-mark.png" />
     </div>
     <div class="layout-col-1 data centered">
-      <img *ngIf="!eintrag.checked" class="icon" src="assets/images/skype/white-question-mark.png" />
-      <img *ngIf="eintrag.checked" class="icon" src="assets/images/skype/check-mark.png" />
+      <img *ngIf="!eintrag().checked" class="icon" src="assets/images/skype/white-question-mark.png" />
+      <img *ngIf="eintrag().checked" class="icon" src="assets/images/skype/check-mark.png" />
     </div>
-    <div *ngIf="!eintrag.deleted" class="layout-col-1 centered">
+    <div *ngIf="!eintrag().deleted" class="layout-col-1 centered">
       <button mat-raised-button tabindex="-1">
         <mat-icon
           class="material-icons color_gray"
@@ -64,7 +64,7 @@
           >clear</mat-icon
         >
       </button>
-      <button mat-raised-button [disabled]="eintrag.checked" tabindex="-1">
+      <button mat-raised-button [disabled]="eintrag().checked" tabindex="-1">
         <mat-icon
           class="material-icons color_gray"
           aria-hidden="false"
@@ -78,7 +78,7 @@
         >
       </button>
     </div>
-    <div *ngIf="eintrag.deleted" class="layout-col-1 centered deleted">
+    <div *ngIf="eintrag().deleted" class="layout-col-1 centered deleted">
       Notenblatt zurückgezogen
       <button mat-raised-button tabindex="-1" class="small-button">
         <mat-icon

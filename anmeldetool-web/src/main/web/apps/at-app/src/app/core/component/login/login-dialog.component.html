@@ -1,71 +1,55 @@
-<h1>Login</h1>
+<section class="login-dialog layout-container">
+  <h1 mat-dialog-title>Login</h1>
 
-<form (ngSubmit)="login()" class="layout-container">
-  <!-- VEREIN AUTOCOMPLETE -->
-  <mat-form-field [appearance]="appearance">
-    <mat-label>Wähle deinen Verein aus</mat-label>
-    <input type="text" matInput [formField]="loginForm.vereinText" [matAutocomplete]="auto" />
+  <form (ngSubmit)="login()" class="login-form">
+    <mat-dialog-content class="login-dialog-content">
+      <mat-form-field [appearance]="appearance">
+        <mat-label>Wähle deinen Verein aus</mat-label>
+        <input type="text" matInput [formField]="loginForm.vereinText" [matAutocomplete]="auto" />
 
-    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onVereinSelected($event)">
-      @for (verein of filteredOptions(); track verein.id) {
-        <mat-option [value]="verein">
-          {{ verein.name }}
-        </mat-option>
-      }
-    </mat-autocomplete>
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onVereinSelected($event)">
+          @for (verein of filteredOptions(); track verein.id) {
+            <mat-option [value]="verein">
+              {{ verein.name }}
+            </mat-option>
+          }
+        </mat-autocomplete>
 
-    <!-- 💡 REPARIERT: getError() statt hasError() -->
-    @if (loginForm.vereinText().touched && loginForm.vereinText().invalid()) {
-      <mat-error>
-        @if (loginForm.vereinText().getError('required')) {
-          Pflichtfeld
+        @if (loginForm.vereinText().touched() && loginForm.vereinText().invalid()) {
+          <mat-error>Bitte einen Verein aus der Liste auswählen.</mat-error>
         }
-        @if (loginForm.vereinText().getError('vereinSelection')) {
-          Bitte einen Verein aus der Liste auswählen
+      </mat-form-field>
+
+      <mat-form-field [appearance]="appearance">
+        <mat-label>Gib den Benutzernamen (E-Mail) ein</mat-label>
+        <input matInput type="email" [formField]="loginForm.userName" />
+
+        @if (loginForm.userName().touched() && loginForm.userName().invalid()) {
+          <mat-error>Bitte eine gültige E-Mail-Adresse eingeben.</mat-error>
         }
-      </mat-error>
+      </mat-form-field>
+
+      <mat-form-field [appearance]="appearance">
+        <mat-label>Gib das Passwort ein</mat-label>
+        <input matInput type="password" [formField]="loginForm.password" />
+
+        @if (loginForm.password().touched() && loginForm.password().invalid()) {
+          <mat-error>Pflichtfeld</mat-error>
+        }
+      </mat-form-field>
+    </mat-dialog-content>
+
+    @if (loginError()) {
+      <div class="error-banner" role="alert">{{ errorMessage() }}</div>
     }
-  </mat-form-field>
 
-  <!-- BENUTZERNAME (EMAIL) -->
-  <mat-form-field [appearance]="appearance">
-    <mat-label>Gib den Benutzernamen (E-Mail) ein</mat-label>
-    <input matInput type="email" [formField]="loginForm.userName" />
+    <div class="actions">
+      <button mat-raised-button color="primary" type="submit" [disabled]="loginForm().invalid()">Login</button>
+      <button mat-button type="button" (click)="cancel()">Abbrechen</button>
+    </div>
 
-    <!-- 💡 REPARIERT: getError() statt hasError() -->
-    @if (loginForm.userName().touched && loginForm.userName().invalid()) {
-      <mat-error>
-        @if (loginForm.userName().getError('required')) {
-          Pflichtfeld
-        }
-        @if (loginForm.userName().getError('email')) {
-          Bitte eine gültige E-Mail-Adresse eingeben.
-        }
-      </mat-error>
-    }
-  </mat-form-field>
-
-  <!-- PASSWORT -->
-  <mat-form-field [appearance]="appearance">
-    <mat-label>Gib das Passwort ein</mat-label>
-    <input matInput type="password" [formField]="loginForm.password" />
-
-    @if (loginForm.password().touched && loginForm.password().invalid()) {
-      <mat-error>Pflichtfeld</mat-error>
-    }
-  </mat-form-field>
-
-  <!-- ACTIONS & ERRORS -->
-  @if (loginError()) {
-    <div class="error-banner">{{ errorMessage() }}</div>
-  }
-
-  <div class="actions">
-    <button mat-raised-button color="primary" type="submit" [disabled]="loginForm().invalid()">Login</button>
-    <button mat-button type="button" (click)="cancel()">Abbrechen</button>
-  </div>
-
-  <div class="links">
-    <button type="button" class="link" (click)="newVereinClicked()">Neues Vereinslogin beantragen</button>
-  </div>
-</form>
+    <div class="links">
+      <button mat-button type="button" (click)="newVereinClicked()">Neues Vereinslogin beantragen</button>
+    </div>
+  </form>
+</section>

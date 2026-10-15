@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise -- intentional bitmask flags for status combinations */
 export enum AnzeigeStatusEnum {
   NOCH_NICHT_OFFEN = 'noch nicht offen',
   ERFASSEN_CLOSED = 'Erfassen geschlossen',
@@ -22,9 +23,6 @@ export class Anzeigestatus {
   };
 
   private status_ = Anzeigestatus.FLAG_MAP[AnzeigeStatusEnum.PUBLISHED];
-
-  constructor() {}
-
   private isFlagSet(flag: number): boolean {
     return (this.status_ & flag) === flag;
   }

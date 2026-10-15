@@ -1,4 +1,14 @@
-import { Component, type EventEmitter, Input, type OnInit, Output, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  type EventEmitter,
+  inject,
+  input,
+  type OnInit,
+  ViewEncapsulation,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MaterialModule } from 'src/app/shared/material-module';
 import { Subject } from 'rxjs';
 import type { AbteilungEnum } from 'src/app/core/model/AbteilungEnum';
 import { AnlageEnum } from 'src/app/core/model/AnlageEnum';
@@ -7,53 +17,47 @@ import type { ITeilnahmeStatistic } from 'src/app/core/model/ITeilnahmeStatistic
 import type { KategorieEnum } from 'src/app/core/model/KategorieEnum';
 import { CachingAnlassService } from 'src/app/core/service/caching-services/caching.anlass.service';
 import { RanglistenService } from 'src/app/core/service/rangliste/ranglisten.service';
+import { EinteilungAnlageComponent } from '../einteilung-anlage/einteilung-anlage.component';
 
 @Component({
-  selector: 'lxt-einteilung-abteilung',
+  selector: 'ztv-einteilung-abteilung',
   templateUrl: './einteilung-abteilung.component.html',
-  styleUrls: ['./einteilung-abteilung.component.css'],
+  styleUrls: ['./einteilung-abteilung.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, MaterialModule, EinteilungAnlageComponent],
 })
 export class EinteilungAbteilungComponent implements OnInit {
-  @Input()
-  anlass: IAnlass;
-  @Input()
-  kategorie: KategorieEnum;
-  @Input()
-  abteilung: AbteilungEnum;
-  @Input()
-  search: string;
-  @Input()
-  refreshEmitter: EventEmitter<string>;
-  @Input()
-  expanded: boolean;
+  readonly anlass = input.required<IAnlass>();
+  readonly kategorie = input.required<KategorieEnum>();
+  readonly abteilung = input.required<AbteilungEnum>();
+  readonly search = input<string | undefined>();
+  readonly refreshEmitter = input.required<EventEmitter<string>>();
+  readonly expanded = input(false);
 
   anlagen: AnlageEnum[];
 
   teilnahmeStatistic: ITeilnahmeStatistic;
 
-  loaded$: Subject<boolean>;
-
   private statisticLoaded = false;
   private otherLoaded = false;
 
-  constructor(
-    private anlassService: CachingAnlassService,
-    private ranglistenService: RanglistenService,
-  ) {
-    this.loaded$ = new Subject();
-  }
+  private readonly anlassService = inject(CachingAnlassService);
+  private readonly ranglistenService = inject(RanglistenService);
+  readonly loaded$ = new Subject<boolean>();
 
-  ngOnInit() {
-    this.ranglistenService.getAnlagenForAnlass(this.anlass, this.kategorie, this.abteilung).subscribe((anlagen) => {
-      this.anlagen = anlagen;
-      if (this.statisticLoaded) {
-        this.loaded$.next(true);
-      }
-      this.otherLoaded = true;
-    });
+  ngOnInit(): void {
+    this.ranglistenService
+      .getAnlagenForAnlass(this.anlass(), this.kategorie(), this.abteilung())
+      .subscribe((anlagen) => {
+        this.anlagen = anlagen;
+        if (this.statisticLoaded) {
+          this.loaded$.next(true);
+        }
+        this.otherLoaded = true;
+      });
     this.anlassService
-      .getTeilnahmeStatistic(this.anlass, this.kategorie, this.abteilung, undefined, undefined, this.search)
+      .getTeilnahmeStatistic(this.anlass(), this.kategorie(), this.abteilung(), undefined, undefined, this.search())
       .subscribe((statistic) => {
         this.teilnahmeStatistic = statistic;
         if (this.otherLoaded) {
@@ -61,18 +65,17 @@ export class EinteilungAbteilungComponent implements OnInit {
         }
         this.statisticLoaded = true;
       });
-    this.refreshEmitter.subscribe((search) => {
+    this.refreshEmitter().subscribe((search) => {
       console.log('EinteilungAbteilungComponent, Refresh Kategorie: ', search);
-      this.search = search;
       this.anlassService
-        .getTeilnahmeStatistic(this.anlass, this.kategorie, this.abteilung, undefined, undefined, search)
+        .getTeilnahmeStatistic(this.anlass(), this.kategorie(), this.abteilung(), undefined, undefined, search)
         .subscribe((statistic) => {
           this.teilnahmeStatistic = statistic;
         });
     });
   }
 
-  private getIndex(anlage: AnlageEnum) {
+  private getIndex(anlage: AnlageEnum): number {
     const index = Object.keys(AnlageEnum).indexOf(anlage);
     return index;
   }

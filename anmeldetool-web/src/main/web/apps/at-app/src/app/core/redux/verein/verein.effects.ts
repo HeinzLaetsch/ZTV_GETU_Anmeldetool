@@ -1,4 +1,4 @@
-import { inject, Inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, mergeMap, of, switchMap } from 'rxjs';
 import { VereinService } from '../../service/verein/verein.service';
@@ -12,7 +12,7 @@ export class VereinEffects {
   loadVereine$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(VereinActions.loadAllVereineInvoked),
-      mergeMap((action) => {
+      mergeMap(() => {
         return this.vereinService.getVereine().pipe(
           switchMap((vereine) => [VereinActions.loadAllVereineSuccess({ payload: vereine })]),
           catchError((error) => {

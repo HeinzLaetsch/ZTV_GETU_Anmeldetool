@@ -7,7 +7,7 @@ export type HasChangesDialogResult = 'leave' | 'stay';
 @Component({
   selector: 'ztv-has-changes',
   templateUrl: './has-changes.component.html',
-  styleUrls: ['./has-changes.component.css'],
+  styleUrls: ['./has-changes.component.scss'],
   standalone: true,
   imports: [MaterialModule],
 })

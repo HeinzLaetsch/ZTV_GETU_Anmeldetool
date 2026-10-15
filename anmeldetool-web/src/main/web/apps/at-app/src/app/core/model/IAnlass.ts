@@ -4,8 +4,6 @@ import { GeraeteEnum } from './GeraeteEnum';
 import { IWertungsrichterSlot } from './IWertungsrichterSlot';
 import { KategorieEnum } from './KategorieEnum';
 import { TiTuEnum } from './TiTuEnum';
-import { IOrganisationTeilnahmenStatistik } from './IOrganisationTeilnahmenStatistik';
-import { IAnlassSummary } from './IAnlassSummary';
 
 export class IAnlass {
   id: string;
@@ -64,19 +62,16 @@ export class IAnlass {
   get organisator(): string {
     return this.organisator_;
   }
-  set startDatum(startDatum: Date) {
-    if (!(startDatum instanceof Date)) {
-      startDatum = new Date(startDatum);
-    }
-    this.startDatum_ = startDatum;
+  set startDatum(startDatum: Date | string) {
+    this.startDatum_ = this.toDate(startDatum);
   }
   get startDatum(): Date {
     return this.startDatum_;
   }
   startDatum_: Date;
 
-  set endDatum(endDatum: Date) {
-    this.endDatum_ = endDatum;
+  set endDatum(endDatum: Date | string) {
+    this.endDatum_ = this.toDate(endDatum);
     this.updateAnzeigeStatus();
   }
   get endDatum(): Date {
@@ -85,8 +80,8 @@ export class IAnlass {
   endDatum_: Date;
 
   // Anmeldung ist eröffnet, es kann alles erfasst werden
-  set anmeldungBeginn(anmeldungBeginn: Date) {
-    this.anmeldungBeginn_ = anmeldungBeginn;
+  set anmeldungBeginn(anmeldungBeginn: Date | string) {
+    this.anmeldungBeginn_ = this.toDate(anmeldungBeginn);
     this.updateAnzeigeStatus();
   }
   get anmeldungBeginn(): Date {
@@ -95,8 +90,8 @@ export class IAnlass {
   anmeldungBeginn_: Date;
 
   // Neu Erfassen nicht mehr erlaubt
-  set erfassenGeschlossen(erfassenGeschlossen: Date) {
-    this.erfassenGeschlossen_ = erfassenGeschlossen;
+  set erfassenGeschlossen(erfassenGeschlossen: Date | string) {
+    this.erfassenGeschlossen_ = this.toDate(erfassenGeschlossen);
     this.updateAnzeigeStatus();
   }
   get erfassenGeschlossen(): Date {
@@ -105,8 +100,8 @@ export class IAnlass {
   erfassenGeschlossen_: Date;
 
   // Neu Erfassen verlängert
-  set erfassenVerlaengert(erfassenVerlaengert: Date) {
-    this.erfassenVerlaengert_ = erfassenVerlaengert;
+  set erfassenVerlaengert(erfassenVerlaengert: Date | string) {
+    this.erfassenVerlaengert_ = this.toDate(erfassenVerlaengert);
     this.updateAnzeigeStatus();
   }
   get erfassenVerlaengert(): Date {
@@ -115,8 +110,8 @@ export class IAnlass {
   erfassenVerlaengert_: Date;
 
   // Cross Kategorie Aenderungen nicht mehr erlaubt
-  set crossKategorieAenderungenGeschlossen(crossKategorieAenderungenGeschlossen: Date) {
-    this.crossKategorieAenderungenGeschlossen_ = crossKategorieAenderungenGeschlossen;
+  set crossKategorieAenderungenGeschlossen(crossKategorieAenderungenGeschlossen: Date | string) {
+    this.crossKategorieAenderungenGeschlossen_ = this.toDate(crossKategorieAenderungenGeschlossen);
     this.updateAnzeigeStatus();
   }
   get crossKategorieAenderungenGeschlossen(): Date {
@@ -125,8 +120,8 @@ export class IAnlass {
   crossKategorieAenderungenGeschlossen_: Date;
 
   // Aenderungen innerhalb Kategorie nicht mehr erlaubt.
-  set aenderungenInKategorieGeschlossen(aenderungenInKategorieGeschlossen: Date) {
-    this.aenderungenInKategorieGeschlossen_ = aenderungenInKategorieGeschlossen;
+  set aenderungenInKategorieGeschlossen(aenderungenInKategorieGeschlossen: Date | string) {
+    this.aenderungenInKategorieGeschlossen_ = this.toDate(aenderungenInKategorieGeschlossen);
     this.updateAnzeigeStatus();
   }
   get aenderungenInKategorieGeschlossen(): Date {
@@ -135,14 +130,18 @@ export class IAnlass {
   aenderungenInKategorieGeschlossen_: Date;
 
   // Kurz vor Wettkampf, keine Mutationen mehr erlaubt
-  set aenderungenNichtMehrErlaubt(aenderungenNichtMehrErlaubt: Date) {
-    this.aenderungenNichtMehrErlaubt_ = aenderungenNichtMehrErlaubt;
+  set aenderungenNichtMehrErlaubt(aenderungenNichtMehrErlaubt: Date | string) {
+    this.aenderungenNichtMehrErlaubt_ = this.toDate(aenderungenNichtMehrErlaubt);
     this.updateAnzeigeStatus();
   }
   get aenderungenNichtMehrErlaubt(): Date {
     return this.aenderungenNichtMehrErlaubt_;
   }
   aenderungenNichtMehrErlaubt_: Date;
+
+  private toDate(value: Date | string): Date {
+    return value instanceof Date ? value : new Date(value);
+  }
 
   // Anlass nicht anzeigen oder sperren kein Org
   set published(published: boolean) {

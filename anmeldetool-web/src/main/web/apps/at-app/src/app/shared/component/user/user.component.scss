@@ -1,14 +1,32 @@
-mat-form-field,
-.mat-form-field {
+:host {
+  display: block;
   width: 100%;
-  min-width: 25rem;
+  max-width: 100%;
+  min-width: 0;
+}
+
+:host > div {
+  width: 100%;
+  min-width: 0;
+}
+
+mat-form-field,
+.mat-mdc-form-field {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   box-sizing: border-box;
 }
 
+p {
+  max-width: 100%;
+  margin-right: 0;
+  margin-left: 0;
+}
 .label {
   color: rgba(0, 0, 0, 0.54);
 }
-
 button {
   margin-right: 10px;
 }

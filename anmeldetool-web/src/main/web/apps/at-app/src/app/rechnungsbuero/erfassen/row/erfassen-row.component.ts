@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, type OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, type OnInit, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -10,23 +10,18 @@ import { MaterialModule } from 'src/app/shared/material-module';
 import { NotenBlattZurueckZiehen } from './delete-dialog/delete-notenblatt.component';
 
 @Component({
-  selector: 'lxt-erfassen-row',
+  selector: 'ztv-erfassen-row',
   templateUrl: './erfassen-row.component.html',
-  styleUrls: ['./erfassen-row.component.css'],
-  standalone: true,
+  styleUrls: ['./erfassen-row.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ReactiveFormsModule, MaterialModule],
 })
 export class ErfassenRowComponent implements OnInit {
-  @Input()
-  anlass: IAnlass;
-  @Input()
-  eintrag: ILauflistenEintrag;
-  @Input()
-  sprung: boolean;
-  @Input()
-  modeErfassen: boolean;
-  @Output()
-  entryChangedEvent = new EventEmitter<ILauflistenEintrag>();
+  readonly anlass = input.required<IAnlass>();
+  readonly eintrag = input.required<ILauflistenEintrag>();
+  readonly sprung = input.required<boolean>();
+  readonly modeErfassen = input.required<boolean>();
+  readonly entryChangedEvent = output<ILauflistenEintrag>();
 
   note_1_Cntr: UntypedFormControl;
   note_2_Cntr: UntypedFormControl;
@@ -34,10 +29,10 @@ export class ErfassenRowComponent implements OnInit {
   note_2_correct = false;
   //     private toastr: ToastrService
 
-  constructor(
-    private ranglistenService: RanglistenService,
-    public dialog: MatDialog,
-  ) {
+  private readonly ranglistenService = inject(RanglistenService);
+  readonly dialog = inject(MatDialog);
+
+  constructor() {
     this.note_1_Cntr = new UntypedFormControl('', {
       updateOn: 'blur',
       validators: [
@@ -58,10 +53,10 @@ export class ErfassenRowComponent implements OnInit {
     });
   }
   ngOnInit(): void {
-    console.log('Row und Eintrag' + this.eintrag);
-    if (this.modeErfassen) {
-      this.note_1_Cntr.setValue(this.eintrag.note_1, { emitEvent: false });
-      if (this.eintrag.erfasst) {
+    console.log('Row und Eintrag' + this.eintrag());
+    if (this.modeErfassen()) {
+      this.note_1_Cntr.setValue(this.eintrag().note_1, { emitEvent: false });
+      if (this.eintrag().erfasst) {
         this.note_1_Cntr.disable();
         this.note_2_Cntr.disable();
       } else {
@@ -70,55 +65,55 @@ export class ErfassenRowComponent implements OnInit {
       }
       this.note_1_Cntr.valueChanges.subscribe((value) => {
         console.log('On Control Blur , Value: ', this.note_1_Cntr.value);
-        if (this.eintrag.note_1 !== value) {
+        if (this.eintrag().note_1 !== value) {
           const corrected = this.addPoint(value);
           this.note_1_Cntr.setValue(corrected, { emitEvent: false });
-          this.eintrag.note_1 = +corrected;
+          this.eintrag().note_1 = +corrected;
           this.note_1_correct = true;
           this.note_2_correct = true;
           this.fireUpdateEvent();
         }
       });
-      this.note_2_Cntr.setValue(this.eintrag.note_2, { emitEvent: false });
+      this.note_2_Cntr.setValue(this.eintrag().note_2, { emitEvent: false });
       this.note_2_Cntr.valueChanges.subscribe((value) => {
-        if (this.eintrag.note_2 !== value) {
+        if (this.eintrag().note_2 !== value) {
           const corrected = this.addPoint(value);
           this.note_2_Cntr.setValue(corrected, { emitEvent: false });
-          this.eintrag.note_2 = +corrected;
+          this.eintrag().note_2 = +corrected;
           this.note_1_correct = true;
           this.note_2_correct = true;
           this.fireUpdateEvent();
         }
       });
     } else {
-      if (this.eintrag.checked) {
+      if (this.eintrag().checked) {
         this.note_1_Cntr.disable();
         this.note_2_Cntr.disable();
-        this.note_1_Cntr.setValue(this.eintrag.note_1, { emitEvent: false });
-        this.note_2_Cntr.setValue(this.eintrag.note_2, { emitEvent: false });
+        this.note_1_Cntr.setValue(this.eintrag().note_1, { emitEvent: false });
+        this.note_2_Cntr.setValue(this.eintrag().note_2, { emitEvent: false });
       } else {
         this.note_1_Cntr.enable();
         this.note_2_Cntr.enable();
       }
       this.note_1_Cntr.valueChanges.subscribe((value: string) => {
         this.note_1_Cntr.setValue(this.addPoint(value), { emitEvent: false });
-        this.note_1_correct = +this.note_1_Cntr.value === this.eintrag.note_1;
-        if (!this.sprung) {
+        this.note_1_correct = +this.note_1_Cntr.value === this.eintrag().note_1;
+        if (!this.sprung()) {
           this.note_2_correct = this.note_1_correct;
         }
         this.fireCheckedEvent();
       });
       this.note_2_Cntr.valueChanges.subscribe((value) => {
         this.note_2_Cntr.setValue(this.addPoint(value), { emitEvent: false });
-        this.note_2_correct = +this.note_2_Cntr.value === this.eintrag.note_2;
+        this.note_2_correct = +this.note_2_Cntr.value === this.eintrag().note_2;
         this.fireCheckedEvent();
       });
     }
-    if (this.eintrag.deleted) {
-      if (this.eintrag.note_1 <= 0) {
+    if (this.eintrag().deleted) {
+      if (this.eintrag().note_1 <= 0) {
         this.note_1_Cntr.disable();
       }
-      if (this.eintrag.note_2 <= 0) {
+      if (this.eintrag().note_2 <= 0) {
         this.note_2_Cntr.disable();
       }
     }
@@ -139,9 +134,9 @@ export class ErfassenRowComponent implements OnInit {
     return value;
   }
 
-  fireCheckedEvent() {
+  fireCheckedEvent(): void {
     if (this.note_1_correct && this.note_2_correct) {
-      this.eintrag.checked = true;
+      this.eintrag().checked = true;
       this.update();
     }
   }
@@ -151,7 +146,7 @@ export class ErfassenRowComponent implements OnInit {
     if (this.note_1_Cntr.errors) {
       hasErrors = true;
     }
-    if (this.sprung) {
+    if (this.sprung()) {
       if (this.note_2_Cntr.errors) {
         hasErrors = true;
       }
@@ -161,14 +156,18 @@ export class ErfassenRowComponent implements OnInit {
     }
   }
 
-  private update() {
-    this.ranglistenService.updateLauflistenEintrag(this.anlass, this.eintrag).subscribe((eintrag) => {
+  private update(): void {
+    this.ranglistenService.updateLauflistenEintrag(this.anlass(), this.eintrag()).subscribe((eintrag) => {
       if (eintrag) {
-        this.eintrag = eintrag;
-        this.entryChangedEvent.emit(this.eintrag);
-        if (this.eintrag.note_1 !== -1) {
+        this.eintrag().note_1 = eintrag.note_1;
+        this.eintrag().note_2 = eintrag.note_2;
+        this.eintrag().erfasst = eintrag.erfasst;
+        this.eintrag().checked = eintrag.checked;
+        this.eintrag().deleted = eintrag.deleted;
+        this.entryChangedEvent.emit(this.eintrag());
+        if (this.eintrag().note_1 !== -1) {
           this.note_1_Cntr.disable({ emitEvent: false });
-          if (this.sprung && this.note_2_Cntr.touched) {
+          if (this.sprung() && this.note_2_Cntr.touched) {
             this.note_2_Cntr.disable({ emitEvent: false });
           }
         }
@@ -176,7 +175,7 @@ export class ErfassenRowComponent implements OnInit {
     });
   }
   getNotenStyle(): string {
-    if (this.sprung) {
+    if (this.sprung()) {
       if (this.note_1_Cntr.touched && this.note_2_Cntr.touched) {
         if (!this.note_1_Cntr.errors && !this.note_2_Cntr.errors) {
           if (this.note_1_correct && this.note_2_correct) {
@@ -210,7 +209,7 @@ export class ErfassenRowComponent implements OnInit {
         note1Status = false;
       }
     }
-    if (this.sprung) {
+    if (this.sprung()) {
       if (this.note_2_Cntr.touched) {
         untouched = false;
         if (this.note_2_Cntr?.errors) {
@@ -225,38 +224,38 @@ export class ErfassenRowComponent implements OnInit {
       return 'notTouchedBg';
     }
 
-    if (!note1Status || !note2Status || !this.note_1_correct || (this.sprung && !this.note_2_correct)) {
+    if (!note1Status || !note2Status || !this.note_1_correct || (this.sprung() && !this.note_2_correct)) {
       return 'errorBg';
     }
     return 'okBg';
   }
-  leeren() {
-    this.eintrag.erfasst = false;
-    this.eintrag.checked = false;
-    this.eintrag.deleted = false;
-    this.eintrag.note_1 = -1;
-    this.eintrag.note_2 = -1;
+  leeren(): void {
+    this.eintrag().erfasst = false;
+    this.eintrag().checked = false;
+    this.eintrag().deleted = false;
+    this.eintrag().note_1 = -1;
+    this.eintrag().note_2 = -1;
     this.note_1_Cntr.setValue(-1, { emitEvent: false });
     this.note_2_Cntr.setValue(-1, { emitEvent: false });
     this.note_1_Cntr.enable();
     this.note_2_Cntr.enable();
     this.update();
   }
-  delete() {
+  delete(): void {
     // console.log("Delete");
     const dialogRef = this.dialog.open(NotenBlattZurueckZiehen, {
-      data: this.eintrag,
+      data: this.eintrag(),
     });
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result === 'abbrechen') {
         return;
       }
-      this.ranglistenService.deleteNotenblatt(this.anlass, this.eintrag, result).subscribe((result) => {
-        if (result) {
-          this.eintrag.deleted = true;
-          this.eintrag.note_1 = -1;
-          this.eintrag.note_2 = -1;
+      this.ranglistenService.deleteNotenblatt(this.anlass(), this.eintrag(), result).subscribe((deleteSuccess) => {
+        if (deleteSuccess) {
+          this.eintrag().deleted = true;
+          this.eintrag().note_1 = -1;
+          this.eintrag().note_2 = -1;
           this.note_1_Cntr.disable();
           this.note_2_Cntr.disable();
           this.update();

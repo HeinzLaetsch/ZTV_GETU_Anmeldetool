@@ -1,20 +1,27 @@
-import { Component, type OnInit, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import type { MatSelectChange } from '@angular/material/select';
 import { select, Store } from '@ngrx/store';
 import { AgGridAngular } from 'ag-grid-angular';
-import type {
-  ColDef,
-  GetRowIdParams,
-  GridApi,
-  GridReadyEvent,
-  ValueGetterParams,
-  ValueSetterParams,
+import {
+  type ColDef,
+  type GetRowIdParams,
+  type GridApi,
+  type GridReadyEvent,
+  themeQuartz,
+  type ValueGetterParams,
+  type ValueSetterParams,
 } from 'ag-grid-community';
 import moment from 'moment';
-import { combineLatest, type Observable, of } from 'rxjs';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AnzeigeStatusEnum } from '../../../core/model/AnzeigeStatusEnum';
 import type { IAnlass } from '../../../core/model/IAnlass';
 import type { IAnlassExtended } from '../../../core/model/IAnlassExtended';
@@ -26,7 +33,7 @@ import type { ITeilnehmer } from '../../../core/model/ITeilnehmer';
 import { KategorieEnum, KategorieEnumFunction } from '../../../core/model/KategorieEnum';
 import { MeldeStatusEnum } from '../../../core/model/MeldeStatusEnum';
 import { isTiTuEnumEqual, parseTiTuEnum, TiTuEnum } from '../../../core/model/TiTuEnum';
-import { selectAnlaesseSortedNew, selectJahre } from '../../../core/redux/anlass/anlass.selector';
+import { selectAnlaesseSortedNew } from '../../../core/redux/anlass/anlass.selector';
 import { AnlassSummariesActions } from '../../../core/redux/anlass-summary/anlass-summary.actions';
 import { selectAnlassSummaries } from '../../../core/redux/anlass-summary/anlass-summary.selector';
 import type { AppState } from '../../../core/redux/core.state';
@@ -35,7 +42,6 @@ import { selectOts } from '../../../core/redux/organisation-teilnahmen/ots.selec
 import { TeilnahmenActions } from '../../../core/redux/teilnahmen/teilnahmen.actions';
 import { selectTeilnahmen } from '../../../core/redux/teilnahmen/teilnahmen.selectors';
 import { AuthService } from '../../../core/service/auth/auth.service';
-import { SubscriptionHelper } from '../../../utils/subscription-helper';
 import { ButtonCellRenderer } from './button-cell-renderer/button-cell-renderer.component';
 import { TeilnahmeStatusEditor } from './teilnahme-status/teilnahme-status-editor.component';
 import { TeilnahmeStatusRenderer } from './teilnahme-status/teilnahme-status-renderer.component';
@@ -44,39 +50,51 @@ import { TeilnehmerGridHelpComponent } from './teilnehmer-grid-help/teilnehmer-g
 import { MaterialModule } from 'src/app/shared/material-module';
 
 @Component({
-  selector: 'lxt-teilnehmer-grid',
+  selector: 'ztv-teilnehmer-grid',
   templateUrl: './teilnehmer-grid.html',
-  styleUrls: ['./teilnehmer-grid.css'],
-  standalone: true,
-  imports: [CommonModule, FormsModule, MaterialModule, AgGridAngular],
+  styleUrls: ['./teilnehmer-grid.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MaterialModule, AgGridAngular],
 })
-export class TeilnehmerGridComponent extends SubscriptionHelper implements OnInit {
+export class TeilnehmerGridComponent {
+  private readonly dialog = inject(MatDialog);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly store = inject(Store<AppState>);
+  private readonly authService = inject(AuthService);
+
+  gridTheme = themeQuartz;
   static tColumns = 4;
   tooltipShowDelay = 1500;
-  selectedJahr = -1;
+  readonly selectedJahr = signal(moment().year());
+  readonly selectedState = signal<TiTuEnum | undefined>(undefined);
 
-  selectedState: TiTuEnum | undefined = undefined;
-
-  anlaesseAlle$!: Observable<IAnlass[]>;
-  anlassSummaries$!: Observable<IAnlassSummary[]>;
-  jahresListeAnlaesse$!: Observable<IAnlass[]>;
-  jahresListe$!: Observable<number[]>;
-  // alleAnlaesse: IAnlass[];
-  anlaesseExtended: IAnlassExtended[] = [];
-
-  rowData$!: Observable<ITeilnahmen[]>;
-  data: ITeilnahmen[] = [];
-  // private anlassSummaries = new Array<IAnlassSummary>();
+  readonly anlaesse = toSignal(
+    this.store.pipe(select(selectAnlaesseSortedNew(this.authService.isAdministratorSig()))),
+    {
+      initialValue: [] as IAnlass[],
+    },
+  );
+  readonly anlassSummaries = toSignal(this.store.pipe(select(selectAnlassSummaries())), {
+    initialValue: [] as IAnlassSummary[],
+  });
+  readonly anlaesseExtended = computed(() =>
+    this.anlaesse()
+      .map((anlass) => {
+        const summary = this.anlassSummaries().find((anlassSummary) => anlassSummary.anlassId === anlass.id);
+        return summary ? { anlass, summary } : undefined;
+      })
+      .filter((anlassExt): anlassExt is IAnlassExtended => anlassExt !== undefined),
+  );
+  readonly rowData = toSignal(this.store.pipe(select(selectTeilnahmen())), {
+    initialValue: [] as ITeilnahmen[],
+  });
   private gridApi!: GridApi<ITeilnahmen>;
 
-  ots$!: Observable<IOrganisationTeilnahmenStatistik[]>;
-  private otsData: IOrganisationTeilnahmenStatistik[] = [];
+  readonly otsData = toSignal(this.store.pipe(select(selectOts())), {
+    initialValue: [] as IOrganisationTeilnahmenStatistik[],
+  });
 
-  showOldAnlaesse = false;
-
-  // Each Column Definition results in one Column.
-  // headerValueGetter;
-  // valueGetter;
+  readonly showOldAnlaesse = signal(false);
 
   context: { this: TeilnehmerGridComponent } = {
     this: this,
@@ -86,20 +104,19 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
       headerName: 'Aktion',
       colId: 'teilnehmer.delete',
       cellRenderer: ButtonCellRenderer,
-      width: 70,
+      width: 90,
       editable: false,
       pinned: 'left',
     },
     {
       colId: 'teilnehmer.name',
       headerName: 'Name',
-      // field: "teilnehmer.name",
       minWidth: 150,
       maxWidth: 200,
       valueSetter: this.teilnehmerAttributeValueSetter,
       valueGetter: this.teilnehmerAttributeValueGetter,
       pinned: 'left',
-      tooltipValueGetter: () => 'Doppelklicken um zu ändern',
+      tooltip: () => 'Doppelklicken um zu ändern',
     },
     {
       headerName: 'Vorname',
@@ -109,33 +126,36 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
       valueSetter: this.teilnehmerAttributeValueSetter,
       valueGetter: this.teilnehmerAttributeValueGetter,
       pinned: 'left',
-      tooltipValueGetter: () => 'Doppelklicken um zu ändern',
+      tooltip: () => 'Doppelklicken um zu ändern',
     },
     {
       headerName: 'Jahrg.',
       colId: 'teilnehmer.jahrgang',
-      maxWidth: 70,
+      maxWidth: 90,
       valueSetter: this.teilnehmerAttributeValueSetter,
       valueGetter: this.teilnehmerAttributeValueGetter,
-      tooltipValueGetter: () => 'Doppelklicken um zu ändern',
+      pinned: 'left',
+      tooltip: () => 'Doppelklicken um zu ändern',
     },
     {
       headerName: 'Ti/Tu',
       colId: 'teilnehmer.tiTu',
-      maxWidth: 80,
+      maxWidth: 90,
       cellEditor: 'agSelectCellEditor',
       cellEditorParams: { values: ['Ti', 'Tu'] },
       valueSetter: this.teilnehmerAttributeValueSetter,
       valueGetter: this.teilnehmerAttributeValueGetter,
-      tooltipValueGetter: () => 'Doppelklicken um zu ändern',
+      pinned: 'left',
+      tooltip: () => 'Doppelklicken um zu ändern',
     },
     {
       headerName: 'STV Nr.',
       colId: 'teilnehmer.stvNummer',
-      maxWidth: 80,
+      maxWidth: 90,
       valueSetter: this.teilnehmerAttributeValueSetter,
       valueGetter: this.teilnehmerAttributeValueGetter,
-      tooltipValueGetter: () => 'Doppelklicken um zu ändern',
+      pinned: 'left',
+      tooltip: () => 'Doppelklicken um zu ändern',
     },
     {
       headerName: 'aktuelle Kategorie',
@@ -148,13 +168,13 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
         values: this.getAvailableKategories(params.data?.teilnehmer),
       }),
       comparator: this.kValueComparator,
-      maxWidth: 90,
+      maxWidth: 100,
       valueSetter: this.teilnehmerAttributeValueSetter,
       pinned: 'left',
     },
   ];
+  private readonly staticColumnDefs = this.columnDefs;
 
-  // DefaultColDef sets props common to all Columns
   defaultColDef: ColDef<ITeilnahmen> = {
     sortable: true,
     filter: true,
@@ -165,16 +185,17 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
   };
 
   // For accessing the Grid's API
-  @ViewChild(AgGridAngular) agGrid!: AgGridAngular;
+  readonly agGrid = viewChild.required(AgGridAngular);
+  private readonly columnEffect = effect(() => {
+    this.anlaesseExtended();
+    if (this.gridApi && !this.gridApi.isDestroyed()) {
+      this.refreshAnlaesse();
+    }
+  });
 
-  constructor(
-    public dialog: MatDialog,
-    private store: Store<AppState>,
-    private authService: AuthService, // private anlassService: AnlassService
-  ) {
-    super();
-    this.selectedJahr = moment().year();
+  constructor() {
     this.store.dispatch(AnlassSummariesActions.loadAllAnlasssummariesInvoked());
+    this.loadTeilnahmen();
   }
 
   onSuppressKeyboardEvent(params: { event: KeyboardEvent }): boolean {
@@ -185,17 +206,6 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
       return true;
     }
     return false;
-  }
-
-  jahrSelektiert(event: MatSelectChange): void {
-    console.log('Jahr: ', event);
-    this.selectedJahr = event.value;
-    this.loadTeilnahmen();
-    this.rowData$ = this.store.pipe(select(selectTeilnahmen())) as Observable<ITeilnahmen[]>;
-  }
-
-  getYear(anlass: IAnlass): number {
-    return moment(anlass.endDatum).year();
   }
 
   private getAvailableKategories(teilnehmer?: ITeilnehmer): string[] {
@@ -229,7 +239,7 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
   teilnehmerAttributeValueSetter(params: ValueSetterParams): boolean {
     const component: TeilnehmerGridComponent = params.context.this;
     const rowValue: ITeilnahmen = JSON.parse(JSON.stringify(params.data));
-    rowValue.jahr = component.selectedJahr;
+    rowValue.jahr = component.selectedJahr();
     switch (params.column.getColId().toUpperCase()) {
       case 'TEILNEHMER.NAME': {
         rowValue.teilnehmer.name = params.newValue;
@@ -260,41 +270,29 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
     return false;
   }
 
-  ngOnInit(): void {
-    this.loadTeilnahmen();
-    this.registerSelects();
-    this.subscribeColumnData();
-  }
-
   private loadTeilnahmen(): void {
     this.store.dispatch(
       TeilnahmenActions.loadAllTeilnahmenInvoked({
-        payload: this.selectedJahr,
+        payload: this.selectedJahr(),
       }),
     );
     this.store.dispatch(
       OtsActions.loadAllOtsInvoked({
-        payload: this.selectedJahr,
+        payload: this.selectedJahr(),
       }),
     );
   }
 
-  showOldChanged(checked: boolean): void {
-    this.showOldAnlaesse = checked;
+  onShowOldAnlaesseChange(checked: boolean): void {
+    this.showOldAnlaesse.set(checked);
     this.redraw();
   }
 
   onGridReady(params: GridReadyEvent): void {
-    this.gridApi = params.api;
-    this.registerSubscription(
-      this.rowData$.subscribe((data) => {
-        if (!this.gridApi.isDestroyed()) {
-          this.gridApi.setGridOption('rowData', data);
-        }
-      }),
-    );
+    const gridApi = params.api;
+    this.gridApi = gridApi;
+    this.refreshAnlaesse();
     this.sortByNameAsc();
-    this.getSummaries();
   }
 
   private sortByNameAsc(): void {
@@ -304,111 +302,36 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
     });
   }
 
-  getJahresListe(): Observable<number[]> {
-    return this.jahresListe$;
-  }
-
   getRowId(params: GetRowIdParams<ITeilnahmen>): string {
     return params.data.teilnehmer.id || '';
   }
 
-  subscribeColumnData(): void {
-    /*
-    this.registerSubscription(
-      this.anlaesseAlle$.subscribe((anlaesse) => {
-        this.alleAnlaesse = anlaesse;
-        this.refreshAnlaesse();
-      })
-    );
-    */
-    const anlassExt$ = combineLatest([this.anlaesseAlle$, this.anlassSummaries$]);
-
-    this.registerSubscription(
-      anlassExt$.subscribe(([anlaesse, anlassSummaries]) => {
-        this.anlaesseExtended = anlaesse
-          .map((anlass) => {
-            const summary = anlassSummaries.find((anlassSummary) => {
-              return anlassSummary.anlassId === anlass.id;
-            });
-
-            if (!summary) {
-              return undefined;
-            }
-
-            const anlaesseExtended: IAnlassExtended = {
-              anlass,
-              summary,
-            };
-            return anlaesseExtended;
-          })
-          .filter((anlassExt): anlassExt is IAnlassExtended => anlassExt !== undefined);
-        this.refreshAnlaesse();
-        console.log('AnlaesseExtended: ', this.anlaesseExtended);
-      }),
-    );
-  }
-
-  registerSelects(): void {
-    this.anlaesseAlle$ = this.store.pipe(select(selectAnlaesseSortedNew(this.authService.isAdministratorSig())));
-    this.anlassSummaries$ = this.store.pipe(select(selectAnlassSummaries())) as Observable<IAnlassSummary[]>;
-    this.jahresListeAnlaesse$ = this.store.pipe(select(selectJahre()));
-    this.rowData$ = this.store.pipe(select(selectTeilnahmen())) as Observable<ITeilnahmen[]>;
-    this.ots$ = this.store.pipe(select(selectOts())) as Observable<IOrganisationTeilnahmenStatistik[]>;
-    this.registerSubscription(
-      this.ots$.subscribe((data) => {
-        this.otsData = data;
-      }),
-    );
-    this.registerSubscription(
-      this.jahresListeAnlaesse$.subscribe((anlaesse) => {
-        this.jahresListe$ = of(anlaesse.map((anlass) => this.getYear(anlass)));
-      }),
-    );
-  }
-
-  getSummaries(): void {
-    /*
-    this.agGrid.api.getColumns().forEach((column) => {
-      // this.agGrid.api.getColumnState().forEach((state) => {
-      if (!column.getColId().startsWith("teil")) {
-        const index = +column.getColId();
-        if (this.anlaesseExtended[index].anlass.aktiv) {
-          const anlassSummary$ =
-            this.anlassService.getAnlassOrganisationSummary(
-              this.alleAnlaesse[index],
-              this.authService.currentVerein
-            );
-          this.registerSubscription(
-            anlassSummary$.subscribe((anlassSummary) => {
-              this.anlassSummaries.push(anlassSummary);
-            })
-          );
-        }
-      }
-    });
-    */
-  }
   refreshAnlaesse(): void {
-    this.anlaesseExtended.forEach((anlassExt) => {
-      this.columnDefs.push({
-        headerName: anlassExt.anlass.getCleaned(),
-        valueGetter: this.talValueGetter,
-        valueSetter: this.talValueSetter,
-        minWidth: 100,
-        maxWidth: 150,
-        editable: (params) => params.context.this.isEditable(params, anlassExt),
-        cellRenderer: TeilnahmeStatusRenderer,
-        cellEditor: TeilnahmeStatusEditor,
-        tooltipValueGetter: (params) => params.context.this.getKategorieTooltip(),
-        comparator: this.talComparator,
-        cellEditorPopup: false,
-        cellEditorParams: (params: ValueSetterParams) => ({
-          kats: params.context.this.getAvailableKValues(params, anlassExt),
-          mode: params.context.this.getMode(anlassExt),
-        }),
-        hide: !this.showAnlass(anlassExt.anlass),
-      });
-    });
+    const dynamicColumnDefs = this.anlaesseExtended().map((anlassExt, index) => ({
+      colId: String(index),
+      headerName: anlassExt.anlass.getCleaned(),
+      valueGetter: this.talValueGetter,
+      valueSetter: this.talValueSetter,
+      minWidth: 100,
+      maxWidth: 150,
+      editable: (params): boolean => params.context.this.isEditable(params, anlassExt),
+      cellRenderer: TeilnahmeStatusRenderer,
+      cellEditor: TeilnahmeStatusEditor,
+      tooltip: (): string => this.getKategorieTooltip(),
+      comparator: this.talComparator,
+      cellEditorPopup: false,
+      cellEditorParams: (params: ValueSetterParams): { kats: KategorieEnum[]; mode: number } => ({
+        kats: params.context.this.getAvailableKValues(params, anlassExt),
+        mode: params.context.this.getMode(anlassExt),
+      }),
+      hide: !this.showAnlass(anlassExt.anlass),
+    }));
+
+    this.columnDefs = [...this.staticColumnDefs, ...dynamicColumnDefs];
+
+    if (this.gridApi && !this.gridApi.isDestroyed()) {
+      this.gridApi.setGridOption('columnDefs', this.columnDefs);
+    }
   }
 
   getKategorieTooltip(): string {
@@ -418,43 +341,45 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
     //return "Dein Verein startet nicht! Kein Ändern möglich";
   }
   private showAnlass(anlass: IAnlass): boolean {
-    const asMoment = moment(anlass.endDatum).endOf('day');
-    if (!this.showOldAnlaesse) {
+    const asMoment = moment(anlass.endDatum).endOf('day').add(1, 'day');
+    if (!this.showOldAnlaesse()) {
       return asMoment.isSameOrAfter(moment().startOf('day'));
     }
-    return asMoment.year() === this.selectedJahr;
+    return asMoment.year() === this.selectedJahr();
   }
   redraw(): void {
     let visbility = true;
-    this.agGrid.api.getColumnState().forEach((state) => {
-      if (!state.colId.startsWith('teil')) {
-        const index = +state.colId;
-        if (this.anlaesseExtended.length > index) {
-          if (
-            !this.anlaesseExtended[index].anlass.alleAnlass &&
-            this.selectedState === 'Turner' &&
-            this.anlaesseExtended[index].anlass.tiAnlass
-          ) {
-            visbility = false;
+    const anlaesseExtended = this.anlaesseExtended();
+    this.agGrid()
+      .api.getColumnState()
+      .forEach((state) => {
+        if (!state.colId.startsWith('teil')) {
+          const index = +state.colId;
+          if (anlaesseExtended.length > index) {
+            if (
+              !anlaesseExtended[index].anlass.alleAnlass &&
+              this.selectedState() === 'Turner' &&
+              anlaesseExtended[index].anlass.tiAnlass
+            ) {
+              visbility = false;
+            }
+            if (
+              !anlaesseExtended[index].anlass.alleAnlass &&
+              this.selectedState() === 'Turnerin' &&
+              anlaesseExtended[index].anlass.tuAnlass
+            ) {
+              visbility = false;
+            }
           }
-          if (
-            !this.anlaesseExtended[index].anlass.alleAnlass &&
-            this.selectedState === 'Turnerin' &&
-            this.anlaesseExtended[index].anlass.tuAnlass
-          ) {
-            visbility = false;
+          const showAnlass = this.showAnlass(anlaesseExtended[index].anlass);
+          if (visbility && !showAnlass) {
+            visbility = showAnlass;
+          }
+          if (state.colId) {
+            this.agGrid().api.setColumnsVisible([state.colId], visbility);
           }
         }
-        const showAnlass = this.showAnlass(this.anlaesseExtended[index].anlass);
-        if (visbility && !showAnlass) {
-          visbility = showAnlass;
-        }
-        if (state.colId) {
-          this.agGrid.api.setColumnsVisible([state.colId], visbility);
-        }
-      }
-      // console.log("State ", state);
-    });
+      });
   }
   kValueComparator(valueA: string, valueB: string): number {
     return kategorieComparator(valueA, valueB);
@@ -493,7 +418,7 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
         tiTu,
         anlaesseExt.anlass,
       );
-      const ots = component.filterOts(anlaesseExt.anlass, component.otsData);
+      const ots = component.filterOts(anlaesseExt.anlass, component.otsData());
       if (ots) {
         const katsFiltered = kats.filter((kat: KategorieEnum) => {
           const meldeStati = ots.kategorieStati.find((status) => kat === status.kategorie);
@@ -505,7 +430,6 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
           });
           const abmeldungenCount = abmeldungen?.[0]?.count || 0;
           const neumeldungenCount = neumeldungen?.[0]?.count || 0;
-          console.log('Kategorie: %s , Abmeldungen: %d, Neumeldungen: %d', kat, abmeldungenCount, neumeldungenCount);
           return neumeldungenCount < abmeldungenCount;
         });
         return katsFiltered;
@@ -553,7 +477,6 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
     if (!anzeigeStatus.hasStatus(AnzeigeStatusEnum.IN_KATEGORIE_CLOSED)) {
       return 2;
     }
-    //TODO Beides mal gleich
     if (anzeigeStatus.hasStatus(AnzeigeStatusEnum.IN_KATEGORIE_CLOSED)) {
       return 3;
     }
@@ -627,7 +550,7 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
       return true;
     }
     // Check if Abmeldung
-    const ots = component.filterOts(anlassExt.anlass, component.otsData);
+    const ots = component.filterOts(anlassExt.anlass, component.otsData());
     const possibleKategories = KategorieEnumFunction.valuesAndGreater(
       letzteKategorie,
       params.data.teilnehmer.tiTu,
@@ -661,7 +584,7 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
   getAnlassIdForColId(params: ValueSetterParams): IAnlassExtended {
     const component: TeilnehmerGridComponent = params.context.this;
     const index = Number(params.column.getColId());
-    const anlass = component.anlaesseExtended[index];
+    const anlass = component.anlaesseExtended()[index];
     return anlass;
   }
 
@@ -678,7 +601,7 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
     if (!newValue.talDTOList) {
       newValue.talDTOList = [];
     }
-    newValue.jahr = component.selectedJahr;
+    newValue.jahr = component.selectedJahr();
 
     const tal = newValue.talDTOList.find((talInt: IAnlassLink) => talInt.anlassId === anlassExt.anlass.id);
     if (tal) {
@@ -693,7 +616,7 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
     component.store.dispatch(TeilnahmenActions.updateTeilnahmenInvoked({ payload: newValue }));
     component.store.dispatch(
       OtsActions.loadAllOtsInvoked({
-        payload: component.selectedJahr,
+        payload: component.selectedJahr(),
       }),
     );
 
@@ -705,17 +628,17 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
     const index = Number(params.column.getColId());
     if (params.data) {
       const tal = params.data.talDTOList?.find((element: IAnlassLink) => {
-        if (component.anlaesseExtended === undefined || component.anlaesseExtended[index] === undefined) {
+        if (component.anlaesseExtended()[index] === undefined) {
           return false;
         }
-        return element.anlassId === component.anlaesseExtended[index].anlass.id;
+        return element.anlassId === component.anlaesseExtended()[index].anlass.id;
       });
       if (tal !== undefined) {
         return tal;
       }
       return component.emptyTal(
         params.data.teilnehmer.id,
-        component.anlaesseExtended[index].anlass.id,
+        component.anlaesseExtended()[index].anlass.id,
         component.authService.currentVerein.id,
       );
     }
@@ -737,10 +660,10 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
     const component: TeilnehmerGridComponent = params.context.this;
     const index = Number(params.column.getColId());
     const tal = params.data.talDTOList.find((element: IAnlassLink) => {
-      if (component.anlaesseExtended === undefined || component.anlaesseExtended[index] === undefined) {
+      if (component.anlaesseExtended()[index] === undefined) {
         return false;
       }
-      return element.anlassId === component.anlaesseExtended[index].anlass.id;
+      return element.anlassId === component.anlaesseExtended()[index].anlass.id;
     });
     if (tal !== undefined) {
       return tal.kategorie;
@@ -756,18 +679,18 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
   }
 
   onClick(newValue: TiTuEnum): void {
-    if (this.selectedState === newValue) {
-      this.selectedState = undefined;
+    if (this.selectedState() === newValue) {
+      this.selectedState.set(undefined);
     } else {
-      this.selectedState = newValue;
+      this.selectedState.set(newValue);
     }
-    if (this.selectedState && isTiTuEnumEqual(TiTuEnum.Ti, this.selectedState)) {
+    if (this.selectedState() && isTiTuEnumEqual(TiTuEnum.Ti, this.selectedState())) {
       this.gridApi.setColumnFilterModel('teilnehmer.tiTu', {
         filterType: 'text',
         type: 'equals',
         filter: 'Ti',
       });
-    } else if (this.selectedState && isTiTuEnumEqual(TiTuEnum.Tu, this.selectedState)) {
+    } else if (this.selectedState() && isTiTuEnumEqual(TiTuEnum.Tu, this.selectedState())) {
       this.gridApi.setColumnFilterModel('teilnehmer.tiTu', {
         filterType: 'text',
         type: 'equals',
@@ -782,7 +705,7 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
 
   addRow(): void {
     const selectedStateKey =
-      this.selectedState === TiTuEnum.Ti ? 'Ti' : this.selectedState === TiTuEnum.Tu ? 'Tu' : undefined;
+      this.selectedState() === TiTuEnum.Ti ? 'Ti' : this.selectedState() === TiTuEnum.Tu ? 'Tu' : undefined;
     const newTeilnehmer: ITeilnehmer = {
       tiTu: selectedStateKey,
       dirty: true,
@@ -791,28 +714,24 @@ export class TeilnehmerGridComponent extends SubscriptionHelper implements OnIni
   }
 
   private openDialog(newTeilnehmer: ITeilnehmer): void {
-    const dialogRef = this.dialog.open(TeilnehmerDialog, {
-      data: {
-        title: 'Teilnehmer hinzufügen',
-        actionButton: 'Speichern',
-        disabled: false,
-        teilnehmer: newTeilnehmer,
-      },
-    });
-
-    this.registerSubscription(
-      dialogRef.afterClosed().subscribe((result) => {
+    this.dialog
+      .open(TeilnehmerDialog, {
+        data: {
+          title: 'Teilnehmer hinzufügen',
+          actionButton: 'Speichern',
+          disabled: false,
+          teilnehmer: newTeilnehmer,
+        },
+      })
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => {
         if (result) {
-          console.log(`Dialog result: ${result}`);
           this.store.dispatch(TeilnahmenActions.addTeilnehmerInvoked({ payload: result }));
-        } else {
-          console.log(`Dialog Abbruch: ${result}`);
         }
-      }),
-    );
+      });
   }
   openTeilnehmerGridHelp(): void {
-    console.log('openTeilnehmerGridHelp');
     this.dialog.open(TeilnehmerGridHelpComponent);
   }
 }

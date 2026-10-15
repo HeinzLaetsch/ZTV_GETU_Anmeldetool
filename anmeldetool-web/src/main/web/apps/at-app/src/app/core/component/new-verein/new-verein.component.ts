@@ -1,10 +1,10 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { type MatFormFieldAppearance, MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
@@ -23,7 +23,7 @@ import { UserService } from '../../service/user/user.service';
 import { UserComponent } from 'src/app/shared/component/user/user.component';
 
 @Component({
-  selector: 'app-new-verein',
+  selector: 'ztv-new-verein',
   templateUrl: './new-verein.component.html',
   styleUrls: ['./new-verein.component.scss'],
   standalone: true,
@@ -45,15 +45,15 @@ import { UserComponent } from 'src/app/shared/component/user/user.component';
 })
 export class NewVereinComponent {
   // Moderne Dependency Injection via inject()
-  private formBuilder = inject(UntypedFormBuilder);
-  public dialogRef = inject(MatDialogRef<NewVereinComponent>);
+  private formBuilder = inject(FormBuilder);
+  dialogRef = inject(MatDialogRef<NewVereinComponent>);
   private authService = inject(AuthService);
   private vereinService = inject(VereinService);
   private verbandService = inject(VerbandService);
   private userService = inject(UserService);
   private router = inject(Router);
 
-  appearance = 'outline';
+  appearance: MatFormFieldAppearance = 'outline';
   form = this.formBuilder.group({
     vereinsNameControl: ['', Validators.required],
     verbandFormControl: ['', Validators.required],

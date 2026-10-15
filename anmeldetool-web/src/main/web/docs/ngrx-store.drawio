@@ -1,0 +1,121 @@
+<mxfile host="app.diagrams.net" modified="2026-09-30T00:00:00.000Z" agent="GitHub Copilot" version="24.7.17" type="device">
+  <diagram id="ngrx-overview" name="NgRx Store - Overview">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="app" value="Angular Application\nComponents and Services" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="350" width="210" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="dispatch" value="Store.dispatch(action)\nUser interactions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="310" y="350" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="actions" value="Actions\ncreateActionGroup per feature" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="590" y="350" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="effects" value="Effects\nappEffects via provideEffects" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="870" y="190" width="230" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="reducers" value="Reducers\nappReducers via provideStore" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="870" y="490" width="230" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="services" value="API / Caching Services\nHTTP side effects" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1170" y="190" width="230" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="state" value="Global Store State\nrouter, loading, anlass, verein, user, oal, ots,\nanlasssummary, teilnehmer, teilnahmen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1170" y="490" width="300" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="selectors" value="Selectors / selectSignal()\nFeature selectors and entity selectors" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="870" y="720" width="280" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="view" value="Components render state\nSignals / async views" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="720" width="240" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="app" target="dispatch"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="dispatch" target="actions"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" value="actions" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="actions" target="effects"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e4" value="HTTP request" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="effects" target="services"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5" value="success / error action" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="services" target="actions"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e6" value="reduce" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="actions" target="reducers"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e7" value="feature state" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="reducers" target="state"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e8" value="read" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="state" target="selectors"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e9" value="signals / observables" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="selectors" target="view"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="ngrx-slices" name="NgRx Store - Feature Slices">
+    <mxGraphModel dx="1600" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="root" value="appReducers / provideStore(appReducers)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="610" y="30" width="360" height="60" as="geometry" /></mxCell>
+        <mxCell id="router" value="router\nRouterReducerState&lt;RouterStateUrl&gt;\ncustom serializer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="40" y="150" width="230" height="80" as="geometry" /></mxCell>
+        <mxCell id="loading" value="loading\nLoadingState\nEntityState&lt;ILoading&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="310" y="150" width="230" height="80" as="geometry" /></mxCell>
+        <mxCell id="anlass" value="anlass\nAnlassState\nEntityState&lt;IAnlass&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="580" y="150" width="230" height="80" as="geometry" /></mxCell>
+        <mxCell id="verein" value="verein\nVereinState\nEntityState&lt;IVerein&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="850" y="150" width="230" height="80" as="geometry" /></mxCell>
+        <mxCell id="user" value="user\nUserState\nEntityState&lt;IUser&gt;\nselectId: id / benutzername" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="1120" y="150" width="250" height="100" as="geometry" /></mxCell>
+        <mxCell id="oal" value="oal\nOalState\nEntityState&lt;IOrganisationAnlassLink&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="40" y="300" width="260" height="90" as="geometry" /></mxCell>
+        <mxCell id="ots" value="ots\nOtsState\nEntityState&lt;IOrganisationTeilnahmenStatistik&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="340" y="300" width="280" height="90" as="geometry" /></mxCell>
+        <mxCell id="asummary" value="anlasssummary\nAnlassSummariesState\nEntityState&lt;IAnlassSummary&gt;\nregistered in appReducers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="660" y="300" width="280" height="100" as="geometry" /></mxCell>
+        <mxCell id="teilnehmer" value="teilnehmer\nTeilnehmerState\nEntityState&lt;ITeilnehmer&gt;\nregistered in appReducers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="980" y="300" width="260" height="100" as="geometry" /></mxCell>
+        <mxCell id="teilnahmen" value="teilnahmen\nTeilnahmenState\nEntityState&lt;ITeilnahmen&gt;\nregistered in appReducers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="1280" y="300" width="260" height="100" as="geometry" /></mxCell>
+        <mxCell id="effects" value="appEffects / provideEffects(...appEffects)\nAnlass, AnlassSummary, Loading, Oal, Ots, Teilnahmen, Teilnehmer, User, Verein" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="390" y="500" width="820" height="80" as="geometry" /></mxCell>
+        <mxCell id="selectors" value="Selectors\nanlass.selector.ts | verein.selector.ts | user.selector.ts\noal.selectors.ts | ots.selectors.ts | loading.selectors.ts\nplus feature selectors" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="390" y="670" width="820" height="90" as="geometry" /></mxCell>
+        <mxCell id="meta" value="metaReducers (development)\ndebug reducer logs action/state changes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="520" y="850" width="560" height="70" as="geometry" /></mxCell>
+        <mxCell id="r1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="root" target="router"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="root" target="loading"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="root" target="anlass"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="root" target="verein"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="root" target="user"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="root" target="oal"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="root" target="ots"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="root" target="asummary"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="root" target="teilnehmer"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="root" target="teilnahmen"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r11" value="actions and async results" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="effects" target="root"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r12" value="read state" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="root" target="selectors"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r13" value="dev only" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=block;" edge="1" parent="1" source="meta" target="root"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="component-dependencies" name="Components - Services and NgRx">
+    <mxGraphModel dx="1800" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c-core" value="CORE COMPONENTS\n\nAppRootComponent\nHeaderComponent\nNavComponent\nLoginDialogComponent\nNewAnmelderComponent\nNewVereinComponent\nBusyIndicatorProgressBarComponent\nSnackBarComponent" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="30" y="40" width="290" height="260" as="geometry" /></mxCell>
+        <mxCell id="c-events" value="EVENT COMPONENTS\n\nCreateEventComponent\nEventListComponent\nEventThumbnailComponent\nEventsDetailComponent\nAnlassDetailComponent\nAnlassStatistikComponent\nEventRegisterSummaryComponent\nEventStartListComponent\nEventStartListHeaderComponent\nEventStartListRowComponent\nWertungsrichterChipComponent\nWertungsrichterSlotComponent\nWertungsrichterSelektionComponent" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="30" y="340" width="290" height="390" as="geometry" /></mxCell>
+        <mxCell id="c-admin" value="EVENT ADMIN\n\nEventAdminComponent\nEinteilungComponent\nEinteilungAbteilungComponent\nEinteilungAnlageComponent\nEinteilungKategorieComponent\nEinteilungStartgeraetComponent\nContestUploadComponent\nUploadComponent" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="30" y="770" width="290" height="270" as="geometry" /></mxCell>
+        <mxCell id="c-finance" value="RECHNUNGSBUERO\n\nRechnungsbueroComponent\nErfassenComponent\nErfassenHeaderComponent\nErfassenRowComponent\nAnlassStatusComponent\nAbteilungStatusComponent\nAnlageStatusComponent\nKategorieStatusComponent\nLauflisteStatusComponent\nRanglistenComponent\nRanglistenHeaderComponent\nRanglistenEntryComponent" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="350" y="40" width="300" height="350" as="geometry" /></mxCell>
+        <mxCell id="c-verein" value="VEREIN / PROFILE\n\nProfileComponent\nUserFormComponent\nUserComponent\nRoleFormComponent\nRoleChipComponent\nWertungsrichterFormComponent\nTeilnehmerGridComponent\nTeilnehmerDialogComponent\nTeilnehmerGridHelpComponent\nAnlassHeaderComponent\nButtonCellRendererComponent\nTeilnahmeStatusEditorComponent\nTeilnahmeStatusRendererComponent" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="350" y="440" width="300" height="390" as="geometry" /></mxCell>
+        <mxCell id="c-shared" value="SHARED / OTHER\n\nPage404Component\nSmQualiViewerComponent\nUserExistsComponent\nHasChangesComponent\nHoverDirective\nPhoneInput" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="350" y="880" width="300" height="190" as="geometry" /></mxCell>
+        <mxCell id="s-auth" value="AuthService\nLogin state and roles\nCurrent user / Verein" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="780" y="80" width="220" height="90" as="geometry" /></mxCell>
+        <mxCell id="s-anlass" value="AnlassService / CachingAnlassService\nEvent data and caching" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="780" y="210" width="250" height="80" as="geometry" /></mxCell>
+        <mxCell id="s-rangliste" value="RanglistenService\nScoring / ranking data" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="780" y="330" width="220" height="80" as="geometry" /></mxCell>
+        <mxCell id="s-user" value="CachingUserService / UserService\nUser and judge data" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="780" y="450" width="250" height="80" as="geometry" /></mxCell>
+        <mxCell id="s-other" value="VereinService / VerbandService\nWertungsrichterService\nRoleService / CachingRoleService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="780" y="570" width="250" height="100" as="geometry" /></mxCell>
+        <mxCell id="store-event" value="NgRx: anlass\nAnlassState\nselectors + actions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1120" y="80" width="220" height="80" as="geometry" /></mxCell>
+        <mxCell id="store-summary" value="NgRx: anlasssummary\nAnlassSummariesState\nselectors + actions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="1120" y="190" width="220" height="80" as="geometry" /></mxCell>
+        <mxCell id="store-user" value="NgRx: user\nUserState\nselectSignal + UserActions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1120" y="300" width="240" height="90" as="geometry" /></mxCell>
+        <mxCell id="store-teil" value="NgRx: teilnehmer / teilnahmen\nTeilnehmerState / TeilnahmenState\nactions + selectors" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="1120" y="420" width="260" height="90" as="geometry" /></mxCell>
+        <mxCell id="store-org" value="NgRx: verein / oal / ots\nOrganisation and event links\nselectors + actions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="1120" y="540" width="260" height="90" as="geometry" /></mxCell>
+        <mxCell id="store-loading" value="NgRx: loading\nBusyIndicatorProgressBarEffects\nLoadingActions + selectors" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="1120" y="660" width="260" height="90" as="geometry" /></mxCell>
+        <mxCell id="e-core-auth" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="c-core" target="s-auth"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-core-store" value="reads / dispatches" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="c-core" target="store-event"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-events-auth" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="c-events" target="s-auth"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-events-services" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="c-events" target="s-anlass"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-events-store" value="reads / dispatches" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="c-events" target="store-summary"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-admin-services" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="c-admin" target="s-rangliste"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-admin-event" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="c-admin" target="s-anlass"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-finance" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="c-finance" target="s-rangliste"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-finance-event" value="reads" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="c-finance" target="store-event"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-verein-auth" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="c-verein" target="s-auth"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-verein-user" value="reads / updates" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="c-verein" target="s-user"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-verein-store" value="selectSignal / actions" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="c-verein" target="store-user"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-shared" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="c-shared" target="s-user"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-store-link" value="feature selectors / effects" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="s-auth" target="store-user"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-store-loading" value="loading actions" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="s-anlass" target="store-loading"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

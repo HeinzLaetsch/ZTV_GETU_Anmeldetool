@@ -3,7 +3,7 @@ import { Component, inject } from '@angular/core';
 import { MAT_SNACK_BAR_DATA, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'lxt-snack-bar-component',
+  selector: 'ztv-snack-bar-component',
   templateUrl: './snack-bar.component.html',
   standalone: true,
   imports: [CommonModule, MatSnackBarModule],

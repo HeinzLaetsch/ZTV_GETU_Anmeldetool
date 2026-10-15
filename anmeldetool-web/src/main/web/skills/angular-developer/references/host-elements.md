@@ -76,5 +76,5 @@ export class AppButton {
 Usage:
 
 ```html
-<lxt-btn type="primary">Click Me</lxt-btn>
+<ztv-btn type="primary">Click Me</ztv-btn>
 ```

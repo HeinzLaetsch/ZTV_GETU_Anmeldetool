@@ -3,38 +3,18 @@
     #group="matButtonToggleGroup"
     name="geschlecht"
     aria-label="Geschlecht"
-    [value]="selectedState"
+    [value]="selectedState()"
     (click)="onClick(group.value)"
     localeText="localeTextDE"
   >
     <mat-button-toggle value="Turnerin">Turnerinnen</mat-button-toggle>
     <mat-button-toggle value="Turner">Turner</mat-button-toggle>
   </mat-button-toggle-group>
-  <!--span class="abstand">
-    <mat-form-field>
-      <mat-label>Jahr</mat-label>
-      <mat-select
-        [value]="selectedJahr"
-        (selectionChange)="jahrSelektiert($event)"
-      >
-        <mat-option>None</mat-option>
-        <mat-option
-          *ngFor="let jahr of getJahresListe() | async "
-          [value]="jahr"
-        >
-          {{jahr}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </span-->
   <span class="abstand">
-    <mat-checkbox class="checkbox" [(ngModel)]="showOldAnlaesse" (change)="showOldChanged($event.checked)"
+    <mat-checkbox class="checkbox" [checked]="showOldAnlaesse()" (change)="onShowOldAnlaesseChange($event.checked)"
       >vergangene Wettkämpfe anzeigen</mat-checkbox
     >
   </span>
-  <!--span class="abstand">
-    <mat-checkbox class="checkbox">gelöschte Teilnehmer anzeigen</mat-checkbox>
-  </span-->
 </div>
 <div>
   <button
@@ -64,16 +44,14 @@
     Hilfe
   </button>
 </div>
-<!-- AG Grid Angular Component -->
 <ag-grid-angular
-  style="width: 100%; height: 80%"
-  class="ag-theme-alpine"
-  [columnDefs]="columnDefs"
+  class="teilnehmer-grid"
+  [theme]="gridTheme"
   [getRowId]="getRowId"
   [defaultColDef]="defaultColDef"
   [context]="context"
-  [rowData]="data"
-  [rowSelection]="'multiple'"
+  [rowData]="rowData()"
+  [rowSelection]="{ mode: 'multiRow', checkboxes: false, headerCheckbox: false }"
   [animateRows]="true"
   [pagination]="true"
   [paginationAutoPageSize]="true"

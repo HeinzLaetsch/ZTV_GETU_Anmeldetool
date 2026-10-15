@@ -18,27 +18,31 @@
         class="drag-drop-list layout-col"
         (cdkDropListDropped)="drop($event)"
       >
-        <div class="drag-drop-box" *ngFor="let role of allRoles" cdkDrag [cdkDragDisabled]="disableRole(role)">
-          <lxt-role-chip [role]="role" [isAllRolesList]="true"></lxt-role-chip>
-        </div>
+        @for (role of allRoles; track role.name) {
+          <div class="drag-drop-box" cdkDrag [cdkDragDisabled]="disableRole(role)">
+            <ztv-role-chip [role]="role" [isAllRolesList]="true"></ztv-role-chip>
+          </div>
+        }
       </div>
       <div
         cdkDropList
         #assignedRolesList="cdkDropList"
-        [cdkDropListData]="assignedRoles"
+        [cdkDropListData]="assignedRoles()"
         [cdkDropListConnectedTo]="[allRolesList]"
         class="drag-drop-list layout-col"
         (cdkDropListDropped)="drop($event)"
       >
-        <div class="drag-drop-box" *ngFor="let role of assignedRoles" cdkDrag [cdkDragDisabled]="disableRole(role)">
-          <lxt-role-chip
-            [role]="role"
-            [isAllRolesList]="false"
-            [isVereinsVerantwortlicher]="isVereinsAnmelder"
-            [isVereinsAnmelder]="isVereinsAnmelder"
-            (roleChange)="aktivChange($event)"
-          ></lxt-role-chip>
-        </div>
+        @for (role of assignedRoles(); track role.name) {
+          <div class="drag-drop-box" cdkDrag [cdkDragDisabled]="disableRole(role)">
+            <ztv-role-chip
+              [role]="role"
+              [isAllRolesList]="false"
+              [isVereinsVerantwortlicher]="isVereinsAnmelder()"
+              [isVereinsAnmelder]="isVereinsAnmelder()"
+              (roleChange)="aktivChange($event)"
+            ></ztv-role-chip>
+          </div>
+        }
       </div>
     </div>
   </div>

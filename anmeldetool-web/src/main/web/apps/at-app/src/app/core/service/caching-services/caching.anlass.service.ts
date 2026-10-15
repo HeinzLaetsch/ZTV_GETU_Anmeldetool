@@ -1,3 +1,4 @@
+import { HttpEvent } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { IVerein } from 'src/app/verein/verein';
@@ -115,11 +116,11 @@ export class CachingAnlassService {
     this.anlassService.getTeilnehmerForAnlassCsv(anlass, false);
   }
 
-  importTeilnehmerForAnlassCsv(anlass: IAnlass, formData: FormData): Observable<any> {
+  importTeilnehmerForAnlassCsv(anlass: IAnlass, formData: FormData): Observable<HttpEvent<unknown>> {
     return this.anlassService.importTeilnehmerForAnlassCsv(anlass, formData);
   }
 
-  importContestTeilnehmerForAnlassCsv(anlass: IAnlass, formData: FormData): Observable<any> {
+  importContestTeilnehmerForAnlassCsv(anlass: IAnlass, formData: FormData): Observable<HttpEvent<unknown>> {
     return this.anlassService.importContestTeilnehmerForAnlassCsv(anlass, formData);
   }
 
@@ -178,7 +179,7 @@ export class CachingAnlassService {
     return undefined;
   }
 
-  compare(a: number | string, b: number | string, isAsc: boolean) {
+  compare(a: number | string, b: number | string, isAsc: boolean): number {
     return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
   }
 
@@ -270,19 +271,19 @@ export class CachingAnlassService {
     }
     return undefined;
   }
-  getAnlassById(id: string) {
+  getAnlassById(id: string): IAnlass {
     if (this.loaded) {
       return this.anlaesse.find((anlass) => anlass.id === id);
     }
     return undefined;
   }
-  getAnlassByOrganisatorId(id: string) {
+  getAnlassByOrganisatorId(id: string): IAnlass {
     if (this.loaded) {
       return this.anlaesse.find((anlass) => anlass.organisatorId === id);
     }
     return undefined;
   }
-  getAnlassByAnlassBezeichnung(anlassBezeichnung: string, titu: string) {
+  getAnlassByAnlassBezeichnung(anlassBezeichnung: string, titu: string): IAnlass {
     if (this.loaded) {
       return this.anlaesse.find((anlass) => anlass.anlassBezeichnung === anlassBezeichnung && anlass.tiTu === titu);
     }
@@ -344,7 +345,7 @@ export class CachingAnlassService {
     return this.teilnahmenLoaded.asObservable();
   }
 
-  getTeilnahmen(anlass: IAnlass, brevet: number) {
+  getTeilnahmen(anlass: IAnlass, brevet: number): IAnlassLink[] {
     const teilnahmen = this.getTeilnehmerForAnlass(anlass);
     if (teilnahmen) {
       if (brevet === 1) {

@@ -9,9 +9,9 @@ import type { IAnlass } from 'src/app/core/model/IAnlass';
 import { CachingAnlassService } from 'src/app/core/service/caching-services/caching.anlass.service';
 
 @Component({
-  selector: 'lxt-upload',
+  selector: 'ztv-upload',
   templateUrl: './upload.component.html',
-  styleUrls: ['./upload.component.css'],
+  styleUrls: ['./upload.component.scss'],
   standalone: true,
   imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
 })

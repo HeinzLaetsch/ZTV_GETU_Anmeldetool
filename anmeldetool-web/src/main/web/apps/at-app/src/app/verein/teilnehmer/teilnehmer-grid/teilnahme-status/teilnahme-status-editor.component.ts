@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ViewChild, ViewContainerRef } from '@angular/
 import { NgFor } from '@angular/common';
 import { NgIf } from '@angular/common';
 import { ICellEditorAngularComp } from 'ag-grid-angular';
+import type { ICellEditorParams } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
 import { MaterialModule } from 'src/app/shared/material-module';
 import { IAnlassLink } from 'src/app/core/model/IAnlassLink';
@@ -65,20 +66,24 @@ import { MeldeStatusEnum } from 'src/app/core/model/MeldeStatusEnum';
   ],
 })
 export class TeilnahmeStatusEditor implements ICellEditorAngularComp, AfterViewInit {
-  params: any;
+  params!: ICellEditorParams & {
+    kats: string[];
+    mode: number;
+    value: IAnlassLink;
+  };
   tal: IAnlassLink;
 
   @ViewChild('container', { read: ViewContainerRef })
   container!: ViewContainerRef;
 
   // dont use afterGuiAttached for post gui events - hook into ngAfterViewInit instead for this
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     window.setTimeout(() => {
       this.container.element.nativeElement.focus();
     });
   }
 
-  agInit(params: any): void {
+  agInit(params: ICellEditorParams & { kats: string[]; mode: number; value: IAnlassLink }): void {
     this.params = params;
     console.log('Mode: ', params?.mode);
     this.tal = {
@@ -89,15 +94,15 @@ export class TeilnahmeStatusEditor implements ICellEditorAngularComp, AfterViewI
       meldeStatus: this.params.value.meldeStatus,
     };
   }
-  selected() {
-    if (this.params.kats.length > 0 && this.params.value.meldeStatus?.toUpperCase() == 'ABGEMELDET') {
+  selected(): void {
+    if (this.params.kats.length > 0 && this.params.value.meldeStatus?.toUpperCase() === 'ABGEMELDET') {
       console.log('Selected');
       this.tal.meldeStatus = MeldeStatusEnum.STARTET;
       this.params.stopEditing();
     }
   }
 
-  resetKategorie() {
+  resetKategorie(): void {
     // this.tal.kategorie = "KEIN_START";
     if (this.tal.meldeStatus?.toUpperCase() === 'ABGEMELDET') {
       this.tal.meldeStatus = MeldeStatusEnum.STARTET;
@@ -115,7 +120,7 @@ export class TeilnahmeStatusEditor implements ICellEditorAngularComp, AfterViewI
     return false;
   }
 
-  onChanged() {
+  onChanged(): void {
     if (this.tal.kategorie === 'KEIN_START') {
       this.tal.meldeStatus = MeldeStatusEnum.ABGEMELDET;
     } else {
@@ -124,14 +129,13 @@ export class TeilnahmeStatusEditor implements ICellEditorAngularComp, AfterViewI
     this.params.stopEditing();
   }
 
-  onKeyDown(event: any): void {
+  onKeyDown(event: KeyboardEvent): void {
     const key = event.key;
     if (
-      key == 'ArrowLeft' || // left
-      key == 'ArrowRight'
+      key === 'ArrowLeft' || // left
+      key === 'ArrowRight'
     ) {
       event.stopPropagation();
     }
   }
-  onClick(newValue: string) {}
 }

@@ -1,4 +1,5 @@
-import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
+import { createFeature, createReducer, createSelector, type MemoizedSelector, on } from '@ngrx/store';
+import type { ITeilnahmen } from '../../model/ITeilnahmen';
 import { initialState, teilnahmenAdapter } from './teilnahmen.state';
 import { TeilnahmenActions } from './teilnahmen.actions';
 
@@ -35,4 +36,5 @@ export const teilnahmenFeature = createFeature({
 
 export const { selectAll, selectEntities, selectIds, selectTotal } = teilnahmenAdapter.getSelectors();
 
-export const selectEntityById = (id) => createSelector(selectEntities, (entities) => entities[id]);
+export const selectEntityById = (id: string): MemoizedSelector<object, ITeilnahmen | undefined> =>
+  createSelector(selectEntities, (entities) => entities[id]);

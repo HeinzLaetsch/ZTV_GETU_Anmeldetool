@@ -5,7 +5,7 @@ export const anlassAdapter: EntityAdapter<IAnlass> = createEntityAdapter<IAnlass
   sortComparer: sortByStartDatum,
 });
 
-export function sortByStartDatum(a: IAnlass, b: IAnlass): any {
+export function sortByStartDatum(a: IAnlass, b: IAnlass): number {
   return a.startDatum.getTime() - b.startDatum.getTime();
 }
 

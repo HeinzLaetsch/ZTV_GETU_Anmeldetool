@@ -22,6 +22,7 @@ export default tseslint.config(
   },
   {
     files: ['**/*.ts'],
+    ignores: ['cypress/**/*.ts'],
     extends: [
       eslint.configs.recommended,
       ...tseslint.configs.recommended,
@@ -82,9 +83,12 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-inferrable-types': 'warn',
       '@typescript-eslint/no-shadow': 'warn',
-      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
+      ],
       // JavaScript best practices
-      eqeqeq: 'error',
+      eqeqeq: ['error', 'smart'],
       complexity: ['error', 20],
       curly: 'error',
       'guard-for-in': 'error',
@@ -103,7 +107,7 @@ export default tseslint.config(
       'no-useless-concat': 'error',
       'no-var': 'error',
       'no-restricted-syntax': 'off',
-      'no-shadow': 'error',
+      'no-shadow': 'off',
       'one-var': ['error', 'never'],
       'prefer-arrow-callback': 'error',
       'prefer-const': 'error',
@@ -118,6 +122,30 @@ export default tseslint.config(
       // Security
       'no-eval': 'error',
       'no-implied-eval': 'error',
+    },
+  },
+  {
+    files: ['cypress/**/*.ts'],
+    extends: [
+      eslint.configs.recommended,
+      ...tseslint.configs.recommended,
+      ...tseslint.configs.stylistic,
+      eslintConfigPrettier,
+    ],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        project: path.join(__dirname, '../../cypress/tsconfig.json'),
+        tsconfigRootDir: path.join(__dirname, '../..'),
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint.plugin,
+    },
+    rules: {
+      eqeqeq: ['error', 'smart'],
+      'no-var': 'error',
+      'prefer-const': 'error',
     },
   },
 );

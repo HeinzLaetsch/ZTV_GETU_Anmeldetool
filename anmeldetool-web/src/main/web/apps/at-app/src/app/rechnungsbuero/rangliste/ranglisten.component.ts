@@ -1,8 +1,13 @@
+import { CommonModule } from '@angular/common';
 import { Component, type OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import type { MatSelectChange } from '@angular/material/select';
-import type { MatSliderChange } from '@angular/material/slider';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSliderModule } from '@angular/material/slider';
 import { ActivatedRoute } from '@angular/router';
-import { Store, select } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import type { Observable } from 'rxjs';
 import type { IAnlass } from 'src/app/core/model/IAnlass';
 import type { ILauflistenStatus } from 'src/app/core/model/ILauflistenStatus';
@@ -16,11 +21,23 @@ import type { AppState } from 'src/app/core/redux/core.state';
 import { AuthService } from 'src/app/core/service/auth/auth.service';
 import { RanglistenService } from 'src/app/core/service/rangliste/ranglisten.service';
 import { SubscriptionHelper } from 'src/app/utils/subscription-helper';
+import { RanglistenEntryComponent } from './entry/ranglisten-entry.component';
+import { RanglistenHeaderComponent } from './header/ranglisten-header.component';
 
 @Component({
-  selector: 'lxt-ranglisten',
+  selector: 'ztv-ranglisten',
   templateUrl: './ranglisten.component.html',
-  styleUrls: ['./ranglisten.component.css'],
+  styleUrls: ['./ranglisten.component.scss'],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatSliderModule,
+    RanglistenHeaderComponent,
+    RanglistenEntryComponent,
+  ],
 })
 export class RanglistenComponent extends SubscriptionHelper implements OnInit {
   currentUser: IUser;
@@ -46,7 +63,7 @@ export class RanglistenComponent extends SubscriptionHelper implements OnInit {
     this.kategorie = KategorieEnum.K1;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.currentUser = this.authService.currentUser;
     //const organisatorId: string = this.route.snapshot.params.id;
     const anlassId: string = this.route.snapshot.params.id;
@@ -64,7 +81,7 @@ export class RanglistenComponent extends SubscriptionHelper implements OnInit {
   }
 
   // In Store moven und im Tab Header anzeigen geht nicht Kategorie
-  getRanglistenState() {
+  getRanglistenState(): void {
     this.ranglistenService.getRanglistenState(this.anlass, this.getFilter(), this.kategorie).subscribe((result) => {
       this.lauflistenStatus = result;
     });
@@ -84,7 +101,6 @@ export class RanglistenComponent extends SubscriptionHelper implements OnInit {
     }
     const labelAsString =
       'Rang ' + this.maxAuszeichnungen + ' / ' + (this.maxAuszeichnungen / this.ranglistenEntries.length) * 100 + ' %';
-    this.ranglistenEntries;
     return labelAsString;
   }
   get maxAuszeichnungen(): number {
@@ -98,12 +114,12 @@ export class RanglistenComponent extends SubscriptionHelper implements OnInit {
       this.config.maxAuszeichnungen = maxAuszeichnungen;
     }
   }
-  sliderChanged(value: MatSliderChange) {
+  sliderChanged(value: Event): void {
     console.log('Slider: ', value);
     this.getRangliste();
   }
   private getFilter(): string {
-    let filter = 'Tu';
+    let filter: string;
     if (this.isAlle()) {
       filter = 'Ti';
       if (TiTuEnum.Tu === this.tiTu) {
@@ -118,23 +134,23 @@ export class RanglistenComponent extends SubscriptionHelper implements OnInit {
     }
     return filter;
   }
-  getTeamwertung() {
+  getTeamwertung(): void {
     this.ranglistenService.getTeamwertung(this.anlass, this.getFilter(), this.kategorie);
   }
 
-  getRanglistePdfPerVerein() {
+  getRanglistePdfPerVerein(): void {
     this.ranglistenService.getRanglistePdfPerVerein(this.anlass, this.getFilter(), this.kategorie);
   }
 
-  getRanglistePdf() {
+  getRanglistePdf(): void {
     this.ranglistenService.getRanglistePdf(this.anlass, this.getFilter(), this.kategorie, this.maxAuszeichnungen);
   }
 
-  getRanglisteCsv() {
+  getRanglisteCsv(): void {
     this.ranglistenService.getRanglisteCsv(this.anlass, this.getFilter(), this.kategorie, this.maxAuszeichnungen);
   }
 
-  getRangliste() {
+  getRangliste(): void {
     this.ranglistenService
       .getRangliste(this.anlass, this.getFilter(), this.kategorie, this.maxAuszeichnungen)
       .subscribe((result) => {
@@ -154,7 +170,7 @@ export class RanglistenComponent extends SubscriptionHelper implements OnInit {
       });
   }
 
-  getConfig() {
+  getConfig(): void {
     this.ranglistenService
       .getRanglisteConfiguration(this.anlass, this.getFilter(), this.kategorie)
       .subscribe((result) => {

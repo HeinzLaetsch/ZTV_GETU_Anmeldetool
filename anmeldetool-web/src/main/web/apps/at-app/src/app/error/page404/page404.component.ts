@@ -1,16 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, type OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'lxt-page404',
+  selector: 'ztv-page404',
   templateUrl: './page404.component.html',
-  styleUrls: ['./page404.component.css'],
+  styleUrls: ['./page404.component.scss'],
   standalone: true,
   imports: [CommonModule, RouterModule],
 })
-export class Page404Component implements OnInit {
-  constructor() {}
-
-  ngOnInit() {}
-}
+export class Page404Component {}

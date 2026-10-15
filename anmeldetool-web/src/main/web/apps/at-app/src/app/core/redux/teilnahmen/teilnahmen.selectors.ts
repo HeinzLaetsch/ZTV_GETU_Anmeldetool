@@ -1,4 +1,5 @@
-import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { createFeatureSelector, createSelector, type MemoizedSelector } from '@ngrx/store';
+import type { ITeilnahmen } from '../../model/ITeilnahmen';
 import { TeilnahmenState } from './teilnahmen.state';
 import { teilnahmenFeature } from './teilnahmen.reducer';
 import * as fromTeilnahmen from './teilnahmen.reducer';
@@ -8,35 +9,32 @@ export const selectTeilnahmenState = createFeatureSelector<TeilnahmenState>(teil
 
 export const selectAllTeilnahmen = createSelector(selectTeilnahmenState, fromTeilnahmen.selectAll);
 
-export const selectTeilnahmen = () =>
-  createSelector(selectAllTeilnahmen, (teilnahmenState) => {
-    return teilnahmenState;
-  });
+export const selectTeilnahmen = (): MemoizedSelector<object, ITeilnahmen[]> =>
+  createSelector(selectAllTeilnahmen, (teilnahmenState) => teilnahmenState);
 
-export const selectTuTeilnahmen = () =>
-  createSelector(selectAllTeilnahmen, (teilnahmenState) => {
-    const ret = teilnahmenState.filter((x) => isTiTuEnumEqual(TiTuEnum.Tu, x.teilnehmer.tiTu));
-    return ret;
-  });
+export const selectTuTeilnahmen = (): MemoizedSelector<object, ITeilnahmen[]> =>
+  createSelector(selectAllTeilnahmen, (teilnahmenState) =>
+    teilnahmenState.filter((item) => isTiTuEnumEqual(TiTuEnum.Tu, item.teilnehmer.tiTu)),
+  );
 
-export const selectTiTeilnahmen = () =>
-  createSelector(selectAllTeilnahmen, (teilnahmenState) => {
-    const ret = teilnahmenState.filter((x) => isTiTuEnumEqual(TiTuEnum.Ti, x.teilnehmer.tiTu));
-    return ret;
-  });
+export const selectTiTeilnahmen = (): MemoizedSelector<object, ITeilnahmen[]> =>
+  createSelector(selectAllTeilnahmen, (teilnahmenState) =>
+    teilnahmenState.filter((item) => isTiTuEnumEqual(TiTuEnum.Ti, item.teilnehmer.tiTu)),
+  );
 
-export const selectTeilnahmenByAnlassId = (anlassId: string) =>
+export const selectTeilnahmenByAnlassId = (anlassId: string): MemoizedSelector<object, ITeilnahmen[]> =>
   createSelector(selectAllTeilnahmen, (teilnahmenState) => {
-    const ret = teilnahmenState
-      .map((x) => {
-        const tals = (x.talDTOList ?? []).filter((y) => y.anlassId === anlassId);
+    return teilnahmenState
+      .map((item) => {
+        const tals = (item.talDTOList ?? []).filter((link) => link.anlassId === anlassId);
         if (tals.length > 0) {
-          return {
-            ...x,
+          const teilnahmenForAnlass: ITeilnahmen = {
+            ...item,
             talDTOList: tals,
           };
+          return teilnahmenForAnlass;
         }
+        return undefined;
       })
-      .filter((x) => x !== undefined);
-    return ret;
+      .filter((item): item is ITeilnahmen => item !== undefined);
   });
