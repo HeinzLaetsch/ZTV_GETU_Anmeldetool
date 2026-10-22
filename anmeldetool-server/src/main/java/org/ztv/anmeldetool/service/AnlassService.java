@@ -12,8 +12,10 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import org.ztv.anmeldetool.exception.NotFoundException;
 import org.ztv.anmeldetool.models.Anlass;
 import org.ztv.anmeldetool.models.KategorieEnum;
@@ -27,11 +29,14 @@ import org.ztv.anmeldetool.models.RollenLink;
 import org.ztv.anmeldetool.models.Teilnehmer;
 import org.ztv.anmeldetool.models.TeilnehmerAnlassLink;
 import org.ztv.anmeldetool.models.TiTuEnum;
+import org.ztv.anmeldetool.models.WertungsrichterBrevetEnum;
+import org.ztv.anmeldetool.models.WertungsrichterSlot;
 import org.ztv.anmeldetool.repositories.AnlassRepository;
 import org.ztv.anmeldetool.repositories.PersonAnlassLinkRepository;
 import org.ztv.anmeldetool.repositories.TeilnehmerAnlassLinkRepository;
 import org.ztv.anmeldetool.transfer.AnlassDTO;
 import org.ztv.anmeldetool.transfer.BenutzerDTO;
+import org.ztv.anmeldetool.transfer.WertungsrichterSlotDTO;
 import org.ztv.anmeldetool.util.AnlassMapper;
 
 /**
@@ -52,6 +57,81 @@ public class AnlassService extends AbstractBaseService<Anlass> {
   private final PersonAnlassLinkRepository personAnlassLinkRepository;
 
   private final AnlassMapper anlassMapper;
+
+  private final OrganisationService organisationService;
+
+  @Transactional
+  public AnlassDTO createAnlass(AnlassDTO dto) {
+    if (dto.getId() != null || dto.getAnlassBezeichnung() == null
+        || dto.getAnlassBezeichnung().isBlank() || dto.getOrt() == null || dto.getOrt().isBlank()
+        || dto.getHalle() == null || dto.getHalle().isBlank() || dto.getOrganisatorId() == null
+        || dto.getTiTu() == null || dto.getTiefsteKategorie() == null
+        || dto.getHoechsteKategorie() == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pflichtangaben fehlen oder ID ist gesetzt");
+    }
+    if (dto.getTiefsteKategorie() == KategorieEnum.KEIN_START
+        || dto.getHoechsteKategorie() == KategorieEnum.KEIN_START
+        || dto.getTiefsteKategorie().ordinal() > dto.getHoechsteKategorie().ordinal()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ungueltiger Kategorienbereich");
+    }
+    LocalDateTime[] dates = { dto.getAnmeldungBeginn(), dto.getErfassenGeschlossen(),
+        dto.getCrossKategorieAenderungenGeschlossen(), dto.getAenderungenInKategorieGeschlossen(),
+        dto.getAenderungenNichtMehrErlaubt(), dto.getStartDatum(), dto.getEndDatum() };
+    for (int index = 0; index < dates.length; index++) {
+      if (dates[index] == null || (index > 0 && dates[index].isBefore(dates[index - 1]))) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ungueltige Datumsreihenfolge");
+      }
+    }
+    Organisation organisator = organisationService.findById(dto.getOrganisatorId());
+    Anlass anlass = new Anlass();
+    anlass.setAnlassBezeichnung(dto.getAnlassBezeichnung().trim());
+    anlass.setOrt(dto.getOrt().trim());
+    anlass.setHalle(dto.getHalle().trim());
+    anlass.setOrganisator(organisator);
+    anlass.setTiTu(dto.getTiTu());
+    anlass.setTiefsteKategorie(dto.getTiefsteKategorie());
+    anlass.setHoechsteKategorie(dto.getHoechsteKategorie());
+    anlass.setStartDate(dto.getStartDatum());
+    anlass.setEndDate(dto.getEndDatum());
+    anlass.setAnmeldungBeginn(dto.getAnmeldungBeginn());
+    anlass.setErfassenGeschlossen(dto.getErfassenGeschlossen());
+    anlass.setCrossKategorieAenderungenGeschlossen(dto.getCrossKategorieAenderungenGeschlossen());
+    anlass.setAenderungenInKategorieGeschlossen(dto.getAenderungenInKategorieGeschlossen());
+    anlass.setAenderungenNichtMehrErlaubt(dto.getAenderungenNichtMehrErlaubt());
+    anlass.setAktiv(true);
+    anlass.setPublished(false);
+    addWertungsrichterSlots(anlass, dto.getWertungsrichterSlots());
+    return anlassMapper.toDto(anlassRepo.save(anlass));
+  }
+
+  private void addWertungsrichterSlots(Anlass anlass, List<WertungsrichterSlotDTO> slots) {
+    if (slots == null || slots.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mindestens ein Wertungsrichter-Slot ist erforderlich");
+    }
+    for (WertungsrichterSlotDTO input : slots) {
+      if (input == null || input.getId() != null || input.getBrevet() < 1 || input.getBrevet() > 2
+          || input.getTag() == null) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ungueltige Wertungsrichter-Slot-Angaben");
+      }
+      if (input.getTag().isBefore(anlass.getStartDate().toLocalDate())
+          || input.getTag().isAfter(anlass.getEndDate().toLocalDate())
+          || (input.getStart_zeit() != null && input.getEnd_zeit() != null
+              && !input.getEnd_zeit().isAfter(input.getStart_zeit()))) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ungueltiger Slot-Tag oder Zeitraum");
+      }
+      WertungsrichterSlot slot = new WertungsrichterSlot();
+      slot.setAnlass(anlass);
+      slot.setAktiv(true);
+      slot.setReihenfolge(anlass.getWertungsrichterSlots().size() + 1);
+      slot.setBrevet(WertungsrichterBrevetEnum.fromInt(input.getBrevet()));
+      slot.setTag(input.getTag());
+      slot.setStart_zeit(input.getStart_zeit());
+      slot.setEnd_zeit(input.getEnd_zeit());
+      slot.setBeschreibung(input.getBeschreibung() == null ? "" : input.getBeschreibung().trim());
+      slot.setEgalSlot(input.isEgalSlot());
+      anlass.getWertungsrichterSlots().add(slot);
+    }
+  }
 
   public List<BenutzerDTO> getAnmelderAndVerantwortliche(Anlass anlass) {
     try {
@@ -97,12 +177,13 @@ public class AnlassService extends AbstractBaseService<Anlass> {
   @Transactional(readOnly = true)
   public Optional<Anlass> findPreviousAnlass(Anlass anlass, KategorieEnum kategorie) {
 
-   return getAnlaesse(false).stream()
-       .filter(a -> a.getStartDate().isBefore(anlass.getStartDate())
-           && a.getTiefsteKategorie().ordinal() <= kategorie.ordinal()
-           && a.getHoechsteKategorie().ordinal() >= kategorie.ordinal())
-       .min((a1, a2) -> a2.getStartDate().compareTo(a1.getStartDate()));
+    return getAnlaesse(false).stream()
+        .filter(a -> a.getStartDate().isBefore(anlass.getStartDate())
+            && a.getTiefsteKategorie().ordinal() <= kategorie.ordinal()
+            && a.getHoechsteKategorie().ordinal() >= kategorie.ordinal())
+        .min((a1, a2) -> a2.getStartDate().compareTo(a1.getStartDate()));
   }
+
   @Transactional()
   public AnlassDTO updateAnlass(AnlassDTO anlass) {
     return anlassMapper.toDto(this.anlassRepo.save(anlassMapper.toEntity(anlass)));
@@ -133,9 +214,9 @@ public class AnlassService extends AbstractBaseService<Anlass> {
     }
     return Optional.ofNullable(pals.get(0));
   }
-  //***************************************************
+  // ***************************************************
   // Ab hier missing
-  //***************************************************
+  // ***************************************************
 
   @Transactional(readOnly = true)
   public List<Anlass> getAnlaesse(boolean onlyAktiv) {
@@ -154,7 +235,7 @@ public class AnlassService extends AbstractBaseService<Anlass> {
   public Map<Teilnehmer, List<TeilnehmerAnlassLink>> getTeilnahmen(int jahr,
       Organisation organisation) {
     LocalDateTime startDate = LocalDateTime.of(jahr, 1, 1, 0, 0);
-    LocalDateTime endDate = LocalDateTime.of(jahr+1, 12, 31, 23, 59);
+    LocalDateTime endDate = LocalDateTime.of(jahr + 1, 12, 31, 23, 59);
     List<Anlass> anlaesse = anlassRepo.findByStartDateBetweenAndAktivOrderByStartDate(startDate,
         endDate, true);
     Map<Teilnehmer, List<TeilnehmerAnlassLink>> teilnahmenDTOMap = new HashMap<>();
@@ -176,7 +257,7 @@ public class AnlassService extends AbstractBaseService<Anlass> {
   public List<Anlass> getAnlaesseFiltered(int jahr, boolean nurSmQuali, TiTuEnum tiTu) {
     LocalDateTime start = LocalDateTime.parse(jahr + "-01-01T00:00:00");
     LocalDateTime end = LocalDateTime.now();
-    boolean[] nurSmQualis = {true, false};
+    boolean[] nurSmQualis = { true, false };
     if (nurSmQuali) {
       nurSmQualis[1] = true;
     }
@@ -185,16 +266,16 @@ public class AnlassService extends AbstractBaseService<Anlass> {
             end);
   }
 
-  //TODO Move to TeilnehmerAnlassLinkService
+  // TODO Move to TeilnehmerAnlassLinkService
   @Transactional(readOnly = true)
   public List<TeilnehmerAnlassLink> getTeilnahmen(Anlass anlass, Organisation organisation,
       boolean exclude) {
     List<TeilnehmerAnlassLink> teilnahmen = null;
     if (exclude) {
       List<MeldeStatusEnum> exclusion = Arrays
-          .asList(new MeldeStatusEnum[]{MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.ABGEMELDET_1,
+          .asList(new MeldeStatusEnum[] { MeldeStatusEnum.ABGEMELDET, MeldeStatusEnum.ABGEMELDET_1,
               MeldeStatusEnum.ABGEMELDET_2, MeldeStatusEnum.ABGEMELDET_3,
-              MeldeStatusEnum.UMMELDUNG});
+              MeldeStatusEnum.UMMELDUNG });
       teilnahmen = teilnehmerAnlassLinkRepository.findByAnlassAndOrganisationExclude(anlass,
           organisation,
           exclusion);
@@ -228,5 +309,3 @@ public class AnlassService extends AbstractBaseService<Anlass> {
     return anlassRepo.findById(id).orElseThrow(() -> new NotFoundException(Organisation.class, id));
   }
 }
-
-

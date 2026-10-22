@@ -42,11 +42,11 @@
         title="{{ label }}"
         min="0"
         [max]="anzahl"
-        [(ngModel)]="maxAuszeichnungen"
         thumbLabel
         tickInterval="1"
         (change)="sliderChanged($event)"
       ></mat-slider>
+      <input matSliderThumb [(ngModel)]="maxAuszeichnungen" />
     </div>
     <div class="layout-col-sm-1">
       <button

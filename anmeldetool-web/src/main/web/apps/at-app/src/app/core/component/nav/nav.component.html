@@ -1,4 +1,4 @@
-<mat-toolbar class="ztv-toolbar-theme" id="main-menu">
+<mat-toolbar class="ztv-toolbar-theme main-menu">
   <div class="main-nav-container">
     <a class="brand" routerLink="/anlaesse" aria-label="ZTV Anmeldetool Startseite">
       <span class="brand-mark"><mat-icon aria-hidden="true">event_available</mat-icon></span>
@@ -8,9 +8,11 @@
       <mat-nav-list class="list-horizontal primary-nav" aria-label="Hauptnavigation">
         @if (!authService.isAnlassUserSig()) {
           <mat-list-item
+            #anlaesseRoute="routerLinkActive"
             routerLink="/anlaesse"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
+            [activated]="anlaesseRoute.isActive"
             matRipple
           >
             <button mat-button class="mainNav nav-action" disableRipple>
@@ -28,6 +30,10 @@
               <mat-icon class="material-icons-outlined arrow-icon"> arrow_drop_down </mat-icon>
             </button>
             <mat-menu #adminMenu="matMenu" class="nav-menu">
+              <button mat-menu-item type="button" data-cy="create-event-nav-btn" routerLink="/anlaesse/neu">
+                <mat-icon aria-hidden="true">add</mat-icon>
+                <span>Neuen Anlass erstellen</span>
+              </button>
               @for (anlass of eigeneAnlaesse; track anlass.id) {
                 <button
                   mat-menu-item
@@ -47,7 +53,12 @@
           </mat-list-item>
         }
         @if (!authService.isAnlassUserSig()) {
-          <mat-list-item routerLink="/verein/teilnehmer" routerLinkActive="active">
+          <mat-list-item
+            #teilnehmerRoute="routerLinkActive"
+            routerLink="/verein/teilnehmer"
+            routerLinkActive="active"
+            [activated]="teilnehmerRoute.isActive"
+          >
             <button mat-button class="mainNav nav-action" disableRipple>
               <mat-icon aria-hidden="true">groups</mat-icon>
               <span>Teilnehmer</span>
@@ -117,9 +128,11 @@
       </mat-nav-list>
       <mat-nav-list class="list-horizontal account-nav" aria-label="Benutzerkonto">
         <mat-list-item
+          #userRoute="routerLinkActive"
           routerLink="/user"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
+          [activated]="userRoute.isActive"
           matRipple
         >
           <button mat-button class="mainNav nav-action" disableRipple>

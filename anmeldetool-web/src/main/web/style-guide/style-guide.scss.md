@@ -25,8 +25,8 @@ This document contains guidelines for _Angular_ styling (SCSS) files.
 - max 2, in rare cases 3 nested selectors
 - use global CSS custom properties for design tokens
 - use component-private CSS custom properties on `:host` for component-specific styling knobs
-- prefer component-specific styles for component style
-- use global styles for global styles only
+- use component-specific stylesheets for layout and non-Material app-specific details only
+- use global styles for global layout utilities only; Material visual styling belongs in the generated theme
 - use shorthand or intrinsic wherever possible and useful
   - `margin: 1em auto;`
 - write zero values without a unit
@@ -36,9 +36,10 @@ This document contains guidelines for _Angular_ styling (SCSS) files.
 - use `@use` and `@forward` instead of deprecated `@import`
 - use `rem` for typography instead of `px`
 
-- Use the shared `--ztv-*` color tokens for navigation colors instead of defining component-local color values.
-- Keep navigation hover and selected states consistent: blue backgrounds with white text; selected buttons should inherit colors from their active list item.
-- Prefer using global styles over styles defined within components.
+- Treat `apps/at-app/src/assets/theme/ztv-gen-theme.scss` as the source of truth for Angular Material colors, typography, shapes, and states.
+- Do not redeclare Material component tokens, colors, border radii, or hover/focus/disabled styles in component or app-global SCSS.
+- If a Material visual needs changing, update the generated theme through its Angular Material Sass override mixins instead of adding local selectors or custom-property overrides.
+- Use Material component inputs and states, such as `activated`, to express selection instead of simulating Material states with CSS classes.
 
 ### Should do
 
@@ -72,6 +73,7 @@ This document contains guidelines for _Angular_ styling (SCSS) files.
   - hell no: `body.ztv-is-home .ztv-person.ztv-is-disabled > .ztv-avatar`
   - use modifier instead: `.ztv-avatar--disabled`
 - avoid defining raw colors in components (use design tokens or component-private custom properties)
+- avoid overriding Angular Material styles in component stylesheets; use the generated theme as the single source of truth
 - avoid `float` use CSS grid or flexbox instead
   - howto [choose between grid and flexbox](https://medium.com/youstart-labs/beginners-guide-to-choose-between-css-grid-and-flexbox-783005dd2412)
 - avoid writing properties which could be shorthanded (e.g., margin)

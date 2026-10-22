@@ -26,10 +26,7 @@ There are specific style guides for:
 
 #### all Components
 
-- Use `var(--ztv-blue)` backgrounds with `var(--ztv-white)` text selected states.
-- Use `var(--ztv-dark-blue)` backgrounds with `var(--ztv-light-gray)` text hover states.
-- Use `var(--ztv-lighter-blue)` for the background and `var(--ztv-gray)` for the text disabled states.
-- Use `var(--ztv-lighter-gray)` for the background and `--ztv-dark-gray` for the text for all other states.
+- Use `apps/at-app/src/assets/theme/ztv-gen-theme.scss` as the authoritative source for Angular Material styling.
 
 ### Should do
 
@@ -42,7 +39,9 @@ There are specific style guides for:
 ### Shared Rules
 
 - Use shared design tokens such as `--ztv-*` for colors instead of defining raw colors in component styles.
-- Keep application-wide theme defaults and shared tokens in global styles; keep component-specific layout and state styles in the component stylesheet.
+- Keep Material colors, typography, shapes, and state styling in `ztv-gen-theme.scss`; do not redefine them in component or app-global styles.
+- Use component stylesheets for layout and non-Material details, referencing theme tokens where visual styling is needed.
+- If a Material style needs changing, update the generated theme using its Sass override API rather than adding a local selector or custom property override.
 - Define each visual state once. Avoid duplicate selectors and conflicting declarations; use `!important` only when a library's specificity requires it.
 - Keep foreground, background, icon, and overlay colors coherent across hover, focus, selected, and disabled states.
 - Preserve visible keyboard focus. Do not remove focus indicators or neutralize focus layers as a side effect of changing hover styling.
@@ -51,9 +50,8 @@ There are specific style guides for:
 ### Buttons
 
 - Style all Buttons within the application the same way
-- Use a consistent `0.6rem` border radius for buttons, matching the navigation list items.
-- In the default state (enabled, unselected, and not hovered), buttons should match a Material list item: use its container and label color tokens.
-- Use the shared button theme and styles for a given button variant. Add an explicit variant when a button has a distinct semantic purpose instead of introducing ad hoc overrides.
+- Use the button shape and state colors supplied by `ztv-gen-theme.scss`; do not set button colors, radii, or Material tokens in component SCSS.
+- Use the shared button theme and styles for a given button variant. Add an explicit variant when a button has a distinct semantic purpose instead of adding local overrides.
 - Apply state colors to the full button surface, including its label and icons, so hover or selected styles do not leave contrasting edges.
 - Keep hover, focus, active, disabled, and selected behavior intentional and consistent across buttons of the same variant.
 
@@ -65,12 +63,13 @@ There are specific style guides for:
 
 ### Navigation
 
-- When a navigation button is inside an active list item, let the button inherit the active item's colors rather than repeating the same declarations.
-- For Material list-item hover states, set `--mat-list-list-item-hover-state-layer-color` to `transparent` on the hovered item when the default overlay creates a contrasting edge. Keep keyboard-focus styling distinct and visible.
+- Represent the selected route with Material's `activated` state and let `ztv-gen-theme.scss` provide its appearance.
+- Define Material list-item hover and focus colors in `ztv-gen-theme.scss`, not in the navigation component stylesheet.
 - Keep navigation-specific responsive overrides in the established 900px and 560px breakpoints, and change only the properties needed at each breakpoint.
 
 ## Don't
 
+- Don't override or redeclare Angular Material tokens or state colors in component stylesheets or app-global styles.
 - Don't commit AI slop. Always review and edit AI-generated code before committing it!
 
 ## Resources

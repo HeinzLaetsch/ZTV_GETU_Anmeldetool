@@ -1,71 +1,487 @@
+/* These tokens are generated using https://themes.angular-material.dev/ */
+/* Preview: https://themes.angular-material.dev/?bold-font-weight=700&brand-font-family=Roboto&medium-font-weight=500&plain-font-family=Roboto&regular-font-weight=400&seed-error=%23e05353&seed-neutral=%23ececfc&seed-neutral-variant=%23e0e2fc&seed-primary=%23488dd6&seed-secondary=%23607d8b&seed-tertiary=%23d9744b */
+/* Seed Colors: primary: #488dd6, secondary: #607d8b, tertiary: #d9744b, error: #e05353, neutral: #ececfc, neutral-variant: #e0e2fc */
+/* Seed Typography: plain-font-family: Roboto, brand-font-family: Roboto, bold-font-weight: 700, medium-font-weight: 500, regular-font-weight: 400 */
+
+/* Make sure to import fonts in `<head>` of html */
+/*
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto&family=Roboto&display=swap');
+</style>
+
+OR
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto&family=Roboto&display=swap">
+*/
+
 @use '@angular/material' as mat;
 
-@include mat.core();
-
-$primary-palette: mat.m2-define-palette(mat.$m2-indigo-palette);
-$accent-palette: mat.m2-define-palette(mat.$m2-pink-palette, A200, A100, A400);
-$warn-palette: mat.m2-define-palette(mat.$m2-red-palette);
-
-$ztv-typography: mat.m2-define-typography-config(
-  $font-family: 'Roboto, Arial, sans-serif',
-  $headline-1: mat.m2-define-typography-level(96px, 96px, 300),
-  $headline-2: mat.m2-define-typography-level(60px, 60px, 300),
-);
-
-$ztv-theme: mat.m2-define-light-theme(
-  (
-    color: (
-      primary: $primary-palette,
-      accent: $accent-palette,
-      warn: $warn-palette,
-    ),
-    typography: $ztv-typography,
-  )
-);
-
-$dark-theme: mat.m2-define-dark-theme(
-  (
-    color: (
-      primary: $primary-palette,
-      accent: $accent-palette,
-      warn: $warn-palette,
-    ),
-  )
-);
-
-.ztv-toolbar-theme {
-  @include mat.toolbar-theme($ztv-theme);
-  background-color: mat.m2-get-color-from-palette($primary-palette);
-  color: white;
-
-  .mat-toolbar-row {
-    font-size: 20px;
-  }
+/* Light Theme */
+:root,
+:host {
+  @include mat.theme-overrides((primary: #0061a6,
+      on-primary: #ffffff,
+      primary-container: #d2e4ff,
+      on-primary-container: #001c37,
+      inverse-primary: #a0c9ff,
+      primary-fixed: #d2e4ff,
+      primary-fixed-dim: #a0c9ff,
+      on-primary-fixed: #001c37,
+      on-primary-fixed-variant: #00497f,
+      secondary: #466270,
+      on-secondary: #ffffff,
+      secondary-container: #c9e7f7,
+      on-secondary-container: #001f2a,
+      secondary-fixed: #c9e7f7,
+      secondary-fixed-dim: #adcbda,
+      on-secondary-fixed: #001f2a,
+      on-secondary-fixed-variant: #2e4b57,
+      tertiary: #9b4520,
+      on-tertiary: #ffffff,
+      tertiary-container: #ffdbce,
+      on-tertiary-container: #370e00,
+      tertiary-fixed: #ffdbce,
+      tertiary-fixed-dim: #ffb599,
+      on-tertiary-fixed: #370e00,
+      on-tertiary-fixed-variant: #7c2e09,
+      background: #fcf8f9,
+      on-background: #1c1b1c,
+      surface: #fcf8f9,
+      surface-dim: #dcd9da,
+      surface-bright: #fcf8f9,
+      surface-container-lowest: #ffffff,
+      surface-container-low: #f6f3f3,
+      surface-container: #f1edee,
+      surface-container-high: #ebe7e8,
+      surface-container-highest: #e5e2e2,
+      on-surface: #1c1b1c,
+      shadow: #000000,
+      scrim: #000000,
+      surface-tint: #5c5e6b,
+      inverse-surface: #313031,
+      inverse-on-surface: #f3f0f1,
+      outline: #77767c,
+      outline-variant: #c7c5cd,
+      neutral: #787677,
+      neutral10: #1c1b1c,
+      error: #ba1a1a,
+      error-container: #ffdad6,
+      on-error: #ffffff,
+      on-error-container: #410002,
+      surface-variant: #e3e1e9,
+      on-surface-variant: #46464c,
+      neutral-variant: #77767d,
+      neutral-variant20: #303036,
+      inverse-secondary: #adcbda,
+      inverse-tertiary: #ffb599,
+    ));
 }
 
-// Example: Custom button style
-.ztv-button-theme {
-  @include mat.button-theme($ztv-theme);
+/* Component token overrides */
+:root,
+:host {
+  @include mat.theme-overrides((corner-extra-small: 10px,
+    ));
 
-  .mat-raised-button {
-    border-radius: 8px; // Custom rounded corners
-    padding: 10px 20px;
-  }
+  @include mat.form-field-overrides((container-height: 56px,
+      container-vertical-padding: 16px,
+      container-text-font: Roboto,
+      container-text-line-height: 24px,
+      container-text-size: 0.8rem,
+      container-text-tracking: 0.03125em,
+      container-text-weight: 300,
+      filled-label-display: block,
+      filled-with-label-container-padding-top: 24px,
+      filled-with-label-container-padding-bottom: 8px,
+      filled-container-shape: 10px,
+      filled-active-indicator-height: 1px,
+      filled-focus-active-indicator-height: 2px,
+      outlined-container-shape: 10px,
+      outlined-outline-width: 1px,
+      outlined-focus-outline-width: 2px,
+      outlined-label-text-font: Roboto,
+      outlined-label-text-size: 0.8rem,
+      outlined-label-text-tracking: 0.03125em,
+      outlined-label-text-weight: 300,
+      outlined-label-text-populated-size: 0.8rem,
+      filled-label-text-font: Roboto,
+      filled-label-text-size: 0.8rem,
+      filled-label-text-tracking: 0.03125em,
+      filled-label-text-weight: 300,
+      subscript-text-font: Roboto,
+      subscript-text-line-height: 20px,
+      subscript-text-size: 12px,
+      subscript-text-tracking: 0.0333333333em,
+      subscript-text-weight: 400,
+      focus-select-arrow-color: var(--ztv-dark-blue),
+      filled-caret-color: var(--ztv-dark-blue),
+      filled-focus-active-indicator-color: var(--ztv-dark-blue),
+      filled-focus-label-text-color: var(--ztv-light-gray),
+      outlined-caret-color: var(--ztv-dark-blue),
+      outlined-focus-outline-color: var(--ztv-dark-blue),
+      outlined-focus-label-text-color: var(--ztv-light-gray),
+      disabled-input-text-placeholder-color: var(--ztv-gray),
+      state-layer-color: var(--ztv-dark-blue),
+      error-text-color: var(--ztv-error),
+      select-option-text-color: var(--ztv-dark-gray),
+      select-disabled-option-text-color: var(--ztv-gray),
+      leading-icon-color: var(--ztv-dark-gray),
+      disabled-leading-icon-color: var(--ztv-gray),
+      trailing-icon-color: var(--ztv-dark-gray),
+      disabled-trailing-icon-color: var(--ztv-gray),
+      error-focus-trailing-icon-color: var(--ztv-error),
+      error-hover-trailing-icon-color: var(--ztv-error),
+      error-trailing-icon-color: var(--ztv-error),
+      enabled-select-arrow-color: var(--ztv-dark-gray),
+      disabled-select-arrow-color: var(--ztv-gray),
+      hover-state-layer-opacity: 1,
+      focus-state-layer-opacity: 1,
+      filled-container-color: var(--ztv-lighter-gray),
+      filled-disabled-container-color: var(--ztv-lighter-blue),
+      filled-label-text-color: var(--ztv-dark-gray),
+      filled-hover-label-text-color: var(--ztv-light-gray),
+      filled-disabled-label-text-color: var(--ztv-gray),
+      filled-input-text-color: var(--ztv-dark-gray),
+      filled-disabled-input-text-color: var(--ztv-gray),
+      filled-input-text-placeholder-color: var(--ztv-dark-gray),
+      filled-error-hover-label-text-color: var(--ztv-error),
+      filled-error-focus-label-text-color: var(--ztv-error),
+      filled-error-label-text-color: var(--ztv-error),
+      filled-error-caret-color: var(--ztv-error),
+      filled-active-indicator-color: var(--ztv-dark-gray),
+      filled-disabled-active-indicator-color: var(--ztv-gray),
+      filled-hover-active-indicator-color: var(--ztv-dark-blue),
+      filled-error-active-indicator-color: var(--ztv-error),
+      filled-error-focus-active-indicator-color: var(--ztv-error),
+      filled-error-hover-active-indicator-color: var(--ztv-error),
+      outlined-label-text-color: var(--ztv-dark-gray),
+      outlined-hover-label-text-color: var(--ztv-light-gray),
+      outlined-disabled-label-text-color: var(--ztv-gray),
+      outlined-input-text-color: var(--ztv-dark-gray),
+      outlined-disabled-input-text-color: var(--ztv-gray),
+      outlined-input-text-placeholder-color: var(--ztv-dark-gray),
+      outlined-error-caret-color: var(--ztv-error),
+      outlined-error-focus-label-text-color: var(--ztv-error),
+      outlined-error-label-text-color: var(--ztv-error),
+      outlined-error-hover-label-text-color: var(--ztv-error),
+      outlined-outline-color: var(--ztv-dark-gray),
+      outlined-disabled-outline-color: var(--ztv-gray),
+      outlined-hover-outline-color: var(--ztv-dark-blue),
+      outlined-error-focus-outline-color: var(--ztv-error),
+      outlined-error-hover-outline-color: var(--ztv-error),
+      outlined-error-outline-color: var(--ztv-error),
+    ));
+
+  @include mat.option-overrides((label-text-color: var(--ztv-dark-gray),
+      label-text-font: Roboto,
+      label-text-line-height: 24px,
+      label-text-size: 0.8rem,
+      label-text-tracking: 0.03125em,
+      label-text-weight: 400,
+      hover-state-layer-color: var(--ztv-dark-blue),
+      focus-state-layer-color: var(--ztv-dark-blue),
+      selected-state-layer-color: var(--ztv-blue),
+      selected-state-label-text-color: var(--ztv-white),
+    ));
+
+  @include mat.list-overrides((active-indicator-shape: 4px,
+      active-indicator-color: var(--ztv-blue),
+      list-item-container-shape: 0,
+      list-item-container-color: var(--ztv-lighter-gray),
+      list-item-selected-container-color: var(--ztv-blue),
+      list-item-leading-avatar-shape: 50%,
+      list-item-leading-avatar-size: 40px,
+      list-item-leading-avatar-color: transparent,
+      list-item-leading-icon-size: 24px,
+      list-item-leading-icon-start-space: 16px,
+      list-item-leading-icon-end-space: 32px,
+      list-item-trailing-icon-size: 24px,
+      list-item-one-line-container-height: 48px,
+      list-item-two-line-container-height: 64px,
+      list-item-three-line-container-height: 88px,
+      list-item-label-text-color: var(--ztv-dark-gray),
+      list-item-label-text-font: Roboto,
+      list-item-label-text-line-height: 24px,
+      list-item-label-text-size: 16px,
+      list-item-label-text-tracking: 0.03125em,
+      list-item-label-text-weight: 400,
+      list-item-supporting-text-color: var(--ztv-dark-gray),
+      list-item-supporting-text-font: Roboto,
+      list-item-supporting-text-line-height: 20px,
+      list-item-supporting-text-size: 14px,
+      list-item-supporting-text-tracking: 0.0178571429em,
+      list-item-supporting-text-weight: 400,
+      list-item-trailing-supporting-text-color: var(--ztv-dark-gray),
+      list-item-trailing-supporting-text-font: Roboto,
+      list-item-trailing-supporting-text-line-height: 20px,
+      list-item-trailing-supporting-text-size: 12px,
+      list-item-trailing-supporting-text-tracking: 0.0333333333em,
+      list-item-trailing-supporting-text-weight: 400,
+      list-item-leading-icon-color: var(--ztv-dark-gray),
+      list-item-trailing-icon-color: var(--ztv-dark-gray),
+      list-item-selected-trailing-icon-color: var(--ztv-white),
+      list-item-disabled-state-layer-color: var(--ztv-lighter-blue),
+      list-item-disabled-state-layer-opacity: 1,
+      list-item-disabled-label-text-color: var(--ztv-gray),
+      list-item-disabled-label-text-opacity: 1,
+      list-item-disabled-leading-icon-color: var(--ztv-gray),
+      list-item-disabled-leading-icon-opacity: 1,
+      list-item-disabled-trailing-icon-color: var(--ztv-gray),
+      list-item-disabled-trailing-icon-opacity: 1,
+      list-item-hover-label-text-color: var(--ztv-light-gray),
+      list-item-hover-leading-icon-color: var(--ztv-light-gray),
+      list-item-hover-trailing-icon-color: var(--ztv-light-gray),
+      list-item-hover-state-layer-color: var(--ztv-dark-blue),
+      list-item-hover-state-layer-opacity: 1,
+      list-item-focus-label-text-color: var(--ztv-light-gray),
+      list-item-focus-state-layer-color: var(--ztv-dark-blue),
+      list-item-focus-state-layer-opacity: 1,
+    ));
 }
 
-.icon-primary {
-  color: mat.m2-get-color-from-palette($primary-palette);
+.mat-mdc-button-base,
+.mat-mdc-button-base.mat-primary,
+.mat-mdc-button-base.mat-accent,
+.mat-mdc-button-base.mat-warn {
+  @include mat.button-overrides((filled-container-shape: 0.6rem,
+      filled-horizontal-padding: 16px,
+      filled-icon-offset: -4px,
+      filled-icon-spacing: 8px,
+      filled-touch-target-size: 48px,
+      outlined-container-shape: 0.6rem,
+      outlined-horizontal-padding: 15px,
+      outlined-icon-offset: -4px,
+      outlined-icon-spacing: 8px,
+      outlined-outline-width: 1px,
+      outlined-touch-target-size: 48px,
+      protected-container-shape: 0.6rem,
+      protected-container-elevation-shadow: (0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+        0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+        0px 1px 5px 0px rgba(0, 0, 0, 0.12),
+      ),
+      protected-disabled-container-elevation-shadow: (0px 0px 0px 0px rgba(0, 0, 0, 0.2),
+        0px 0px 0px 0px rgba(0, 0, 0, 0.14),
+        0px 0px 0px 0px rgba(0, 0, 0, 0.12),
+      ),
+      protected-focus-container-elevation-shadow: (0px 2px 4px -1px rgba(0, 0, 0, 0.2),
+        0px 4px 5px 0px rgba(0, 0, 0, 0.14),
+        0px 1px 10px 0px rgba(0, 0, 0, 0.12),
+      ),
+      protected-hover-container-elevation-shadow: (0px 2px 4px -1px rgba(0, 0, 0, 0.2),
+        0px 4px 5px 0px rgba(0, 0, 0, 0.14),
+        0px 1px 10px 0px rgba(0, 0, 0, 0.12),
+      ),
+      protected-pressed-container-elevation-shadow: (0px 5px 5px -3px rgba(0, 0, 0, 0.2),
+        0px 8px 10px 1px rgba(0, 0, 0, 0.14),
+        0px 3px 14px 2px rgba(0, 0, 0, 0.12),
+      ),
+      protected-horizontal-padding: 16px,
+      protected-icon-offset: -4px,
+      protected-icon-spacing: 8px,
+      protected-touch-target-size: 48px,
+      text-container-shape: 0.6rem,
+      text-horizontal-padding: 8px,
+      text-icon-offset: 0,
+      text-icon-spacing: 8px,
+      text-with-icon-horizontal-padding: 8px,
+      text-touch-target-size: 48px,
+      tonal-container-shape: 0.6rem,
+      tonal-horizontal-padding: 16px,
+      tonal-icon-offset: -4px,
+      tonal-icon-spacing: 8px,
+      tonal-touch-target-size: 48px,
+      filled-container-color: var(--ztv-lighter-gray),
+      filled-disabled-container-color: var(--ztv-lighter-blue),
+      filled-disabled-label-text-color: var(--ztv-gray),
+      filled-disabled-state-layer-color: var(--ztv-lighter-blue),
+      filled-focus-state-layer-opacity: 1,
+      filled-hover-state-layer-opacity: 1,
+      filled-label-text-color: var(--ztv-dark-gray),
+      filled-pressed-state-layer-opacity: 1,
+      filled-ripple-color: var(--ztv-dark-blue),
+      filled-state-layer-color: var(--ztv-dark-blue),
+      outlined-disabled-label-text-color: var(--ztv-gray),
+      outlined-disabled-outline-color: var(--ztv-gray),
+      outlined-disabled-state-layer-color: var(--ztv-lighter-blue),
+      outlined-focus-state-layer-opacity: 1,
+      outlined-hover-state-layer-opacity: 1,
+      outlined-label-text-color: var(--ztv-dark-gray),
+      outlined-outline-color: var(--ztv-dark-gray),
+      outlined-pressed-state-layer-opacity: 1,
+      outlined-ripple-color: var(--ztv-dark-blue),
+      outlined-state-layer-color: var(--ztv-dark-blue),
+      protected-container-color: var(--ztv-lighter-gray),
+      protected-disabled-container-color: var(--ztv-lighter-blue),
+      protected-disabled-label-text-color: var(--ztv-gray),
+      protected-disabled-state-layer-color: var(--ztv-lighter-blue),
+      protected-focus-state-layer-opacity: 1,
+      protected-hover-state-layer-opacity: 1,
+      protected-label-text-color: var(--ztv-dark-gray),
+      protected-pressed-state-layer-opacity: 1,
+      protected-ripple-color: var(--ztv-dark-blue),
+      protected-state-layer-color: var(--ztv-dark-blue),
+      text-disabled-label-text-color: var(--ztv-gray),
+      text-disabled-state-layer-color: var(--ztv-lighter-blue),
+      text-focus-state-layer-opacity: 1,
+      text-hover-state-layer-opacity: 1,
+      text-label-text-color: var(--ztv-dark-gray),
+      text-pressed-state-layer-opacity: 1,
+      text-ripple-color: var(--ztv-dark-blue),
+      text-state-layer-color: var(--ztv-dark-blue),
+      tonal-container-color: var(--ztv-lighter-gray),
+      tonal-disabled-container-color: var(--ztv-lighter-blue),
+      tonal-disabled-label-text-color: var(--ztv-gray),
+      tonal-disabled-state-layer-color: var(--ztv-lighter-blue),
+      tonal-focus-state-layer-opacity: 1,
+      tonal-hover-state-layer-opacity: 1,
+      tonal-label-text-color: var(--ztv-dark-gray),
+      tonal-pressed-state-layer-opacity: 1,
+      tonal-ripple-color: var(--ztv-dark-blue),
+      tonal-state-layer-color: var(--ztv-dark-blue),
+      filled-container-height: 36px,
+      filled-touch-target-display: block,
+      outlined-container-height: 36px,
+      outlined-touch-target-display: block,
+      protected-container-height: 36px,
+      protected-touch-target-display: block,
+      text-container-height: 36px,
+      text-touch-target-display: block,
+      tonal-container-height: 36px,
+      tonal-touch-target-display: block,
+      filled-label-text-font: Roboto,
+      filled-label-text-size: 0.8rem,
+      filled-label-text-tracking: 0.0892857143em,
+      filled-label-text-transform: none,
+      filled-label-text-weight: 300,
+      outlined-label-text-font: Roboto,
+      outlined-label-text-size: 0.8rem,
+      outlined-label-text-tracking: 0.0892857143em,
+      outlined-label-text-transform: none,
+      outlined-label-text-weight: 300,
+      protected-label-text-font: Roboto,
+      protected-label-text-size: 0.8rem,
+      protected-label-text-tracking: 0.0892857143em,
+      protected-label-text-transform: none,
+      protected-label-text-weight: 300,
+      text-label-text-font: Roboto,
+      text-label-text-size: 0.8rem,
+      text-label-text-tracking: 0.0892857143em,
+      text-label-text-transform: none,
+      text-label-text-weight: 300,
+      tonal-label-text-font: Roboto,
+      tonal-label-text-size: 0.8rem,
+      tonal-label-text-tracking: 0.0892857143em,
+      tonal-label-text-transform: none,
+      tonal-label-text-weight: 300,
+    ));
+
+  background-color: var(--ztv-lighter-gray);
+  border-radius: 0.6rem;
+  color: var(--ztv-dark-gray);
 }
 
-.icon-accent {
-  color: mat.m2-get-color-from-palette($accent-palette);
+.mat-mdc-button-base:hover:not(:disabled),
+.mat-mdc-button-base:focus-visible:not(:disabled) {
+  @include mat.button-overrides((filled-label-text-color: var(--ztv-light-gray),
+      outlined-label-text-color: var(--ztv-light-gray),
+      protected-label-text-color: var(--ztv-light-gray),
+      text-label-text-color: var(--ztv-light-gray),
+      tonal-label-text-color: var(--ztv-light-gray),
+    ));
+
+  background-color: var(--ztv-dark-blue);
+  color: var(--ztv-light-gray);
 }
 
-@include mat.all-component-themes($ztv-theme);
-@include mat.all-component-typographies($ztv-typography);
-
-/*
-.dark-theme {
-  @include mat.all-component-colors($dark-theme);
+.mat-mdc-button-base:disabled {
+  background-color: var(--ztv-lighter-blue);
+  color: var(--ztv-gray);
 }
-*/
+
+.mat-mdc-option:not(.mdc-list-item--disabled) {
+  background-color: var(--ztv-lighter-gray);
+}
+
+.mat-mdc-option:hover:not(.mdc-list-item--disabled),
+.mat-mdc-option:focus:not(.mdc-list-item--disabled),
+.mat-mdc-option.mat-mdc-option-active:not(.mdc-list-item--disabled) {
+  --mat-option-label-text-color: var(--ztv-light-gray);
+}
+
+/* Dark Theme */
+.dark {
+  @include mat.theme-overrides((primary: #a0c9ff,
+      on-primary: #00325a,
+      primary-container: #00497f,
+      on-primary-container: #d2e4ff,
+      inverse-primary: #0061a6,
+      primary-fixed: #d2e4ff,
+      primary-fixed-dim: #a0c9ff,
+      on-primary-fixed: #001c37,
+      on-primary-fixed-variant: #00497f,
+      secondary: #adcbda,
+      on-secondary: #163440,
+      secondary-container: #2e4b57,
+      on-secondary-container: #c9e7f7,
+      secondary-fixed: #c9e7f7,
+      secondary-fixed-dim: #adcbda,
+      on-secondary-fixed: #001f2a,
+      on-secondary-fixed-variant: #2e4b57,
+      tertiary: #ffb599,
+      on-tertiary: #5a1c00,
+      tertiary-container: #7c2e09,
+      on-tertiary-container: #ffdbce,
+      tertiary-fixed: #ffdbce,
+      tertiary-fixed-dim: #ffb599,
+      on-tertiary-fixed: #370e00,
+      on-tertiary-fixed-variant: #7c2e09,
+      background: #131314,
+      on-background: #e5e2e2,
+      surface: #131314,
+      surface-dim: #131314,
+      surface-bright: #3a393a,
+      surface-container-lowest: #0e0e0f,
+      surface-container-low: #1c1b1c,
+      surface-container: #201f20,
+      surface-container-high: #2a2a2b,
+      surface-container-highest: #353435,
+      on-surface: #e5e2e2,
+      shadow: #000000,
+      scrim: #000000,
+      surface-tint: #c5c5d5,
+      inverse-surface: #e5e2e2,
+      inverse-on-surface: #313031,
+      outline: #919096,
+      outline-variant: #46464c,
+      neutral: #787677,
+      neutral10: #1c1b1c,
+      error: #ffb4ab,
+      error-container: #93000a,
+      on-error: #690005,
+      on-error-container: #ffdad6,
+      surface-variant: #46464c,
+      on-surface-variant: #c7c5cd,
+      neutral-variant: #77767d,
+      neutral-variant20: #303036,
+      inverse-secondary: #466270,
+      inverse-tertiary: #9b4520,
+    ));
+}
+
+/* Typography */
+:root,
+:host {
+  /* core typography tokens are not generating css variables, hence below */
+  --mat-sys-brand-font-family: Roboto;
+  --mat-sys-plain-font-family: Roboto;
+  --mat-sys-bold-font-weight: 700;
+  --mat-sys-medium-font-weight: 500;
+  --mat-sys-regular-font-weight: 400;
+
+  @include mat.theme-overrides((brand-family: Roboto,
+      plain-family: Roboto,
+      bold-weight: 700,
+      medium-weight: 500,
+      regular-weight: 400,
+    ));
+}

@@ -1,25 +1,118 @@
 /* These tokens are generated using https://themes.angular-material.dev/ */
-/* Preview: https://themes.angular-material.dev/?bold-font-weight=700&brand-font-family=Roboto&medium-font-weight=500&plain-font-family=Roboto&regular-font-weight=400&seed-error=%23ba1a1a&seed-neutral=%2375777d&seed-neutral-variant=%23717782&seed-primary=%23488dd6&seed-secondary=%2349607d&seed-tertiary=%23834593 */
-/* Seed Colors: primary: #488dd6, secondary: #49607d, tertiary: #834593, error: #ba1a1a, neutral: #75777d, neutral-variant: #717782 */
-/* Seed Typography: plain-font-family: Roboto, brand-font-family: Roboto, bold-font-weight: 700, medium-font-weight: 500, regular-font-weight: 400 */
+/* Preview: https://themes.angular-material.dev/?bold-font-weight=700&brand-font-family=Ubuntu&medium-font-weight=500&plain-font-family=Ubuntu&regular-font-weight=400&seed-error=%23e05353&seed-neutral=%23ececfc&seed-neutral-variant=%23e0e2fc&seed-primary=%23488dd6&seed-secondary=%23607d8b&seed-tertiary=%23d9744b */
+/* Seed Colors: primary: #488dd6, secondary: #607d8b, tertiary: #d9744b, error: #e05353, neutral: #ececfc, neutral-variant: #e0e2fc */
+/* Seed Typography: plain-font-family: Ubuntu, brand-font-family: Ubuntu, bold-font-weight: 700, medium-font-weight: 500, regular-font-weight: 400 */
 
 /* Make sure to import fonts in `<head>` of html */
 /*
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Ubuntu&family=Ubuntu&display=swap');
 </style>
 
 OR
 
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu&family=Ubuntu&display=swap">
 */
 
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
+
+.mdc-text-field__input {
+  margin-left: 0px;
+}
+
+.main-menu .list-horizontal mat-list-item:hover {
+  @include mat.list-overrides((
+    list-item-hover-label-text-color: var(--mat-sys-on-secondary),
+    list-item-hover-leading-icon-color: var(--mat-sys-on-secondary),
+    list-item-hover-trailing-icon-color: var(--mat-sys-on-secondary),
+    list-item-hover-state-layer-color: var(--mat-sys-secondary),
+    list-item-hover-state-layer-opacity: 1,
+  ));
+}
+
+.main-menu .list-horizontal mat-list-item:hover .nav-action {
+  @include mat.icon-overrides((
+    color: var(--mat-sys-on-secondary),
+  ));
+  @include mat.button-overrides((
+    text-label-text-color: var(--mat-sys-on-secondary),
+    text-state-layer-color: var(--mat-sys-on-secondary),
+    text-hover-state-layer-opacity: 0,
+  ));
+}
+
+.brand-mark,
+.mat-mdc-unelevated-button,
+.mat-mdc-raised-button,
+.mat-mdc-fab,
+.mat-mdc-mini-fab,
+.mat-mdc-button-base:disabled,
+.mat-mdc-button-disabled {
+  @include mat.icon-overrides((
+    color: currentColor,
+  ));
+}
+
+:root,
+:host {
+  @include mat.theme-overrides((
+    corner-extra-small: 8px,
+    hover-state-layer-opacity: 0.08,
+    focus-state-layer-opacity: 0.12,
+    pressed-state-layer-opacity: 0.12,
+    dragged-state-layer-opacity: 0.16,
+  ));
+  @include mat.form-field-overrides((
+    container-text-line-height: 24px,
+    leading-icon-color: var(--mat-sys-primary),
+    trailing-icon-color: var(--mat-sys-primary),
+  ));
+  @include mat.icon-overrides((
+    color: var(--mat-sys-primary),
+  ));
+  @include mat.button-overrides((
+    filled-container-shape: var(--mat-sys-corner-extra-small),
+    outlined-container-shape: var(--mat-sys-corner-extra-small),
+    protected-container-shape: var(--mat-sys-corner-extra-small),
+    text-container-shape: var(--mat-sys-corner-extra-small),
+    tonal-container-shape: var(--mat-sys-corner-extra-small),
+  ));
+  @include mat.icon-button-overrides((
+    container-shape: var(--mat-sys-corner-extra-small),
+    icon-color: var(--mat-sys-primary),
+  ));
+  @include mat.fab-overrides((
+    container-shape: var(--mat-sys-corner-extra-small),
+    small-container-shape: var(--mat-sys-corner-extra-small),
+    extended-container-shape: var(--mat-sys-corner-extra-small),
+  ));
+  @include mat.button-toggle-overrides((
+    shape: var(--mat-sys-corner-extra-small),
+    legacy-shape: var(--mat-sys-corner-extra-small),
+  ));
+  @include mat.list-overrides((
+    active-indicator-shape: var(--mat-sys-corner-extra-small),
+    list-item-container-shape: var(--mat-sys-corner-extra-small),
+    list-item-leading-icon-color: var(--mat-sys-primary),
+    list-item-trailing-icon-color: var(--mat-sys-primary),
+    list-item-selected-trailing-icon-color: var(--mat-sys-primary),
+  ));
+  @include mat.chips-overrides((
+    container-shape-radius: var(--mat-sys-corner-extra-small),
+  ));
+  @include mat.menu-overrides((
+    container-shape: var(--mat-sys-corner-extra-small),
+    item-icon-color: var(--mat-sys-primary),
+  ));
+  @include mat.autocomplete-overrides((
+    container-shape: var(--mat-sys-corner-extra-small),
+  ));
+}
 
 /* Light Theme */
 :root,
 :host {
-  @include mat.theme-overrides(
-    (
-      primary: #0061a6,
+  @include mat.theme-overrides((primary: #0061a6,
       on-primary: #ffffff,
       primary-container: #d2e4ff,
       on-primary-container: #001c37,
@@ -28,61 +121,58 @@ OR
       primary-fixed-dim: #a0c9ff,
       on-primary-fixed: #001c37,
       on-primary-fixed-variant: #00497f,
-      secondary: #49607d,
+      secondary: #466270,
       on-secondary: #ffffff,
-      secondary-container: #d2e4ff,
-      on-secondary-container: #011c36,
-      secondary-fixed: #d2e4ff,
-      secondary-fixed-dim: #b1c8ea,
-      on-secondary-fixed: #011c36,
-      on-secondary-fixed-variant: #314864,
-      tertiary: #834593,
+      secondary-container: #c9e7f7,
+      on-secondary-container: #001f2a,
+      secondary-fixed: #c9e7f7,
+      secondary-fixed-dim: #adcbda,
+      on-secondary-fixed: #001f2a,
+      on-secondary-fixed-variant: #2e4b57,
+      tertiary: #9b4520,
       on-tertiary: #ffffff,
-      tertiary-container: #fcd7ff,
-      on-tertiary-container: #340043,
-      tertiary-fixed: #fcd7ff,
-      tertiary-fixed-dim: #f2afff,
-      on-tertiary-fixed: #340043,
-      on-tertiary-fixed-variant: #692d79,
-      background: #fcf8f8,
+      tertiary-container: #ffdbce,
+      on-tertiary-container: #370e00,
+      tertiary-fixed: #ffdbce,
+      tertiary-fixed-dim: #ffb599,
+      on-tertiary-fixed: #370e00,
+      on-tertiary-fixed-variant: #7c2e09,
+      background: #fcf8f9,
       on-background: #1c1b1c,
-      surface: #fcf8f8,
-      surface-dim: #dcd9d9,
-      surface-bright: #fcf8f8,
+      surface: #fcf8f9,
+      surface-dim: #dcd9da,
+      surface-bright: #fcf8f9,
       surface-container-lowest: #ffffff,
       surface-container-low: #f6f3f3,
-      surface-container: #f1eded,
-      surface-container-high: #ebe7e7,
+      surface-container: #f1edee,
+      surface-container-high: #ebe7e8,
       surface-container-highest: #e5e2e2,
       on-surface: #1c1b1c,
       shadow: #000000,
       scrim: #000000,
-      surface-tint: #5c5e64,
-      inverse-surface: #313030,
-      inverse-on-surface: #f3f0f0,
-      outline: #76777b,
-      outline-variant: #c5c6cb,
-      neutral: #797777,
+      surface-tint: #5c5e6b,
+      inverse-surface: #313031,
+      inverse-on-surface: #f3f0f1,
+      outline: #77767c,
+      outline-variant: #c7c5cd,
+      neutral: #787677,
       neutral10: #1c1b1c,
       error: #ba1a1a,
       error-container: #ffdad6,
       on-error: #ffffff,
       on-error-container: #410002,
-      surface-variant: #e2e2e8,
-      on-surface-variant: #45474b,
-      neutral-variant: #75777c,
-      neutral-variant20: #2e3035,
-      inverse-secondary: #b1c8ea,
-      inverse-tertiary: #f2afff,
-    )
-  );
+      surface-variant: #e3e1e9,
+      on-surface-variant: #46464c,
+      neutral-variant: #77767d,
+      neutral-variant20: #303036,
+      inverse-secondary: #adcbda,
+      inverse-tertiary: #ffb599,
+    ));
 }
 
 /* Dark Theme */
 .dark {
-  @include mat.theme-overrides(
-    (
-      primary: #a0c9ff,
+  @include mat.theme-overrides((primary: #a0c9ff,
       on-primary: #00325a,
       primary-container: #00497f,
       on-primary-container: #d2e4ff,
@@ -91,73 +181,116 @@ OR
       primary-fixed-dim: #a0c9ff,
       on-primary-fixed: #001c37,
       on-primary-fixed-variant: #00497f,
-      secondary: #b1c8ea,
-      on-secondary: #19324c,
-      secondary-container: #314864,
-      on-secondary-container: #d2e4ff,
-      secondary-fixed: #d2e4ff,
-      secondary-fixed-dim: #b1c8ea,
-      on-secondary-fixed: #011c36,
-      on-secondary-fixed-variant: #314864,
-      tertiary: #f2afff,
-      on-tertiary: #501261,
-      tertiary-container: #692d79,
-      on-tertiary-container: #fcd7ff,
-      tertiary-fixed: #fcd7ff,
-      tertiary-fixed-dim: #f2afff,
-      on-tertiary-fixed: #340043,
-      on-tertiary-fixed-variant: #692d79,
+      secondary: #adcbda,
+      on-secondary: #163440,
+      secondary-container: #2e4b57,
+      on-secondary-container: #c9e7f7,
+      secondary-fixed: #c9e7f7,
+      secondary-fixed-dim: #adcbda,
+      on-secondary-fixed: #001f2a,
+      on-secondary-fixed-variant: #2e4b57,
+      tertiary: #ffb599,
+      on-tertiary: #5a1c00,
+      tertiary-container: #7c2e09,
+      on-tertiary-container: #ffdbce,
+      tertiary-fixed: #ffdbce,
+      tertiary-fixed-dim: #ffb599,
+      on-tertiary-fixed: #370e00,
+      on-tertiary-fixed-variant: #7c2e09,
       background: #131314,
       on-background: #e5e2e2,
       surface: #131314,
       surface-dim: #131314,
-      surface-bright: #3a3939,
-      surface-container-lowest: #0e0e0e,
+      surface-bright: #3a393a,
+      surface-container-lowest: #0e0e0f,
       surface-container-low: #1c1b1c,
       surface-container: #201f20,
-      surface-container-high: #2a2a2a,
+      surface-container-high: #2a2a2b,
       surface-container-highest: #353435,
       on-surface: #e5e2e2,
       shadow: #000000,
       scrim: #000000,
-      surface-tint: #c5c6cd,
+      surface-tint: #c5c5d5,
       inverse-surface: #e5e2e2,
-      inverse-on-surface: #313030,
-      outline: #909095,
-      outline-variant: #45474b,
-      neutral: #797777,
+      inverse-on-surface: #313031,
+      outline: #919096,
+      outline-variant: #46464c,
+      neutral: #787677,
       neutral10: #1c1b1c,
       error: #ffb4ab,
       error-container: #93000a,
       on-error: #690005,
       on-error-container: #ffdad6,
-      surface-variant: #45474b,
-      on-surface-variant: #c5c6cb,
-      neutral-variant: #75777c,
-      neutral-variant20: #2e3035,
-      inverse-secondary: #49607d,
-      inverse-tertiary: #834593,
-    )
-  );
+      surface-variant: #46464c,
+      on-surface-variant: #c7c5cd,
+      neutral-variant: #77767d,
+      neutral-variant20: #303036,
+      inverse-secondary: #466270,
+      inverse-tertiary: #9b4520,
+    ));
 }
 
 /* Typography */
 :root,
 :host {
   /* core typography tokens are not generating css variables, hence below */
-  --mat-sys-brand-font-family: Roboto;
-  --mat-sys-plain-font-family: Roboto;
+  --mat-sys-brand-font-family: Ubuntu;
+  --mat-sys-plain-font-family: Ubuntu;
   --mat-sys-bold-font-weight: 700;
   --mat-sys-medium-font-weight: 500;
   --mat-sys-regular-font-weight: 400;
 
-  @include mat.theme-overrides(
-    (
-      brand-family: Roboto,
-      plain-family: Roboto,
+  @include mat.theme-overrides((brand-family: Ubuntu,
+      plain-family: Ubuntu,
       bold-weight: 700,
       medium-weight: 500,
       regular-weight: 400,
-    )
-  );
+      headline-large-font: var(--mat-sys-brand-font-family),
+      headline-medium-font: var(--mat-sys-brand-font-family),
+      headline-small-font: var(--mat-sys-brand-font-family),
+      display-large-font: var(--mat-sys-brand-font-family),
+      display-medium-font: var(--mat-sys-brand-font-family),
+      display-small-font: var(--mat-sys-brand-font-family),
+      title-large-font: var(--mat-sys-brand-font-family),
+      body-large: var(--mat-sys-body-large-weight) var(--mat-sys-body-large-size) / var(--mat-sys-body-large-line-height) var(--mat-sys-body-large-font),
+      body-medium: var(--mat-sys-body-medium-weight) var(--mat-sys-body-medium-size) / var(--mat-sys-body-medium-line-height) var(--mat-sys-body-medium-font),
+      body-small: var(--mat-sys-body-small-weight) var(--mat-sys-body-small-size) / var(--mat-sys-body-small-line-height) var(--mat-sys-body-small-font),
+      label-large: var(--mat-sys-label-large-weight) var(--mat-sys-label-large-size) / var(--mat-sys-label-large-line-height) var(--mat-sys-label-large-font),
+      label-medium: var(--mat-sys-label-medium-weight) var(--mat-sys-label-medium-size) / var(--mat-sys-label-medium-line-height) var(--mat-sys-label-medium-font),
+      label-small: var(--mat-sys-label-small-weight) var(--mat-sys-label-small-size) / var(--mat-sys-label-small-line-height) var(--mat-sys-label-small-font),
+      title-large: var(--mat-sys-title-large-weight) var(--mat-sys-title-large-size) / var(--mat-sys-title-large-line-height) var(--mat-sys-title-large-font),
+      title-medium: var(--mat-sys-title-medium-weight) var(--mat-sys-title-medium-size) / var(--mat-sys-title-medium-line-height) var(--mat-sys-title-medium-font),
+      title-small: var(--mat-sys-title-small-weight) var(--mat-sys-title-small-size) / var(--mat-sys-title-small-line-height) var(--mat-sys-title-small-font),
+      headline-large: var(--mat-sys-headline-large-weight) var(--mat-sys-headline-large-size) / var(--mat-sys-headline-large-line-height) var(--mat-sys-headline-large-font),
+      headline-medium: var(--mat-sys-headline-medium-weight) var(--mat-sys-headline-medium-size) / var(--mat-sys-headline-medium-line-height) var(--mat-sys-headline-medium-font),
+      headline-small: var(--mat-sys-headline-small-weight) var(--mat-sys-headline-small-size) / var(--mat-sys-headline-small-line-height) var(--mat-sys-headline-small-font),
+      display-large: var(--mat-sys-display-large-weight) var(--mat-sys-display-large-size) / var(--mat-sys-display-large-line-height) var(--mat-sys-display-large-font),
+      display-medium: var(--mat-sys-display-medium-weight) var(--mat-sys-display-medium-size) / var(--mat-sys-display-medium-line-height) var(--mat-sys-display-medium-font),
+      display-small: var(--mat-sys-display-small-weight) var(--mat-sys-display-small-size) / var(--mat-sys-display-small-line-height) var(--mat-sys-display-small-font),
+      body-large-font: var(--mat-sys-plain-font-family),
+      body-medium-font: var(--mat-sys-plain-font-family),
+      body-small-font: var(--mat-sys-plain-font-family),
+      label-large-font: var(--mat-sys-plain-font-family),
+      label-medium-font: var(--mat-sys-plain-font-family),
+      label-small-font: var(--mat-sys-plain-font-family),
+      title-medium-font: var(--mat-sys-plain-font-family),
+      title-small-font: var(--mat-sys-plain-font-family),
+      label-large-weight-prominent: var(--mat-sys-bold-font-weight),
+      label-medium-weight-prominent: var(--mat-sys-bold-font-weight),
+      label-large-weight: var(--mat-sys-medium-font-weight),
+      label-medium-weight: var(--mat-sys-medium-font-weight),
+      label-small-weight: var(--mat-sys-medium-font-weight),
+      title-medium-weight: var(--mat-sys-medium-font-weight),
+      title-small-weight: var(--mat-sys-medium-font-weight),
+      body-large-weight: var(--mat-sys-regular-font-weight),
+      body-medium-weight: var(--mat-sys-regular-font-weight),
+      body-small-weight: var(--mat-sys-regular-font-weight),
+      display-large-weight: var(--mat-sys-regular-font-weight),
+      display-medium-weight: var(--mat-sys-regular-font-weight),
+      display-small-weight: var(--mat-sys-regular-font-weight),
+      headline-large-weight: var(--mat-sys-regular-font-weight),
+      headline-medium-weight: var(--mat-sys-regular-font-weight),
+      headline-small-weight: var(--mat-sys-regular-font-weight),
+      title-large-weight: var(--mat-sys-regular-font-weight),
+    ));
 }

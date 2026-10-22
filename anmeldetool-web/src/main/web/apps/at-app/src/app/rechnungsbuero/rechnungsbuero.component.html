@@ -3,16 +3,22 @@
     <mat-tab-group #tabs mat-align-tabs="start">
       <mat-tab>
         <ng-template mat-tab-label>Erfassen</ng-template>
-        <ztv-erfassen [anlass]="currentAnlass" [modeErfassen]="true"></ztv-erfassen>
+        <ng-template matTabContent>
+          <ztv-erfassen [anlass]="currentAnlass" [modeErfassen]="true"></ztv-erfassen>
+        </ng-template>
       </mat-tab>
       <mat-tab>
         <ng-template mat-tab-label>Überprüfen</ng-template>
-        <ztv-erfassen [anlass]="currentAnlass" [modeErfassen]="false"></ztv-erfassen>
+        <ng-template matTabContent>
+          <ztv-erfassen [anlass]="currentAnlass" [modeErfassen]="false"></ztv-erfassen>
+        </ng-template>
       </mat-tab>
       @if (authService.isAdministrator()) {
         <mat-tab>
           <ng-template mat-tab-label>Ranglisten</ng-template>
-          <ztv-ranglisten></ztv-ranglisten>
+          <ng-template matTabContent>
+            <ztv-ranglisten></ztv-ranglisten>
+          </ng-template>
         </mat-tab>
       }
     </mat-tab-group>

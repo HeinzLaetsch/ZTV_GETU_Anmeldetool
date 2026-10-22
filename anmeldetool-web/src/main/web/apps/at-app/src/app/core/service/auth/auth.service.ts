@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { IUser } from 'src/app/core/model/IUser';
 import { IVerein } from 'src/app/verein/verein';
@@ -15,6 +16,7 @@ import { Store } from '@ngrx/store';
 })
 export class AuthService {
   private store: Store<AppState> = inject(Store<AppState>);
+  private readonly router = inject(Router);
 
   // Privates Signal für den Login-Status
   private readonly _isLoggedIn = signal(false);
@@ -108,6 +110,7 @@ export class AuthService {
         this.currentVerein = verein;
         this.store.dispatch(UserActions.loadAllUserInvoked());
         this._isLoggedIn.set(true);
+        void this.router.navigate(['/anlaesse']);
       }),
       catchError((error) => {
         this._isLoggedIn.set(false);

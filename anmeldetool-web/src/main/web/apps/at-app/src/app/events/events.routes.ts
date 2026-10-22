@@ -1,4 +1,7 @@
-import { Routes } from '@angular/router';
+import { type Routes, type UrlTree } from '@angular/router';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../core/service/auth/auth.service';
 import { provideEffects } from '@ngrx/effects';
 import { provideState } from '@ngrx/store';
 import { AnlassSummaryEffects } from '../core/redux/anlass-summary';
@@ -25,6 +28,21 @@ export const eventsRoutes: Routes = [
       {
         path: '',
         component: EventListComponent,
+      },
+      {
+        path: 'neu',
+        loadComponent: () =>
+          import('./create-event/create-event.component').then((module) => module.CreateEventComponent),
+        canActivate: [
+          (): boolean | UrlTree => {
+            const authService = inject(AuthService);
+            return (
+              authService.isAdministratorSig() ||
+              authService.isSekretariatSig() ||
+              inject(Router).createUrlTree(['/page404'])
+            );
+          },
+        ],
       },
       {
         path: ':id',

@@ -1,2 +1,169 @@
-<h1>Neuer Anlass</h1>
-<hr />
+<h1>Neuen Anlass erstellen</h1>
+
+<form [formGroup]="form" (ngSubmit)="onSave()" [attr.aria-busy]="isSaving()">
+  <fieldset [disabled]="isSaving()">
+    <legend>Stammdaten</legend>
+    <div class="event-fields">
+      @for (field of ['anlassBezeichnung', 'ort', 'halle']; track field) {
+        <mat-form-field appearance="outline">
+          <mat-label>{{ field === 'anlassBezeichnung' ? 'Bezeichnung' : field === 'ort' ? 'Ort' : 'Halle' }}</mat-label>
+          <input matInput [name]="field" [formControlName]="field" required />
+          <mat-error>Bitte ausfüllen.</mat-error>
+        </mat-form-field>
+      }
+      <mat-form-field appearance="outline">
+        <mat-label>Organisator</mat-label>
+        <mat-icon matIconPrefix aria-hidden="true">search</mat-icon>
+        <input
+          matInput
+          type="search"
+          name="organisatorSearch"
+          [formControl]="organisatorSearch"
+          [matAutocomplete]="organisatorOptions"
+          [matAutocompleteDisabled]="isSaving()"
+          [readOnly]="isSaving()"
+          (focus)="onOrganisatorSearchOpened()"
+          required
+        />
+        <mat-autocomplete
+          #organisatorOptions="matAutocomplete"
+          [displayWith]="displayOrganisator"
+          (optionSelected)="onOrganisatorSelected($event)"
+          (closed)="onOrganisatorSearchClosed()"
+        >
+          @for (verein of filteredOrganisatoren(); track verein.id) {
+            <mat-option [value]="verein">{{ verein.name }}</mat-option>
+          } @empty {
+            <mat-option disabled>Kein Verein gefunden</mat-option>
+          }
+        </mat-autocomplete>
+        <mat-error>Bitte einen Organisator auswählen.</mat-error>
+      </mat-form-field>
+    </div>
+    <div class="event-fields event-category-fields">
+      <mat-form-field appearance="outline">
+        <mat-label>Ti/Tu</mat-label>
+        <mat-select formControlName="tiTu" required>
+          <mat-option value="Ti">Turnerinnen</mat-option>
+          <mat-option value="Tu">Turner</mat-option>
+          <mat-option value="Alle">Gemeinsamer Anlass</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Tiefste Kategorie</mat-label>
+        <mat-select formControlName="tiefsteKategorie" required>
+          @for (kategorie of tiefsteKategorien(); track kategorie) {
+            <mat-option [value]="kategorie">{{ kategorie }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Höchste Kategorie</mat-label>
+        <mat-select formControlName="hoechsteKategorie" required>
+          @for (kategorie of hoechsteKategorien(); track kategorie) {
+            <mat-option [value]="kategorie">{{ kategorie }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    @if (form.hasError('categoryOrder')) {
+      <p role="alert">Die höchste Kategorie darf nicht unter der tiefsten Kategorie liegen.</p>
+    }
+  </fieldset>
+
+  <fieldset [disabled]="isSaving()">
+    <legend>Termine und Anmeldefristen</legend>
+    <div class="event-fields">
+      @for (field of dateFields; track field.name) {
+        <mat-form-field appearance="outline">
+          <mat-label>{{ field.label }}</mat-label>
+          <input matInput [matDatepicker]="picker" [name]="field.name" [formControlName]="field.name" required />
+          <mat-datepicker-toggle matIconSuffix [for]="picker" [aria-label]="field.label + ' auswählen'" />
+          <mat-datepicker #picker />
+          <mat-error>Bitte ein gültiges Datum angeben.</mat-error>
+        </mat-form-field>
+      }
+    </div>
+    @if (form.hasError('dateOrder')) {
+      <p role="alert">Die Termine müssen vom Anmeldebeginn bis zum Anlassende in zeitlicher Reihenfolge liegen.</p>
+    }
+  </fieldset>
+
+  <fieldset formArrayName="wertungsrichterSlots" [disabled]="isSaving()">
+    <legend>Wertungsrichter-Slots</legend>
+    @for (slot of form.controls.wertungsrichterSlots.controls; track slot; let slotIndex = $index) {
+      <div class="slot-row" [formGroupName]="slotIndex" role="group" [attr.aria-label]="'Slot ' + (slotIndex + 1)">
+        <div class="slot-heading">
+          <h2>Slot {{ slotIndex + 1 }}</h2>
+          <button
+            mat-icon-button
+            type="button"
+            [attr.aria-label]="'Slot ' + (slotIndex + 1) + ' entfernen'"
+            matTooltip="Slot entfernen"
+            [disabled]="isSaving() || form.controls.wertungsrichterSlots.length === 1"
+            (click)="onRemoveSlot(slotIndex)"
+          >
+            <mat-icon aria-hidden="true">delete</mat-icon>
+          </button>
+        </div>
+        <div class="event-fields">
+          <mat-form-field appearance="outline">
+            <mat-label>Brevet</mat-label>
+            <mat-select formControlName="brevet" required>
+              <mat-option [value]="1">Brevet 1</mat-option>
+              <mat-option [value]="2">Brevet 2</mat-option>
+            </mat-select>
+            <mat-error>Bitte ein Brevet auswählen.</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Tag</mat-label>
+            <input
+              matInput
+              formControlName="tag"
+              [name]="'slot-tag-' + slotIndex"
+              [matDatepicker]="slotPicker"
+              [min]="form.controls.startDatum.value"
+              [max]="form.controls.endDatum.value"
+              required
+            />
+            <mat-datepicker-toggle matIconSuffix [for]="slotPicker" [aria-label]="'Slot-Tag auswählen'" />
+            <mat-datepicker #slotPicker />
+            <mat-error>Bitte ein Datum innerhalb des Anlasses angeben.</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Startzeit</mat-label>
+            <input matInput type="time" formControlName="startzeit" [name]="'slot-startzeit-' + slotIndex" />
+            <mat-error>Bitte eine gültige Startzeit angeben.</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Endzeit</mat-label>
+            <input matInput type="time" formControlName="endzeit" [name]="'slot-endzeit-' + slotIndex" />
+            <mat-error>Bitte eine gültige Endzeit angeben.</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="slot-description">
+            <mat-label>Kommentar</mat-label>
+            <input matInput formControlName="beschreibung" [name]="'slot-beschreibung-' + slotIndex" />
+          </mat-form-field>
+        </div>
+        @if (slot.hasError('timeOrder')) {
+          <p role="alert">Die Endzeit muss nach der Startzeit liegen.</p>
+        }
+      </div>
+    }
+    <button mat-stroked-button type="button" [disabled]="isSaving()" (click)="onAddSlot()">
+      <mat-icon aria-hidden="true">add</mat-icon>
+      Slot hinzufügen
+    </button>
+  </fieldset>
+
+  @if (errorMessage()) {
+    <p role="alert">{{ errorMessage() }}</p>
+  }
+  <div class="event-actions">
+    <a mat-button routerLink="/anlaesse" [disabled]="isSaving()">Abbrechen</a>
+    <button mat-flat-button type="submit" [disabled]="isSaving()">
+      <mat-icon aria-hidden="true">save</mat-icon>
+      {{ isSaving() ? 'Wird gespeichert...' : 'Anlass erstellen' }}
+    </button>
+  </div>
+</form>

@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -34,7 +35,9 @@ public class ZTVSecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.cors(Customizer.withDefaults()).csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(
-            authz -> authz.requestMatchers("/", "/admin/login", "/admin/verbaende",
+            authz -> authz.requestMatchers(HttpMethod.POST, "/admin/anlaesse")
+                .hasAnyAuthority("ADMINISTRATOR", "SEKRETARIAT")
+                .requestMatchers("/", "/admin/login", "/admin/verbaende",
                     "/admin/anlaesse", "/admin/organisationen",
                     "/admin/teilnahmen", "/favicon.ico", "/admin/user", "/admin/user/benutzernamen/**")
                 .permitAll().anyRequest().authenticated())
@@ -57,9 +60,9 @@ public class ZTVSecurityConfig {
     configuration.setAllowedOrigins(Arrays.asList("http://www.getu.ztv", "http://localhost:4200"));
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
     configuration.setAllowedHeaders(List.of("*"));
-    //configuration.setAllowedHeaders(Arrays.asList(
-    //    "Origin", "X-Requested-With", "Content-Type",  "Accept", "Authorization",
-    //   "Access-Control-Allow-Headers", "authtoken"));
+    // configuration.setAllowedHeaders(Arrays.asList(
+    // "Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization",
+    // "Access-Control-Allow-Headers", "authtoken"));
     configuration.setAllowCredentials(true);
     configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Disposition"));
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -1,10 +1,8 @@
-@use 'assets/styles/colors' as colors;
-
 :host {
   display: block;
 }
 
-#main-menu {
+.main-menu {
   position: sticky;
   top: 0;
   display: flex;
@@ -12,10 +10,10 @@
   height: auto;
   box-sizing: border-box;
   padding: 0 1rem;
-  color: colors.$black;
-  background: linear-gradient(110deg, #e8edf2 0%, colors.$nav-backgroud 100%);
-  border-bottom: 1px solid rgba(18, 38, 63, 0.12);
-  box-shadow: 0 2px 12px rgba(18, 38, 63, 0.08);
+  color: var(--mat-sys-on-surface);
+  background-color: var(--mat-sys-surface-container);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--mat-sys-shadow) 8%, transparent);
   z-index: 9;
 }
 
@@ -32,7 +30,7 @@
   flex: 0 0 auto;
   align-items: center;
   gap: 0.65rem;
-  color: #12263f;
+  color: var(--mat-sys-on-surface);
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -46,10 +44,9 @@
   justify-content: center;
   width: 2.15rem;
   height: 2.15rem;
-  color: colors.$white;
-  background: #1f5f7a;
-  border-radius: 0.65rem;
-  box-shadow: 0 4px 10px rgba(31, 95, 122, 0.24);
+  color: var(--mat-sys-on-primary);
+  background-color: var(--mat-sys-primary);
+  border-radius: var(--mat-sys-corner-medium, 0.65rem);
 }
 
 .brand-mark mat-icon {
@@ -84,96 +81,20 @@
   width: auto;
   min-width: auto;
   padding: 0;
-  border-radius: 0.6rem;
   overflow: hidden;
 }
 
-.list-horizontal mat-list-item:hover {
-  --mat-list-list-item-hover-state-layer-color: transparent;
-  background-color: var(--ztv-dark-blue);
-}
-
 .nav-action {
-  --mat-button-text-label-text-color: var(--mat-list-list-item-label-text-color, var(--mat-sys-on-surface));
-  --mat-button-text-label-text-color-hover: var(--ztv-light-gray);
-
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  min-height: 42px;
-  padding: 0 0.75rem;
-  color: var(--mat-list-list-item-label-text-color, var(--mat-sys-on-surface));
-  background-color: var(--mat-list-list-item-container-color, transparent);
-  font-size: 0.84rem;
-  font-weight: 600;
-  border-radius: 0.6rem;
-  transition:
-    background-color 160ms ease,
-    color 160ms ease,
-    transform 160ms ease;
-}
-
-.nav-action mat-icon {
-  width: 1.1rem;
-  height: 1.1rem;
-  font-size: 1.1rem;
-}
-
-.nav-action:hover {
-  color: var(--ztv-light-gray);
-  background-color: var(--ztv-dark-blue);
-  transform: translateY(-1px);
+  min-width: 0;
 }
 
 .arrow-icon {
-  width: 1rem !important;
-  height: 1rem !important;
   margin-left: -0.15rem;
-  padding: 0 !important;
-  font-size: 1rem !important;
-}
-
-.active {
-  color: var(--ztv-white) !important;
-  background-color: var(--ztv-blue) !important;
-  box-shadow: 0 2px 8px rgba(18, 38, 63, 0.1);
-}
-
-.active .nav-action {
-  --mat-button-text-label-text-color: var(--ztv-white);
-  --mat-button-text-label-text-color-hover: var(--ztv-white);
-  --mat-button-text-label-text-color-focus: var(--ztv-white);
-
-  color: var(--ztv-white);
-  background-color: inherit;
 }
 
 .task-add-btn {
   display: flex !important;
   justify-content: center;
-}
-
-.dropdown-item {
-  display: flex;
-  font-weight: 400;
-  font-size: 12px;
-  flex-direction: row;
-  align-items: center;
-  box-sizing: border-box;
-  padding: 0 4px;
-  position: relative;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  width: 100%;
-}
-
-.dropdown-item:hover {
-  background: rgba(0, 0, 0, 0.04) !important;
-}
-
-.dropdown-item button {
-  font-weight: 400 !important;
-  font-size: 10px;
-  line-height: 20px;
 }
 
 .menu-search {
@@ -182,38 +103,37 @@
   gap: 0.5rem;
   margin: 0.35rem 0.5rem;
   padding: 0.45rem 0.65rem;
-  background: #f3f6f8;
-  border: 1px solid rgba(18, 38, 63, 0.14);
-  border-radius: 0.5rem;
+  background-color: var(--mat-sys-surface-container-high);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-extra-small);
 }
 
 .menu-search mat-icon {
-  color: #526477;
+  color: var(--mat-sys-on-surface-variant);
   font-size: 1.1rem;
 }
 
 .menu-search input {
   width: 14rem;
   min-width: 0;
-  color: #12263f;
+  color: var(--mat-sys-on-surface);
   background: transparent;
   border: 0;
-  outline: 0;
   font: inherit;
 }
 
 .menu-search input::placeholder {
-  color: #708090;
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .menu-empty {
   padding: 0.75rem 1rem;
-  color: #687887;
+  color: var(--mat-sys-on-surface-variant);
   font-size: 0.85rem;
 }
 
 @media (max-width: 900px) {
-  #main-menu {
+  .main-menu {
     padding: 0.5rem 0.75rem;
   }
 
@@ -242,7 +162,6 @@
 @media (max-width: 560px) {
   .nav-action {
     min-width: 42px;
-    padding: 0 0.6rem;
   }
 
   .nav-action span {

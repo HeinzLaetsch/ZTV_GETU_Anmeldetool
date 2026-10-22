@@ -131,7 +131,6 @@ export class TeilnehmerGridComponent {
     {
       headerName: 'Jahrg.',
       colId: 'teilnehmer.jahrgang',
-      maxWidth: 90,
       valueSetter: this.teilnehmerAttributeValueSetter,
       valueGetter: this.teilnehmerAttributeValueGetter,
       pinned: 'left',
@@ -140,7 +139,6 @@ export class TeilnehmerGridComponent {
     {
       headerName: 'Ti/Tu',
       colId: 'teilnehmer.tiTu',
-      maxWidth: 90,
       cellEditor: 'agSelectCellEditor',
       cellEditorParams: { values: ['Ti', 'Tu'] },
       valueSetter: this.teilnehmerAttributeValueSetter,
@@ -151,7 +149,6 @@ export class TeilnehmerGridComponent {
     {
       headerName: 'STV Nr.',
       colId: 'teilnehmer.stvNummer',
-      maxWidth: 90,
       valueSetter: this.teilnehmerAttributeValueSetter,
       valueGetter: this.teilnehmerAttributeValueGetter,
       pinned: 'left',
@@ -161,14 +158,12 @@ export class TeilnehmerGridComponent {
       headerName: 'aktuelle Kategorie',
       colId: 'teilnehmer.aktuelle_kategorie',
       editable: this.isAdmin,
-      wrapHeaderText: true,
       valueGetter: this.kategorieValueGetter,
       cellEditor: 'agSelectCellEditor',
       cellEditorParams: (params: { data?: ITeilnahmen }): { values: string[] } => ({
         values: this.getAvailableKategories(params.data?.teilnehmer),
       }),
       comparator: this.kValueComparator,
-      maxWidth: 100,
       valueSetter: this.teilnehmerAttributeValueSetter,
       pinned: 'left',
     },
@@ -179,8 +174,8 @@ export class TeilnehmerGridComponent {
     sortable: true,
     filter: true,
     editable: true,
-    wrapHeaderText: true,
-    autoHeaderHeight: true,
+    wrapHeaderText: false,
+    autoHeaderHeight: false,
     suppressKeyboardEvent: (params) => this.onSuppressKeyboardEvent(params),
   };
 
@@ -313,7 +308,6 @@ export class TeilnehmerGridComponent {
       valueGetter: this.talValueGetter,
       valueSetter: this.talValueSetter,
       minWidth: 100,
-      maxWidth: 150,
       editable: (params): boolean => params.context.this.isEditable(params, anlassExt),
       cellRenderer: TeilnahmeStatusRenderer,
       cellEditor: TeilnahmeStatusEditor,
@@ -331,6 +325,7 @@ export class TeilnehmerGridComponent {
 
     if (this.gridApi && !this.gridApi.isDestroyed()) {
       this.gridApi.setGridOption('columnDefs', this.columnDefs);
+      this.gridApi.autoSizeAllColumns(false);
     }
   }
 

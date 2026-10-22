@@ -141,8 +141,7 @@ public class AnlassAdminController {
       @PathVariable UUID anlassId) {
     Anlass anlass = anlassSrv.findById(anlassId);
     List<BenutzerDTO> benutzerList = anlassSrv.getAnmelderAndVerantwortliche(anlass);
-    String reportName =
-        "Verantwortliche_Anmelder_" + anlassSrv.findById(anlassId).getAnlassBezeichnung();
+    String reportName = "Verantwortliche_Anmelder_" + anlassSrv.findById(anlassId).getAnlassBezeichnung();
     response.addHeader(HttpHeaders.CONTENT_DISPOSITION,
         "attachment; filename=" + reportName + ".csv");
     response.addHeader(HttpHeaders.CONTENT_TYPE, "text/csv");
@@ -177,9 +176,14 @@ public class AnlassAdminController {
     return ResponseEntity.ok(anlassSrv.updateAnlass(anlassDTO));
   }
 
+  @PostMapping
+  public ResponseEntity<AnlassDTO> createAnlass(@RequestBody AnlassDTO anlassDTO) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(anlassSrv.createAnlass(anlassDTO));
+  }
+
   @PutMapping("/{anlassId}/teilnehmer/{teilnehmerid}")
   public ResponseEntity<Void> updateAnlassStart(@PathVariable UUID teilnehmerid, @RequestBody TeilnehmerStartDTO ts) {
-    teilnehmerAnlassLinkSrv.updateAnlassTeilnahme(teilnehmerid,ts);
+    teilnehmerAnlassLinkSrv.updateAnlassTeilnahme(teilnehmerid, ts);
     return ResponseEntity.ok().build();
   }
 
@@ -230,6 +234,7 @@ public class AnlassAdminController {
         kategorie, abteilung, anlage, geraet, search);
     return ResponseEntity.ok(statistic);
   }
+
   @GetMapping("/{anlassId}/teilnehmer/{kategorie}/{abteilung}/{anlage}/{geraet}")
   public ResponseEntity<List<TeilnehmerStartDTO>> getByStartgeraet(@PathVariable UUID anlassId,
       @PathVariable(required = false) KategorieEnum kategorie,
@@ -261,8 +266,9 @@ public class AnlassAdminController {
   public ResponseEntity<Void> getTeilnehmer(HttpServletResponse response,
       @PathVariable UUID anlassId,
       @RequestParam Optional<Boolean> rotate) {
-//    List<TeilnehmerAnlassLinkCsvDTO> talsCsv = teilnehmerAnlassLinkSrv.getAllTeilnehmerForAnlassAsCsv(
-//        anlassId, rotate, maxAbteilung);
+    // List<TeilnehmerAnlassLinkCsvDTO> talsCsv =
+    // teilnehmerAnlassLinkSrv.getAllTeilnehmerForAnlassAsCsv(
+    // anlassId, rotate, maxAbteilung);
     List<TeilnehmerAnlassLinkCsvDTO> talsCsv = teilnehmerAnlassLinkSrv.getAllTeilnehmerForAnlassAsCsv(
         anlassId, rotate);
     if (talsCsv.isEmpty()) {
@@ -333,7 +339,7 @@ public class AnlassAdminController {
 
   @GetMapping(value = "/{anlassId}/organisationen/{orgId}/anmeldekontrolle/", produces = "application/pdf")
   public void getAnmeldeKontrollePDF(HttpServletResponse response, @PathVariable UUID anlassId,
-      @PathVariable UUID orgId)  {
+      @PathVariable UUID orgId) {
     Anlass anlass = anlassSrv.findById(anlassId);
     Organisation organisation = organisationSrv.findById(orgId);
 

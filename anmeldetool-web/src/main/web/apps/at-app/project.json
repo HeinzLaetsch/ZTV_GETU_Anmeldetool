@@ -150,6 +150,11 @@
         "development": {
           "buildTarget": "at-app:build:development"
         },
+        "e2e": {
+          "buildTarget": "at-app:build:development",
+          "port": 4300,
+          "host": "127.0.0.1"
+        },
         "production": {
           "buildTarget": "at-app:build:production"
         },
@@ -173,27 +178,17 @@
       }
     },
     "e2e": {
-      "executor": "@cypress/schematic:cypress",
+      "executor": "nx:run-commands",
+      "cache": false,
       "options": {
-        "devServerTarget": "at-app:serve",
-        "watch": true,
-        "headless": false
-      },
-      "configurations": {
-        "production": {
-          "devServerTarget": "at-app:serve:development"
-        }
+        "command": "playwright test --config=e2e/playwright.config.ts"
       }
     },
-    "cypress-run": {
-      "executor": "@cypress/schematic:cypress",
+    "playwright": {
+      "executor": "nx:run-commands",
+      "cache": false,
       "options": {
-        "devServerTarget": "at-app:serve"
-      },
-      "configurations": {
-        "production": {
-          "devServerTarget": "at-app:serve:development"
-        }
+        "command": "playwright test --config=e2e/playwright.config.ts"
       }
     }
   }

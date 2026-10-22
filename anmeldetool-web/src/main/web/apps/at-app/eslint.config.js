@@ -22,7 +22,6 @@ export default tseslint.config(
   },
   {
     files: ['**/*.ts'],
-    ignores: ['cypress/**/*.ts'],
     extends: [
       eslint.configs.recommended,
       ...tseslint.configs.recommended,
@@ -122,30 +121,6 @@ export default tseslint.config(
       // Security
       'no-eval': 'error',
       'no-implied-eval': 'error',
-    },
-  },
-  {
-    files: ['cypress/**/*.ts'],
-    extends: [
-      eslint.configs.recommended,
-      ...tseslint.configs.recommended,
-      ...tseslint.configs.stylistic,
-      eslintConfigPrettier,
-    ],
-    languageOptions: {
-      parser: tseslint.parser,
-      parserOptions: {
-        project: path.join(__dirname, '../../cypress/tsconfig.json'),
-        tsconfigRootDir: path.join(__dirname, '../..'),
-      },
-    },
-    plugins: {
-      '@typescript-eslint': tseslint.plugin,
-    },
-    rules: {
-      eqeqeq: ['error', 'smart'],
-      'no-var': 'error',
-      'prefer-const': 'error',
     },
   },
 );

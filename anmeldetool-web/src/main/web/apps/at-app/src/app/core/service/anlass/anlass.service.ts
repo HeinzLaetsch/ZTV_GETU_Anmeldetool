@@ -21,6 +21,29 @@ import { KategorieEnum } from '../../model/KategorieEnum';
 import { ITeilnahmen } from '../../model/ITeilnahmen';
 import { IOrganisationTeilnahmenStatistik } from '../../model/IOrganisationTeilnahmenStatistik';
 import { ServiceHelper } from 'src/app/utils/service-helper';
+import type { CreateWertungsrichterSlot, WertungsrichterSlotResponse } from '../../model/IWertungsrichterSlot';
+
+export type CreateAnlass = {
+  anlassBezeichnung: string;
+  ort: string;
+  halle: string;
+  organisatorId: string;
+  tiTu: 'Ti' | 'Tu' | 'Alle';
+  tiefsteKategorie: KategorieEnum;
+  hoechsteKategorie: KategorieEnum;
+  startDatum: string;
+  endDatum: string;
+  anmeldungBeginn: string;
+  erfassenGeschlossen: string;
+  crossKategorieAenderungenGeschlossen: string;
+  aenderungenInKategorieGeschlossen: string;
+  aenderungenNichtMehrErlaubt: string;
+  wertungsrichterSlots: CreateWertungsrichterSlot[];
+};
+
+type AnlassResponse = Omit<Partial<IAnlass>, 'wertungsrichterSlots'> & {
+  wertungsrichterSlots?: WertungsrichterSlotResponse[];
+};
 
 @Injectable({
   providedIn: 'root',
@@ -42,12 +65,12 @@ export class AnlassService extends ServiceHelper {
       finalUrl = finalUrl + '?onlyAktiv=' + onlyAktiv;
     }
 
-    return this.http.get<IAnlass[]>(finalUrl).pipe(
+    return this.http.get<AnlassResponse[]>(finalUrl).pipe(
       map((anlaesse) => {
         return anlaesse.map((value) => {
           // Check wieso Copy
           // const tmp: IAnlass = Object.assign(new IAnlass(), value);
-          const tmp: IAnlass = new IAnlass(value);
+          const tmp: IAnlass = this.toAnlass(value);
           return tmp;
         });
       }),
@@ -299,6 +322,26 @@ export class AnlassService extends ServiceHelper {
         return this.handleError('updateAnlass', err, caught);
       }),
     );
+  }
+
+  createAnlass(anlass: CreateAnlass): Observable<IAnlass> {
+    return this.http.post<AnlassResponse>(this.url, anlass).pipe(map((created) => this.toAnlass(created)));
+  }
+
+  private toAnlass(value: AnlassResponse): IAnlass {
+    return new IAnlass({
+      ...value,
+      wertungsrichterSlots: value.wertungsrichterSlots?.map((slot) => ({
+        id: slot.id,
+        reihenfolge: slot.reihenfolge,
+        brevet: slot.brevet,
+        beschreibung: slot.beschreibung,
+        egalSlot: slot.egalSlot,
+        tag: slot.tag ? new Date(`${slot.tag}T00:00:00`) : undefined,
+        startzeit: slot.tag && slot.start_zeit ? new Date(`${slot.tag}T${slot.start_zeit}`) : undefined,
+        endzeit: slot.tag && slot.end_zeit ? new Date(`${slot.tag}T${slot.end_zeit}`) : undefined,
+      })),
+    });
   }
 
   // updateTeilnahme

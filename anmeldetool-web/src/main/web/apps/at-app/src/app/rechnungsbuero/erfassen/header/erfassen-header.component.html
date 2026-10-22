@@ -1,18 +1,18 @@
-<ng-container *ngIf="laufliste">
+@if (laufliste(); as currentLaufliste) {
   <div class="layout-col label">Laufliste</div>
-  <div class="layout-col data">{{ laufliste().laufliste }}</div>
+  <div class="layout-col data">{{ currentLaufliste.laufliste }}</div>
   <div class="layout-col label">Gerät</div>
-  <div class="layout-col data">{{ laufliste().geraet }}</div>
+  <div class="layout-col data">{{ currentLaufliste.geraet }}</div>
   <div class="layout-col label">Abteilung</div>
   <div class="layout-col data">
-    {{ laufliste().abteilung.substring(laufliste().abteilung.indexOf('_') + 1) }}
+    {{ currentLaufliste.abteilung.substring(currentLaufliste.abteilung.indexOf('_') + 1) }}
   </div>
   <div class="layout-col label">Anlage</div>
   <div class="layout-col data">
-    {{ laufliste().anlage.substring(laufliste().anlage.indexOf('_') + 1) }}
+    {{ currentLaufliste.anlage.substring(currentLaufliste.anlage.indexOf('_') + 1) }}
   </div>
   <div class="layout-col label">Wechsel</div>
   <div class="layout-col data">
-    {{ laufliste().abloesung }}
+    {{ currentLaufliste.abloesung }}
   </div>
-</ng-container>
+}
