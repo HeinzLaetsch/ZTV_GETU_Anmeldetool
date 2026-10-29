@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -36,6 +35,8 @@ import org.ztv.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerDTO;
 import org.ztv.anmeldetool.transfer.VerbandDTO;
 import org.ztv.anmeldetool.transfer.WertungsrichterDTO;
+import org.springframework.http.HttpHeaders;
+import org.ztv.anmeldetool.models.LoginResult;
 
 @ExtendWith(MockitoExtension.class)
 //@Disabled
@@ -111,23 +112,22 @@ public class AdminControllerTest {
 
     @Test
     void positive_delegatesToLoginService() {
-      HttpServletRequest req = mock(HttpServletRequest.class);
       org.ztv.anmeldetool.models.LoginData ld = new org.ztv.anmeldetool.models.LoginData();
+      ld.setUsername("testuser");
+      ld.setOrganisationId(UUID.randomUUID());
       PersonDTO dto = mock(PersonDTO.class);
-      when(loginSrv.login(any(HttpServletRequest.class), any(LoginData.class))).thenReturn(
-          dto);
+      when(loginSrv.login(any(LoginData.class))).thenReturn(new LoginResult(dto, "signed-token"));
 
-      ResponseEntity<PersonDTO> resp = controller.login(req, ld);
+      ResponseEntity<PersonDTO> resp = controller.login(ld);
       assertSame(dto, resp.getBody());
+      assertEquals("Bearer signed-token", resp.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
     }
 
     @Test
     void negative_serviceThrows_propagates() {
-      HttpServletRequest req = mock(HttpServletRequest.class);
       org.ztv.anmeldetool.models.LoginData ld = new org.ztv.anmeldetool.models.LoginData();
-      when(loginSrv.login(any(HttpServletRequest.class), any(LoginData.class))).thenThrow(
-          new RuntimeException("boom"));
-      assertThrows(RuntimeException.class, () -> controller.login(req, ld));
+      when(loginSrv.login(any(LoginData.class))).thenThrow(new RuntimeException("boom"));
+      assertThrows(RuntimeException.class, () -> controller.login(ld));
     }
   }
 

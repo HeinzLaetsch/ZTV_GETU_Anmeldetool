@@ -1,48 +1,45 @@
 server:
   port: 8080
   servlet.context-path: /
+
 spring:
   profiles.active: "prod"
   flyway:
     locations: ["classpath:/db/migration"]
     username: ${DB_USER}
     password: ${DB_PASSWORD}
-
   jpa:
-     database-platform: org.hibernate.dialect.PostgreSQLDialect
-     show-sql: "false"
-     properties.hibernate.jdbc.time_zone: "GMT+1"
-              
+    show-sql: "false"
+    open-in-view: true
+    properties.hibernate.jdbc.time_zone: "GMT+1"
   datasource:
     url: ${DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
   jackson:
-     deserialization.adjust-dates-to-context-time-zone: true
-     time-zone: "Europe/Zurich"   
-     # time-zone: "UTC"
+    datatype.datetime.adjust-dates-to-context-time-zone: true
+    deserialization.fail-on-null-for-primitives: false
+    time-zone: "Europe/Zurich"
   mail:
-     enabled: ${MAIL_ENABLED}
-     username:  ${MAIL_USER}
-     password: ${MAIL_PASSWORD}
-
-     host: ${MAIL_HOST}
-     port: ${MAIL_PORT}
-     templates.path: "mail-templates"
-     properties.mail.smtp:
-          auth: "true"
-          starttls.enable: "true"
-     simulate:  ${SIMULATE_ENABLED}
-     simulateemail: ${SIMULATE_EMAIL}
-     
+    enabled: ${MAIL_ENABLED}
+    username: ${MAIL_USER}
+    password: ${MAIL_PASSWORD}
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    templates.path: "mail-templates"
+    properties.mail.smtp:
+      auth: "true"
+      starttls.enable: "true"
+    simulate: ${SIMULATE_ENABLED}
+    simulateemail: ${SIMULATE_EMAIL}
   thymeleaf.prefix: "classpath:/mail-templates/"
   application.name: ztv-anmeldetool
   cloud.config:
-# this info may be accessed via actuator
-info.app:
-  name: Anmeldetool
-  version: "@version@"
-  buildtime: "@timestamp@"
+    # this info may be accessed via actuator
+    info.app:
+      name: Anmeldetool
+      version: "@version@"
+      buildtime: "@timestamp@"
 
 logging.level.org:
   springframework:
@@ -52,20 +49,25 @@ logging.level.org:
   flywaydb: INFO
   hibernate.SQL: INFO
   ztv.anmeldetool.service: INFO
-# 0 */5 * * * ?
-scheduler:
-   reminder:
-      cron: "0 0 1 * * ?"
-      daysbefore: 3
-   closed:
-      cron: "0 0 2 * * ?"
-      daysafter: 1
-   mutationen:
-      cron: "0 0 3 * * ?"
-      daysbefore: 3
-   published.cron: "0 0 4 * * ?"
 
-      
+# JWT Configuration
+# Supply a unique Base64-encoded signing key of at least 256 bits through JWT_SECRET.
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400000 # 24 hours in milliseconds
+
+scheduler:
+  reminder:
+    cron: "0 0 1 * * ?"
+    daysbefore: 3
+  closed:
+    cron: "0 0 2 * * ?"
+    daysafter: 1
+  mutationen:
+    cron: "0 0 3 * * ?"
+    daysbefore: 3
+  published.cron: "0 0 4 * * ?"
+
 management:
   endpoints.web.cors:
     path-mappings: /**
@@ -74,6 +76,6 @@ management:
     allowed-headers: "*"
   server.base-path: /admin
   endpoint:
-    beans.enabled: true
-    health.enabled: true
-    info.enabled: true
+    beans.access: read-only
+    health.access: read-only
+    info.access: read-only

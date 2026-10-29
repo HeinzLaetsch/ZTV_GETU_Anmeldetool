@@ -1,10 +1,18 @@
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import {
+  HTTP_INTERCEPTORS,
+  HttpClient,
+  HttpHeaders,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter, Router } from '@angular/router';
-import { provideStore } from '@ngrx/store';
+import { ActionsSubject, provideStore } from '@ngrx/store';
 import { vi } from 'vitest';
 import { appReducers } from 'src/app/core/redux/app.reducer';
+import { HttpSecurityInterceptorService } from '../../interceptor/http.security.interceptor.service';
+import { UserActions } from '../../redux/user';
 
 import { AuthService } from './auth.service';
 
@@ -17,8 +25,13 @@ describe('AuthService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(),
+        provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
+        {
+          provide: HTTP_INTERCEPTORS,
+          useClass: HttpSecurityInterceptorService,
+          multi: true,
+        },
         provideStore(appReducers),
         provideRouter([
           {
@@ -54,16 +67,41 @@ describe('AuthService', () => {
       service.login(verein, 'test@example.com', 'test-password').subscribe();
       expect(navigate).not.toHaveBeenCalled();
       const request = http.expectOne((candidate) => candidate.url.endsWith('/admin/login'));
-      request.flush(user);
+      request.flush(user, {
+        headers: new HttpHeaders({ Authorization: 'Bearer test-jwt' }),
+      });
 
       expect(service.isLoggedIn()).toBe(true);
       expect(service.currentUser).toEqual(user);
       expect(service.currentVerein).toEqual(verein);
+      expect(service.getToken()).toBe('test-jwt');
       expect(navigate).toHaveBeenCalledWith(['/anlaesse']);
       await navigate.mock.results[0].value;
       expect(router.url).toBe('/anlaesse');
     },
   );
+
+  it('sends a bearer token when loading users immediately after login', () => {
+    vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    const actionsSubscription = TestBed.inject(ActionsSubject).subscribe((action) => {
+      if (action.type === UserActions.loadAllUserInvoked.type) {
+        TestBed.inject(HttpClient).get('/admin/user').subscribe();
+      }
+    });
+
+    service.login(verein, 'test@example.com', 'test-password').subscribe();
+    http
+      .expectOne((request) => request.url.endsWith('/admin/login'))
+      .flush({ id: 'user-id', rollen: [] }, { headers: new HttpHeaders({ Authorization: 'Bearer test-jwt' }) });
+    actionsSubscription.unsubscribe();
+
+    const request = http.expectOne('/admin/user');
+    request.flush([]);
+
+    expect(request.request.headers.get('Authorization')).toBe('Bearer test-jwt');
+    expect(request.request.headers.get('vereinsid')).toBe(verein.id);
+    expect(request.request.headers.get('userid')).toBe('user-id');
+  });
 
   it('stays on the current page after a failed login', async () => {
     await router.navigateByUrl('/user');

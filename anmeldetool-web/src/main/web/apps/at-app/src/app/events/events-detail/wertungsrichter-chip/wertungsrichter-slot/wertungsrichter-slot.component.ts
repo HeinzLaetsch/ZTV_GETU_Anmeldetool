@@ -37,9 +37,9 @@ export class WertungsrichterSlotComponent {
   readonly slotText = computed(() => {
     const slot = this.slot();
     const parts = [
-      slot.tag ? this.datePipe.transform(slot.tag, 'dd-yyyy-MM') : undefined,
-      slot.startzeit ? this.datePipe.transform(slot.startzeit, 'hh:mm') : undefined,
-      slot.endzeit ? this.datePipe.transform(slot.endzeit, 'hh:mm') : undefined,
+      slot.tag ? this.datePipe.transform(slot.tag, 'dd-MM-yyyy') : undefined,
+      slot.startzeit ? this.datePipe.transform(slot.startzeit, 'HH:mm') : undefined,
+      slot.endzeit ? this.datePipe.transform(slot.endzeit, 'HH:mm') : undefined,
       slot.beschreibung,
     ];
 

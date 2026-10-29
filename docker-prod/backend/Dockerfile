@@ -1,6 +1,6 @@
-FROM openjdk:11-jdk 
+FROM eclipse-temurin:25-jre
 
-MAINTAINER Heinz Lätsch
+LABEL authors="Heinz Lätsch"
 
 # WORKDIR /anmeldetool
 

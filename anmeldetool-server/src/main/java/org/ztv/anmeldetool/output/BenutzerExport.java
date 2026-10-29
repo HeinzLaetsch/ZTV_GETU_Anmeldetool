@@ -5,7 +5,6 @@ import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import com.opencsv.bean.HeaderColumnNameMappingStrategyBuilder;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
-import com.opencsv.bean.comparator.LiteralComparator;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -30,7 +29,7 @@ public class BenutzerExport {
       HeaderColumnNameMappingStrategy<BenutzerDTO> strategy = new HeaderColumnNameMappingStrategyBuilder<BenutzerDTO>()
           .build();
       strategy.setType(BenutzerDTO.class);
-      strategy.setColumnOrderOnWrite(new LiteralComparator(BenutzerDTO.FIELDS_ORDER));
+      strategy.setColumnOrderOnWrite(CsvColumnOrder.of(BenutzerDTO.FIELDS_ORDER));
 
       StatefulBeanToCsv<BenutzerDTO> writer = new StatefulBeanToCsvBuilder<BenutzerDTO>(
           responseWriter)

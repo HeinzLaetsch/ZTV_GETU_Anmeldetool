@@ -74,4 +74,29 @@ test.describe('InMemoryDbService', () => {
     login(database);
     expect(database.handle({ method: 'GET', url: '/admin/not-implemented' }).status).toBe(404);
   });
+
+  test('requires authentication before deleting an event', () => {
+    const database = new InMemoryDbService();
+    const id = database.createDb().anlaesse[0].id;
+    expect(database.handle({ method: 'DELETE', url: `/admin/anlaesse/${id}` }).status).toBe(401);
+    expect(database.handle({ method: 'GET', url: '/admin/anlaesse' }).body).toHaveLength(1);
+  });
+
+  test('deletes only the selected event and its nested slots', () => {
+    const database = new InMemoryDbService();
+    login(database);
+    const created = database.handle({
+      method: 'POST',
+      url: '/admin/anlaesse',
+      body: { anlassBezeichnung: 'Delete test', wertungsrichterSlots: [{ brevet: 1 }, { brevet: 2 }] },
+    });
+    const saved = created.body as { id: string; wertungsrichterSlots: { id: string }[] };
+    expect(saved.wertungsrichterSlots).toHaveLength(2);
+    expect(database.handle({ method: 'DELETE', url: `/admin/anlaesse/${saved.id}` })).toEqual({
+      status: 204,
+      body: null,
+    });
+    expect(database.handle({ method: 'GET', url: '/admin/anlaesse' }).body).toEqual(database.createDb().anlaesse);
+    expect(database.handle({ method: 'DELETE', url: `/admin/anlaesse/${saved.id}` }).status).toBe(404);
+  });
 });

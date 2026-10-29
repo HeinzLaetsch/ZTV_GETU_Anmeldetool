@@ -15,7 +15,6 @@ import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import com.opencsv.bean.HeaderColumnNameMappingStrategyBuilder;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
-import com.opencsv.bean.comparator.LiteralComparator;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
@@ -34,7 +33,7 @@ public class SmQualiOutput {
 		HeaderColumnNameMappingStrategy<SmQualiDTO> strategy = new HeaderColumnNameMappingStrategyBuilder<SmQualiDTO>()
 				.build();
 		strategy.setType(SmQualiDTO.class);
-		strategy.setColumnOrderOnWrite(new LiteralComparator(SmQualiDTO.FIELDS_ORDER));
+		strategy.setColumnOrderOnWrite(CsvColumnOrder.of(SmQualiDTO.FIELDS_ORDER));
 
 		StatefulBeanToCsv<SmQualiDTO> writer = new StatefulBeanToCsvBuilder<SmQualiDTO>(responseWriter)
 				.withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(';').withMappingStrategy(strategy)

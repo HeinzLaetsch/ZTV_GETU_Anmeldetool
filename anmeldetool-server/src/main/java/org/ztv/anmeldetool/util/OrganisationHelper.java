@@ -1,7 +1,7 @@
 package org.ztv.anmeldetool.util;
 
-import java.util.Calendar;
 
+import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.Verband;
@@ -15,7 +15,7 @@ public class OrganisationHelper {
 	public static Organisation createOrganisation(OrganisationDTO organisationDTO, Verband verband) {
 		Organisation organisation = new Organisation();
 		organisation.setAktiv(true);
-		organisation.setChangeDate(Calendar.getInstance());
+		organisation.setChangeDate(LocalDate.now());
 		organisation.setDeleted(false);
 		organisation.setName(organisationDTO.getName());
 		organisation.setVerband(verband);

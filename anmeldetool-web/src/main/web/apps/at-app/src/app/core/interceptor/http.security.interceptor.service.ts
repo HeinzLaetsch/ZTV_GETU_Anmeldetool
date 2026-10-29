@@ -1,15 +1,7 @@
-import {
-  HttpErrorResponse,
-  HttpEvent,
-  HttpHandler,
-  HttpInterceptor,
-  HttpRequest,
-  HttpResponse,
-} from '@angular/common/http';
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { catchError, Observable, throwError } from 'rxjs';
 import { AuthService } from '../service/auth/auth.service';
 
 @Injectable()
@@ -20,11 +12,7 @@ export class HttpSecurityInterceptorService implements HttpInterceptor {
   ) {}
 
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    console.log('HttpSecurityInterceptorService intercept called for URL: ', req.url);
-
-    const isLoginRequest = req.url.includes('/admin/login');
-
-    if (isLoginRequest) {
+    if (req.url.includes('/admin/login')) {
       return next.handle(req.clone({ withCredentials: true }));
     }
 
@@ -33,37 +21,26 @@ export class HttpSecurityInterceptorService implements HttpInterceptor {
     const token = this.authService.getToken();
     const userId = this.authService.currentUser?.id ?? '';
 
-    if (this.authService.isAuthenticatedSig() && token && userId) {
-      headers = headers
-        .set('authtoken', token)
-        .set('userid', userId)
-        .set('vereinsid', vereinId)
-        .set('Authorization', `Bearer ${token}`);
+    if (this.authService.isAuthenticatedSig() && token) {
+      headers = headers.set('Authorization', 'Bearer ' + token).set('authtoken', token);
+      if (userId) {
+        headers = headers.set('userid', userId);
+      }
+      if (vereinId) {
+        headers = headers.set('vereinsid', vereinId);
+      }
     } else if (vereinId) {
       headers = headers.set('vereinsid', vereinId);
     }
 
-    const authReq = req.clone({ withCredentials: true, headers });
-
-    return next.handle(authReq).pipe(
-      tap({
-        next: (evt) => {
-          if (evt instanceof HttpResponse) {
-            const tokenFromHeader = evt.headers.get('JSESSIONID') ?? evt.headers.get('X-AUTH-TOKEN');
-            if (tokenFromHeader) {
-              this.authService.setToken(tokenFromHeader);
-            }
-          }
-        },
-        error: (err: HttpErrorResponse) => {
-          if (err instanceof HttpErrorResponse) {
-            if (err.status !== 401 && err.status !== 403) {
-              return;
-            }
-            this.authService.currentUser = null;
-            this.router.navigate(['/']);
-          }
-        },
+    return next.handle(req.clone({ withCredentials: true, headers })).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 401 || error.status === 403) {
+          this.authService.currentUser = null;
+          this.authService.setToken('');
+          this.router.navigate(['/']);
+        }
+        return throwError(() => error);
       }),
     );
   }

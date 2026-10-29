@@ -25,6 +25,7 @@ function asRecord(value: unknown): Record<string, unknown> | undefined {
 export class InMemoryDbService {
   private readonly database = this.createDb();
   private isAuthenticated = false;
+  private readonly clubStarts = new Map<string, { startet: boolean; verlaengerungsDate: string | null }>();
 
   createDb(): Database {
     const organisationen = [
@@ -90,8 +91,13 @@ export class InMemoryDbService {
     if (request.method === 'GET' && path === '/admin/user') {
       return this.response(200, this.database.user);
     }
-    if (request.method === 'GET' && /^\/admin\/teilnahmen\/\d{4}\/organisationen\/[^/]+(?:\/teilnahmen)?$/.test(path)) {
-      return this.response(200, []);
+    const eventResponse = this.handleEventRequest(request.method, path);
+    if (eventResponse) {
+      return eventResponse;
+    }
+    const participationResponse = this.handleParticipationRequest(request, path);
+    if (participationResponse) {
+      return participationResponse;
     }
     const summaries = path.match(/^\/admin\/anlaesse\/organisationen\/([^/]+)\/summaries$/);
     if (request.method === 'GET' && summaries) {
@@ -108,6 +114,7 @@ export class InMemoryDbService {
           gemeldeteBr2: 0,
           br1Ok: true,
           br2Ok: true,
+          ...this.clubStarts.get(`${anlass.id}:${summaries[1]}`),
         })),
       );
     }
@@ -131,6 +138,73 @@ export class InMemoryDbService {
       return this.response(201, saved);
     }
     return this.response(404, { message: `Nicht gemockter Endpunkt: ${request.method} ${path}` });
+  }
+
+  private handleEventRequest(method: string, path: string): InMemoryResponse | undefined {
+    const eventPath = path.match(/^\/admin\/anlaesse\/([^/]+)$/);
+    if (method === 'DELETE' && eventPath) {
+      const index = this.database.anlaesse.findIndex((event) => event.id === eventPath[1]);
+      if (index === -1) {
+        return this.response(404, { message: 'Anlass nicht gefunden' });
+      }
+      this.database.anlaesse.splice(index, 1);
+      return this.response(204, null);
+    }
+    const statistics = path.match(/^\/admin\/anlaesse\/([^/]+)\/teilnehmer\/statistic(?:\/[^/]+){0,2}$/);
+    if (method === 'GET' && statistics) {
+      if (!this.database.anlaesse.some((event) => event.id === statistics[1])) {
+        return this.response(404, { message: 'Anlass nicht gefunden' });
+      }
+      return this.response(200, {
+        total: 0,
+        totalStartende: 0,
+        totalZurueckgezogen: 0,
+        startet: 0,
+        neumeldung: 0,
+        abgemeldet_1: 0,
+        abgemeldet_2: 0,
+        abgemeldet_3: 0,
+        ummeldung: 0,
+        verletzt: 0,
+        nichtGestartet: 0,
+        lauflistenGeneriert: false,
+      });
+    }
+    const divisions = path.match(/^\/anlaesse\/([^/]+)\/lauflisten\/[^/]+$/);
+    if (method === 'GET' && divisions) {
+      return this.database.anlaesse.some((event) => event.id === divisions[1])
+        ? this.response(200, [])
+        : this.response(404, { message: 'Anlass nicht gefunden' });
+    }
+    if (method === 'GET' && /^\/admin\/teilnahmen\/\d{4}\/organisationen\/[^/]+(?:\/teilnahmen)?$/.test(path)) {
+      return this.response(200, []);
+    }
+    return undefined;
+  }
+
+  private handleParticipationRequest(request: InMemoryRequest, path: string): InMemoryResponse | undefined {
+    const link = path.match(/^\/admin\/anlaesse\/([^/]+)\/organisationen\/([^/]+)$/);
+    if (request.method === 'PATCH' && link) {
+      const input = asRecord(request.body);
+      if (!this.database.anlaesse.some((event) => event.id === link[1]) ||
+          !this.database.organisationen.some((organisation) => organisation.id === link[2])) {
+        return this.response(404, { message: 'Anlass oder Verein nicht gefunden' });
+      }
+      if (typeof input?.startet !== 'boolean') {
+        return this.response(400, { message: 'Startstatus ist erforderlich' });
+      }
+      const state = {
+        startet: input.startet,
+        verlaengerungsDate: typeof input.verlaengerungsDate === 'string' ? input.verlaengerungsDate : null,
+      };
+      this.clubStarts.set(`${link[1]}:${link[2]}`, state);
+      return this.response(200, { anlassId: link[1], organisationsId: link[2], ...state });
+    }
+    if (request.method === 'GET' &&
+        /^\/admin\/anlaesse\/[^/]+\/organisationen\/[^/]+\/wertungsrichter\/[12]\/(?:verfuegbar|eingeteilt)$/.test(path)) {
+      return this.response(200, []);
+    }
+    return undefined;
   }
 
   private login(body: unknown): InMemoryResponse {

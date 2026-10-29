@@ -20,6 +20,8 @@ services:
     build: 
       context: ../
       dockerfile: ./docker/backend/Dockerfile
+    environment:
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET to a base64-encoded key of at least 256 bits}
     ports:
       - 8088:8080
     links:
@@ -37,4 +39,3 @@ services:
     links:
       - backend
     restart: always
-

@@ -1,5 +1,6 @@
 package org.ztv.anmeldetool.service;
 
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,7 +21,6 @@ import org.ztv.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.transfer.RolleDTO;
 import org.ztv.anmeldetool.util.PersonMapper;
 
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -169,7 +169,7 @@ public class PersonService {
 
   private OrganisationPersonLink createOrgPersonLinks(Person person, Organisation organisation) {
     OrganisationPersonLink orgPersLink = new OrganisationPersonLink();
-    orgPersLink.setChangeDate(Calendar.getInstance());
+    orgPersLink.setChangeDate(LocalDate.now());
     orgPersLink.setAktiv(true);
     orgPersLink.setDeleted(false);
     orgPersLink.setOrganisation(organisation);
@@ -217,7 +217,7 @@ public class PersonService {
         }
       } else { // Create new role link
         RollenLink rl = new RollenLink();
-        rl.setChangeDate(Calendar.getInstance());
+        rl.setChangeDate(LocalDate.now());
         rl.setAktiv(rolleDTO.isAktiv());
         rl.setDeleted(false);
         rl.setId(UUID.randomUUID());

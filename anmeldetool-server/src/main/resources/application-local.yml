@@ -4,13 +4,24 @@ spring:
     username: postgres
     password: adrian2000
   jpa:
-     database-platform: org.hibernate.dialect.PostgreSQLDialect
      show-sql: "false"
      
   datasource:
     url: jdbc:postgresql://localhost:5432/getuwettkaempfe2
     username: postgres
     password: adrian2000
+  mail:
+    enabled: false
+    username: ""
+    password: ""
+    host: localhost
+    port: 25
+    simulate: true
+    simulateemail: ""
+
+# Local development signing key only; production uses JWT_SECRET.
+jwt:
+  secret: ${JWT_SECRET:bG9jYWwtZGV2ZWxvcG1lbnQtand0LXNpZ25pbmcta2V5LTAxMjM0NQ==}
 
 logging:
   level:

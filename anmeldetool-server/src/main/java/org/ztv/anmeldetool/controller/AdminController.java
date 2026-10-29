@@ -1,6 +1,5 @@
 package org.ztv.anmeldetool.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.NotSupportedException;
 
 import java.io.UnsupportedEncodingException;
@@ -17,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.ztv.anmeldetool.exception.NotFoundException;
 import org.ztv.anmeldetool.models.LoginData;
+import org.ztv.anmeldetool.models.LoginResult;
 import org.ztv.anmeldetool.models.Organisation;
 import org.ztv.anmeldetool.models.Person;
 import org.ztv.anmeldetool.service.AnlassService;
@@ -67,9 +68,12 @@ public class AdminController {
   private final TeilnehmerService teilnehmerSrv;
 
   @PostMapping("/login")
-  public ResponseEntity<PersonDTO> login(HttpServletRequest request, @RequestBody LoginData loginData) {
+  public ResponseEntity<PersonDTO> login(@jakarta.validation.Valid @RequestBody LoginData loginData) {
     log.info("Login attempt {}", loginData.getUsername());
-    return ResponseEntity.ok(loginSrv.login(request, loginData));
+    LoginResult result = loginSrv.login(loginData);
+    return ResponseEntity.ok()
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.token())
+        .body(result.user());
   }
 
   @GetMapping("/organisationen")

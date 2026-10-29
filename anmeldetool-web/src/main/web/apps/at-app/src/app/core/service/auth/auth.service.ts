@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, Observable, tap, throwError } from 'rxjs';
+import { catchError, map, Observable, tap, throwError } from 'rxjs';
 import { IUser } from 'src/app/core/model/IUser';
 import { IVerein } from 'src/app/verein/verein';
 import { environment } from 'src/environments/environment';
@@ -104,16 +104,29 @@ export class AuthService {
       username: userName,
       password: password,
     };
-    return this.http.post<IUser>(this.loginUrl, loginData).pipe(
+    return this.http.post<IUser>(this.loginUrl, loginData, { observe: 'response' }).pipe(
+      map((response) => {
+        const authorization = response.headers.get('Authorization');
+        const token = authorization?.startsWith('Bearer ') ? authorization.slice(7) : '';
+
+        if (!response.body || !token) {
+          throw new Error('Login response did not contain a user and bearer token.');
+        }
+
+        this.setToken(token);
+        return response.body;
+      }),
       tap((user) => {
         this.currentUser = user;
         this.currentVerein = verein;
-        this.store.dispatch(UserActions.loadAllUserInvoked());
         this._isLoggedIn.set(true);
+        this.store.dispatch(UserActions.loadAllUserInvoked());
         void this.router.navigate(['/anlaesse']);
       }),
       catchError((error) => {
         this._isLoggedIn.set(false);
+        this.currentUser = null;
+        this.setToken('');
         return throwError(() => error);
       }),
     );

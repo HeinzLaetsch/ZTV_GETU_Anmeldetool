@@ -12,6 +12,9 @@ backend:
     tag: "0.0.2"
 
   replicaCount: 1
+  jwt:
+    # -- Base64-encoded HMAC signing key; provide a unique key of at least 256 bits.
+    secret: ""
   database:
     url: jdbc:postgresql://postgres-service.infra.svc.cluster.local:5432/getuwettkaempfe
     username: "username"
@@ -55,4 +58,3 @@ httpRoute:
   # Hostnames matching HTTP header.
   hostnames:
   - ztv-anmeldetool.duckdns.org
-

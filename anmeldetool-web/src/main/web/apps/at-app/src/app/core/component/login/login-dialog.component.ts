@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { form, FormField, required, validate } from '@angular/forms/signals';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -129,7 +130,11 @@ export class LoginComponent {
         },
         error: (error) => {
           this.loginError.set(true);
-          this.errorMessage.set('Fehler beim Login, Verein, Name oder Passwort falsch. ' + error);
+          const serverMessage =
+            error instanceof HttpErrorResponse && typeof error.error?.message === 'string'
+              ? error.error.message
+              : undefined;
+          this.errorMessage.set(serverMessage ?? 'Login fehlgeschlagen. Bitte Verein, Benutzername und Passwort prüfen.');
         },
       });
   }

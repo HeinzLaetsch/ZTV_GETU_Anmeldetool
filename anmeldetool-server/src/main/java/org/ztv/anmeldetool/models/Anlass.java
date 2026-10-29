@@ -35,7 +35,6 @@ public class Anlass extends Base {
 
 	private String halle;
 
-	// TODO replace private String organisator;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ORGANISATOR_ID", nullable = false, insertable = true, updatable = true)
 	@ToString.Exclude
@@ -100,7 +99,8 @@ public class Anlass extends Base {
 	@ToString.Exclude
 	private List<OrganisationAnlassLink> organisationenLinks;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "anlass", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "anlass", cascade = { CascadeType.PERSIST,
+			CascadeType.MERGE }, orphanRemoval = true)
 	@ToString.Exclude
 	private List<WertungsrichterSlot> wertungsrichterSlots;
 

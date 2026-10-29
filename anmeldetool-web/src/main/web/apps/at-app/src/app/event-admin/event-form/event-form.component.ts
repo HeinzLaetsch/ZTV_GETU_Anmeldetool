@@ -12,10 +12,13 @@ import {
 } from '@angular/forms';
 import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
 import type { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { finalize } from 'rxjs';
+import type { IAnlass } from '../../core/model/IAnlass';
+import type { IWertungsrichterSlot } from '../../core/model/IWertungsrichterSlot';
 import { KategorieEnum } from '../../core/model/KategorieEnum';
+import { isTiTuEnumEqual, TiTuEnum } from '../../core/model/TiTuEnum';
 import { AnlassActions } from '../../core/redux/anlass/anlass.actions';
 import { selectVereineSorted } from '../../core/redux/verein';
 import { AnlassService, type CreateAnlass } from '../../core/service/anlass/anlass.service';
@@ -35,6 +38,8 @@ const DATE_FIELDS = [
 ] as const;
 
 type WertungsrichterSlotForm = FormGroup<{
+  id: FormControl<string>;
+  egalSlot: FormControl<boolean>;
   brevet: FormControl<number>;
   tag: FormControl<Date | null>;
   startzeit: FormControl<string>;
@@ -83,9 +88,9 @@ function toMidnightDateTime(value: Date | null): string {
 }
 
 @Component({
-  selector: 'ztv-create-event',
-  templateUrl: './create-event.component.html',
-  styleUrls: ['./create-event.component.scss'],
+  selector: 'ztv-event-form',
+  templateUrl: './event-form.component.html',
+  styleUrls: ['./event-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReactiveFormsModule, RouterLink, MaterialModule],
   providers: [
@@ -93,13 +98,19 @@ function toMidnightDateTime(value: Date | null): string {
     { provide: MAT_DATE_LOCALE, useValue: 'de-CH' },
   ],
 })
-export class CreateEventComponent {
+export class EventFormComponent {
   private readonly formBuilder = inject(FormBuilder).nonNullable;
   private readonly anlassService = inject(AnlassService);
   private readonly authService = inject(AuthService);
   private readonly store = inject(Store);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly eventId = inject(ActivatedRoute).snapshot.paramMap.get('id');
+  private existingEvent: IAnlass | null = null;
+
+  protected readonly isEditing = Boolean(this.eventId);
+  protected readonly isLoading = signal(this.isEditing);
+  protected readonly returnLink = this.eventId ? ['/admin', this.eventId, 'admin'] : ['/anlaesse'];
 
   protected readonly vereine = this.store.selectSignal(selectVereineSorted());
   protected readonly organisatorSearch = this.formBuilder.control<IVerein | string>(
@@ -130,6 +141,9 @@ export class CreateEventComponent {
       ort: ['', [Validators.required, Validators.pattern(/\S/)]],
       halle: ['', [Validators.required, Validators.pattern(/\S/)]],
       organisatorId: [this.authService.currentVerein?.id ?? '', Validators.required],
+      iban: [''],
+      smQuali: [false],
+      ausserkantonal: [false],
       tiTu: this.formBuilder.control<CreateAnlass['tiTu']>('Alle', Validators.required),
       tiefsteKategorie: [KategorieEnum.K1, Validators.required],
       hoechsteKategorie: [KategorieEnum.K7, Validators.required],
@@ -171,6 +185,66 @@ export class CreateEventComponent {
     this.form.controls.aenderungenNichtMehrErlaubt.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe((value) => this.form.controls.aenderungenInKategorieGeschlossen.setValue(value));
+
+    if (this.eventId) {
+      this.anlassService
+        .getAnlaesse(false)
+        .pipe(takeUntilDestroyed())
+        .subscribe({
+          next: (events) => {
+            const event = events.find((candidate) => candidate.id === this.eventId);
+            if (event) {
+              this.loadEvent(event);
+            } else {
+              this.errorMessage.set('Der Anlass wurde nicht gefunden.');
+            }
+            this.isLoading.set(false);
+          },
+          error: () => {
+            this.isLoading.set(false);
+            this.errorMessage.set('Der Anlass konnte nicht geladen werden.');
+          },
+        });
+    }
+  }
+
+  private loadEvent(event: IAnlass): void {
+    this.existingEvent = event;
+    this.form.patchValue(
+      {
+        anlassBezeichnung: event.anlassBezeichnung,
+        ort: event.ort,
+        halle: event.halle,
+        organisatorId: event.organisatorId,
+        iban: event.iban ?? '',
+        smQuali: event.smQuali,
+        ausserkantonal: event.ausserkantonal,
+        tiTu: isTiTuEnumEqual(event.tiTu, TiTuEnum.Ti)
+          ? 'Ti'
+          : isTiTuEnumEqual(event.tiTu, TiTuEnum.Tu)
+            ? 'Tu'
+            : 'Alle',
+        tiefsteKategorie: event.tiefsteKategorie,
+        hoechsteKategorie: event.hoechsteKategorie,
+        startDatum: event.startDatum,
+        endDatum: event.endDatum,
+        anmeldungBeginn: event.anmeldungBeginn,
+        erfassenGeschlossen: event.erfassenGeschlossen,
+        crossKategorieAenderungenGeschlossen: event.crossKategorieAenderungenGeschlossen,
+        aenderungenInKategorieGeschlossen: event.aenderungenInKategorieGeschlossen,
+        aenderungenNichtMehrErlaubt: event.aenderungenNichtMehrErlaubt,
+      },
+      { emitEvent: false },
+    );
+    this.form.controls.tiefsteKategorie.updateValueAndValidity();
+    this.form.controls.hoechsteKategorie.updateValueAndValidity();
+    const organizer = this.vereine().find((verein) => verein.id === event.organisatorId);
+    this.organisatorSearch.setValue(organizer ?? '');
+    const slots = this.form.controls.wertungsrichterSlots;
+    slots.clear();
+    for (const slot of event.wertungsrichterSlots ?? []) {
+      slots.push(this.createSlotForm(slot));
+    }
   }
 
   protected displayOrganisator(value: IVerein | string | null): string {
@@ -205,54 +279,94 @@ export class CreateEventComponent {
     }
   }
 
-  private createSlotForm(): WertungsrichterSlotForm {
+  private createSlotForm(slot?: IWertungsrichterSlot): WertungsrichterSlotForm {
     return this.formBuilder.group(
       {
-        brevet: [1, [Validators.required, Validators.min(1), Validators.max(2)]],
-        tag: this.formBuilder.control<Date | null>(null, Validators.required),
-        startzeit: ['', Validators.pattern(/^([01]\d|2[0-3]):[0-5]\d$/)],
-        endzeit: ['', Validators.pattern(/^([01]\d|2[0-3]):[0-5]\d$/)],
-        beschreibung: [''],
+        id: [slot?.id ?? ''],
+        egalSlot: [slot?.egalSlot ?? false],
+        brevet: [slot?.brevet ?? 1, [Validators.required, Validators.min(1), Validators.max(2)]],
+        tag: this.formBuilder.control<Date | null>(slot?.tag ?? null, slot?.egalSlot ? [] : Validators.required),
+        startzeit: [
+          slot?.startzeit ? formatDate(slot.startzeit, 'HH:mm', 'en-US') : '',
+          Validators.pattern(/^([01]\d|2[0-3]):[0-5]\d$/),
+        ],
+        endzeit: [
+          slot?.endzeit ? formatDate(slot.endzeit, 'HH:mm', 'en-US') : '',
+          Validators.pattern(/^([01]\d|2[0-3]):[0-5]\d$/),
+        ],
+        beschreibung: [slot?.beschreibung ?? ''],
       },
       { validators: validateSlotTimes },
     );
   }
 
   protected onSave(): void {
-    if (this.isSaving()) {
+    if (this.isSaving() || this.isLoading() || (this.isEditing && !this.existingEvent)) {
       return;
     }
     this.form.markAllAsTouched();
     this.organisatorSearch.markAsTouched();
     if (this.form.invalid) {
+      console.error('Ungültiges Anlassformular', {
+        errors: this.form.errors,
+        fields: Object.entries(this.form.controls)
+          .filter(([, control]) => control.invalid)
+          .map(([field, control]) => ({ field, errors: control.errors })),
+        slots: this.form.controls.wertungsrichterSlots.controls.flatMap((slot, index) =>
+          slot.invalid
+            ? [
+                {
+                  index,
+                  errors: slot.errors,
+                  fields: Object.entries(slot.controls)
+                    .filter(([, control]) => control.invalid)
+                    .map(([field, control]) => ({ field, errors: control.errors })),
+                },
+              ]
+            : [],
+        ),
+      });
+      this.errorMessage.set('Bitte alle Pflichtfelder korrekt ausfüllen.');
       return;
     }
     this.isSaving.set(true);
     this.errorMessage.set('');
     const values = this.form.getRawValue();
     this.form.disable({ emitEvent: false });
-    this.anlassService
-      .createAnlass({
-        ...values,
-        anlassBezeichnung: values.anlassBezeichnung.trim(),
-        ort: values.ort.trim(),
-        halle: values.halle.trim(),
-        startDatum: toMidnightDateTime(values.startDatum),
-        endDatum: toMidnightDateTime(values.endDatum),
-        anmeldungBeginn: toMidnightDateTime(values.anmeldungBeginn),
-        erfassenGeschlossen: toMidnightDateTime(values.erfassenGeschlossen),
-        crossKategorieAenderungenGeschlossen: toMidnightDateTime(values.crossKategorieAenderungenGeschlossen),
-        aenderungenInKategorieGeschlossen: toMidnightDateTime(values.aenderungenInKategorieGeschlossen),
-        aenderungenNichtMehrErlaubt: toMidnightDateTime(values.aenderungenNichtMehrErlaubt),
-        wertungsrichterSlots: values.wertungsrichterSlots.map((slot, index) => ({
-          reihenfolge: index + 1,
-          brevet: slot.brevet,
-          tag: slot.tag ? formatDate(slot.tag, 'yyyy-MM-dd', 'en-US') : '',
-          start_zeit: slot.startzeit ? `${slot.startzeit}:00` : null,
-          end_zeit: slot.endzeit ? `${slot.endzeit}:00` : null,
-          beschreibung: slot.beschreibung.trim(),
-        })),
-      })
+    const input: CreateAnlass = {
+      ...values,
+      anlassBezeichnung: values.anlassBezeichnung.trim(),
+      ort: values.ort.trim(),
+      halle: values.halle.trim(),
+      iban: values.iban.trim(),
+      startDatum: toMidnightDateTime(values.startDatum),
+      endDatum: toMidnightDateTime(values.endDatum),
+      anmeldungBeginn: toMidnightDateTime(values.anmeldungBeginn),
+      erfassenGeschlossen: toMidnightDateTime(values.erfassenGeschlossen),
+      crossKategorieAenderungenGeschlossen: toMidnightDateTime(values.crossKategorieAenderungenGeschlossen),
+      aenderungenInKategorieGeschlossen: toMidnightDateTime(values.aenderungenInKategorieGeschlossen),
+      aenderungenNichtMehrErlaubt: toMidnightDateTime(values.aenderungenNichtMehrErlaubt),
+      wertungsrichterSlots: values.wertungsrichterSlots.map((slot, index) => ({
+        ...(this.isEditing && slot.id ? { id: slot.id } : {}),
+        ...(this.isEditing ? { egalSlot: slot.egalSlot } : {}),
+        reihenfolge: index + 1,
+        brevet: slot.brevet,
+        tag: slot.tag ? formatDate(slot.tag, 'yyyy-MM-dd', 'en-US') : '',
+        start_zeit: slot.startzeit ? `${slot.startzeit}:00` : null,
+        end_zeit: slot.endzeit ? `${slot.endzeit}:00` : null,
+        beschreibung: slot.beschreibung.trim(),
+      })),
+    };
+    const save$ = this.existingEvent
+      ? this.anlassService.updateAnlass({
+          ...this.existingEvent,
+          ...input,
+          id: this.existingEvent.id,
+          published: this.existingEvent.published,
+          aktiv: this.existingEvent.aktiv,
+        })
+      : this.anlassService.createAnlass(input);
+    save$
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
@@ -265,7 +379,7 @@ export class CreateEventComponent {
       .subscribe({
         next: () => {
           this.store.dispatch(AnlassActions.loadAllAnlaesseInvoked());
-          void this.router.navigate(['/anlaesse']);
+          void this.router.navigate(this.returnLink);
         },
         error: () => {
           this.errorMessage.set('Der Anlass konnte nicht gespeichert werden. Bitte erneut versuchen.');

@@ -29,10 +29,10 @@ export const test = base.extend<{ inMemoryDb: InMemoryDbService }>({
         headers: {
           'Access-Control-Allow-Origin': request.headers().origin ?? new URL(request.url()).origin,
           'Access-Control-Allow-Credentials': 'true',
-          'Access-Control-Expose-Headers': 'X-AUTH-TOKEN',
-          'X-AUTH-TOKEN': 'in-memory-test-token',
+          'Access-Control-Expose-Headers': 'Authorization',
+          Authorization: 'Bearer in-memory-test-token',
         },
-        body: JSON.stringify(response.body),
+        body: response.status === 204 ? '' : JSON.stringify(response.body),
       });
     });
     await use(page);

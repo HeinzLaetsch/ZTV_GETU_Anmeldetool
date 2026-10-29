@@ -1,5 +1,4 @@
-# FROM docker.io/openjdk:21-jdk 
-FROM alpine/java:21-jre
+FROM eclipse-temurin:25-jre
 
 LABEL authors="Heinz Lätsch"
 

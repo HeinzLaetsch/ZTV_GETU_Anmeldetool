@@ -7,6 +7,7 @@ import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.ztv.anmeldetool.models.Anlass;
@@ -29,9 +30,18 @@ public abstract class AnlassMapper {
 	@Mapping(source = "organisator.id", target = "organisatorId")
 	public abstract AnlassDTO toDto(Anlass anlass);
 
-  @Mapping(source = "startDatum", target = "startDate")
-  @Mapping(source = "endDatum", target = "endDate")
-  public abstract Anlass toEntity(AnlassDTO anlassDTO);
+	@Mapping(source = "startDatum", target = "startDate")
+	@Mapping(source = "endDatum", target = "endDate")
+	public abstract Anlass toEntity(AnlassDTO anlassDTO);
+
+	@Mapping(source = "startDatum", target = "startDate")
+	@Mapping(source = "endDatum", target = "endDate")
+	@Mapping(source = "organisatorId", target = "organisator")
+	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "organisationenLinks", ignore = true)
+	@Mapping(target = "wertungsrichterSlots", ignore = true)
+	@Mapping(target = "ranglisteConfigurationen", ignore = true)
+	public abstract void updateFromDto(AnlassDTO dto, @MappingTarget Anlass anlass);
 
 	public List<OrganisationDTO> mapOrganisationenDTO(List<OrganisationAnlassLink> links) {
 		return links.stream().map(link -> {

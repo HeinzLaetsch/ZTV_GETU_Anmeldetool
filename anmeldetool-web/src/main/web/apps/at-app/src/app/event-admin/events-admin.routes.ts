@@ -4,6 +4,12 @@ import { EventAdminComponent } from './index';
 
 export const EventAdminRoutes: Routes = [
   {
+    path: ':id/bearbeiten',
+    loadComponent: () => import('./event-form/event-form.component').then((module) => module.EventFormComponent),
+    canActivate: [eventCanActivate],
+    data: { roles: ['SEKRETARIAT'] },
+  },
+  {
     path: '',
     component: EventAdminComponent,
   },

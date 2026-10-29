@@ -1,13 +1,11 @@
 package org.ztv.anmeldetool.models;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -27,14 +25,13 @@ public class Wertungsrichter extends Base {
 
 	private boolean gueltig;
 
-	@Temporal(TemporalType.DATE)
-	private Calendar letzterFk;
+	private LocalDate letzterFk;
 
 	public Wertungsrichter() {
 	}
 
 	@Builder
-	public Wertungsrichter(Person person, WertungsrichterBrevetEnum brevet, Calendar letzterFk) {
+	public Wertungsrichter(Person person, WertungsrichterBrevetEnum brevet, LocalDate letzterFk) {
 		this.person = person;
 		this.brevet = brevet;
 		this.letzterFk = letzterFk;

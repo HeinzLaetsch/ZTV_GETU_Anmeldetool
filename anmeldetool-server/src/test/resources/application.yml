@@ -15,6 +15,9 @@ spring:
       ddl-auto: none
     generate-ddl: false
     defer-datasource-initialization: false
+  jackson:
+    deserialization:
+      fail-on-null-for-primitives: false
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:test;mode=postgresql;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;NON_KEYWORDS=KEY
@@ -35,6 +38,8 @@ spring:
       starttls.enable: "true"
     simulate:  "false"
     simulateemail: ""
+jwt:
+  secret: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
 scheduler:
   reminder:
     cron: "0 0 1 * * ?"

@@ -1,6 +1,6 @@
 package org.ztv.anmeldetool.transfer;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import lombok.Builder;
@@ -14,6 +14,6 @@ public class WertungsrichterDTO {
 	// private WertungsrichterBrevetEnum brevet;
 	private int brevet;
 	private boolean gueltig;
-	private Calendar letzterFk;
+	private LocalDate letzterFk;
 	private boolean aktiv;
 }

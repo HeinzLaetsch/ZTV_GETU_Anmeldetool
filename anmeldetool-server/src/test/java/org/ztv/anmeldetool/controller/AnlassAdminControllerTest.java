@@ -184,7 +184,7 @@ public class AnlassAdminControllerTest {
       when(anlassMapper.toDto(anlass)).thenReturn(dto);
 
       ResponseEntity<List<AnlassDTO>> resp = controller.getAnlaesse(true);
-      assertEquals(200, resp.getStatusCodeValue());
+      assertEquals(200, resp.getStatusCode().value());
       assertNotNull(resp.getBody());
       assertEquals(1, resp.getBody().size());
     }
@@ -202,7 +202,7 @@ public class AnlassAdminControllerTest {
         mocked.when(ServletUriComponentsBuilder::fromCurrentRequest).thenReturn(builderMock);
 
         ResponseEntity<List<AnlassDTO>> resp = controller.getAnlaesse(true);
-        assertEquals(404, resp.getStatusCodeValue());
+        assertEquals(404, resp.getStatusCode().value());
       }
     }
   }
@@ -216,7 +216,7 @@ public class AnlassAdminControllerTest {
       when(anlassSummaryService.getAnlassSummaries(any(), eq(true))).thenReturn(List.of(dto));
       ResponseEntity<Collection<AnlassSummaryDTO>> resp = controller.getAnlassOrganisationSummaries(
            UUID.randomUUID());
-      assertEquals(200, resp.getStatusCodeValue());
+      assertEquals(200, resp.getStatusCode().value());
     }
 
     @Test
@@ -233,7 +233,7 @@ public class AnlassAdminControllerTest {
 
         ResponseEntity<Collection<AnlassSummaryDTO>> resp = controller.getAnlassOrganisationSummaries(
              UUID.randomUUID());
-        assertEquals(404, resp.getStatusCodeValue());
+        assertEquals(404, resp.getStatusCode().value());
       }
     }
   }

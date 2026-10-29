@@ -2,12 +2,15 @@ package org.ztv.anmeldetool.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +42,7 @@ import org.ztv.anmeldetool.models.WertungsrichterBrevetEnum;
 import org.ztv.anmeldetool.output.AnmeldeKontrolleExport;
 import org.ztv.anmeldetool.output.AnmeldeKontrolleOutput;
 import org.ztv.anmeldetool.output.BenutzerExport;
+import org.ztv.anmeldetool.output.StartlisteWordOutput;
 import org.ztv.anmeldetool.output.TeilnehmerExportImport;
 import org.ztv.anmeldetool.output.WertungsrichterExport;
 import org.ztv.anmeldetool.output.WertungsrichterOutput;
@@ -50,6 +54,7 @@ import org.ztv.anmeldetool.service.OrganisationAnlassLinkService;
 import org.ztv.anmeldetool.service.OrganisationService;
 import org.ztv.anmeldetool.service.PersonAnlassLinkService;
 import org.ztv.anmeldetool.service.PersonService;
+import org.ztv.anmeldetool.service.StartlisteService;
 import org.ztv.anmeldetool.service.StvContestService;
 import org.ztv.anmeldetool.service.TeilnehmerAnlassLinkService;
 import org.ztv.anmeldetool.service.TeilnehmerService;
@@ -64,6 +69,7 @@ import org.ztv.anmeldetool.transfer.OrganisationDTO;
 import org.ztv.anmeldetool.transfer.PersonAnlassLinkCsvDTO;
 import org.ztv.anmeldetool.transfer.PersonAnlassLinkDTO;
 import org.ztv.anmeldetool.transfer.PersonDTO;
+import org.ztv.anmeldetool.transfer.StartlisteDTO;
 import org.ztv.anmeldetool.transfer.TeilnahmeStatisticDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkCsvDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
@@ -89,6 +95,7 @@ public class AnlassAdminController {
   private final OrganisationAnlassLinkService organisationAnlassLinkSrv;
   private final PersonAnlassLinkService personAnlassLinkSrv;
   private final PersonService personSrv;
+  private final StartlisteService startlisteSrv;
 
   @GetMapping
   public ResponseEntity<List<AnlassDTO>> getAnlaesse(
@@ -149,6 +156,20 @@ public class AnlassAdminController {
     BenutzerExport.csvWriteToWriter(benutzerList, response);
   }
 
+  private static final String DOCX_MIME_TYPE =
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+  @GetMapping(value = "/{anlassId}/startliste", produces = DOCX_MIME_TYPE)
+  public void getStartliste(HttpServletResponse response, @PathVariable UUID anlassId) throws IOException {
+    StartlisteDTO startliste = startlisteSrv.getStartliste(anlassId);
+    String fileName = "Startliste_" + startliste.anlassBezeichnung() + ".docx";
+    response.setContentType(DOCX_MIME_TYPE);
+    response.addHeader(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
+        .filename(fileName, StandardCharsets.UTF_8).build().toString());
+    response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+    StartlisteWordOutput.write(startliste, response.getOutputStream());
+  }
+
   @GetMapping(value = "/{anlassId}", produces = "text/csv;charset=UTF-8")
   public void getAnmeldeDatenExport(HttpServletResponse response, @PathVariable UUID anlassId)
       throws IOException {
@@ -174,6 +195,16 @@ public class AnlassAdminController {
   public ResponseEntity<AnlassDTO> updateAnlass(@PathVariable UUID anlassId,
       @RequestBody AnlassDTO anlassDTO) {
     return ResponseEntity.ok(anlassSrv.updateAnlass(anlassDTO));
+  }
+
+  @DeleteMapping("/{anlassId}")
+  public ResponseEntity<Void> deleteAnlass(@PathVariable UUID anlassId) {
+    try {
+      anlassSrv.deleteAnlass(anlassId);
+      return ResponseEntity.noContent().build();
+    } catch (DataIntegrityViolationException exception) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
   }
 
   @PostMapping

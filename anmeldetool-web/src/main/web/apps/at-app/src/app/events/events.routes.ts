@@ -32,7 +32,7 @@ export const eventsRoutes: Routes = [
       {
         path: 'neu',
         loadComponent: () =>
-          import('./create-event/create-event.component').then((module) => module.CreateEventComponent),
+          import('../event-admin/event-form/event-form.component').then((module) => module.EventFormComponent),
         canActivate: [
           (): boolean | UrlTree => {
             const authService = inject(AuthService);

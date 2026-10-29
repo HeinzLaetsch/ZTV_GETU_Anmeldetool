@@ -1,10 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, type OnInit } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  EventEmitter,
+  inject,
+  type OnInit,
+  signal,
+  type TemplateRef,
+  viewChild,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { select, Store } from '@ngrx/store';
-import { type Observable, Subject } from 'rxjs';
+import { filter, finalize, type Observable, Subject, switchMap } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import type { AbteilungEnum } from 'src/app/core/model/AbteilungEnum';
 import type { AnlageEnum } from 'src/app/core/model/AnlageEnum';
@@ -14,6 +25,7 @@ import type { KategorieEnum } from 'src/app/core/model/KategorieEnum';
 import { AuthService } from 'src/app/core/service/auth/auth.service';
 import { RanglistenService } from 'src/app/core/service/rangliste/ranglisten.service';
 import { selectAnlassById } from '../core/redux/anlass';
+import { AnlassActions } from '../core/redux/anlass/anlass.actions';
 import type { AppState } from '../core/redux/core.state';
 import { AnlassService } from '../core/service/anlass/anlass.service';
 import { MaterialModule } from '../shared/material-module';
@@ -27,9 +39,15 @@ import { Upload } from './upload-dialog/upload.component';
   templateUrl: './event-admin.component.html',
   styleUrls: ['./event-admin.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, MaterialModule, EinteilungComponent],
+  imports: [CommonModule, FormsModule, MaterialModule, EinteilungComponent, RouterLink],
 })
 export class EventAdminComponent extends SubscriptionHelper implements OnInit {
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly deleteDialog = viewChild.required<TemplateRef<unknown>>('deleteDialog');
+  readonly isDeleting = signal(false);
+  readonly deleteError = signal('');
+
   anlass$!: Observable<IAnlass>;
   anlass: IAnlass;
 
@@ -77,6 +95,9 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
     this.anlass$ = this.store.pipe(select(selectAnlassById(anlassId)));
     this.registerSubscription(
       this.anlass$.subscribe((data) => {
+        if (!data) {
+          return;
+        }
         this.anlass = data;
         if (this.anlass.alleAnlass) {
           this.hideOnlyTi = true;
@@ -100,8 +121,42 @@ export class EventAdminComponent extends SubscriptionHelper implements OnInit {
     return this.authService.isSekretariat();
   }
 
+  onDeleteAnlass(): void {
+    if (this.isDeleting() || (!this.administrator)) {
+      return;
+    }
+    this.isDeleting.set(true);
+    this.deleteError.set('');
+    this.dialog
+      .open<unknown, unknown, boolean>(this.deleteDialog(), { width: '480px' })
+      .afterClosed()
+      .pipe(
+        filter((confirmed) => confirmed === true),
+        switchMap(() => this.anlassService.deleteAnlass(this.anlass.id)),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isDeleting.set(false)),
+      )
+      .subscribe({
+        next: () => {
+          this.store.dispatch(AnlassActions.loadAllAnlaesseInvoked());
+          void this.router.navigate(['/anlaesse']);
+        },
+        error: (error: unknown) => {
+          this.deleteError.set(
+            error instanceof HttpErrorResponse && error.status === 409
+              ? 'Der Anlass kann nicht gelöscht werden, da noch weitere Daten mit ihm oder seinen Slots verknüpft sind.'
+              : 'Der Anlass konnte nicht gelöscht werden. Bitte erneut versuchen.',
+          );
+        },
+      });
+  }
+
   exportMutationen(): void {
     this.anlassService.getMutationenForAnlassCsv(this.anlass);
+  }
+
+  exportStartliste(): void {
+    this.anlassService.getStartlisteDocx(this.anlass);
   }
 
   exportTeilnehmer(): void {

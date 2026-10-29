@@ -1,1 +1,1 @@
-org.springframework.boot.env.EnvironmentPostProcessor=org.ztv.anmeldetool.DockerSecretsPasswordProcessor
+org.springframework.boot.EnvironmentPostProcessor=org.ztv.anmeldetool.DockerSecretsPasswordProcessor

@@ -127,7 +127,7 @@ public class AnlassControllerTest {
         ResponseEntity<RanglisteConfigurationDTO> resp = controller.putRanglistenConfig(dto);
         assertNotNull(resp);
         assertEquals(404, resp.getStatusCode().value());
-        assertTrue(resp.getHeaders().containsKey("Location"));
+        assertNotNull(resp.getHeaders().getFirst("Location"));
       } catch (IllegalStateException ise) {
         // In some test environments ServletUriComponentsBuilder may still fail to build a location;
         // accept IllegalStateException as a valid negative outcome.

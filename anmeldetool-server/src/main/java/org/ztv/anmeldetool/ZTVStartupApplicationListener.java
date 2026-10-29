@@ -1,7 +1,7 @@
 package org.ztv.anmeldetool;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -169,11 +169,11 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 		Person person = Person.builder().benutzername("trainer1@verein1.com").name("Trainer1").vorname("Best")
 				.handy("076 12 345 67").email("verein1@verein1.com").password(password).build();
 		person.setAktiv(true);
-		person.setChangeDate(Calendar.getInstance());
+		person.setChangeDate(LocalDate.now());
 
 		OrganisationPersonLink opLink = new OrganisationPersonLink();
 		opLink.setAktiv(true);
-		opLink.setChangeDate(Calendar.getInstance());
+		opLink.setChangeDate(LocalDate.now());
 		opLink.setPerson(person);
 		opLink.setOrganisation(verein1);
 		opLink = orgPersLinkRepo.save(opLink);
@@ -192,12 +192,12 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 		person = Person.builder().benutzername("trainer2@tvverein1.ch").name("Trainer2").vorname("Super")
 				.handy("078 11 111 11").email("trainer2@tvverein1.ch").password(password).build();
 		person.setAktiv(true);
-		person.setChangeDate(Calendar.getInstance());
+		person.setChangeDate(LocalDate.now());
 		// person.addToOrganisationenLink(opLink);
 
 		opLink = new OrganisationPersonLink();
 		opLink.setAktiv(true);
-		opLink.setChangeDate(Calendar.getInstance());
+		opLink.setChangeDate(LocalDate.now());
 		// verein1.addToPersonenLink(opLink);
 		opLink.setPerson(person);
 		opLink.setOrganisation(verein1);
@@ -222,12 +222,12 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 		person = Person.builder().benutzername("WR.Brevet_1@tvverein1.ch").name("Muster").vorname("Hans")
 				.handy("078 11 111 11").email("WR.Brevet_1@tvverein1.ch").password(password).build();
 		person.setAktiv(true);
-		person.setChangeDate(Calendar.getInstance());
+		person.setChangeDate(LocalDate.now());
 		// person.addToOrganisationenLink(opLink);
 
 		opLink = new OrganisationPersonLink();
 		opLink.setAktiv(true);
-		opLink.setChangeDate(Calendar.getInstance());
+		opLink.setChangeDate(LocalDate.now());
 		opLink.setPerson(person);
 		opLink.setOrganisation(verein1);
 		// verein1.addToPersonenLink(opLink);
@@ -251,12 +251,12 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 		person = Person.builder().benutzername("WR.Brevet_2@tvverein1.ch").name("Kein Muster").vorname("Sofie")
 				.handy("078 11 111 11").email("WR.Brevet_2@tvverein1.ch").password(password).build();
 		person.setAktiv(true);
-		person.setChangeDate(Calendar.getInstance());
+		person.setChangeDate(LocalDate.now());
 		person = personSrv.create(person, opLink);
 
 		opLink = new OrganisationPersonLink();
 		opLink.setAktiv(true);
-		opLink.setChangeDate(Calendar.getInstance());
+		opLink.setChangeDate(LocalDate.now());
 		opLink.setPerson(person);
 		opLink.setOrganisation(verein1);
 		// verein1.addToPersonenLink(opLink);
@@ -316,7 +316,7 @@ public class ZTVStartupApplicationListener implements ApplicationListener<Contex
 
 	// Helper methods and constants for clean code
 	private static final String DEFAULT_WL_PASSWORD = "wl@ztv";
-	private static Calendar now() { return Calendar.getInstance(); }
+	private static LocalDate now() { return LocalDate.now(); }
 
 	private void createWL(Organisation ztv, String benutzername, String name, String vorname, String handy, String email) {
 		OrganisationPersonLink opLink = new OrganisationPersonLink();

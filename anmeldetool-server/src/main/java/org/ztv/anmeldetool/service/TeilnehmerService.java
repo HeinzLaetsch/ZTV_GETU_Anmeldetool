@@ -1,7 +1,7 @@
 package org.ztv.anmeldetool.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -165,7 +165,7 @@ public class TeilnehmerService {
 
     Teilnehmer teilnehmer = teilnehmerOptional.get();
     teilnehmer.setAktiv(teilnehmer2.isAktiv());
-    teilnehmer.setChangeDate(Calendar.getInstance());
+    teilnehmer.setChangeDate(LocalDate.now());
 
     teilnehmer.setJahrgang(teilnehmer2.getJahrgang());
     teilnehmer.setTiTu(teilnehmer2.getTiTu());

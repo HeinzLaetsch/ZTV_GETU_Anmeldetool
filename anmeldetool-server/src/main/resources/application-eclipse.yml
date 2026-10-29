@@ -6,16 +6,19 @@ spring:
   flyway:
     locations: ["classpath:/db/migration"]
   jpa:
-     database-platform: org.hibernate.dialect.PostgreSQLDialect
      show-sql: "true"
+     open-in-view: true
      properties:
         hibernate:
            jdbc:
               # time_zone: "Europe/Zurich"
               time_zone: "GMT+1"
   jackson:
+     datatype:
+        datetime:
+           adjust-dates-to-context-time-zone: true
      deserialization:
-        adjust-dates-to-context-time-zone: true
+        fail-on-null-for-primitives: false
      # time-zone: "Europe/Zurich"
      time-zone: "UTC"
   mail:
@@ -70,8 +73,8 @@ management:
       base-path: /admin
   endpoint:
     beans:
-      enabled: true
+      access: read-only
     health:
-      enabled: true
+      access: read-only
     info:
-      enabled: true
+      access: read-only

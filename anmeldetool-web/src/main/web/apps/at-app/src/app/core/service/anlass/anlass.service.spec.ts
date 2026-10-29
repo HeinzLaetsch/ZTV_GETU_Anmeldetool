@@ -1,10 +1,14 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import * as FileSaver from 'file-saver';
+import { vi } from 'vitest';
 import { environment } from 'src/environments/environment';
 import { IAnlass } from '../../model/IAnlass';
 import { KategorieEnum } from '../../model/KategorieEnum';
 import { AnlassService, type CreateAnlass } from './anlass.service';
+
+vi.mock('file-saver', () => ({ saveAs: vi.fn() }));
 
 describe('AnlassService slot contract', () => {
   let service: AnlassService;
@@ -28,12 +32,87 @@ describe('AnlassService slot contract', () => {
 
   afterEach(() => http.verify());
 
+  it('downloads the Startliste as Word document using the UTF-8 file name from the server', () => {
+    const saveAs = vi.mocked(FileSaver.saveAs);
+    service.getStartlisteDocx({ id: 'anlass-id' } as IAnlass);
+
+    const request = http.expectOne(`${environment.apiHost}/admin/anlaesse/anlass-id/startliste`);
+    expect(request.request.method).toBe('GET');
+    expect(request.request.responseType).toBe('blob');
+    request.flush(new Blob(['docx']), {
+      headers: { 'Content-Disposition': "attachment; filename*=UTF-8''Startliste_Fr%C3%BChling.docx" },
+    });
+
+    expect(saveAs).toHaveBeenCalledWith(expect.any(Blob), 'Startliste_Frühling.docx');
+    expect((saveAs.mock.calls[0][0] as Blob).type).toBe(
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    );
+  });
+
+  it('deletes the selected event with a single DELETE request', () => {
+    let completed = false;
+    service.deleteAnlass('existing-id').subscribe(() => {
+      completed = true;
+    });
+    const request = http.expectOne(`${environment.apiHost}/admin/anlaesse/existing-id`);
+    expect(request.request.method).toBe('DELETE');
+    request.flush(null, { status: 204, statusText: 'No Content' });
+    expect(completed).toBe(true);
+  });
+
+  it('propagates a blocked deletion without retrying', () => {
+    let failure: unknown;
+    service.deleteAnlass('existing-id').subscribe({
+      error: (error) => {
+        failure = error;
+      },
+    });
+    http.expectOne(`${environment.apiHost}/admin/anlaesse/existing-id`).flush(null, {
+      status: 409,
+      statusText: 'Conflict',
+    });
+    expect(failure).toBeDefined();
+    http.expectNone(`${environment.apiHost}/admin/anlaesse/existing-id`);
+  });
+
+  it('updates the existing event and maps the returned slot dates', () => {
+    let updated: IAnlass | undefined;
+    service.updateAnlass(new IAnlass({ id: 'existing-id' })).subscribe((event) => {
+      updated = event;
+    });
+    const request = http.expectOne(`${environment.apiHost}/admin/anlaesse/existing-id`);
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body.id).toBe('existing-id');
+    request.flush({ id: 'existing-id', wertungsrichterSlots: [slot] });
+    expect(updated).toBeInstanceOf(IAnlass);
+    expect(updated?.wertungsrichterSlots?.[0].id).toBe(slot.id);
+    expect(updated?.wertungsrichterSlots?.[0].startzeit).toEqual(new Date(2027, 2, 1, 8));
+  });
+
+  it('propagates update failures without retrying the save', () => {
+    let failure: unknown;
+    service.updateAnlass(new IAnlass({ id: 'existing-id' })).subscribe({
+      error: (error) => {
+        failure = error;
+      },
+    });
+    http.expectOne(`${environment.apiHost}/admin/anlaesse/existing-id`).flush('Save failed', {
+      status: 500,
+      statusText: 'Internal Server Error',
+    });
+    expect(failure).toBeDefined();
+    http.expectNone(`${environment.apiHost}/admin/anlaesse/existing-id`);
+  });
+
   it('posts new slots without IDs and maps the saved slots into IWertungsrichterSlot dates', () => {
     const input: CreateAnlass = {
       anlassBezeichnung: 'Testanlass',
       ort: 'Zürich',
       halle: 'Turnhalle',
       organisatorId: 'verein-id',
+      iban: 'CH93 0076 2011 6238 5295 7',
+      smQuali: true,
+      ausserkantonal: true,
       tiTu: 'Alle',
       tiefsteKategorie: KategorieEnum.K1,
       hoechsteKategorie: KategorieEnum.K7,
@@ -61,6 +140,9 @@ describe('AnlassService slot contract', () => {
     });
     const request = http.expectOne(`${environment.apiHost}/admin/anlaesse`);
     expect(request.request.method).toBe('POST');
+    expect(request.request.body.iban).toBe(input.iban);
+    expect(request.request.body.smQuali).toBe(true);
+    expect(request.request.body.ausserkantonal).toBe(true);
     expect(request.request.body.wertungsrichterSlots).toEqual(input.wertungsrichterSlots);
     expect(request.request.body.wertungsrichterSlots[0].id).toBeUndefined();
     request.flush({ id: 'anlass-id', wertungsrichterSlots: [slot] });

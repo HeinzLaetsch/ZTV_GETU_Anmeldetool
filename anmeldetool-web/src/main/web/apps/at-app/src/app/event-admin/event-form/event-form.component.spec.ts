@@ -2,9 +2,10 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { type Signal, signal } from '@angular/core';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatAutocompleteHarness } from '@angular/material/autocomplete/testing';
+import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
 import { MatDatepickerInputHarness } from '@angular/material/datepicker/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
-import { provideRouter, Router } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { of, Subject, throwError } from 'rxjs';
 import { vi } from 'vitest';
@@ -12,12 +13,15 @@ import { IAnlass } from '../../core/model/IAnlass';
 import { AnlassActions } from '../../core/redux/anlass/anlass.actions';
 import { AnlassService } from '../../core/service/anlass/anlass.service';
 import { AuthService } from '../../core/service/auth/auth.service';
-import { CreateEventComponent } from './create-event.component';
+import { EventFormComponent } from './event-form.component';
 
-describe('CreateEventComponent', () => {
-  let fixture: ComponentFixture<CreateEventComponent>;
+describe('EventFormComponent', () => {
+  let fixture: ComponentFixture<EventFormComponent>;
   let root: HTMLElement;
   const createAnlass = vi.fn();
+  const updateAnlass = vi.fn();
+  const getAnlaesse = vi.fn();
+  const route = { snapshot: { paramMap: convertToParamMap({}) } };
   const dispatch = vi.fn();
   const verein = { id: 'verein-id', name: 'Testverein', verbandId: 'verband-id' };
   const winterthur = { ...verein, id: 'winterthur-id', name: 'TV Winterthur' };
@@ -25,12 +29,16 @@ describe('CreateEventComponent', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    route.snapshot.paramMap = convertToParamMap({});
     createAnlass.mockReturnValue(of(new IAnlass({ id: 'new-id' })));
+    updateAnlass.mockReturnValue(of(new IAnlass({ id: 'existing-id' })));
+    getAnlaesse.mockReturnValue(of([]));
     await TestBed.configureTestingModule({
-      imports: [CreateEventComponent],
+      imports: [EventFormComponent],
       providers: [
         provideRouter([]),
-        { provide: AnlassService, useValue: { createAnlass } },
+        { provide: ActivatedRoute, useValue: route },
+        { provide: AnlassService, useValue: { createAnlass, updateAnlass, getAnlaesse } },
         { provide: AuthService, useValue: { currentVerein: verein } },
         {
           provide: Store,
@@ -39,7 +47,7 @@ describe('CreateEventComponent', () => {
       ],
     }).compileComponents();
     vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
-    fixture = TestBed.createComponent(CreateEventComponent);
+    fixture = TestBed.createComponent(EventFormComponent);
     root = fixture.nativeElement;
     fixture.detectChanges();
     await fixture.whenStable();
@@ -175,6 +183,92 @@ describe('CreateEventComponent', () => {
     expect(root.querySelector<HTMLInputElement>('[name="organisatorSearch"]')?.value).toBe('Testverein');
   });
 
+  it('loads an existing event and updates it without losing slot IDs or other settings', async () => {
+    const event = new IAnlass({
+      id: 'existing-id',
+      anlassBezeichnung: 'Existing event',
+      ort: 'Zürich',
+      halle: 'Turnhalle',
+      organisatorId: winterthur.id,
+      iban: 'CH93 0076 2011 6238 5295 7',
+      smQuali: true,
+      ausserkantonal: true,
+      bank: 'Existing bank',
+      zuGunsten: 'Existing recipient',
+      published: true,
+      aktiv: true,
+      toolSperren: true,
+      tiefsteKategorie: 'K1' as IAnlass['tiefsteKategorie'],
+      hoechsteKategorie: 'K7' as IAnlass['hoechsteKategorie'],
+      tiTu: 'Alle' as IAnlass['tiTu'],
+      startDatum: new Date(2027, 2, 1),
+      endDatum: new Date(2027, 2, 2),
+      anmeldungBeginn: new Date(2027, 0, 1),
+      erfassenGeschlossen: new Date(2027, 1, 1),
+      crossKategorieAenderungenGeschlossen: new Date(2027, 1, 1),
+      aenderungenInKategorieGeschlossen: new Date(2027, 1, 4),
+      aenderungenNichtMehrErlaubt: new Date(2027, 1, 4),
+      wertungsrichterSlots: [
+        {
+          id: 'existing-slot-id',
+          reihenfolge: 1,
+          brevet: 1,
+          tag: new Date(2027, 2, 1),
+          startzeit: new Date(2027, 2, 1, 8),
+          endzeit: new Date(2027, 2, 1, 12),
+          beschreibung: 'Existing slot',
+        },
+      ],
+    });
+    fixture.destroy();
+    route.snapshot.paramMap = convertToParamMap({ id: event.id });
+    getAnlaesse.mockReturnValue(of([event]));
+    fixture = TestBed.createComponent(EventFormComponent);
+    root = fixture.nativeElement;
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(root.querySelector('h1')?.textContent).toContain('Anlass bearbeiten');
+    expect(root.querySelector<HTMLInputElement>('[name="organisatorSearch"]')?.value).toBe(winterthur.name);
+    fillInput('anlassBezeichnung', ' Updated event ');
+    submit();
+    expect(createAnlass).not.toHaveBeenCalled();
+    expect(updateAnlass).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: event.id,
+        anlassBezeichnung: 'Updated event',
+        bank: event.bank,
+        zuGunsten: event.zuGunsten,
+        published: true,
+        aktiv: true,
+        toolSperren: true,
+        smQuali: true,
+        ausserkantonal: true,
+        wertungsrichterSlots: [expect.objectContaining({ id: 'existing-slot-id', start_zeit: '08:00:00' })],
+      }),
+    );
+    expect(TestBed.inject(Router).navigate).toHaveBeenCalledWith(['/admin', event.id, 'admin']);
+  });
+
+  it('saves an empty IBAN and unchecked event flags by default', () => {
+    fillValidForm();
+    submit();
+    expect(createAnlass).toHaveBeenCalledWith(
+      expect.objectContaining({ iban: '', smQuali: false, ausserkantonal: false }),
+    );
+  });
+
+  it('saves the entered IBAN and selected event flags', async () => {
+    fillValidForm();
+    fillInput('iban', ' CH93 0076 2011 6238 5295 7 ');
+    const loader = TestbedHarnessEnvironment.loader(fixture);
+    await (await loader.getHarness(MatCheckboxHarness.with({ label: 'SM-Qualifikation' }))).check();
+    await (await loader.getHarness(MatCheckboxHarness.with({ label: 'Ausserkantonal' }))).check();
+    submit();
+    expect(createAnlass).toHaveBeenCalledWith(
+      expect.objectContaining({ iban: 'CH93 0076 2011 6238 5295 7', smQuali: true, ausserkantonal: true }),
+    );
+  });
+
   it('filters organizer options on each input, ignoring case and surrounding whitespace', async () => {
     const search = await TestbedHarnessEnvironment.loader(fixture).getHarness(MatAutocompleteHarness);
     await search.focus();
@@ -236,7 +330,23 @@ describe('CreateEventComponent', () => {
   });
 
   it('does not save incomplete required fields', () => {
+    const logError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     submit();
+    expect(logError).toHaveBeenCalledWith(
+      'Ungültiges Anlassformular',
+      expect.objectContaining({
+        fields: expect.arrayContaining([
+          { field: 'anlassBezeichnung', errors: expect.objectContaining({ required: true }) },
+        ]),
+        slots: expect.arrayContaining([
+          expect.objectContaining({
+            index: 0,
+            fields: expect.arrayContaining([{ field: 'tag', errors: expect.objectContaining({ required: true }) }]),
+          }),
+        ]),
+      }),
+    );
+    logError.mockRestore();
     expect(createAnlass).not.toHaveBeenCalled();
     expect(root.textContent).toContain('Bitte ausfüllen.');
   });

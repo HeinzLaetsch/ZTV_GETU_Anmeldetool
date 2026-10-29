@@ -23,11 +23,16 @@ import { IOrganisationTeilnahmenStatistik } from '../../model/IOrganisationTeiln
 import { ServiceHelper } from 'src/app/utils/service-helper';
 import type { CreateWertungsrichterSlot, WertungsrichterSlotResponse } from '../../model/IWertungsrichterSlot';
 
+const STARTLISTE_MIME_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
 export type CreateAnlass = {
   anlassBezeichnung: string;
   ort: string;
   halle: string;
   organisatorId: string;
+  iban: string;
+  smQuali: boolean;
+  ausserkantonal: boolean;
   tiTu: 'Ti' | 'Tu' | 'Alle';
   tiefsteKategorie: KategorieEnum;
   hoechsteKategorie: KategorieEnum;
@@ -40,6 +45,8 @@ export type CreateAnlass = {
   aenderungenNichtMehrErlaubt: string;
   wertungsrichterSlots: CreateWertungsrichterSlot[];
 };
+
+export type UpdateAnlass = Omit<Partial<IAnlass>, keyof CreateAnlass> & CreateAnlass & { id: string };
 
 type AnlassResponse = Omit<Partial<IAnlass>, 'wertungsrichterSlots'> & {
   wertungsrichterSlots?: WertungsrichterSlotResponse[];
@@ -315,13 +322,13 @@ export class AnlassService extends ServiceHelper {
     );
   }
 
-  updateAnlass(anlass: IAnlass): Observable<IAnlass> {
+  updateAnlass(anlass: IAnlass | UpdateAnlass): Observable<IAnlass> {
     const combinedUrl = this.url + '/' + anlass.id;
-    return this.http.put<IAnlass>(combinedUrl, anlass).pipe(
-      catchError((err, caught) => {
-        return this.handleError('updateAnlass', err, caught);
-      }),
-    );
+    return this.http.put<AnlassResponse>(combinedUrl, anlass).pipe(map((updated) => this.toAnlass(updated)));
+  }
+
+  deleteAnlass(anlassId: string): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${anlassId}`);
   }
 
   createAnlass(anlass: CreateAnlass): Observable<IAnlass> {
@@ -555,6 +562,21 @@ export class AnlassService extends ServiceHelper {
     });
   }
 
+  getStartlisteDocx(anlass: IAnlass): void {
+    const combinedUrl = `${this.url}/${anlass.id}/startliste`;
+    this.http
+      .get(combinedUrl, { observe: 'response', responseType: 'blob' })
+      .pipe(
+        catchError((err, caught) => {
+          return this.handleError('getStartlisteDocx', err, caught);
+        }),
+      )
+      .subscribe((result: HttpResponse<Blob>) => {
+        const fileName = this.extractFileName(result.headers.get('Content-Disposition'), 'startliste.docx');
+        this.saveAsFile(result.body ?? new Blob(), fileName, STARTLISTE_MIME_TYPE);
+      });
+  }
+
   getAnmeldeKontrolleCsv(anlass: IAnlass): void {
     const combinedUrl = this.url + '/' + anlass.id;
     this.http
@@ -628,6 +650,10 @@ export class AnlassService extends ServiceHelper {
   private extractFileName(header: string | null, fallback: string): string {
     if (!header) {
       return fallback;
+    }
+    const encoded = /filename\*=UTF-8''([^;]+)/i.exec(header);
+    if (encoded) {
+      return decodeURIComponent(encoded[1]);
     }
     const parts = header.split('filename=');
     return (parts[1] ?? fallback).replace('%', '');

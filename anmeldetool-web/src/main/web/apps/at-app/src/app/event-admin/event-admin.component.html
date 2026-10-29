@@ -3,6 +3,17 @@
     <div class="layout-row">
       <div class="layout-col-7">
         <h1>{{ anlass.getCleaned() + ' ' + anlass.ort }}</h1>
+        <a mat-stroked-button [routerLink]="['/admin', anlass.id, 'bearbeiten']">
+          <mat-icon aria-hidden="true">edit</mat-icon>
+          Anlass bearbeiten
+        </a>
+        <button mat-stroked-button type="button" [disabled]="isDeleting()" (click)="onDeleteAnlass()">
+          <mat-icon aria-hidden="true">delete</mat-icon>
+          Anlass löschen
+        </button>
+        @if (deleteError()) {
+          <p role="alert">{{ deleteError() }}</p>
+        }
       </div>
       <div class="layout-col-sm-1">
         <h1>{{ anlass.tiTu }}</h1>
@@ -172,6 +183,25 @@
         </div>
 
         <div class="layout-row">
+          <div class="layout-col-3">
+            <h2>Startliste (Word)</h2>
+          </div>
+          <div class="layout-col-sm-2">
+            <button
+              mat-button
+              color="primary"
+              #tooltip="matTooltip"
+              matTooltip="Startliste mit Vereinen pro Abteilung als Word-Dokument exportieren"
+              matTooltipPosition="below"
+              matTooltipHideDelay="500"
+              (click)="exportStartliste()"
+            >
+              Exportieren
+            </button>
+          </div>
+        </div>
+
+        <div class="layout-row">
           <div class="layout-col-2">
             <h2>Lauflisten</h2>
           </div>
@@ -297,5 +327,18 @@
   </mat-tab-group>
 </div>
 <ng-template #elseBlock><h1>Zugriff verweigert</h1></ng-template>
+<ng-template #deleteDialog>
+  <h2 mat-dialog-title>Anlass löschen?</h2>
+  <mat-dialog-content>
+    <p>Der Anlass „{{ anlass.anlassBezeichnung }}“ und alle dazugehörigen Slots werden unwiderruflich gelöscht.</p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" [mat-dialog-close]="false" cdkFocusInitial>Abbrechen</button>
+    <button mat-flat-button type="button" [mat-dialog-close]="true">
+      <mat-icon aria-hidden="true">delete</mat-icon>
+      Endgültig löschen
+    </button>
+  </mat-dialog-actions>
+</ng-template>
 
 <ng-template #loading>Loading...</ng-template>

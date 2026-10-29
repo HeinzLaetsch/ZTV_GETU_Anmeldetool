@@ -26,7 +26,6 @@ import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import com.opencsv.bean.HeaderColumnNameMappingStrategyBuilder;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
-import com.opencsv.bean.comparator.LiteralComparator;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import java.io.IOException;
@@ -203,7 +202,7 @@ public class RanglistenOutput {
     HeaderColumnNameMappingStrategy<RanglistenEntryDTO> strategy = new HeaderColumnNameMappingStrategyBuilder<RanglistenEntryDTO>()
         .build();
     strategy.setType(RanglistenEntryDTO.class);
-    strategy.setColumnOrderOnWrite(new LiteralComparator(RanglistenEntryDTO.FIELDS_ORDER));
+    strategy.setColumnOrderOnWrite(CsvColumnOrder.of(RanglistenEntryDTO.FIELDS_ORDER));
 
     StatefulBeanToCsv<RanglistenEntryDTO> writer = new StatefulBeanToCsvBuilder<RanglistenEntryDTO>(
         responseWriter)

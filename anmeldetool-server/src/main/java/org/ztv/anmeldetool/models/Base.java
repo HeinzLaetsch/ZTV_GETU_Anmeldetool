@@ -1,12 +1,10 @@
 package org.ztv.anmeldetool.models;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,11 +29,9 @@ public abstract class Base implements Persistable<UUID> {
 	@Builder.Default
 	private boolean deleted = false;
 	@Builder.Default
-	@Temporal(TemporalType.DATE)
-	private Calendar changeDate = Calendar.getInstance();
+	private LocalDate changeDate = LocalDate.now();
 	@Builder.Default
-	@Temporal(TemporalType.DATE)
-	private Calendar deletionDate = null;
+	private LocalDate deletionDate = null;
 
 	public Base(UUID id) {
 		this.id = id;
@@ -46,7 +42,7 @@ public abstract class Base implements Persistable<UUID> {
 		this.aktiv = aktiv;
 	}
 
-	public Base(Boolean aktiv, Calendar changeDate) {
+	public Base(Boolean aktiv, LocalDate changeDate) {
 		this.aktiv = aktiv;
 		this.changeDate = changeDate;
 	}

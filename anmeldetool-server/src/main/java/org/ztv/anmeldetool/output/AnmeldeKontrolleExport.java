@@ -23,7 +23,6 @@ import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import com.opencsv.bean.HeaderColumnNameMappingStrategyBuilder;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
-import com.opencsv.bean.comparator.LiteralComparator;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
@@ -42,7 +41,7 @@ public class AnmeldeKontrolleExport {
 		HeaderColumnNameMappingStrategy<VereinsStartDTO> strategy = new HeaderColumnNameMappingStrategyBuilder<VereinsStartDTO>()
 				.build();
 		strategy.setType(VereinsStartDTO.class);
-		strategy.setColumnOrderOnWrite(new LiteralComparator(VereinsStartDTO.FIELDS_ORDER));
+		strategy.setColumnOrderOnWrite(CsvColumnOrder.of(VereinsStartDTO.FIELDS_ORDER));
 
 		StatefulBeanToCsv<VereinsStartDTO> writer = new StatefulBeanToCsvBuilder<VereinsStartDTO>(responseWriter)
 				.withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(';')

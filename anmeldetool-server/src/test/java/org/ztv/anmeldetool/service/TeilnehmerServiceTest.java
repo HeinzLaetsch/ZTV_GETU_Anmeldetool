@@ -147,7 +147,7 @@ class TeilnehmerServiceTest {
             when(organisationSrv.findById(orgId)).thenReturn(null);
             TeilnehmerDTO input = TeilnehmerDTO.builder().name("X").vorname("Y").organisationid(orgId).build();
             ResponseEntity<TeilnehmerDTO> res = service.create(orgId, input);
-            assertEquals(404, res.getStatusCodeValue());
+            assertEquals(404, res.getStatusCode().value());
         }
 
         @Test
@@ -165,7 +165,7 @@ class TeilnehmerServiceTest {
             });
 
             ResponseEntity<TeilnehmerDTO> res = service.create(org.getId(), raw);
-            assertEquals(200, res.getStatusCodeValue());
+            assertEquals(200, res.getStatusCode().value());
             TeilnehmerDTO body = res.getBody();
             assertNotNull(body);
             assertEquals(org.getId(), body.getOrganisationid());

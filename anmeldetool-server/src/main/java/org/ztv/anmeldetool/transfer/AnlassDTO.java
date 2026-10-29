@@ -8,10 +8,16 @@ import org.ztv.anmeldetool.models.KategorieEnum;
 import org.ztv.anmeldetool.models.TiTuEnum;
 
 import lombok.Builder;
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Value
+@Getter
+@Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AnlassDTO {
 
 	UUID id;

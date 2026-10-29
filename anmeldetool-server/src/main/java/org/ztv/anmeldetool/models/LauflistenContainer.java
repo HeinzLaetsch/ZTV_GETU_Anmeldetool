@@ -1,7 +1,7 @@
 package org.ztv.anmeldetool.models;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -109,7 +109,7 @@ public class LauflistenContainer extends Base {
 					laufliste.setGeraet(value);
 					laufliste.setId(UUID.randomUUID());
 					laufliste.setLauflistenContainer(this);
-					laufliste.setChangeDate(Calendar.getInstance());
+					laufliste.setChangeDate(LocalDate.now());
 					laufliste.setKey(getKey(lauflistenRepo));
 					geraeteLauflisten.add(laufliste);
 				}

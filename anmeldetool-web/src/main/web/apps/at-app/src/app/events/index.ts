@@ -1,4 +1,3 @@
-export * from './create-event/index';
 export * from './dates/events-dates.component';
 export * from './event-list/index';
 export * from './event-register-summary/index';

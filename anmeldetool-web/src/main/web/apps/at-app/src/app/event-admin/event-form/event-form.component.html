@@ -1,4 +1,8 @@
-<h1>Neuen Anlass erstellen</h1>
+<h1>{{ isEditing ? 'Anlass bearbeiten' : 'Neuen Anlass erstellen' }}</h1>
+
+@if (isLoading()) {
+  <p role="status">Anlass wird geladen...</p>
+}
 
 <form [formGroup]="form" (ngSubmit)="onSave()" [attr.aria-busy]="isSaving()">
   <fieldset [disabled]="isSaving()">
@@ -39,7 +43,13 @@
         </mat-autocomplete>
         <mat-error>Bitte einen Organisator auswählen.</mat-error>
       </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>IBAN</mat-label>
+        <input matInput name="iban" formControlName="iban" />
+      </mat-form-field>
     </div>
+    <mat-checkbox formControlName="smQuali">SM-Qualifikation</mat-checkbox>
+    <mat-checkbox formControlName="ausserkantonal">Ausserkantonal</mat-checkbox>
     <div class="event-fields event-category-fields">
       <mat-form-field appearance="outline">
         <mat-label>Ti/Tu</mat-label>
@@ -124,7 +134,7 @@
               [matDatepicker]="slotPicker"
               [min]="form.controls.startDatum.value"
               [max]="form.controls.endDatum.value"
-              required
+              [required]="!slot.controls.egalSlot.value"
             />
             <mat-datepicker-toggle matIconSuffix [for]="slotPicker" [aria-label]="'Slot-Tag auswählen'" />
             <mat-datepicker #slotPicker />
@@ -160,10 +170,10 @@
     <p role="alert">{{ errorMessage() }}</p>
   }
   <div class="event-actions">
-    <a mat-button routerLink="/anlaesse" [disabled]="isSaving()">Abbrechen</a>
-    <button mat-flat-button type="submit" [disabled]="isSaving()">
+    <a mat-button [routerLink]="returnLink" [disabled]="isSaving()">Abbrechen</a>
+    <button mat-flat-button type="submit" [disabled]="isSaving() || isLoading()">
       <mat-icon aria-hidden="true">save</mat-icon>
-      {{ isSaving() ? 'Wird gespeichert...' : 'Anlass erstellen' }}
+      {{ isSaving() ? 'Wird gespeichert...' : isEditing ? 'Änderungen speichern' : 'Anlass erstellen' }}
     </button>
   </div>
 </form>

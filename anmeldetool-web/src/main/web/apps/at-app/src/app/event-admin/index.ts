@@ -1,3 +1,4 @@
+export * from './event-form/index';
 export * from './event-admin.component';
 export * from './upload-dialog/upload.component';
 export * from './contest-upload-dialog/contest-upload.component';
