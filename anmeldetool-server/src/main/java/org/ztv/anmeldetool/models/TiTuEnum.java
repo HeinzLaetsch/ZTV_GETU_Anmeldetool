@@ -3,7 +3,7 @@ package org.ztv.anmeldetool.models;
 public enum TiTuEnum {
 	Ti("Turnerin"), Tu("Turner"), Alle("Gemeinsamer Wettkampf");
 
-	private String beschreibung;
+	private final String beschreibung;
 
 	TiTuEnum(String beschreibung) {
 		this.beschreibung = beschreibung;

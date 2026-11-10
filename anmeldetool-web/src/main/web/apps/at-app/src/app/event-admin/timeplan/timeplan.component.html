@@ -1,0 +1,82 @@
+@if (loading()) {
+  <p>Loading...</p>
+} @else {
+  <p class="timeplan-hint">
+    Gruppen von ca. 9 Teilnehmenden, pro Anlage und Abteilung höchstens eine Gruppe pro Gerät. Es werden keine
+    Teilnehmenden zugeteilt.
+  </p>
+  @if (vorschlaege().length === 0) {
+    <p>Keine Teilnehmenden vorhanden.</p>
+  } @else {
+    <table class="timeplan-table">
+      <thead>
+        <tr>
+          <th>Kategorie</th>
+          <th>Turnerinnen/Turner</th>
+          <th>Geräte</th>
+          <th>Max. Anlagen</th>
+          <th>Max. Abteilungen</th>
+          <th class="number">Teilnehmende</th>
+          <th class="number">Gruppen</th>
+          <th class="number">Gruppengrösse</th>
+          <th class="number">Anlagen</th>
+          <th class="number">Abteilungen</th>
+          <th class="number">Gruppen pro Anlage</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (vorschlag of vorschlaege(); track vorschlag.kategorie + vorschlag.tiTu) {
+          <tr>
+            <td>{{ vorschlag.kategorie }}</td>
+            <td>{{ tiTuLabel(vorschlag.tiTu) }}</td>
+            <td>{{ geraeteLabel(vorschlag.geraete) }}</td>
+            <td>
+              <input
+                type="number"
+                min="1"
+                [max]="maxAnlagen"
+                [attr.aria-label]="'Max. Anlagen ' + vorschlag.kategorie + ' ' + tiTuLabel(vorschlag.tiTu)"
+                [ngModel]="vorschlag.maxAnlagen"
+                (ngModelChange)="updateMaxAnlagen(vorschlag, $event)"
+              />
+            </td>
+            <td>
+              <input
+                type="number"
+                min="1"
+                [max]="maxAbteilungen"
+                [attr.aria-label]="'Max. Abteilungen ' + vorschlag.kategorie + ' ' + tiTuLabel(vorschlag.tiTu)"
+                [ngModel]="vorschlag.maxAbteilungen"
+                (ngModelChange)="updateMaxAbteilungen(vorschlag, $event)"
+              />
+            </td>
+            <td class="number">
+              {{ vorschlag.anzahlTeilnehmer }}
+              @if (isVeraltet(vorschlag)) {
+                <span class="veraltet" title="Teilnehmerzahl hat sich geändert, bitte neu berechnen">
+                  (aktuell {{ vorschlag.aktuelleTeilnehmer }})
+                </span>
+              }
+            </td>
+            <td class="number">{{ vorschlag.anzahlGruppen }}</td>
+            <td class="number">{{ gruppenGroesse(vorschlag) }}</td>
+            <td class="number result">{{ vorschlag.anzahlAnlagen }}</td>
+            <td class="number result">{{ vorschlag.anzahlAbteilungen }}</td>
+            <td class="number">{{ vorschlag.gruppenProAnlage }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (!isValid()) {
+      <p role="alert">
+        Max. Anlagen muss zwischen 1 und {{ maxAnlagen }}, max. Abteilungen zwischen 1 und {{ maxAbteilungen }} liegen.
+      </p>
+    }
+    <button mat-raised-button color="primary" type="button" [disabled]="saving() || !isValid()" (click)="berechnen()">
+      Berechnen und speichern
+    </button>
+  }
+  @if (error()) {
+    <p role="alert">{{ error() }}</p>
+  }
+}

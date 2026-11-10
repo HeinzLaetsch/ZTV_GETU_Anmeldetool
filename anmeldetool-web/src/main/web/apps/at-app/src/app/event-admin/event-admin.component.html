@@ -324,6 +324,16 @@
         </div>
       </div>
     </mat-tab>
+    <mat-tab label="Timeplan">
+      <ng-template matTabContent>
+        <div class="layout-row">
+          <div class="layout-col-sm-12">
+            <h2>Timeplan-Vorschlag</h2>
+            <ztv-timeplan [anlass]="anlass"></ztv-timeplan>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
   </mat-tab-group>
 </div>
 <ng-template #elseBlock><h1>Zugriff verweigert</h1></ng-template>

@@ -54,10 +54,12 @@ import org.ztv.anmeldetool.service.OrganisationAnlassLinkService;
 import org.ztv.anmeldetool.service.OrganisationService;
 import org.ztv.anmeldetool.service.PersonAnlassLinkService;
 import org.ztv.anmeldetool.service.PersonService;
+import org.ztv.anmeldetool.service.ServiceException;
 import org.ztv.anmeldetool.service.StartlisteService;
 import org.ztv.anmeldetool.service.StvContestService;
 import org.ztv.anmeldetool.service.TeilnehmerAnlassLinkService;
 import org.ztv.anmeldetool.service.TeilnehmerService;
+import org.ztv.anmeldetool.service.TimeplanService;
 import org.ztv.anmeldetool.service.WertungsrichterEinsatzService;
 import org.ztv.anmeldetool.service.WertungsrichterService;
 import org.ztv.anmeldetool.transfer.AnlassDTO;
@@ -70,6 +72,8 @@ import org.ztv.anmeldetool.transfer.PersonAnlassLinkCsvDTO;
 import org.ztv.anmeldetool.transfer.PersonAnlassLinkDTO;
 import org.ztv.anmeldetool.transfer.PersonDTO;
 import org.ztv.anmeldetool.transfer.StartlisteDTO;
+import org.ztv.anmeldetool.transfer.TimeplanInputDTO;
+import org.ztv.anmeldetool.transfer.TimeplanVorschlagDTO;
 import org.ztv.anmeldetool.transfer.TeilnahmeStatisticDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkCsvDTO;
 import org.ztv.anmeldetool.transfer.TeilnehmerAnlassLinkDTO;
@@ -96,6 +100,7 @@ public class AnlassAdminController {
   private final PersonAnlassLinkService personAnlassLinkSrv;
   private final PersonService personSrv;
   private final StartlisteService startlisteSrv;
+  private final TimeplanService timeplanSrv;
 
   @GetMapping
   public ResponseEntity<List<AnlassDTO>> getAnlaesse(
@@ -154,6 +159,17 @@ public class AnlassAdminController {
     response.addHeader(HttpHeaders.CONTENT_TYPE, "text/csv");
     response.addHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
     BenutzerExport.csvWriteToWriter(benutzerList, response);
+  }
+
+  @GetMapping("/{anlassId}/timeplan")
+  public ResponseEntity<List<TimeplanVorschlagDTO>> getTimeplan(@PathVariable UUID anlassId) {
+    return ResponseEntity.ok(timeplanSrv.getVorschlaege(anlassId));
+  }
+
+  @PutMapping("/{anlassId}/timeplan")
+  public ResponseEntity<List<TimeplanVorschlagDTO>> putTimeplan(@PathVariable UUID anlassId,
+      @RequestBody List<TimeplanInputDTO> inputs) throws ServiceException {
+    return ResponseEntity.ok(timeplanSrv.speichereVorschlaege(anlassId, inputs));
   }
 
   private static final String DOCX_MIME_TYPE =
