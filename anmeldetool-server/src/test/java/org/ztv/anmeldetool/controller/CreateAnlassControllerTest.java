@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import java.util.List;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -21,6 +22,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 import org.ztv.anmeldetool.transfer.StartlisteDTO;
+import org.ztv.anmeldetool.transfer.TimeplanInputDTO;
+import org.ztv.anmeldetool.models.KategorieEnum;
+import org.ztv.anmeldetool.models.TiTuEnum;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -42,6 +46,7 @@ import org.ztv.anmeldetool.service.StartlisteService;
 import org.ztv.anmeldetool.service.StvContestService;
 import org.ztv.anmeldetool.service.TeilnehmerAnlassLinkService;
 import org.ztv.anmeldetool.service.TeilnehmerService;
+import org.ztv.anmeldetool.service.TimeplanService;
 import org.ztv.anmeldetool.service.WertungsrichterEinsatzService;
 import org.ztv.anmeldetool.service.WertungsrichterService;
 import org.ztv.anmeldetool.security.JwtUtil;
@@ -51,7 +56,7 @@ import org.ztv.anmeldetool.models.Anlass;
 
 @WebMvcTest(AnlassAdminController.class)
 @Import(ZTVSecurityConfig.class)
-@MockitoBean(types = { AnlassService.class, StartlisteService.class, OrganisationService.class, AnlassSummaryService.class,
+@MockitoBean(types = { AnlassService.class, StartlisteService.class, TimeplanService.class, OrganisationService.class, AnlassSummaryService.class,
         AnmeldekontrolService.class, TeilnehmerAnlassLinkService.class, TeilnehmerService.class,
         StvContestService.class, WertungsrichterService.class, WertungsrichterEinsatzService.class,
         OrganisationAnlassLinkService.class, PersonAnlassLinkService.class, PersonService.class,
@@ -63,6 +68,28 @@ class CreateAnlassControllerTest {
     private AnlassService service;
     @Autowired
     private StartlisteService startlisteService;
+    @Autowired
+    private TimeplanService timeplanService;
+
+    @Test
+    void sekretariatCanSaveTimeplan() throws Exception {
+        UUID id = UUID.randomUUID();
+        mvc.perform(put("/admin/anlaesse/{id}/timeplan", id)
+                .with(user("sekretariat").authorities(() -> "SEKRETARIAT"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[{\"kategorie\":\"K1\",\"tiTu\":\"Ti\",\"maxAnlagen\":2,\"maxAbteilungen\":3}]"))
+                .andExpect(status().isOk());
+        verify(timeplanService).speichereVorschlaege(id,
+                List.of(new TimeplanInputDTO(KategorieEnum.K1, TiTuEnum.Ti, 2, 3)));
+    }
+
+    @Test
+    void anmelderCannotReadTimeplan() throws Exception {
+        mvc.perform(get("/admin/anlaesse/{id}/timeplan", UUID.randomUUID())
+                .with(user("anmelder").authorities(() -> "ANMELDER")))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(timeplanService);
+    }
 
     @Test
     void startlisteIsDownloadedAsWordDocument() throws Exception {

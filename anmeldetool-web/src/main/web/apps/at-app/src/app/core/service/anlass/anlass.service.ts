@@ -22,6 +22,7 @@ import { ITeilnahmen } from '../../model/ITeilnahmen';
 import { IOrganisationTeilnahmenStatistik } from '../../model/IOrganisationTeilnahmenStatistik';
 import { ServiceHelper } from 'src/app/utils/service-helper';
 import type { CreateWertungsrichterSlot, WertungsrichterSlotResponse } from '../../model/IWertungsrichterSlot';
+import type { ITimeplanInput, ITimeplanVorschlag } from '../../model/ITimeplanVorschlag';
 
 const STARTLISTE_MIME_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
@@ -560,6 +561,18 @@ export class AnlassService extends ServiceHelper {
       observe: 'events',
       reportProgress: true,
     });
+  }
+
+  getTimeplan(anlassId: string): Observable<ITimeplanVorschlag[]> {
+    return this.http
+      .get<ITimeplanVorschlag[]>(`${this.url}/${anlassId}/timeplan`)
+      .pipe(catchError((err, caught) => this.handleError('getTimeplan', err, caught, [])));
+  }
+
+  saveTimeplan(anlassId: string, inputs: ITimeplanInput[]): Observable<ITimeplanVorschlag[]> {
+    return this.http
+      .put<ITimeplanVorschlag[]>(`${this.url}/${anlassId}/timeplan`, inputs)
+      .pipe(catchError((err, caught) => this.handleError('saveTimeplan', err, caught)));
   }
 
   getStartlisteDocx(anlass: IAnlass): void {

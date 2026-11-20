@@ -42,6 +42,8 @@ public class ZTVSecurityConfig {
                         .hasAnyAuthority("ADMINISTRATOR", "SEKRETARIAT")
                         .requestMatchers(HttpMethod.DELETE, "/admin/anlaesse/*")
                         .hasAnyAuthority("ADMINISTRATOR", "SEKRETARIAT")
+                        .requestMatchers("/admin/anlaesse/*/timeplan")
+                        .hasAnyAuthority("ADMINISTRATOR", "SEKRETARIAT")
                         .requestMatchers("/admin/health", "/admin/info", "/admin/actuator/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/admin/verbaende", "/admin/anlaesse",
                                 "/admin/organisationen", "/admin/teilnahmen",

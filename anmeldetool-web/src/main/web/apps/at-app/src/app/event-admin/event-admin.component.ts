@@ -32,6 +32,7 @@ import { MaterialModule } from '../shared/material-module';
 import { SubscriptionHelper } from '../utils/subscription-helper';
 import { ContestUpload } from './contest-upload-dialog/contest-upload.component';
 import { EinteilungComponent } from './einteilung/einteilung.component';
+import { TimeplanComponent } from './timeplan/timeplan.component';
 import { Upload } from './upload-dialog/upload.component';
 
 @Component({
@@ -39,7 +40,7 @@ import { Upload } from './upload-dialog/upload.component';
   templateUrl: './event-admin.component.html',
   styleUrls: ['./event-admin.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, MaterialModule, EinteilungComponent, RouterLink],
+  imports: [CommonModule, FormsModule, MaterialModule, EinteilungComponent, TimeplanComponent, RouterLink],
 })
 export class EventAdminComponent extends SubscriptionHelper implements OnInit {
   private readonly router = inject(Router);
